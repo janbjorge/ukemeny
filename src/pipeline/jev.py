@@ -9,6 +9,7 @@ is done here, in code.
 """
 
 import asyncio
+import logging
 import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -21,6 +22,8 @@ from core.errors import ClassifierUnavailableError
 from core.models import Ingredient, Item, Offer
 
 type Question = Noul | Choice | Score
+
+log = logging.getLogger("matris.jev")
 
 # Jev list price per million input tokens; output is free. docs.typesafe.ai/models
 PRICE_PER_MTOK = 0.042
@@ -58,8 +61,16 @@ class Jev:
             finally:
                 self.calls += 1
                 self.seconds += time.monotonic() - started
-            if response.usage is not None:
-                self.tokens += response.usage.input_tokens or 0
+            tokens = (response.usage.input_tokens or 0) if response.usage is not None else 0
+            self.tokens += tokens
+            log.debug(
+                "Jev %s %r: %d questions, %d tokens, %.1f s",
+                name,
+                state.get("ingredient") if isinstance(state, dict) else state,
+                len(questions),
+                tokens,
+                time.monotonic() - started,
+            )
             return response
 
 

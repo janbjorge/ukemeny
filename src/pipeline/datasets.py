@@ -2,15 +2,20 @@
 for every ingredient and offer. Nothing is kept between runs. Run on a laptop, then commit datasets/ and push
 (which deploys).
 
-    uv run python -m pipeline.datasets
+    uv run python -m pipeline.datasets       # a line per step and a count about every tenth
+    uv run python -m pipeline.datasets -v    # also speed, time left, time and Jev cost per step, failures, catalogs
+    uv run python -m pipeline.datasets -vv   # also a line per page, ingredient, offer match and Jev call
+    uv run python -m pipeline.datasets -vvv  # also every HTTP request
 
 Needs TYPESAFE_API_KEY. The site reads only datasets/.
 """
 
 import argparse
 import asyncio
+import logging
 import os
 import sys
+import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 
@@ -51,16 +56,44 @@ STEPS = {
 """What each step of the build says as it starts (app.build.Progress)."""
 
 
-def reporter(steps: Mapping[str, str], echo: Callable[[str], None]) -> build.Progress:
-    """Light output: a line as each step starts, then done/due about every tenth."""
+def reporter(
+    steps: Mapping[str, str], echo: Callable[[str], None], verbose: int = 0, clock: Callable[[], float] = time.monotonic
+) -> build.Progress:
+    """A line as each step starts, then done/due about every tenth; with `verbose`, also the speed, the time left, and
+    how long the step took."""
+    started: dict[str, float] = {}
 
     def report(step: str, done: int, due: int) -> None:
         if done == 0:
+            started[step] = clock()
             echo(steps[step].format(due=f"{due:,}"))
-        elif due > 1 and (done == due or done % max(1, due // 10) == 0):
-            echo(f"  {done:,}/{due:,}")
+            return
+        if due <= 1 or not (done == due or done % max(1, due // 10) == 0):
+            return
+        line = f"  {done:,}/{due:,}"
+        if verbose:
+            seconds = clock() - started[step]
+            per_second = done / seconds if seconds else 0.0
+            if done == due:
+                line += f" in {_duration(seconds)}"
+            elif per_second:
+                line += f" · {per_second:.1f}/s · {_duration((due - done) / per_second)} left"
+        echo(line)
 
     return report
+
+
+def _duration(seconds: float) -> str:
+    minutes, seconds = divmod(round(seconds), 60)
+    return f"{minutes} min {seconds:02d} s" if minutes else f"{seconds} s"
+
+
+def configure(verbose: int) -> None:
+    """Where the build's log lines go: -v info, -vv debug for the build, -vvv debug for every library too."""
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(logging.Formatter("%(asctime)s %(message)s", "%H:%M:%S"))
+    logging.basicConfig(level=logging.DEBUG if verbose >= 3 else logging.WARNING, handlers=[handler], force=True)
+    logging.getLogger("matris").setLevel(logging.WARNING if verbose == 0 else logging.INFO if verbose == 1 else logging.DEBUG)
 
 
 async def run(progress: build.Progress | None = None) -> Result:
@@ -74,14 +107,24 @@ async def run(progress: build.Progress | None = None) -> Result:
         AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
     ):
         jev = Jev(client, max_in_flight=JEV_IN_FLIGHT)
-        snapshot, report = await build.snapshot(recipes, JevIngredientClassifier(jev), offers, JevOfferMatcher(jev), progress)
+
+        def step(name: str, done: int, due: int) -> None:
+            if progress:
+                progress(name, done, due)
+            if done == due and name in ("ingredients", "offers"):
+                logging.getLogger("matris.jev").info("so far: %s", jev.status())
+
+        snapshot, report = await build.snapshot(recipes, JevIngredientClassifier(jev), offers, JevOfferMatcher(jev), step)
     return Result(snapshot, report, datasets.write(snapshot), jev.status())
 
 
 def main() -> None:
-    argparse.ArgumentParser(description="Build datasets/ from scratch: matprat.no, mattilbud.no and Jev.").parse_args()
+    parser = argparse.ArgumentParser(description="Build datasets/ from scratch: matprat.no, mattilbud.no and Jev.")
+    parser.add_argument("-v", "--verbose", action="count", default=0, help="more detail: -v, -vv or -vvv")
+    verbose = parser.parse_args().verbose
+    configure(verbose)
     try:
-        result = asyncio.run(run(reporter(STEPS, lambda line: print(line, file=sys.stderr, flush=True))))
+        result = asyncio.run(run(reporter(STEPS, lambda line: print(line, file=sys.stderr, flush=True), verbose)))
     except SetupError as e:
         sys.exit(f"error: {e}")
     s, r = result.snapshot, result.recipes

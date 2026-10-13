@@ -5,6 +5,7 @@ one location search stops at 1,000 offers. Nothing is kept between runs.
 """
 
 import asyncio
+import logging
 import re
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -20,6 +21,7 @@ from core.models import Offer
 API = "https://squid-api.tjek.com/v2"
 PAGE = 100
 USER_AGENT = "matris/0.1 (+https://matris.app)"
+log = logging.getLogger("matris.tjek")
 
 
 _NUMBER = r"(\d+(?:[ \u00a0]\d{3})*(?:,\d+)?)"
@@ -129,6 +131,8 @@ class TjekOfferSource:
             and c.get("offer_count")
             and datetime.fromisoformat(c["run_from"]) <= now <= datetime.fromisoformat(c["run_till"])
         ]
+        for c in catalogs:
+            log.info("catalog: %s, %s offers, %s to %s", c["dealer"]["name"], c["offer_count"], c["run_from"][:10], c["run_till"][:10])
         pages = await asyncio.gather(*(self._paged("/offers", {"catalog_ids": c["id"]}) for c in catalogs))
         offers = {o.id: o for page in pages for o in map(parse_offer, page)}
         return list(offers.values())

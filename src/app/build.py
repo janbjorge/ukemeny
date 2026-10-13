@@ -7,6 +7,7 @@ the server needs no Jev key and makes no calls to matprat.no or mattilbud.no.
 """
 
 import asyncio
+import logging
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import UTC, datetime
 
@@ -15,6 +16,9 @@ from core.errors import SourceUnavailableError
 from core.matching import candidates, heading_key, obvious, weight
 from core.models import Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
 from core.ports import IngredientClassifier, OfferMatcher, OfferSource, RecipeSource
+
+log = logging.getLogger("matris.build")
+"""-v (info): failures and totals. -vv (debug): what each page, ingredient and offer became."""
 
 MATCH_THRESHOLD = 0.5
 """An offer counts as the ingredient from this probability on."""
@@ -36,11 +40,15 @@ async def recipes(source: RecipeSource, progress: Callable[[int, int], None] | N
         nonlocal done, failed
         try:
             recipe = await source.fetch(ref.url)
-        except SourceUnavailableError:
+        except SourceUnavailableError as e:
             failed += 1
+            log.info("failed: %s (%s)", ref.url, e)
         else:
             if recipe is not None and recipe.is_dinner:
                 dinners.append(recipe)
+                log.debug("dinner: %s (%d ingredients) %s", recipe.name, len(recipe.ingredients), ref.url)
+            else:
+                log.debug("%s: %s", "no recipe" if recipe is None else "not a dinner", ref.url)
         done += 1
         if progress:
             progress(done, len(listed))
@@ -48,6 +56,7 @@ async def recipes(source: RecipeSource, progress: Callable[[int, int], None] | N
     async with asyncio.TaskGroup() as tg:
         for ref in listed:
             tg.create_task(one(ref))
+    log.info("matprat.no: %d dinners from %d pages, %d failed", len(dinners), len(listed), failed)
     return dinners, RefreshReport(listed=len(listed), fetched=done - failed, failed=failed, dinners=len(dinners))
 
 
@@ -67,6 +76,8 @@ async def classify(
     async def one(name: str) -> Traits:
         nonlocal done
         levels = await classifier.classify(wanted[name], classifier.labels)
+        flagged = " ".join(f"{k}={v}" for k, v in levels.items() if k != "model" and v not in ("no", "none", "ok", "low"))
+        log.debug("%s (%s): %s", name, wanted[name].category, flagged or "nothing to note")
         done += 1
         if progress:
             progress(done, len(wanted))
@@ -96,6 +107,7 @@ async def match(
                 scores[pair] = answer
             else:
                 ask.setdefault(name, []).append(o)
+    log.info("offers: %d ingredients with candidates, %d pairs settled without Jev", len(lookups), len(scores))
     done = 0
     if progress:
         progress(done, len(ask))
@@ -103,6 +115,8 @@ async def match(
     async def one(name: str, found: Sequence[Offer]) -> Mapping[str, float]:
         nonlocal done
         ranked = await matcher.rank(name, found)
+        hits = sorted({o.heading for o in found if ranked.get(o.id, 0.0) >= threshold})
+        log.debug("%s: %d of %d offers match %s", name, len(hits), len(found), hits)
         done += 1
         if progress:
             progress(done, len(ask))

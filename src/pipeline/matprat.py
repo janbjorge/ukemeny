@@ -8,6 +8,7 @@ and the dish type matprat reports to analytics ("Middagsrett"). robots.txt allow
 
 import asyncio
 import json
+import logging
 import re
 import xml.etree.ElementTree as ET
 from collections.abc import AsyncGenerator
@@ -28,6 +29,7 @@ RETRY_STATUS = frozenset({429, 500, 502, 503, 504})
 _RECIPE_URL = re.compile(r"^https://www\.matprat\.no/oppskrifter/[^/]+/[^/]+/$")
 _NEXT_DATA = re.compile(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.DOTALL)
 _SITEMAP_NS = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+log = logging.getLogger("matris.matprat")
 
 
 def parse_sitemap(xml: str) -> list[RecipeRef]:
@@ -126,6 +128,7 @@ class MatpratRecipeSource:
             except httpx2.TransportError as e:
                 if attempt == self.tries - 1:
                     raise SourceUnavailableError("matprat.no", str(e)) from e
+                log.info("retry %d: %s (%s)", attempt + 1, url, e)
             else:
                 if response.status_code in (404, 410):
                     raise _GoneError(url)
@@ -135,6 +138,7 @@ class MatpratRecipeSource:
                     return response.text
                 if attempt == self.tries - 1:
                     raise SourceUnavailableError("matprat.no", f"{response.status_code} {url}")
+                log.info("retry %d: %s (%d)", attempt + 1, url, response.status_code)
             await asyncio.sleep(2**attempt)
         raise AssertionError("unreachable")
 

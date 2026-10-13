@@ -1,0 +1,5 @@
+{# The next ideas for "Vis flere" (/middager/flere): cards, then a new button if there are more. #}
+{% from "_dinner.html" import card with context %}
+{% from "_ui.html" import more_button with context %}
+{% for d in found.dinners[start:] %}{{ card(d, found.search, found.via.get(d.dish.url, ())) }}{% endfor %}
+{% if found.total > shown %}{{ more_button(found, shown) }}{% endif %}

@@ -1,0 +1,14 @@
+{# Small pieces the list and "Vis flere" share. Import "with context": they use link(). #}
+{% macro go(text, antall=none) %}{% set qs = link(text, antall) %}href="/{{ '?' ~ qs if qs }}#forslag" hx-get="/middager{{ '?' ~ qs if qs }}"{% endmacro %}
+
+{% macro chip(c) -%}
+{% if c.on or c.count %}<a {{ go(c.text) }}{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}{% if c.on %} aria-current="true"{% endif %}>{{ c.label }}{% if c.count %} <span class="n">{{ c.count|tall }}</span>{% endif %}</a>
+{%- else %}<span class="off"{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}>{{ c.label }}</span>{% endif %}
+{%- endmacro %}
+
+{# The button after the cards, inside the grid: it is replaced by the next cards and a new button. #}
+{% macro more_button(found, shown) -%}
+{% set qs = link(found.search.text) %}
+<p class="more"><a href="/?{{ link(found.search.text, shown + page) }}#forslag" hx-get="/middager/flere?{{ qs ~ '&' if qs }}fra={{ shown }}"
+  hx-target="closest .more" hx-swap="outerHTML" hx-indicator="closest .more">Vis flere <span class="n">{{ (found.total - shown)|tall }} til</span></a></p>
+{%- endmacro %}

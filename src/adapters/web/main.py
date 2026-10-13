@@ -10,15 +10,16 @@ from typing import Annotated
 
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from markupsafe import Markup
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from adapters import profile
 from adapters.datasets import JsonDatasets
 from adapters.web import api, fmt
-from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link
+from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
 from app.queries import Found, Queries
 from core.search import Kind, Tag, marked, protein_clause, protein_word, tag_clause
 
@@ -38,6 +39,10 @@ DIET_CHIPS = (Tag.AS_IS, Tag.GLUTEN_FREE, Tag.ONION_FREE, Tag.LOW_LACTOSE, Tag.G
 EXAMPLES = ("rask kylling uten sopp", "laks eller torsk på tilbud", "barnevennlig vegetar", "suppe under 40 min", "godt likt lam")
 # The elements that send a search as it is typed; their own answer must not replace the search box
 SEARCH_BOX = {"q", "sok"}
+# Ideas per page and per "Vis flere": a phone screen holds one or two cards
+PAGE = 12
+# Pages may be cached this long, and served stale while the cache fetches a new copy (the data changes weekly)
+PAGE_CACHE = "public, max-age=300, stale-while-revalidate=86400"
 
 type Q = Annotated[str | None, Query()]
 
@@ -68,8 +73,17 @@ def chips(found: Found) -> dict[str, list[Chip]]:
         if n := found.counts.proteins.get(p):
             clause = protein_clause(protein_word(p))
             on = chosen is not None and chosen.values == (p,)
-            proteins.append(Chip(protein_word(p), s.toggle(clause).text, on, None if on else n, p))
-    return {"kinds": [tag(t) for t in KIND_CHIPS], "diets": [tag(t) for t in DIET_CHIPS], "proteins": proteins}
+            proteins.append(Chip(protein_word(p).capitalize(), s.toggle(clause).text, on, None if on else n, p))
+
+    def on_first(row: list[Chip]) -> list[Chip]:
+        """Chosen chips lead their row, so a phone, which shows a row as one line to swipe, shows them."""
+        return sorted(row, key=lambda c: not c.on)
+
+    return {
+        "kinds": on_first([tag(t) for t in KIND_CHIPS]),
+        "diets": on_first([tag(t) for t in DIET_CHIPS]),
+        "proteins": on_first(proteins),
+    }
 
 
 class HeadAsGet:
@@ -94,6 +108,10 @@ STATIC_HASHES = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()[:10] for p i
 
 def static_url(name: str) -> str:
     return f"/static/{name}?v={STATIC_HASHES[name]}"
+
+
+# The stylesheet goes inline in every page: about 3 kB gzipped, and no request blocks the first paint
+STYLE = Markup((HERE / "static" / "app.css").read_text())
 
 
 def create_app(queries: Queries) -> FastAPI:
@@ -123,7 +141,7 @@ def create_app(queries: Queries) -> FastAPI:
             # One URL answers a full page or a redirect without HTMX and a fragment with it; a cache must keep them apart
             response.headers["Vary"] = ", ".join(filter(None, (response.headers.get("Vary"), "HX-Request")))
             if "hx-request" not in request.headers:
-                response.headers["Cache-Control"] = "public, max-age=300"
+                response.headers["Cache-Control"] = PAGE_CACHE
         return response
 
     app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
@@ -139,6 +157,7 @@ def create_app(queries: Queries) -> FastAPI:
         """Names every template can use."""
         return {
             "static_url": static_url,
+            "style": STYLE,
             "canonical": f"https://{CANONICAL_HOST}{request.url.path}" if CANONICAL_HOST else "",
             "household": queries.household_lines(),
             "built": queries.snapshot.built,
@@ -147,23 +166,24 @@ def create_app(queries: Queries) -> FastAPI:
             "fish": queries.week.fish,
             "link": link,
             "marked": marked,
+            "page": PAGE,
         }
 
     templates = Jinja2Templates(directory=HERE / "templates", context_processors=[context])
     templates.env.filters |= {name: getattr(fmt, name) for name in fmt.__all__}
 
-    def ideas(choice: DinnerQuery) -> Found:
+    def ideas(choice: DinnerQuery, count: int) -> Found:
         week = frozenset(d.dish.url for d in queries.plan().dinners)  # shown above the list already
-        return queries.search(choice.text(), limit=choice.antall, skip=week)
+        return queries.search(choice.text(), limit=count, skip=week)
 
-    def dinner_context(found: Found, choice: DinnerQuery, trigger: str | None = None) -> dict[str, object]:
+    def dinner_context(found: Found, trigger: str | None = None) -> dict[str, object]:
         s = found.search
         return {
             "found": found,
             "chips": chips(found),
             "understood": [(c, s.drop(c).text) for c in s.clauses],
             "relax": [(c, n, s.drop(c).text) for c, n in found.relax],
-            "more": choice.antall + 30 if found.total > len(found.dinners) else None,
+            "shown": len(found.dinners),
             # A chip or a link changed the search: send the box its new text (out of band)
             "box": trigger not in SEARCH_BOX,
         }
@@ -171,8 +191,9 @@ def create_app(queries: Queries) -> FastAPI:
     @app.get("/", response_class=HTMLResponse)
     def index(request: Request, q: Q = None, protein: Q = None, tilbud: Q = None, antall: Q = None) -> HTMLResponse:
         choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall)
+        found = ideas(choice, choice.antall if antall else PAGE)
         return templates.TemplateResponse(
-            request, "index.html", {"week": queries.plan(), "examples": EXAMPLES, **dinner_context(ideas(choice), choice), "box": False}
+            request, "index.html", {"week": queries.plan(), "examples": EXAMPLES, **dinner_context(found), "box": False}
         )
 
     @app.get("/middager", response_class=HTMLResponse)
@@ -180,13 +201,22 @@ def create_app(queries: Queries) -> FastAPI:
         """The ideas under the week, for a search. Without HTMX it is the front page with the same search."""
         choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall)
         if "hx-request" not in request.headers:
-            query = link(choice.text(), choice.antall)
+            query = link(choice.text(), choice.antall if antall else None)
             return RedirectResponse(f"/?{query}#forslag" if query else "/#forslag", status_code=303)
-        found = ideas(choice)
-        response = templates.TemplateResponse(request, "_dinners.html", dinner_context(found, choice, request.headers.get("hx-trigger")))
+        found = ideas(choice, choice.antall if antall else PAGE)
+        response = templates.TemplateResponse(request, "_dinners.html", dinner_context(found, request.headers.get("hx-trigger")))
         query = link(found.search.text)
         response.headers["HX-Replace-Url"] = f"/?{query}#forslag" if query else "/#forslag"
         return response
+
+    @app.get("/middager/flere", response_class=HTMLResponse)
+    def more_dinners(request: Request, q: Q = None, protein: Q = None, tilbud: Q = None, fra: Q = None) -> Response:
+        """The next ideas after the first `fra`, to append to the list. Without HTMX, the front page with them all."""
+        choice, start = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud), offset(fra)
+        if "hx-request" not in request.headers:
+            return RedirectResponse(f"/?{link(choice.text(), start + PAGE)}#forslag", status_code=303)
+        found = ideas(choice, start + PAGE)
+        return templates.TemplateResponse(request, "_more.html", {"found": found, "start": start, "shown": len(found.dinners)})
 
     @app.get("/om", response_class=HTMLResponse)
     def about(request: Request) -> HTMLResponse:
@@ -217,6 +247,31 @@ def create_app(queries: Queries) -> FastAPI:
             f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n',
             media_type="application/xml",
         )
+
+    @app.get("/manifest.webmanifest")
+    def manifest() -> JSONResponse:
+        """For "Legg til på Hjem-skjerm": the site opens like an app, with its own icon."""
+        icons = [{"src": static_url(f"icon-{n}.png"), "sizes": f"{n}x{n}", "type": "image/png"} for n in (192, 512)]
+        return JSONResponse(
+            {
+                "name": "matris: ukens middager",
+                "short_name": "matris",
+                "lang": "nb",
+                "start_url": "/",
+                "scope": "/",
+                "display": "standalone",
+                "background_color": "#fffaf3",
+                "theme_color": "#ffffff",
+                "icons": icons,
+            },
+            media_type="application/manifest+json",
+        )
+
+    @app.get("/apple-touch-icon.png")
+    @app.get("/apple-touch-icon-precomposed.png")
+    def apple_touch_icon() -> FileResponse:
+        """iPhones ask for these at the root, whatever the page links."""
+        return FileResponse(HERE / "static" / "apple-touch-icon.png", media_type="image/png")
 
     @app.get("/favicon.ico")
     @app.get("/favicon.svg")

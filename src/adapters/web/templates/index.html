@@ -9,7 +9,7 @@
     {% for line in household %}<li>{{ line }}</li>{% endfor %}
   </ul>
 </section>
-<div class="cards week">
+<div class="cards week" aria-label="Ukens middager">
   {% for d in week.dinners %}{{ card(d) }}{% endfor %}
 </div>
 <p class="muted">{{ week.fitting|tall }} av {{ week.considered|tall }} middager på matprat.no passer, {{ week.on_sale|tall }} av dem med hovedråvaren på tilbud.
@@ -18,13 +18,15 @@
 <section id="forslag" class="finder">
   <h2>Finn en middag</h2>
   <form class="search" id="sok" action="/#forslag" method="get" role="search"
-    hx-get="/middager" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste">
+    hx-get="/middager" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste"
+    hx-on:submit="document.getElementById('q').blur()">
     {{ search_box(found.search.text) }}
     <button type="submit">Søk</button>
   </form>
-  <p class="examples">Skriv det som du ville sagt det, for eksempel
-    {% for e in examples %}<a href="/?{{ link(e) }}#forslag" hx-get="/middager?{{ link(e) }}" hx-target="#forslag-liste" hx-swap="outerHTML">«{{ e }}»</a>{{ ", " if not loop.last else "." }}
-    {% endfor %}</p>
+  <div class="filters tries">
+    <div class="row"><span class="label">Prøv for eksempel</span>
+      <nav class="chips" aria-label="Eksempler på søk">{% for e in examples %}<a href="/?{{ link(e) }}#forslag" hx-get="/middager?{{ link(e) }}" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste">{{ e }}</a> {% endfor %}</nav></div>
+  </div>
   {% include "_dinners.html" %}
 </section>
 {% endblock %}

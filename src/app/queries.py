@@ -41,6 +41,7 @@ class Queries:
         # The snapshot and household only change on deploy, so the ranking and the index are worked out once
         self.ranked = ranking.dinners(self.snapshot, household)
         self.index = Index(self.ranked, self.snapshot.traits, household)
+        self._plan: Plan | None = None
 
     def search(self, text: str = "", limit: int = 30, per_protein: int = 3, skip: frozenset[str] = frozenset()) -> Found:
         """Dinners that fit and match a search in plain bokmål (core.search), best first. Without a protein
@@ -63,15 +64,18 @@ class Queries:
         )
 
     def plan(self) -> Plan:
-        offers = self.snapshot.offers
-        return Plan(
-            dinners=tuple(ranking.plan(self.ranked, self.week)),
-            offers=len(offers),
-            stores=tuple(sorted({o.store for o in offers})),
-            considered=len(self.snapshot.dishes),
-            fitting=len(self.ranked),
-            on_sale=sum(d.on_sale for d in self.ranked),
-        )
+        """The week, worked out on first use and kept: it only changes with the snapshot."""
+        if self._plan is None:
+            offers = self.snapshot.offers
+            self._plan = Plan(
+                dinners=tuple(ranking.plan(self.ranked, self.week)),
+                offers=len(offers),
+                stores=tuple(sorted({o.store for o in offers})),
+                considered=len(self.snapshot.dishes),
+                fitting=len(self.ranked),
+                on_sale=sum(d.on_sale for d in self.ranked),
+            )
+        return self._plan
 
     def check(self, url: str) -> Check | None:
         dish = next((d for d in self.snapshot.dishes if d.url == url), None)

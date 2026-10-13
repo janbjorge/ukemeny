@@ -57,5 +57,11 @@ class DinnerQuery(BaseModel):
 
 
 def link(text: str, antall: int | None = None) -> str:
-    """The query string for a search, without defaults: "q=rask+kylling"."""
-    return urlencode({k: v for k, v in {"q": text, "antall": antall}.items() if v and v != DEFAULT_DINNERS})
+    """The query string for a search: "q=rask+kylling", with "antall" only when given."""
+    return urlencode({k: v for k, v in {"q": text, "antall": antall}.items() if v})
+
+
+def offset(value: str | None) -> int:
+    """Where "Vis flere" starts: a count of dinners already shown, 0 when missing or nonsense."""
+    digits = "".join(c for c in str(value or "") if c.isdigit())[:4]
+    return int(digits) if digits else 0

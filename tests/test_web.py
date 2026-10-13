@@ -75,9 +75,11 @@ def test_nothing_found_offers_what_to_drop(client: TestClient) -> None:
 def test_chips_toggle_and_count(client: TestClient) -> None:
     html = client.get("/middager?q=kylling", headers=HX).text
     assert 'hx-get="/middager?q=kylling+p%C3%A5+tilbud">På tilbud <span class="n">1</span>' in html
-    assert 'hx-get="/middager?q=fisk" data-protein="fisk">fisk <span class="n">2</span>' in html
-    assert 'data-protein="kylling" aria-current="true">kylling</a>' in html
+    assert 'hx-get="/middager?q=fisk" data-protein="fisk">Fisk <span class="n">2</span>' in html
+    assert 'data-protein="kylling" aria-current="true">Kylling</a>' in html
     assert '<span class="off">Godt likt</span>' in html  # nothing would match
+    proteins = html[html.index('class="chips proteins"') :]
+    assert proteins.index(">Kylling<") < proteins.index(">Alle ")  # a chosen chip leads its row
 
 
 def test_the_box_follows_chips_but_not_typing(client: TestClient) -> None:
@@ -107,7 +109,7 @@ def test_headers(client: TestClient) -> None:
     r = client.get("/")
     assert r.headers["X-Content-Type-Options"] == "nosniff"
     assert 'rel="service-desc"' in r.headers["Link"]
-    assert r.headers["Cache-Control"] == "public, max-age=300"
+    assert r.headers["Cache-Control"] == "public, max-age=300, stale-while-revalidate=86400"
     assert "HX-Request" in r.headers["Vary"]
     css = client.get(main.static_url("app.css"))
     assert css.headers["Cache-Control"].endswith("immutable")
@@ -118,6 +120,33 @@ def test_canonical_host_redirects_everything_but_health(client: TestClient, monk
     r = client.get("/om?x=1", follow_redirects=False)
     assert r.status_code == 301 and r.headers["location"] == "https://matris.app/om?x=1"
     assert client.get("/helse").status_code == 200
+
+
+def test_more_appends_the_next_page(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(main, "PAGE", 1)
+    s = snapshot(*(recipe(f"Laks {n}", SALMON) for n in range(4)))
+    small = TestClient(main.create_app(Queries(FakeDatasets(s), Household(), Week(days=1, fish=1))))
+    html = small.get("/?q=laks").text
+    assert html.count('<article class="card"') == 2  # the week, and one idea
+    assert 'hx-get="/middager/flere?q=laks&amp;fra=1"' in html and 'Vis flere <span class="n">3 til</span>' in html
+    more = small.get("/middager/flere?q=laks&fra=1", headers=HX).text
+    assert more.count('<article class="card"') == 1 and "fra=2" in more and "<html" not in more
+    last = small.get("/middager/flere?q=laks&fra=3", headers=HX).text
+    assert last.count('<article class="card"') == 1 and "Vis flere" not in last
+    r = small.get("/middager/flere?q=laks&fra=1", follow_redirects=False)
+    assert r.status_code == 303 and r.headers["location"] == "/?q=laks&antall=2#forslag"
+
+
+def test_phone_details(client: TestClient) -> None:
+    html = client.get("/").text
+    assert "<style>" in html and 'rel="stylesheet"' not in html  # inline: nothing blocks the first paint
+    assert "viewport-fit=cover" in html and 'name="theme-color"' in html and 'rel="manifest"' in html
+    manifest = client.get("/manifest.webmanifest")
+    assert manifest.headers["content-type"] == "application/manifest+json"
+    assert manifest.json()["short_name"] == "matris" and len(manifest.json()["icons"]) == 2
+    for icon in manifest.json()["icons"]:
+        assert client.get(icon["src"]).headers["content-type"] == "image/png"
+    assert client.get("/apple-touch-icon.png").headers["content-type"] == "image/png"
 
 
 def test_light_always() -> None:

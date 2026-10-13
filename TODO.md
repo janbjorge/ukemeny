@@ -13,7 +13,7 @@ Every request from jb, with status. Newest first. An item is ticked only when it
 
 - Fix the known wrong Jev answers (FACTS.md §6) with a small list of overrides.
 - Logfire tracing as in statsbudsjett, once the site is live.
-- PNG icons (favicon.png, apple-touch-icon) next to icon.svg.
+- Keep one Fly machine running (`min_machines_running = 1`) so the first visit after a quiet spell does not wait for a start; it costs a running machine around the clock.
 - A shopping list for the week, from `check --json` ingredient lists.
 
 ## Done

@@ -2,21 +2,26 @@
 <html lang="nb">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
+<meta name="format-detection" content="telephone=no">
 <title>{% block title %}matris: ukens middager som passer kostholdet, med tilbudene{% endblock %}</title>
 <meta name="description" content="Middager fra matprat.no uten løk og gluten og med lite laktose, valgt etter hva som er på tilbud denne uka.">
 {% if canonical %}<link rel="canonical" href="{{ canonical }}">
 {% endif %}<link rel="alternate" type="text/markdown" href="/llms.txt" title="For KI-agenter">
 <link rel="service-desc" type="application/json" href="/api/openapi.json">
 <link rel="icon" type="image/svg+xml" href="{{ static_url('icon.svg') }}">
-<link rel="stylesheet" href="{{ static_url('app.css') }}">
+<link rel="apple-touch-icon" href="{{ static_url('apple-touch-icon.png') }}">
+<link rel="manifest" href="/manifest.webmanifest">
 <script src="{{ static_url('htmx.min.js') }}" defer></script>
+<style>{{ style }}</style>
 </head>
 <body>
 <nav class="top" aria-label="Sider">
   <div class="in">
-    <a class="brand" href="/"><img src="{{ static_url('icon.svg') }}" alt="">matris</a>
-    <a href="/"{% if request.url.path == "/" %} aria-current="page"{% endif %}>Ukens middager</a>
+    <a class="brand" href="/"><img src="{{ static_url('icon.svg') }}" alt="" width="26" height="26">matris</a>
+    <a class="wide" href="/"{% if request.url.path == "/" %} aria-current="page"{% endif %}>Ukens middager</a>
     <a href="/#forslag">Finn en middag</a>
     <a href="/om"{% if request.url.path == "/om" %} aria-current="page"{% endif %}>Slik virker det</a>
   </div>
@@ -26,7 +31,7 @@
 {% block main %}{% endblock %}
   <footer>
     <p>Oppskriftene er fra <a href="https://www.matprat.no">matprat.no</a>, og hver middag lenker dit. Tilbudene er fra butikkenes kundeaviser, slik
-      <a href="https://mattilbud.no">mattilbud.no</a> viser dem{% if offers_until %}, de fleste til {{ offers_until|dato }}{% endif %}.
+      <a href="https://mattilbud.no">mattilbud.no</a> viser dem{% if offers_until %} (de fleste gjelder til {{ offers_until|dato }}){% endif %}.
       Sjekk alltid etiketten: vi kan ta feil om hva en vare inneholder.</p>
     <p class="muted">Bygget {{ built|dato }} · <a href="/om">Slik virker det</a> · <a href="/llms.txt">For KI-agenter</a> · <a href="/api/openapi.json">API</a></p>
   </footer>

@@ -1,11 +1,7 @@
 {# The ideas under the week: category chips, what the search understood, and the dinners. An HTMX fragment of index.html (/middager). #}
 {% from "_dinner.html" import card with context %}
 {% from "_search.html" import search_box %}
-{% macro go(text, antall=none) %}{% set qs = link(text, antall) %}href="/{{ '?' ~ qs if qs }}#forslag" hx-get="/middager{{ '?' ~ qs if qs }}"{% endmacro %}
-{% macro chip(c) -%}
-{% if c.on or c.count %}<a {{ go(c.text) }}{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}{% if c.on %} aria-current="true"{% endif %}>{{ c.label }}{% if c.count %} <span class="n">{{ c.count|tall }}</span>{% endif %}</a>
-{%- else %}<span class="off"{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}>{{ c.label }}</span>{% endif %}
-{%- endmacro %}
+{% from "_ui.html" import go, chip, more_button with context %}
 {% set s = found.search %}
 <div id="forslag-liste" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste">
   <div class="filters">
@@ -25,11 +21,12 @@
   {% endif %}
   {% for typed, used in s.corrected %}<p class="note">Fant ikke «{{ typed }}», så viser treff for «{{ used }}».</p>{% endfor %}
   <p class="count" role="status">
-    {%- if s.clauses %}{{ found.total|tall }} {{ "middag passer" if found.total == 1 else "middager passer" }}{% if found.total > found.dinners|length %}, her er de {{ found.dinners|length }} beste{% endif %}.
+    {%- if s.clauses %}{{ found.total|tall }} {{ "middag passer" if found.total == 1 else "middager passer" }}.
     {%- else %}De som passer best først: færrest bytter, så mest rabatt, så best likt og raskest. Litt av hvert øverst.{% endif -%}
   </p>
   <div class="cards">
     {% for d in found.dinners %}{{ card(d, s, found.via.get(d.dish.url, ())) }}{% endfor %}
+    {% if found.total > shown %}{{ more_button(found, shown) }}{% endif %}
   </div>
   {% if not found.dinners %}
   <div class="empty">
@@ -37,6 +34,5 @@
     {% if relax %}<p>Prøv å fjerne {% for c, n, rest in relax[:3] %}<a {{ go(rest) }}>«{{ c.label }}»</a> ({{ n|tall }} middager){{ ", " if not loop.last }}{% endfor %}.</p>{% endif %}
   </div>
   {% endif %}
-  {% if more %}<p class="more"><a {{ go(s.text, more) }}>Vis flere</a></p>{% endif %}
   {% if box %}{{ search_box(s.text, oob=true) }}{% endif %}
 </div>

@@ -90,9 +90,9 @@ def test_chips_toggle_and_count(client: TestClient) -> None:
     assert 'data-protein="kylling" aria-current="true">Kylling</a>' in html
     assert '<span class="off">Godt likt</span>' in html  # nothing would match
     assert 'hx-get="/middager?q=kylling+uten+l%C3%B8k" hx-trigger="mousedown, click" hx-sync="this:drop">Uten løk</a>' in html
-    assert f'aria-label="Allergier">' in html and f'hx-get="/middager?q=kylling+uten+egg"{GO}>Uten egg</a>' in html
+    assert 'aria-label="Allergier">' in html and f'hx-get="/middager?q=kylling+uten+egg"{GO}>Uten egg</a>' in html
     assert ">Lav FODMAP</a>" in html and ">Vegetar</a>" in html
-    assert f'aria-label="Sorter">' in html and f'hx-get="/middager?q=kylling+rabatt+i+prosent"{GO}>Rabatt %</a>' in html
+    assert 'aria-label="Sorter">' in html and f'hx-get="/middager?q=kylling+rabatt+i+prosent"{GO}>Rabatt %</a>' in html
     assert 'hx-get="/middager?q=kylling" hx-trigger="mousedown, click" hx-sync="this:drop" aria-current="true">Anbefalt</a>' in html
     proteins_row = html[html.index('class="chips proteins"') :]
     assert "Vegetar" not in proteins_row[: proteins_row.index("</nav>")]  # a rule in Kosthold, not a main protein

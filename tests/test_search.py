@@ -2,12 +2,15 @@
 
 import pytest
 
-from core.models import Gluten, Household, Kids, Onion
+from core.models import Gluten, Household, Kids, Onion, Rule
 from core.ranking import dinners
 from core.search import (
+    ANYTHING,
     MEAT,
+    Diet,
     Index,
     Tag,
+    household,
     marked,
     parse,
     protein_clause,
@@ -50,8 +53,6 @@ def tags_of(text: str) -> list[str]:
         ("ikke sterk", ["barnevennlig"]),
         ("billig middag til barna", ["på tilbud", "barnevennlig"]),
         ("glutenfritt og laktosefri", ["glutenfri", "lite laktose"]),
-        ("passer som den er", ["ingen bytter"]),
-        ("uten bytter", ["ingen bytter"]),
         ("kjottdeig", ["kjøttdeig"]),
         ("lok", ["lok"]),  # Not a category without «uten», just a word
         ("uten lok", ["uten løk"]),
@@ -89,7 +90,7 @@ def test_a_later_prep_time_replaces_an_earlier_one() -> None:
 
 
 def test_the_written_search_parses_back_to_the_same_clauses() -> None:
-    for text in ("rask kylling uten sopp", "laks eller torsk på tilbud", "gris elg", "uten kjøtt barnevennlig", "annet kjøtt", *Tag):
+    for text in ("rask kylling uten sopp", "laks eller torsk på tilbud", "gris elg", "uten kjøtt barnevennlig", "annet kjøtt", *Tag, *Diet):
         once = parse(text)
         assert parse(once.text).clauses == once.clauses
 
@@ -154,18 +155,27 @@ def index() -> Index:
             "rød chili": traits(kids=Kids.SPICY),
         },
     )
-    return Index(dinners(s, HOUSEHOLD), s.traits, HOUSEHOLD)
+    return Index(dinners(s, HOUSEHOLD), s.traits)
 
 
 def names(index: Index, text: str) -> list[str]:
     return [d.dish.name for d in index.find(index.parse(text))]
 
 
-def test_diet_categories_describe_the_recipe_as_written(index: Index) -> None:
-    assert "Kyllinggryte med sopp" not in names(index, "uten løk")  # needs a swap to vårløk
-    assert "Kylling med vårløk" in names(index, "uten løk")  # the household's substitute is fine
-    assert "Pasta med røkelaks" not in names(index, "glutenfri")
-    assert set(names(index, "ingen bytter")) == set(names(index, "")) - {"Kyllinggryte med sopp", "Pasta med røkelaks"}
+def test_diet_words_are_rules_on_top_of_a_base() -> None:
+    assert parse("uten løk, glutenfri og laktosefri kylling").diets == {Diet.ONION, Diet.GLUTEN, Diet.LACTOSE}
+    assert household([]) == ANYTHING
+    h = household([Diet.ONION, Diet.GLUTEN, Diet.LACTOSE])
+    assert (h.onion, h.onion_substitute, h.gluten, h.lactose_g_per_portion) == (Rule.AVOID, "vårløk", Rule.AVOID, 3.0)
+    assert h.garlic is Rule.OK and not h.kid_notes
+    assert household([Diet.ONION], Household(onion_substitute="purre")).onion_substitute == "purre"  # a profile's own
+
+
+def test_rules_do_not_filter_an_index(index: Index) -> None:
+    assert names(index, "glutenfri") == names(index, "")  # the rule picks the index (Queries), it does not narrow one
+
+
+def test_barnevennlig(index: Index) -> None:
     assert "Kyllingsalat" not in names(index, "barnevennlig")  # chili among the ingredients
     assert "Chiliburger" not in names(index, "barnevennlig")  # chili in the name
 

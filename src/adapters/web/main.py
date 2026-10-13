@@ -16,12 +16,11 @@ from fastapi.templating import Jinja2Templates
 from markupsafe import Markup
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-from adapters import profile
 from adapters.datasets import JsonDatasets
 from adapters.web import api, fmt
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
 from app.queries import Found, Queries
-from core.search import Kind, Tag, marked, protein_clause, protein_word, tag_clause
+from core.search import LACTOSE_G, Diet, Kind, Tag, diet_clause, marked, protein_clause, protein_word, tag_clause
 
 HERE = Path(__file__).parent
 # The one public address (matris.app). Set on Fly once the certificate and DNS are live; every other
@@ -32,17 +31,9 @@ LINK = '</llms.txt>; rel="alternate"; type="text/markdown", </api/openapi.json>;
 # The pages a crawler should index; the query-string variants and fragments stay out (see robots_txt)
 PAGES = ("", "om")
 
-# Category chips above the ideas: what a dinner is like, then the diet as the recipe is written
+# The chips above the ideas: the diet rules a visitor picks (none to start with), then what a dinner is like
+DIET_CHIPS = (Diet.ONION, Diet.GLUTEN, Diet.LACTOSE)
 KIND_CHIPS = (Tag.QUICK, Tag.UNDER_40, Tag.ON_SALE, Tag.LIKED, Tag.MILD)
-# "Ingen bytter" is left out: with our rules it is these together, and the name puzzled (jb 2026-10-13). A search still knows it.
-DIET_CHIPS: dict[Tag, str] = {
-    Tag.GLUTEN_FREE: "Glutenfri slik oppskriften står",
-    Tag.ONION_FREE: "Ingen løk i oppskriften",
-    Tag.LOW_LACTOSE: "Lite laktose slik oppskriften står",
-    Tag.GARLIC_FREE: "Ingen hvitløk i oppskriften",
-}
-# Searches to try, shown under the search box
-EXAMPLES = ("rask kylling uten sopp", "laks eller torsk på tilbud", "barnevennlig vegetar", "suppe under 40 min", "godt likt lam")
 # The elements that send a search as it is typed; their own answer must not replace the search box
 SEARCH_BOX = {"q", "sok"}
 # Ideas per page and per "Vis flere": a phone screen holds one or two cards
@@ -62,17 +53,19 @@ class Chip:
     count: int | None
     """Dinners after a click, for a chip that is off."""
     protein: str = ""
-    title: str = ""
-    """What the chip means, on hover."""
 
 
 def chips(found: Found) -> dict[str, list[Chip]]:
     s = found.search
 
-    def tag(t: Tag, title: str = "") -> Chip:
+    def tag(t: Tag) -> Chip:
         clause = tag_clause(t)
         on = s.has(clause)
-        return Chip(clause.label, s.toggle(clause).text, on, None if on else found.counts.tags[t], title=title)
+        return Chip(clause.label, s.toggle(clause).text, on, None if on else found.counts.tags[t])
+
+    def diet(d: Diet) -> Chip:
+        clause = diet_clause(d)
+        return Chip(clause.label, s.toggle(clause).text, s.has(clause), None)
 
     chosen = next((c for c in s.clauses if c.kind is Kind.PROTEIN), None)
     every = sum(found.counts.proteins.values())
@@ -88,8 +81,8 @@ def chips(found: Found) -> dict[str, list[Chip]]:
         return sorted(row, key=lambda c: not c.on)
 
     return {
+        "diets": [diet(d) for d in DIET_CHIPS],
         "kinds": on_first([tag(t) for t in KIND_CHIPS]),
-        "diets": on_first([tag(t, title) for t, title in DIET_CHIPS.items()]),
         "proteins": on_first(proteins),
     }
 
@@ -167,44 +160,38 @@ def create_app(queries: Queries) -> FastAPI:
             "static_url": static_url,
             "style": STYLE,
             "canonical": f"https://{CANONICAL_HOST}{request.url.path}" if CANONICAL_HOST else "",
-            "household": queries.household_lines(),
             "built": queries.snapshot.built,
             "offers_until": queries.offers_until(),
             "stale": queries.stale(date.today()),
-            "fish": queries.week.fish,
             "link": link,
             "marked": marked,
             "page": PAGE,
-            # A card says "Sterk" when the household has small kids and the dinner is not barnevennlig
-            "hot": lambda d: queries.household.kid_notes and not queries.index.has(d, Tag.MILD),
         }
 
     templates = Jinja2Templates(directory=HERE / "templates", context_processors=[context])
     templates.env.filters |= {name: getattr(fmt, name) for name in fmt.__all__}
 
     def ideas(choice: DinnerQuery, count: int) -> Found:
-        week = frozenset(d.dish.url for d in queries.plan().dinners)  # shown above the list already
-        return queries.search(choice.text(), limit=count, skip=week)
+        return queries.search(choice.text(), limit=count, skip_week=True)
 
-    def dinner_context(found: Found, trigger: str | None = None) -> dict[str, object]:
-        s = found.search
+    def dinner_context(found: Found, fragment: bool = False, trigger: str | None = None) -> dict[str, object]:
         return {
             "found": found,
             "chips": chips(found),
-            "understood": [(c, s.drop(c).text) for c in s.clauses],
-            "relax": [(c, n, s.drop(c).text) for c, n in found.relax],
+            "relax": [(c, n, found.search.drop(c).text) for c, n in found.relax],
             "shown": len(found.dinners),
-            # A chip or a link changed the search: send the box its new text (out of band)
-            "box": trigger not in SEARCH_BOX,
+            "week": queries.plan(found.household),
+            # A fragment also sends the week, which follows the diet rules, and, when a chip or a link changed the
+            # search rather than typing, the search box with its new text (both out of band)
+            "week_oob": fragment,
+            "box": fragment and trigger not in SEARCH_BOX,
         }
 
     @app.get("/", response_class=HTMLResponse)
     def index(request: Request, q: Q = None, protein: Q = None, tilbud: Q = None, antall: Q = None) -> HTMLResponse:
         choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall)
         found = ideas(choice, choice.antall if antall else PAGE)
-        return templates.TemplateResponse(
-            request, "index.html", {"week": queries.plan(), "examples": EXAMPLES, **dinner_context(found), "box": False}
-        )
+        return templates.TemplateResponse(request, "index.html", dinner_context(found))
 
     @app.get("/middager", response_class=HTMLResponse)
     def dinners_fragment(request: Request, q: Q = None, protein: Q = None, tilbud: Q = None, antall: Q = None) -> Response:
@@ -214,7 +201,8 @@ def create_app(queries: Queries) -> FastAPI:
             query = link(choice.text(), choice.antall if antall else None)
             return RedirectResponse(f"/?{query}#forslag" if query else "/#forslag", status_code=303)
         found = ideas(choice, choice.antall if antall else PAGE)
-        response = templates.TemplateResponse(request, "_dinners.html", dinner_context(found, request.headers.get("hx-trigger")))
+        context = dinner_context(found, fragment=True, trigger=request.headers.get("hx-trigger"))
+        response = templates.TemplateResponse(request, "_dinners.html", context)
         query = link(found.search.text)
         response.headers["HX-Replace-Url"] = f"/?{query}#forslag" if query else "/#forslag"
         return response
@@ -230,7 +218,7 @@ def create_app(queries: Queries) -> FastAPI:
 
     @app.get("/om", response_class=HTMLResponse)
     def about(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse(request, "om.html", {"plan": queries.plan()})
+        return templates.TemplateResponse(request, "om.html", {"plan": queries.plan(), "lactose_g": LACTOSE_G})
 
     @app.get("/llms.txt", response_class=PlainTextResponse)
     def llms_txt(request: Request) -> Response:
@@ -296,8 +284,8 @@ def create_app(queries: Queries) -> FastAPI:
 
 
 def _default() -> FastAPI:
-    p = profile.load()
-    return create_app(Queries(JsonDatasets(), p.household, p.week))
+    # No profile: the site starts with no diet rules, and a visitor picks them in the search
+    return create_app(Queries(JsonDatasets()))
 
 
 app = HeadAsGet(_default())

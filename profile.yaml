@@ -1,7 +1,6 @@
-# What the household can't eat, where it shops, and what a week looks like.
-# Every matprat.no dinner is checked against this. Edit with `matris profile`.
-# Nothing here is sent to Jev; it only sees ingredient names and offer headings.
-# The site shows the rules in plain words, never why (src/app/queries.py household_lines).
+# What the household can't eat, where it shops, and what a week looks like, for the `matris` CLI.
+# The offline build reads `shopping` from here. The site does not read this file: a visitor picks the diet in the search.
+# Edit with `matris profile`. Nothing here is sent to Jev; it only sees ingredient names and offer headings.
 
 diet:
   # avoid: swap it out, and skip dishes built on it

@@ -1,9 +1,9 @@
 from datetime import date
 
 from app.queries import Queries
-from core.models import Household, Rule
+from core.models import Gluten, Household, Onion, Rule
 from core.ranking import Week
-from tests.fakes import FakeDatasets, ingredient, offer, recipe, snapshot
+from tests.fakes import FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
 SALMON = ingredient("laksefilet", 600, "g", "/fisk og sjømat")
@@ -33,10 +33,13 @@ def test_search() -> None:
 
 
 def test_search_skips_the_week_only_when_browsing_and_relaxes_when_empty() -> None:
+    s = snapshot(recipe("Kylling", CHICKEN), recipe("Laks", SALMON), offers=[SALE], matches={"kyllingfilet": ["sale"]})
+    q = Queries(FakeDatasets(s), week=Week(days=1, fish=0))
+    assert [d.dish.name for d in q.plan().dinners] == ["Kylling"]
+    assert [d.dish.name for d in q.search("", skip_week=True).dinners] == ["Laks"]
+    assert [d.dish.name for d in q.search("glutenfri", skip_week=True).dinners] == ["Laks"]  # rules alone are browsing
+    assert [d.dish.name for d in q.search("kylling", skip_week=True).dinners] == ["Kylling"]
     q = queries()
-    kylling = recipe("Kylling", CHICKEN).url
-    assert [d.dish.name for d in q.search("", skip=frozenset({kylling})).dinners] == ["Laks"]
-    assert [d.dish.name for d in q.search("kylling", skip=frozenset({kylling})).dinners] == ["Kylling"]
     found = q.search("fisk på tilbud")
     assert found.dinners == () and found.total == 0
     assert [(c.text, n) for c, n in found.relax] == [("fisk", 1), ("på tilbud", 1)]
@@ -61,7 +64,23 @@ def test_offers_until_and_stale() -> None:
     assert q.stale(date(2026, 10, 19))
 
 
-def test_household_lines_say_what_not_why() -> None:
-    lines = queries(Household(onion_substitute="vårløk", garlic=Rule.AVOID)).household_lines()
-    assert lines == ["Uten løk (vårløk går fint)", "Glutenfritt", "Lite laktose (under 3 g per porsjon)", "Uten hvitløk", "Barnevennlig"]
-    assert not any(word in " ".join(lines).lower() for word in ("ibs", "intoleran", "mage"))
+def test_the_site_starts_with_no_rules_and_the_search_adds_them() -> None:
+    onion = ingredient("løk", 400, "g", "/grønnsaker")
+    pasta = ingredient("spagetti", 400, "g", "/pasta/ris")
+    s = snapshot(
+        recipe("Biff med løk", onion),
+        recipe("Pasta", pasta),
+        recipe("Laks", SALMON),
+        known={"løk": traits(onion=Onion.ONION), "spagetti": traits(gluten=Gluten.YES)},
+    )
+    q = Queries(FakeDatasets(s))
+    assert {d.dish.name for d in q.search("").dinners} == {"Biff med løk", "Pasta", "Laks"}
+    assert all(not d.verdict.swaps for d in q.search("").dinners)
+    found = q.search("uten løk glutenfri")
+    assert {d.dish.name for d in found.dinners} == {"Pasta", "Laks"}  # onion is the point of the biff
+    assert found.household.onion is Rule.AVOID and found.household.gluten is Rule.AVOID
+    pasta_card = next(d for d in found.dinners if d.dish.name == "Pasta")
+    assert [n.swap for n in pasta_card.verdict.swaps] == ["glutenfri spagetti"]
+    assert q.plan(found.household).fitting == 2 and q.plan().fitting == 3
+    checked = q.check(recipe("Pasta", pasta).url, q.household("glutenfri"))
+    assert checked is not None and checked.verdict.swaps

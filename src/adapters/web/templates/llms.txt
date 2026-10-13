@@ -1,6 +1,6 @@
 # matris.app
 
-> Dinner ideas from matprat.no for one household's diet (no onion, though spring onion is fine; gluten-free; little lactose; fit for small kids), ranked by this week's grocery offers around Stavanger from mattilbud.no.
+> Dinner ideas from matprat.no, ranked by this week's grocery offers around Stavanger from mattilbud.no. Diet rules (no onion, gluten-free, little lactose) apply when a search names them.
 
 The site is in Norwegian (bokmål). Recipes belong to matprat.no; link to them, do not copy them. Offers are from the stores' weekly catalogs. Whether an ingredient holds gluten, onion or lactose was judged by a small language model and can be wrong; tell people to check the label.
 
@@ -9,8 +9,8 @@ The site is in Norwegian (bokmål). Recipes belong to matprat.no; link to them, 
 Read-only, no key, CORS open. `{{ base }}api` redirects to the schema. Keys are English; advice is bokmål; prices are kroner.
 
 - [OpenAPI schema]({{ base }}api/openapi.json): every endpoint and field
-- [This week's dinners]({{ base }}api/plan): a varied week, picked from dinners whose main protein is on sale
-- [Search the dinners that fit]({{ base }}api/middager?q=rask+kylling+uten+sopp): best first. `q` is a search in plain bokmål: categories (`under 20 min`, `på tilbud`, `godt likt`, `barnevennlig`, `ingen bytter`, `glutenfri`, `uten løk`, `lite laktose`, `uten hvitløk`), main proteins ({{ proteins }}; also `kjøtt`, `sjømat`), `uten X` to leave X out, `X eller Y` for either, and any word in the dish name or an ingredient. Typos are fixed and reported in `search.corrected`; `search.understood` says how `q` was read, and `search.query` is the same search written out. `antall` is 1-100.
+- [This week's dinners]({{ base }}api/plan?q=uten+løk+glutenfri): a varied week, picked from dinners whose main protein is on sale; `q` takes diet rules
+- [Search the dinners that fit]({{ base }}api/middager?q=rask+kylling+uten+sopp): best first. `q` is a search in plain bokmål: diet rules (`uten løk`, `glutenfri`, `lite laktose`; they decide which dinners fit and what to swap), categories (`under 20 min`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins ({{ proteins }}; also `kjøtt`, `sjømat`), `uten X` to leave X out, `X eller Y` for either, and any word in the dish name or an ingredient. Typos are fixed and reported in `search.corrected`; `search.understood` says how `q` was read, and `search.query` is the same search written out. `antall` is 1-100.
 - [One recipe]({{ base }}api/oppskrift?url=https://www.matprat.no/oppskrifter/familien/lasagne/): whether it fits, and what to swap. The ingredients and method are on matprat.no; link there
 
 ## Method

@@ -1,8 +1,8 @@
 # matris
 
-Dinner ideas from [matprat.no](https://www.matprat.no) that fit one household's diet, with the week picked from dinners whose main protein is on sale in Stavanger ([mattilbud.no](https://mattilbud.no)). The site is at https://matris.app (in Norwegian).
+Dinner ideas from [matprat.no](https://www.matprat.no), with the week picked from dinners whose main protein is on sale in Stavanger ([mattilbud.no](https://mattilbud.no)). Diet rules (uten løk, glutenfri, lite laktose) are picked in the search. The site is at https://matris.app (in Norwegian).
 
-Code: https://github.com/janbjorge/ukemeny. The household's rules live in `profile.yaml`. FACTS.md says how everything works, METHOD.md every judgement call, TODO.md what is open.
+Code: https://github.com/janbjorge/ukemeny. `profile.yaml` holds our household's rules for the CLI and the shopping area for the build; the site does not use it. FACTS.md says how everything works, METHOD.md every judgement call, TODO.md what is open.
 
 ## Run it
 

@@ -13,7 +13,6 @@
   --good: #207029; --good-ink: #15561d; --good-soft: #dff6de;
   --sale: #ffd23f; --sale-ink: #3c2b02;
   --mark: #fff0a8; --star: #ab7302;
-  --hero-a: #feedda; --hero-b: #fee7e0; --hero-c: #e3f7de;
   --shadow: 0 1px 2px rgb(60 30 0 / 8%), 0 6px 18px rgb(60 30 0 / 7%);
   --shadow-lift: 0 2px 4px rgb(60 30 0 / 10%), 0 14px 30px rgb(60 30 0 / 13%);
   /* Page gutter, wider than the notch on a phone held sideways */
@@ -68,13 +67,9 @@ nav.top a { flex: none; color: var(--text-secondary); text-decoration: none; fon
 nav.top a[aria-current] { color: var(--accent-strong); font-weight: 650; background: var(--accent-soft); }
 nav.top .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 650; font-size: var(--t-body); color: var(--accent); margin-right: auto; padding-left: 0; }
 
+#uka h1 { font-size: var(--t-title); margin: 8px 0 0; }
 main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px + env(safe-area-inset-bottom)); }
 .banner { background: var(--mark); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 10px; }
-.hero { background: linear-gradient(135deg, var(--hero-a) 0%, var(--hero-b) 55%, var(--hero-c) 100%); border-radius: 24px; padding: 28px 28px 24px; }
-.lede { font-size: var(--t-heading); color: var(--text-secondary); max-width: 60ch; margin: 0 0 16px; }
-.rules { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; }
-.rules li { font-size: var(--t-small); font-weight: 650; color: var(--good-ink); }
-.rules li::before { content: "✓ "; }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 16px; margin: 16px 0; align-items: start; }
 .card {
@@ -85,7 +80,6 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
   content-visibility: auto; contain-intrinsic-size: auto 240px;
 }
 .card h3 a { color: var(--text-primary); text-decoration: none; overflow-wrap: anywhere; }
-.card h3 a::after { content: " ↗"; font-size: var(--t-small); color: var(--text-muted); }
 .card .meta { margin: 0; font-size: var(--t-small); color: var(--text-muted); }
 .card .protein { display: inline-block; text-transform: capitalize; color: var(--p-ink, var(--text-secondary)); background: var(--p-soft, var(--surface-2)); font-weight: 650; border-radius: 999px; padding: 1px 10px; margin-right: 2px; }
 .card .star { color: var(--star); }
@@ -93,12 +87,11 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .card p { margin: 0; font-size: var(--t-small); }
 .card .deal { font-size: var(--t-body); }
 .card .pct { display: inline-block; font-weight: 650; color: var(--sale-ink); background: var(--sale); border-radius: 6px; padding: 0 7px; margin-right: 4px; }
-.card .also, .card .via { color: var(--text-secondary); }
-.card .swaps { color: var(--text-secondary); }
+.card .via, .card .swaps { color: var(--text-secondary); }
 .card .swaps b { color: var(--accent-strong); }
 .card .swaps b::before { content: "↺ "; }
 
-/* Finn en middag: the search box, the chips, what the search understood */
+/* Finn en middag: the search box and the chips */
 .finder { margin-top: 48px; background: var(--surface-2); border-radius: 24px; padding: 8px 24px 24px; }
 .finder h2 { margin-top: 20px; }
 .search { display: flex; gap: 8px; margin: 12px 0 8px; }
@@ -114,7 +107,6 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .search button:active { background: var(--accent-strong); }
 
 .filters { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 8px; }
-.filters.tries { margin: 4px 0 0; }
 .filters .row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; min-width: 0; }
 .filters .label { font-size: var(--t-small); color: var(--text-muted); min-width: 8.5em; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
@@ -132,11 +124,6 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .chips a[data-protein][aria-current] { background: var(--p); border-color: var(--p); }
 .chips a[data-protein][aria-current]::before { background: #fff; }
 
-.understood { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0 4px; font-size: var(--t-small); }
-.understood .pill { display: inline-flex; align-items: center; min-height: 36px; background: var(--accent-soft); color: var(--accent-strong); text-decoration: none; border-radius: 999px; padding: 3px 6px 3px 12px; font-weight: 650; }
-.understood .pill .x { margin-left: 4px; width: 1.4em; text-align: center; }
-.understood .pill:active { background: var(--accent); color: #fff; }
-.understood .reset { margin-left: 4px; padding: 8px 4px; }
 .note { background: var(--mark); border-radius: 10px; padding: 8px 12px; font-size: var(--t-small); margin: 8px 0; }
 .count { font-size: var(--t-small); color: var(--text-secondary); margin: 8px 0 0; }
 .empty { background: var(--surface-1); border-radius: 16px; padding: 16px 20px; box-shadow: var(--shadow); }
@@ -162,7 +149,6 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   .card h3 a:hover { color: var(--accent); text-decoration: underline; }
   .chips a:hover { border-color: var(--accent); color: var(--accent-strong); }
   .chips a[aria-current]:hover { color: #fff; }
-  .understood .pill:hover { background: var(--accent); color: #fff; }
   .search button:hover { background: var(--accent-strong); }
   .more a:hover { border-color: var(--accent); }
 }
@@ -171,8 +157,6 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
 @media (max-width: 640px) {
   nav.top .wide { display: none; }
   main { padding-top: 16px; }
-  .hero { padding: 20px 18px 18px; border-radius: 20px; }
-  .lede { font-size: var(--t-body); }
   h2 { margin-top: 32px; }
 
   .cards { gap: 12px; }

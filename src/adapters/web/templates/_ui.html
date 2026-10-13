@@ -2,7 +2,8 @@
 {% macro go(text, antall=none) %}{% set qs = link(text, antall) %}href="/{{ '?' ~ qs if qs }}#forslag" hx-get="/middager{{ '?' ~ qs if qs }}"{% endmacro %}
 
 {% macro chip(c) -%}
-{% if c.on or c.count %}<a {{ go(c.text) }}{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}{% if c.title %} title="{{ c.title }}"{% endif %}{% if c.on %} aria-current="true"{% endif %}>{{ c.label }}{% if c.count %} <span class="n">{{ c.count|tall }}</span>{% endif %}</a>
+{# A chip without a count (a diet rule) is always a link; one with a count of 0 would give nothing, so it is not. #}
+{% if c.on or c.count is none or c.count %}<a {{ go(c.text) }}{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}{% if c.on %} aria-current="true"{% endif %}>{{ c.label }}{% if c.count %} <span class="n">{{ c.count|tall }}</span>{% endif %}</a>
 {%- else %}<span class="off"{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}>{{ c.label }}</span>{% endif %}
 {%- endmacro %}
 

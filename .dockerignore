@@ -4,5 +4,4 @@
 !src
 src/pipeline
 !datasets
-!profile.yaml
 **/__pycache__

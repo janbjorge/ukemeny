@@ -26,30 +26,29 @@ def client() -> TestClient:
         offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale")],
         matches={"kyllingfilet": ["sale"]},
     )
-    queries = Queries(FakeDatasets(s), Household(onion_substitute="vårløk"), Week(days=2, fish=1))
+    queries = Queries(FakeDatasets(s), week=Week(days=2, fish=1))  # as on the site: no rules until searched for
     return TestClient(main.create_app(queries))
 
 
-def test_front_page_shows_the_week_and_the_rules(client: TestClient) -> None:
+def test_front_page_shows_the_week_with_no_rules_until_picked(client: TestClient) -> None:
     html = client.get("/").text
     assert "<h1>Ukens middager</h1>" in html
-    assert "Uten løk (vårløk går fint)" in html and "Glutenfritt" in html
     assert "Kyllinggryte" in html and "\u221227\u00a0%" in html and "kyllingfilet hos KIWI" in html
-    assert "<b>Bytt:</b> vårløk for løk" in html
-    assert "ting å sjekke" not in html  # notes stay in the API, not on the cards
-    assert "og fisk én gang" in html
+    assert "Bytt:" not in html and "Glutenfritt" not in html  # no rules on the page until a visitor picks them
+    for gone in ("ting å sjekke", "Også på tilbud", "Prøv for eksempel", "Søker etter", "Uten bytter"):
+        assert gone not in html
+    picked = client.get("/?q=uten+l%C3%B8k").text
+    assert "<b>Bytt:</b> vårløk for løk" in picked
+    assert 'hx-get="/middager" aria-current="true">Uten løk</a>' in picked
     for private in ("IBS", "intoleran", "år gammel"):
         assert private not in html
 
 
 def test_cards_are_calm(client: TestClient) -> None:
-    hot = recipe("Chili con carne", ingredient("kjøttdeig", 500, "g", "/kjøtt/kjøttdeig/karbonadedeig"))
-    s = snapshot(hot, recipe("Laks i ovn", SALMON, rating=4.6, rating_count=3))
-    page = TestClient(main.create_app(Queries(FakeDatasets(s), Household(), Week(days=2, fish=1)))).get("/").text
-    assert '<span class="hot">Sterk</span>' in page  # chili in the name, and the household has small kids
+    s = snapshot(recipe("Laks i ovn", SALMON, rating=4.6, rating_count=3))
+    page = TestClient(main.create_app(Queries(FakeDatasets(s), week=Week(days=1, fish=1)))).get("/").text
     assert "★" not in page  # 3 ratings are too few to show
-    calm = TestClient(main.create_app(Queries(FakeDatasets(s), Household(kid_notes=False), Week(days=2, fish=1)))).get("/").text
-    assert "Sterk" not in calm
+    assert "Sterk" not in page
 
 
 def test_ideas_leave_out_the_week(client: TestClient) -> None:
@@ -71,10 +70,9 @@ def test_fragment_filters_and_falls_back_to_the_page(client: TestClient) -> None
 def test_search_page_says_what_it_understood(client: TestClient) -> None:
     html = client.get("/?q=laks+i+ovnn").text
     assert 'value="laks ovn"' in html  # the box shows the search as understood
-    assert "Søker etter" in html and "Med laks" in html and "Med ovn" in html
     assert "<mark>Laks</mark> i <mark>ovn</mark>" in html
     assert "Fant ikke «ovnn», så viser treff for «ovn»." in html
-    assert "1 middag passer" in html
+    assert '<p class="count" role="status">1 middag</p>' in html
 
 
 def test_nothing_found_offers_what_to_drop(client: TestClient) -> None:
@@ -89,6 +87,7 @@ def test_chips_toggle_and_count(client: TestClient) -> None:
     assert 'hx-get="/middager?q=fisk" data-protein="fisk">Fisk <span class="n">2</span>' in html
     assert 'data-protein="kylling" aria-current="true">Kylling</a>' in html
     assert '<span class="off">Godt likt</span>' in html  # nothing would match
+    assert 'hx-get="/middager?q=kylling+uten+l%C3%B8k">Uten løk</a>' in html
     proteins = html[html.index('class="chips proteins"') :]
     assert proteins.index(">Kylling<") < proteins.index(">Alle ")  # a chosen chip leads its row
 
@@ -96,6 +95,7 @@ def test_chips_toggle_and_count(client: TestClient) -> None:
 def test_the_box_follows_chips_but_not_typing(client: TestClient) -> None:
     clicked = client.get("/middager?q=fisk", headers=HX).text
     assert 'id="q"' in clicked and 'hx-swap-oob="true"' in clicked
+    assert '<section id="uka" hx-swap-oob="true">' in clicked  # the week follows the rules
     typed = client.get("/middager?q=fisk", headers=HX | {"HX-Trigger": "q"}).text
     assert 'id="q"' not in typed
 

@@ -6,7 +6,6 @@ Every request from jb, with status. Newest first. An item is ticked only when it
 
 - [ ] Rebuild `datasets/` every week so the offers stay current: by hand (`uv run python -m pipeline.datasets`, commit, push), or a scheduled GitHub Action with a `TYPESAFE_API_KEY` secret (Jev would still run offline, not in the site).
 - [ ] Open question: a minimum rating or a maximum prep time in profile.yaml, since a discount can put a three-star, hour-long dish in the week (METHOD.md §5).
-- [ ] Let visitors pick their own rules on the page ("for now" the site shows ours). The search's diet categories (METHOD.md §6) narrow our dinners; they do not change the rules.
 
 ## Ideas not yet requested
 

@@ -1,29 +1,20 @@
-{# The ideas under the week: category chips, what the search understood, and the dinners. An HTMX fragment of index.html (/middager). #}
+{# The ideas: chips, and the dinners for the search. An HTMX fragment of index.html (/middager); then it also sends the
+   search box and the week out of band. #}
 {% from "_dinner.html" import card with context %}
 {% from "_search.html" import search_box %}
 {% from "_ui.html" import go, chip, more_button with context %}
 {% set s = found.search %}
 <div id="forslag-liste" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste">
   <div class="filters">
+    <div class="row"><span class="label">Kosthold</span>
+      <nav class="chips diet" aria-label="Kosthold">{% for c in chips.diets %}{{ chip(c) }} {% endfor %}</nav></div>
     <div class="row"><span class="label">Hva slags</span>
       <nav class="chips" aria-label="Hva slags middag">{% for c in chips.kinds %}{{ chip(c) }} {% endfor %}</nav></div>
-    <div class="row"><span class="label">Uten bytter</span>
-      <nav class="chips diet" aria-label="Slik oppskriften står, uten bytter">{% for c in chips.diets %}{{ chip(c) }} {% endfor %}</nav></div>
     <div class="row"><span class="label">Hovedråvare</span>
       <nav class="chips proteins" aria-label="Hovedråvare">{% for c in chips.proteins %}{{ chip(c) }} {% endfor %}</nav></div>
   </div>
-  {% if s.clauses %}
-  <div class="understood">
-    <span class="muted">Søker etter</span>
-    {% for c, rest in understood %}<a class="pill" {{ go(rest) }} title="Fjern «{{ c.label }}»">{{ c.label }}<span class="x" aria-hidden="true">×</span><span class="vh"> (fjern)</span></a>
-    {% endfor %}<a class="reset" {{ go("") }}>Nullstill</a>
-  </div>
-  {% endif %}
   {% for typed, used in s.corrected %}<p class="note">Fant ikke «{{ typed }}», så viser treff for «{{ used }}».</p>{% endfor %}
-  <p class="count" role="status">
-    {%- if s.clauses %}{{ found.total|tall }} {{ "middag passer" if found.total == 1 else "middager passer" }}.
-    {%- else %}De som passer best først: færrest bytter, så mest rabatt, så best likt og raskest. Litt av hvert øverst.{% endif -%}
-  </p>
+  <p class="count" role="status">{{ found.total|tall }} {{ "middag" if found.total == 1 else "middager" }}</p>
   <div class="cards">
     {% for d in found.dinners %}{{ card(d, s, found.via.get(d.dish.url, ())) }}{% endfor %}
     {% if found.total > shown %}{{ more_button(found, shown) }}{% endif %}
@@ -35,4 +26,5 @@
   </div>
   {% endif %}
   {% if box %}{{ search_box(s.text, oob=true) }}{% endif %}
+  {% if week_oob %}{% include "_week.html" %}{% endif %}
 </div>

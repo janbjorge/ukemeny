@@ -178,7 +178,7 @@ def _search(search: Search, total: int, relax: tuple[tuple[Clause, int], ...]) -
 
 
 def dinners(queries: Queries, found: Found) -> DinnersOut:
-    plan = queries.plan()
+    plan = queries.plan(found.household)
     return DinnersOut(
         considered=plan.considered,
         fitting=plan.fitting,

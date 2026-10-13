@@ -1,0 +1,8 @@
+{# The week: dinners whose main protein is on sale, by the diet rules picked in the search. A fragment sends it out of band. #}
+{% from "_dinner.html" import card with context %}
+<section id="uka"{% if week_oob %} hx-swap-oob="true"{% endif %}>
+  <h1>Ukens middager</h1>
+  <div class="cards week">
+    {% for d in week.dinners %}{{ card(d) }}{% endfor %}
+  </div>
+</section>

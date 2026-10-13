@@ -7,7 +7,6 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-default-groups --no-install-project
 COPY src src
 COPY datasets datasets
-COPY profile.yaml profile.yaml
 USER nobody
 EXPOSE 8080
 CMD ["uvicorn", "adapters.web.main:app", "--host", "0.0.0.0", "--port", "8080", "--proxy-headers", "--forwarded-allow-ips", "*"]

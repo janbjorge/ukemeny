@@ -59,6 +59,14 @@ def test_dinners_search() -> None:
     assert body["dinners"] == [] and [c["text"] for c in body["search"]["without"]] == ["fisk", "på tilbud"]
 
 
+def test_rules_come_from_q() -> None:
+    plain = client.get("/api/plan").json()
+    ruled = client.get("/api/plan", params={"q": "uten løk glutenfri"}).json()
+    assert plain["fitting"] == ruled["fitting"] == 2  # nothing here has onion or gluten
+    body = client.get("/api/oppskrift", params={"url": KYLLING.url, "q": "glutenfri"}).json()
+    assert body["fits"] is True
+
+
 def test_api_root_points_at_the_schema() -> None:
     for path in ("/api", "/api/"):
         r = client.get(path, follow_redirects=False)

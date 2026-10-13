@@ -1,8 +1,8 @@
 """Search dinners in plain bokmål: «rask kylling uten sopp», «laks eller torsk på tilbud», «glutenfri pasta».
 
-`parse` turns the words into clauses: categories (`Tag`), main proteins, and words to find or leave out.
-`Index` finds the dinners that meet every clause. The household's rules apply first: the index holds
-the dinners from core.ranking.dinners, in their order. æ, ø and å may be typed as ae, o and a, and a
+`parse` turns the words into clauses: diet rules (`Diet`), categories (`Tag`), main proteins, and words to
+find or leave out. A diet rule changes which dinners fit and what to swap (`household`); the rest narrow down
+the dinners that fit, which an `Index` holds in ranking order. æ, ø and å may be typed as ae, o and a, and a
 word that matches nothing is swapped for the closest known word (METHOD.md §6).
 """
 
@@ -10,11 +10,11 @@ import difflib
 import re
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 
 from core.matching import PROTEINS, VEGETARIAN
-from core.models import Dinner, Gluten, Household, Kids, Onion, Part, Traits
+from core.models import Dinner, Household, Kids, Part, Rule, Traits
 
 
 class Tag(StrEnum):
@@ -26,11 +26,20 @@ class Tag(StrEnum):
     ON_SALE = "på tilbud"
     LIKED = "godt likt"
     MILD = "barnevennlig"
-    AS_IS = "ingen bytter"
-    GLUTEN_FREE = "glutenfri"
-    ONION_FREE = "uten løk"
-    LOW_LACTOSE = "lite laktose"
-    GARLIC_FREE = "uten hvitløk"
+
+
+class Diet(StrEnum):
+    """A rule the visitor picks. The value is how a search writes it."""
+
+    ONION = "uten løk"
+    GLUTEN = "glutenfri"
+    LACTOSE = "lite laktose"
+
+
+ANYTHING = Household(onion=Rule.OK, gluten=Rule.OK, garlic=Rule.OK, lactose_g_per_portion=None, kid_notes=False)
+"""No rules: what the site starts with."""
+ONION_SUBSTITUTE = "vårløk"
+"""«Uten løk» still allows vårløk, and suggests it instead of onion."""
 
 
 TIME_TAGS = (Tag.QUICK, Tag.UNDER_40, Tag.UNDER_60)
@@ -40,12 +49,14 @@ LIKED_RATING = 4.5
 LIKED_COUNT = 20
 """Godt likt: at least this rating from at least this many ratings."""
 LACTOSE_G = 3.0
-"""Lite laktose when the household sets no limit: grams per portion."""
+"""«Lite laktose»: grams per portion, when the household sets no limit of its own."""
 NOT_MILD = ("chili", "spicy", "sterk")
 """In a dish name, these make it not barnevennlig whatever the ingredients say."""
 
 
 class Kind(StrEnum):
+    DIET = "diet"
+    """A rule: which dinners fit and what to swap (`household`)."""
     TAG = "tag"
     PROTEIN = "protein"
     """The main protein is one of `values`."""
@@ -78,6 +89,10 @@ class Search:
         return " ".join(c.text for c in self.clauses)
 
     @property
+    def diets(self) -> frozenset[Diet]:
+        return frozenset(Diet(c.values[0]) for c in self.clauses if c.kind is Kind.DIET)
+
+    @property
     def words(self) -> tuple[str, ...]:
         """Every word searched for, to mark in dish names."""
         return tuple(w for c in self.clauses if c.kind is Kind.WITH for w in c.values)
@@ -104,6 +119,23 @@ def _replaces(new: Clause, old: Clause) -> bool:
 
 def tag_clause(tag: Tag) -> Clause:
     return Clause(Kind.TAG, (tag.value,), tag.value, tag.value.capitalize())
+
+
+def diet_clause(diet: Diet) -> Clause:
+    return Clause(Kind.DIET, (diet.value,), diet.value, diet.value.capitalize())
+
+
+def household(diets: Iterable[Diet], base: Household = ANYTHING) -> Household:
+    """The base household with the chosen rules on top. The site's base is ANYTHING; the CLI's is profile.yaml."""
+    diets = set(diets)
+    h = base
+    if Diet.ONION in diets:
+        h = replace(h, onion=Rule.AVOID, onion_substitute=h.onion_substitute or ONION_SUBSTITUTE)
+    if Diet.GLUTEN in diets:
+        h = replace(h, gluten=Rule.AVOID)
+    if Diet.LACTOSE in diets and h.lactose_g_per_portion is None:
+        h = replace(h, lactose_g_per_portion=LACTOSE_G)
+    return h
 
 
 MEAT = (*dict.fromkeys(g for g in PROTEINS.values() if g not in ("fisk", "skalldyr")), "kjøtt")
@@ -165,7 +197,7 @@ def without_clause(word: str) -> Clause:
 
 
 # The words, as people write them. Keys are matched folded (see `fold`), so "lok" is "løk".
-TAG_WORDS: Mapping[str, Tag] = {
+TAG_WORDS: Mapping[str, Tag | Diet] = {
     **dict.fromkeys(
         ("rask", "raske", "raskt", "kjapp", "kjappe", "kjapt", "fort", "kvikk", "lynrask", "lettvint", "enkel", "enkle", "enkelt"),
         Tag.QUICK,
@@ -176,34 +208,28 @@ TAG_WORDS: Mapping[str, Tag] = {
     ),
     **dict.fromkeys(("likt", "populær", "populære", "favoritt", "favoritter", "best", "beste", "stjerner", "toppkarakter"), Tag.LIKED),
     **dict.fromkeys(("barnevennlig", "barnevennlige", "barn", "barna", "unger", "ungene", "småbarn", "mild", "milde", "mildt"), Tag.MILD),
-    **dict.fromkeys(("glutenfri", "glutenfritt", "glutenfrie"), Tag.GLUTEN_FREE),
-    **dict.fromkeys(("løkfri", "løkfritt", "løkfrie"), Tag.ONION_FREE),
-    **dict.fromkeys(("laktosefri", "laktosefritt", "laktosefrie"), Tag.LOW_LACTOSE),
-    **dict.fromkeys(("hvitløkfri", "hvitløksfri", "hvitløkfritt"), Tag.GARLIC_FREE),
+    **dict.fromkeys(("glutenfri", "glutenfritt", "glutenfrie"), Diet.GLUTEN),
+    **dict.fromkeys(("løkfri", "løkfritt", "løkfrie"), Diet.ONION),
+    **dict.fromkeys(("laktosefri", "laktosefritt", "laktosefrie"), Diet.LACTOSE),
 }
-PHRASES: Mapping[str, Tag | str] = {
+PHRASES: Mapping[str, Tag | Diet | str] = {
     "på tilbud": Tag.ON_SALE,
     "godt likt": Tag.LIKED,
     "mest likt": Tag.LIKED,
-    "lite laktose": Tag.LOW_LACTOSE,
-    "lav laktose": Tag.LOW_LACTOSE,
-    "som den er": Tag.AS_IS,
+    "lite laktose": Diet.LACTOSE,
+    "lav laktose": Diet.LACTOSE,
     "annet kjøtt": "annet kjøtt",
 }
-"""Several words that mean one thing: a category, or a key of PROTEIN_WORDS."""
-NEGATED: Mapping[str, Tag] = {
-    "løk": Tag.ONION_FREE,
-    "hvitløk": Tag.GARLIC_FREE,
-    "gluten": Tag.GLUTEN_FREE,
-    "laktose": Tag.LOW_LACTOSE,
+"""Several words that mean one thing: a rule, a category, or a key of PROTEIN_WORDS."""
+NEGATED: Mapping[str, Tag | Diet] = {
+    "løk": Diet.ONION,
+    "gluten": Diet.GLUTEN,
+    "laktose": Diet.LACTOSE,
     "chili": Tag.MILD,
     "sterk": Tag.MILD,
     "sterkt": Tag.MILD,
-    "bytte": Tag.AS_IS,
-    "bytter": Tag.AS_IS,
-    "endringer": Tag.AS_IS,
 }
-"""After «uten», «ikke» or «ingen»: «uten løk» is the category, not every word with løk in it."""
+"""After «uten», «ikke» or «ingen»: «uten løk» is the rule, not every word with løk in it."""
 NEGATIONS = frozenset({"uten", "ikke", "ingen", "unntatt", "utenom", "minus"})
 JOINERS = frozenset({"og", "eller", ",", "samt", "pluss"})
 STOP = frozenset(
@@ -304,14 +330,17 @@ def parse(text: str, fix: Callable[[str], str] | None = None) -> Search:
             if clause.kind is Kind.TAG and clause.values[0] in TIME_TAGS:
                 clauses[:] = [c for c in clauses if not _replaces(clause, c)]
             clauses.append(clause)
-        chained = clause.kind in (Kind.WITHOUT, Kind.NOT_PROTEIN) or (clause.kind is Kind.TAG and negate)
+        chained = clause.kind in (Kind.WITHOUT, Kind.NOT_PROTEIN) or (clause.kind in (Kind.TAG, Kind.DIET) and negate)
         negate = alternative = False
+
+    def meaning(m: Tag | Diet) -> Clause:
+        return tag_clause(m) if isinstance(m, Tag) else diet_clause(m)
 
     def word_clause(word: str, key: str) -> Clause | None:
         if negate and key in NEGATED_KEYS:
-            return tag_clause(NEGATED_KEYS[key])
+            return meaning(NEGATED_KEYS[key])
         if key in TAG_KEYS:
-            return tag_clause(TAG_KEYS[key])
+            return meaning(TAG_KEYS[key])
         if key in PROTEIN_KEYS:
             return protein_clause(PROTEIN_KEYS[key], negated=negate)
         return None
@@ -326,8 +355,8 @@ def parse(text: str, fix: Callable[[str], str] | None = None) -> Search:
             continue
         phrase = next((n for n in (3, 2) if tuple(keys[i : i + n]) in PHRASE_KEYS), 0)
         if phrase:
-            meaning = PHRASE_KEYS[tuple(keys[i : i + phrase])]
-            add(tag_clause(meaning) if isinstance(meaning, Tag) else protein_clause(meaning, negated=negate))
+            found = PHRASE_KEYS[tuple(keys[i : i + phrase])]
+            add(meaning(found) if isinstance(found, Tag | Diet) else protein_clause(found, negated=negate))
             i += phrase
             continue
         i += 1
@@ -351,10 +380,8 @@ def parse(text: str, fix: Callable[[str], str] | None = None) -> Search:
     return Search(tuple(clauses), tuple(corrected))
 
 
-def tags(dinner: Dinner, traits: Mapping[str, Traits], household: Household) -> frozenset[Tag]:
-    """The categories a dinner is in. The diet ones describe the recipe as written, with no swaps: a
-    dinner that fits after swapping pasta for gluten-free pasta is not «glutenfri». An ingredient
-    that was never judged makes no diet category."""
+def tags(dinner: Dinner, traits: Mapping[str, Traits]) -> frozenset[Tag]:
+    """The categories a dinner is in. An ingredient never judged keeps it out of «barnevennlig»."""
     dish = dinner.dish
     found: set[Tag] = set()
     limit = next((m for k, m in MINUTES.items() if dish.prep_time.startswith(k)), None)
@@ -364,22 +391,9 @@ def tags(dinner: Dinner, traits: Mapping[str, Traits], household: Household) -> 
         found.add(Tag.ON_SALE)
     if (dish.rating or 0.0) >= LIKED_RATING and dish.rating_count >= LIKED_COUNT:
         found.add(Tag.LIKED)
-    if not dinner.verdict.swaps:
-        found.add(Tag.AS_IS)
-    known = [(p, traits[p.name]) for p in dish.parts if p.name in traits]
-    if len(known) < len(dish.parts):
-        return frozenset(found)
-    substitute = (household.onion_substitute or "").lower()
-    lactose = household.lactose_g_per_portion
-    if dinner.verdict.lactose_g <= (LACTOSE_G if lactose is None else lactose):
-        found.add(Tag.LOW_LACTOSE)
-    if not any(t.gluten is Gluten.YES for _, t in known):
-        found.add(Tag.GLUTEN_FREE)
-    if not any(t.onion is Onion.ONION and not (substitute and substitute in p.name) for p, t in known):
-        found.add(Tag.ONION_FREE)
-    if not any(t.onion is Onion.GARLIC for _, t in known):
-        found.add(Tag.GARLIC_FREE)
-    if not any(t.kids is Kids.SPICY for _, t in known) and not any(w in dish.name.lower() for w in NOT_MILD):
+    known = [traits[p.name] for p in dish.parts if p.name in traits]
+    mild = len(known) == len(dish.parts) and not any(t.kids is Kids.SPICY for t in known)
+    if mild and not any(w in dish.name.lower() for w in NOT_MILD):
         found.add(Tag.MILD)
     return frozenset(found)
 
@@ -428,12 +442,11 @@ class Index:
 
     CACHE = 4096
 
-    def __init__(self, ranked: Sequence[Dinner], traits: Mapping[str, Traits], household: Household) -> None:
+    def __init__(self, ranked: Sequence[Dinner], traits: Mapping[str, Traits]) -> None:
         self.dinners = tuple(ranked)
         everyone = range(len(self.dinners))
-        all_tags = [tags(d, traits, household) for d in self.dinners]
+        all_tags = [tags(d, traits) for d in self.dinners]
         self._tagged = {tag: frozenset(i for i in everyone if tag in all_tags[i]) for tag in Tag}
-        self._at = {d.dish.url: i for i, d in enumerate(self.dinners)}
         self._main: dict[str, set[int]] = {}
         self._present: dict[str, set[int]] = {}
         # Per word, the dinners with it in the name, and with it in an ingredient
@@ -454,11 +467,6 @@ class Index:
                 vocabulary.setdefault(fold(w), w)
         self._vocabulary = vocabulary
         self._hits: dict[str, tuple[frozenset[int], frozenset[int]]] = {}
-
-    def has(self, dinner: Dinner, tag: Tag) -> bool:
-        """Is the dinner in this category? False for a dinner the index does not hold."""
-        i = self._at.get(dinner.dish.url)
-        return i is not None and i in self._tagged[tag]
 
     def hits(self, word: str) -> tuple[frozenset[int], frozenset[int]]:
         """(dinners with the word in the name, dinners with it in the name or an ingredient), with synonyms."""
@@ -490,6 +498,8 @@ class Index:
         named: Counter[int] = Counter()
         for c in clauses:
             match c.kind:
+                case Kind.DIET:
+                    pass  # A rule picks the index (Queries.index), it does not filter one
                 case Kind.TAG:
                     keep &= self._tagged[Tag(c.values[0])]
                 case Kind.PROTEIN:

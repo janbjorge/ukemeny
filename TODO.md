@@ -4,7 +4,7 @@ Every request from jb, with status. Newest first. An item is ticked only when it
 
 ## Open
 
-- [ ] Offers per place, picked in the search (jb 2026-10-13: "At the moment the pipeline assumes one location (stavanger), we need to extend this not assume location, and push that up to the search input in the 'finn en middag' part"). The code is in and checked on a preview dataset (FACTS.md §1). Left: jb runs `uv run python -m pipeline.datasets`, then tests/test_datasets.py passes, a look at the site, commit and push.
+- [ ] Offers per place, picked in the search (jb 2026-10-13: "At the moment the pipeline assumes one location (stavanger), we need to extend this not assume location, and push that up to the search input in the 'finn en middag' part"). The code and the first build with places are committed (FACTS.md §1, §4). Left: a push, then a look at the live site.
 - [ ] Logfire, every insight the app can see (jb 2026-10-13: "I wanto add logfire, go full tilt on all options. Make sure to understand the runtime in terms of being on fly.io and make sure we get every insight metric we can into logfire"). The code is in (FACTS.md §7) and checked in the Docker image. Left: a `matris` project in Logfire with a write token, `fly secrets set LOGFIRE_TOKEN=… -a matris`, a push, then check that the data arrives.
 - [ ] Tune Lavkarbo's 20 g per portion (METHOD.md §1): it leaves 378 of 1 943 dinners.
 - [ ] Rebuild `datasets/` every week so the offers stay current: by hand (`uv run python -m pipeline.datasets`, commit, push), or a scheduled GitHub Action with a `TYPESAFE_API_KEY` secret (Jev would still run offline, not in the site).

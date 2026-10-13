@@ -11,7 +11,7 @@ import argparse
 import asyncio
 import os
 import sys
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -45,7 +45,28 @@ class Result:
     jev: str
 
 
-async def run(refresh: bool = False, limit: int | None = None, progress: Callable[[int, int], None] | None = None) -> Result:
+STEPS = {
+    "recipes": "matprat.no: {due} pages to fetch",
+    "ingredients": "Jev: {due} ingredients to label",
+    "catalogs": "mattilbud.no: reading this week's catalogs",
+    "offers": "Jev: {due} ingredients to match with offers",
+}
+"""What each step of the build says as it starts (app.build.Progress)."""
+
+
+def reporter(steps: Mapping[str, str], echo: Callable[[str], None]) -> build.Progress:
+    """Light output: a line as each step starts, then done/due about every tenth."""
+
+    def report(step: str, done: int, due: int) -> None:
+        if done == 0:
+            echo(steps[step].format(due=f"{due:,}"))
+        elif due > 1 and (done == due or done % max(1, due // 10) == 0):
+            echo(f"  {done:,}/{due:,}")
+
+    return report
+
+
+async def run(refresh: bool = False, limit: int | None = None, progress: build.Progress | None = None) -> Result:
     key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
         raise SetupError("TYPESAFE_API_KEY is not set. Get a TypeSafe API key at https://console.typesafe.ai")
@@ -57,10 +78,11 @@ async def run(refresh: bool = False, limit: int | None = None, progress: Callabl
         AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
     ):
         store = SqliteRecipeStore(db)
-        refreshed = await build.refresh(recipes, store, limit, progress) if refresh else None
+        pages = (lambda done, due: progress("recipes", done, due)) if progress else None
+        refreshed = await build.refresh(recipes, store, limit, pages) if refresh else None
         jev = Jev(client, max_in_flight=JEV_IN_FLIGHT)
         snapshot = await build.snapshot(
-            store, SqliteTraitsStore(db), JevIngredientClassifier(jev), offers, SqliteOfferMatchStore(db), JevOfferMatcher(jev)
+            store, SqliteTraitsStore(db), JevIngredientClassifier(jev), offers, SqliteOfferMatchStore(db), JevOfferMatcher(jev), progress
         )
     return Result(snapshot, refreshed, datasets.write(snapshot), jev.status())
 
@@ -70,12 +92,8 @@ def main() -> None:
     parser.add_argument("--refresh", action="store_true", help="also fetch new and changed recipes from matprat.no")
     args = parser.parse_args()
 
-    def progress(done: int, due: int) -> None:
-        if done % 100 == 0 or done == due:
-            print(f"  {done:,}/{due:,} pages", file=sys.stderr)
-
     try:
-        result = asyncio.run(run(args.refresh, progress=progress))
+        result = asyncio.run(run(args.refresh, progress=reporter(STEPS, lambda line: print(line, file=sys.stderr, flush=True))))
     except SetupError as e:
         sys.exit(f"error: {e}")
     s = result.snapshot

@@ -92,3 +92,25 @@ async def test_snapshot_holds_every_dinner_and_the_shoppable_matches() -> None:
     assert set(s.traits) == {"kyllingfilet", "salt", "brokkoli"}
     assert s.matches == {"kyllingfilet": ("bryst",)}  # Salt is pantry: never looked up
     assert len(s.offers) == 2
+
+
+async def test_snapshot_reports_each_step() -> None:
+    seen: list[tuple[str, int, int]] = []
+    store = FakeRecipes().add(DINNER)
+    await build.snapshot(
+        store,
+        FakeTraits(),
+        FakeClassifier(),
+        FakeOffers([offer("KYLLINGBRYST", id="bryst")]),
+        FakeMatches(),
+        FakeMatcher(),
+        progress=lambda step, done, due: seen.append((step, done, due)),
+    )
+    assert seen == [
+        ("ingredients", 0, 2),
+        *sorted([("ingredients", 1, 2), ("ingredients", 2, 2)]),
+        ("catalogs", 0, 1),
+        ("catalogs", 1, 1),
+        ("offers", 0, 1),
+        ("offers", 1, 1),
+    ]

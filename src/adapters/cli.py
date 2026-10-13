@@ -149,12 +149,14 @@ def build(
     """Lag datasets/ med Jev: ukens tilbud og nye ingredienser. Trenger TYPESAFE_API_KEY."""
     from pipeline import datasets as pipeline
 
-    def progress(done: int, due: int) -> None:
-        if done % 100 == 0 or done == due:
-            typer.echo(f"  {done:,}/{due:,} sider", err=True)
-
+    steps = {
+        "recipes": "matprat.no: {due} sider å hente",
+        "ingredients": "Jev: {due} ingredienser å vurdere",
+        "catalogs": "mattilbud.no: leser ukens kundeaviser",
+        "offers": "Jev: {due} ingredienser å matche mot tilbud",
+    }
     try:
-        result = asyncio.run(pipeline.run(refresh, progress=progress))
+        result = asyncio.run(pipeline.run(refresh, progress=pipeline.reporter(steps, lambda line: typer.echo(line, err=True))))
     except (pipeline.SetupError, profile.ProfileError) as e:
         fail("setup", str(e), False)
     s = result.snapshot

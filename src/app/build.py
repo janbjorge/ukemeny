@@ -5,7 +5,7 @@ the server needs no Jev key and makes no calls to matprat.no or mattilbud.no.
 """
 
 import asyncio
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import UTC, datetime
 
 from core.dishes import dish
@@ -24,6 +24,10 @@ from core.ports import (
 
 MATCH_THRESHOLD = 0.5
 """An offer counts as the ingredient from this probability on."""
+
+type Progress = Callable[[str, int, int], None]
+"""(step, done, due) for a person watching the build: called with done 0 as a step starts, then as each item is done.
+The steps: "recipes" (matprat.no pages), "ingredients" (Jev's labels), "catalogs" (mattilbud.no), "offers" (Jev's matches)."""
 
 
 async def refresh(
@@ -57,7 +61,12 @@ async def refresh(
     return RefreshReport(listed=len(listed), fetched=done - failed, failed=failed, dinners=len(await store.dinners()))
 
 
-async def classify(ingredients: Iterable[Ingredient], store: TraitsStore, classifier: IngredientClassifier) -> dict[str, Traits]:
+async def classify(
+    ingredients: Iterable[Ingredient],
+    store: TraitsStore,
+    classifier: IngredientClassifier,
+    progress: Callable[[int, int], None] | None = None,
+) -> dict[str, Traits]:
     """Traits per ingredient name. The classifier is asked only for the labels not stored for a name, all in one
     request per name, and each answer is stored as it comes, so a run that stops halfway keeps what it got."""
     wanted: dict[str, Ingredient] = {}
@@ -65,11 +74,18 @@ async def classify(ingredients: Iterable[Ingredient], store: TraitsStore, classi
         wanted.setdefault(ingredient.name, ingredient)
     known = await store.get_many(wanted)
     missing = {name: labels for name in sorted(wanted) if (labels := [k for k in classifier.labels if k not in known.get(name, {})])}
+    done = 0
+    if progress:
+        progress(done, len(missing))
 
     async def one(name: str) -> None:
+        nonlocal done
         levels = await classifier.classify(wanted[name], missing[name])
         await store.save_many({name: levels})
         known[name] = {**known.get(name, {}), **levels}
+        done += 1
+        if progress:
+            progress(done, len(missing))
 
     async with asyncio.TaskGroup() as tg:
         for name in missing:
@@ -83,6 +99,7 @@ async def match(
     store: OfferMatchStore,
     matcher: OfferMatcher,
     threshold: float = MATCH_THRESHOLD,
+    progress: Callable[[int, int], None] | None = None,
 ) -> dict[str, tuple[str, ...]]:
     """Per ingredient name, the ids of the offers a cook can buy as it. The matcher is only asked
     about (ingredient, offer heading) pairs that are neither stored from an earlier week nor obvious."""
@@ -95,8 +112,20 @@ async def match(
     ask = {
         name: unknown for name, found in lookups.items() if (unknown := [o for o in found if (name, heading_key(o.heading)) not in scores])
     }
+    done = 0
+    if progress:
+        progress(done, len(ask))
+
+    async def one(name: str, found: Sequence[Offer]) -> Mapping[str, float]:
+        nonlocal done
+        scores = await matcher.rank(name, found)
+        done += 1
+        if progress:
+            progress(done, len(ask))
+        return scores
+
     async with asyncio.TaskGroup() as tg:
-        tasks = {name: tg.create_task(matcher.rank(name, found)) for name, found in ask.items()}
+        tasks = {name: tg.create_task(one(name, found)) for name, found in ask.items()}
     new = {(name, heading_key(o.heading)): tasks[name].result().get(o.id, 0.0) for name, found in ask.items() for o in found}
     await store.save_many(new)
     scores |= new
@@ -115,15 +144,24 @@ async def snapshot(
     offers: OfferSource,
     matches: OfferMatchStore,
     matcher: OfferMatcher,
+    progress: Progress | None = None,
 ) -> Snapshot:
     """Everything the site needs, for every household: no diet rule is applied here. Recipes become
     Dishes: facts per portion, without matprat's wording (docs/plan-web.md)."""
+
+    def step(name: str) -> Callable[[int, int], None] | None:
+        return (lambda done, due: progress(name, done, due)) if progress else None
+
     dinners = await recipes.dinners()
-    known = await classify((i for r in dinners for i in r.ingredients), traits, classifier)
+    known = await classify((i for r in dinners for i in r.ingredients), traits, classifier, step("ingredients"))
+    if progress:
+        progress("catalogs", 0, 1)
     current = await offers.current()
+    if progress:
+        progress("catalogs", 1, 1)
     dishes = tuple(dish(r) for r in sorted(dinners, key=lambda r: r.url))
     shoppable = (p.name for d in dishes for p in d.parts if weight(p))
-    matched = await match(shoppable, current, matches, matcher)
+    matched = await match(shoppable, current, matches, matcher, progress=step("offers"))
     return Snapshot(
         built=datetime.now(UTC),
         dishes=dishes,

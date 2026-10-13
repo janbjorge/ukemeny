@@ -1,5 +1,5 @@
 {
-  "built": "2026-10-13T17:51:30.052660+00:00",
+  "built": "2026-10-13T18:24:20.767651+00:00",
   "matches": {
     "appelsin": [
       "kbPNp60bjhukbdrq7piM7",
@@ -13,16 +13,12 @@
       "YSzrRCiL6-_TLh8B1Du9p",
       "dLaKYxmwzLT50SQairDPz"
     ],
-    "baby gulrot": [
-      "Q02TL40z-dgOQ7X1bzu56",
-      "CzjtaoHtLTer9dgyBQNJf",
-      "F7YmBxWFb7elZyVi24NIW"
-    ],
     "bacon": [
       "-EpJFuKqUZQibYSqZlZs5",
       "G9BGK_lHjaws9mgUwjEbB",
       "s8zaLOglbv8iSCH6JcSBe",
-      "IgN21dnbofklOJS1Ghds4",
+      "jQ6VS34o6J6nhB_HOlLzg",
+      "txjIcb9lXUyR_PR6Urwjf",
       "RZoNrkBasDXJN3Eui4I1b",
       "JEvirfg9v6JMWNncbmizq",
       "6Yta5LFlwdjj1srcqPXmE",
@@ -50,6 +46,9 @@
     "bog av storfe uten ben": [
       "faHOaIqlQA7bp3SuNg82L"
     ],
+    "bog av svin": [
+      "bdD07kSVcDS4FyOs8xxp6"
+    ],
     "brokkoli": [
       "oCAs9fcvmSAvS25GjL3zt"
     ],
@@ -71,7 +70,7 @@
       "5YXQGScXCgnZSdbRSvoFm",
       "gVni4yhjpdFWU31HhSmJZ",
       "6owitj6rL67vA3YXFWTbH",
-      "ygqrJUL_OAWnbhS3ugiiN",
+      "iblVI6jJvbhqhCpEneDXU",
       "K-lgLAjSJTPlM2IFnwiAW",
       "tqgMlnGPWSDaKaAA8nv1K",
       "oXL8x4bvehcH9Rtuj5Sfu",
@@ -144,9 +143,6 @@
     "fullkornspagetti": [
       "WoiDUAbI5iYSFx5_r1HBu"
     ],
-    "fullkornsris": [
-      "WoiDUAbI5iYSFx5_r1HBu"
-    ],
     "fårikålkjøtt": [
       "QgnBOUbxk5_duy8MichX4",
       "GVcmDc1OV7F_y4YNnBGns"
@@ -167,11 +163,14 @@
     "grillpølse": [
       "tk5MqIpiUkAohyyD5XAiF"
     ],
+    "grytekjøtt av lam med bein": [
+      "-asTeDPQcsLIOH3J4i8Yl"
+    ],
     "grønn tomat": [
       "s0HZvzvvS4r8Tj2SELYJG"
     ],
     "grønne druer": [
-      "z5sa1F5bn5mKWREccUmD2",
+      "inT5WOYckNXit_EEk5E_U",
       "mz6CFboBr3sKzCVLG1q5z",
       "aG5m5WgStLBtofVJcvuEk"
     ],
@@ -196,8 +195,8 @@
     "hakkede tomater": [
       "0Ow8CVaIgTl3EVgAAKhYi",
       "vFiIznk5PtmI7iIO0st4j",
-      "jLbNnd_xd0AfITwoN2-wr",
-      "MW1-e_M50jos_7KpzGZZZ"
+      "MW1-e_M50jos_7KpzGZZZ",
+      "jLbNnd_xd0AfITwoN2-wr"
     ],
     "hel ørret": [
       "cilGsN-65MEkwx30A4UYg"
@@ -209,6 +208,7 @@
       "vzdPLkGY5qWi7WD7nbfvI"
     ],
     "indrefilet av svin": [
+      "giLQvVLOYUjFd5Wd6kt-Z",
       "-c8NF_wSqwACJdVhsMqw-",
       "QIo2b4vZhRTCPTu_UBNv-"
     ],
@@ -243,7 +243,7 @@
       "6le_U4BmfCUH-Pa2BDgPr",
       "bdD07kSVcDS4FyOs8xxp6",
       "GnzCxK_pjQGNiC8_aWOH3",
-      "1BC3oDU0T_bniJe4Ua9O5",
+      "fQBskiuQ8afsp6qWSJOAp",
       "rHv1WnsaqJAUa2PdspNXn",
       "8dOrD-MKpfETTBG9a687g",
       "um0uK9o2gZlzk8_Th4VEJ"
@@ -259,14 +259,14 @@
       "6le_U4BmfCUH-Pa2BDgPr",
       "bdD07kSVcDS4FyOs8xxp6",
       "GnzCxK_pjQGNiC8_aWOH3",
-      "1BC3oDU0T_bniJe4Ua9O5",
+      "fQBskiuQ8afsp6qWSJOAp",
       "rHv1WnsaqJAUa2PdspNXn"
     ],
     "kjøttkraft": [
       "cq0OJSEinMBApZFAKQBhm"
     ],
     "kjøttpølse": [
-      "rLjXcTNuaL8J3Y4vDZe4z",
+      "1UorOhiFZZW1Z2eK3hUe1",
       "TSVOL0i4axp2zfsBkhfRs",
       "LMG5ESbtcBpcjS8mH1cnD"
     ],
@@ -299,6 +299,9 @@
     "kremost med pepper": [
       "xXhFpcM8dbF5szWx4Wbcv"
     ],
+    "kylling (ca. 1300 g)": [
+      "G3pUte_nR2_3zJBJzBoA9"
+    ],
     "kylling (ca. 1500 g)": [
       "G3pUte_nR2_3zJBJzBoA9"
     ],
@@ -328,7 +331,7 @@
       "Gvz6QxB9pTyxSIpbB12eh",
       "3wwTqsVyvbn3wZdkDatsf",
       "4XpTvhBqGrgktY8BKhsWd",
-      "JYEC7Z4YEhudyIvAFCjfU",
+      "qrQF88BZwcM0_ZMqi21RV",
       "URg401m0FUzablaD9avIh",
       "Jb5qtI1oA2LX6HxzuBNDW",
       "EOzRe3JpgrVJPuHlIxnyM",
@@ -355,21 +358,21 @@
       "MCgfrRcsf2eHA6Bc1pG-f",
       "Jc1oYCvAkdCcckQO-OSVm",
       "W0enuEmF2VgPjerAToQC5",
-      "9-n1KJvtNJEriaGaFaSwf",
+      "V_7p4RGOvcg4ylhu0R8yy",
       "g9XyOxx71N6p2f0FcmYdi",
       "nM3wiR_2k3xKzfXNhmxw0"
     ],
     "laksefilet": [
       "qzZHSQA7heMGgJYRqCS_V",
       "Jc1oYCvAkdCcckQO-OSVm",
-      "9-n1KJvtNJEriaGaFaSwf",
+      "V_7p4RGOvcg4ylhu0R8yy",
       "g9XyOxx71N6p2f0FcmYdi",
       "nM3wiR_2k3xKzfXNhmxw0"
     ],
     "laksefilet uten bein": [
       "qzZHSQA7heMGgJYRqCS_V",
       "Jc1oYCvAkdCcckQO-OSVm",
-      "9-n1KJvtNJEriaGaFaSwf",
+      "V_7p4RGOvcg4ylhu0R8yy",
       "g9XyOxx71N6p2f0FcmYdi",
       "nM3wiR_2k3xKzfXNhmxw0"
     ],
@@ -393,17 +396,11 @@
     "lammelår i skiver": [
       "GtQQeD3LRFsZj3F3IvHiZ"
     ],
-    "lammesadel": [
-      "GtQQeD3LRFsZj3F3IvHiZ"
-    ],
     "lammeside": [
       "GtQQeD3LRFsZj3F3IvHiZ"
     ],
     "lammestek": [
       "GtQQeD3LRFsZj3F3IvHiZ"
-    ],
-    "lettsaltet lammekjøtt": [
-      "pfaLhkZuoZlHUOKojD6cl"
     ],
     "lettsaltet svineknoke": [
       "AN_lYRRTg2yQBTOAN5vKQ"
@@ -416,13 +413,12 @@
     ],
     "linguine pasta": [
       "WX70A6mmt-sCZWWwThk6c",
-      "H-aC8q_JUalYVvIA4hPLe",
       "K4n7PXk0qBO5SAEeDW0Se",
       "e-3UpeFtDq3CigNGbE-5h"
     ],
     "løk": [
       "OYg4gEbmKZAPgzxc2mxHr",
-      "u7x9jCFKKjcJmT2miXVnU"
+      "O0TnccKSGQQqtpGX5J0FC"
     ],
     "makrell i tomat": [
       "cKejGVgaEEWwqYYWNb47o",
@@ -437,6 +433,9 @@
       "fqg5zuikQCzzRSQXHQl24"
     ],
     "marinert grillribbe av kam": [
+      "NZXLSzOCy_JHpanruWeih"
+    ],
+    "marinert grillribbe i skiver": [
       "NZXLSzOCy_JHpanruWeih"
     ],
     "mortadella": [
@@ -456,6 +455,7 @@
       "hFWdZ9UjHHYuTEl8H_Ah5"
     ],
     "naturris": [
+      "gAtmgXLUJxDN3_RT5jGL6",
       "l5zFQrpwnQ0DATvz5GNLf",
       "feNA982n2nEe7AeWJo6Fx"
     ],
@@ -477,7 +477,6 @@
     "pasta penne": [
       "WX70A6mmt-sCZWWwThk6c",
       "H-aC8q_JUalYVvIA4hPLe",
-      "WoiDUAbI5iYSFx5_r1HBu",
       "K4n7PXk0qBO5SAEeDW0Se",
       "e-3UpeFtDq3CigNGbE-5h"
     ],
@@ -490,21 +489,18 @@
       "e-3UpeFtDq3CigNGbE-5h"
     ],
     "pastavann": [
-      "WZXcTtFdND2i7chMFmEb-",
       "K4n7PXk0qBO5SAEeDW0Se"
     ],
-    "pepperonipølse": [
-      "xXhFpcM8dbF5szWx4Wbcv"
-    ],
     "philadelphia kremost": [
-      "ZNiu0PS2WsrSFbBLx5rN6",
       "gw3Vp6iW28StLR4FaX0hQ"
     ],
     "pillede reker": [
-      "-rCnbdtohQJDJBuEmTm_N",
-      "KbtcJAh4cjUdkX8NJ54Tw"
+      "-rCnbdtohQJDJBuEmTm_N"
     ],
     "pinnekjøtt": [
+      "_Eyyj82aGiHhv1Ee7R6GQ"
+    ],
+    "pinnekjøtt av reinsdyr": [
       "_Eyyj82aGiHhv1Ee7R6GQ"
     ],
     "plomme": [
@@ -533,7 +529,7 @@
       "q6jG_VIZnvrgNV006H_o5"
     ],
     "pølse": [
-      "rLjXcTNuaL8J3Y4vDZe4z",
+      "1UorOhiFZZW1Z2eK3hUe1",
       "tk5MqIpiUkAohyyD5XAiF",
       "TSVOL0i4axp2zfsBkhfRs",
       "LMG5ESbtcBpcjS8mH1cnD",
@@ -548,7 +544,6 @@
       "oxCiWeDnBIQTIh80XpmRo"
     ],
     "renskåret svinekjøtt fra flatbiff eller filet": [
-      "aSh-HtHmx71d6YW8mZ1Ew",
       "giLQvVLOYUjFd5Wd6kt-Z",
       "-c8NF_wSqwACJdVhsMqw-",
       "QIo2b4vZhRTCPTu_UBNv-",
@@ -594,7 +589,7 @@
       "eA2lux-hwBz5YdO9GygCy"
     ],
     "røde druer": [
-      "z5sa1F5bn5mKWREccUmD2",
+      "inT5WOYckNXit_EEk5E_U",
       "4D9ywGMOBWSsdiDqN4caa"
     ],
     "røkt skinke": [
@@ -622,6 +617,7 @@
       "hBLp4VENpMzNl20AO8rSA"
     ],
     "salatost": [
+      "OmBzWW4GrKhMic1fwIzug",
       "HOfSa6gPVWvwHKZRmraSj",
       "mdp5OWx8gHZJW72KlAM3Z",
       "hBLp4VENpMzNl20AO8rSA"
@@ -633,11 +629,8 @@
       "W6P5PUEitf-5lTDWwid_6",
       "Hr73jJ_9B5sOCg_2KxVQT"
     ],
-    "sivri biber (tyrkisk paprika)": [
-      "aAIQBokfhUYZxC97RF_zo"
-    ],
     "skinnfri kjøttpølse": [
-      "rLjXcTNuaL8J3Y4vDZe4z",
+      "1UorOhiFZZW1Z2eK3hUe1",
       "TSVOL0i4axp2zfsBkhfRs",
       "LMG5ESbtcBpcjS8mH1cnD"
     ],
@@ -647,9 +640,6 @@
     "snackpaprika (spiss paprika)": [
       "aAIQBokfhUYZxC97RF_zo",
       "z3dH4wuMKC7jTwImymo0l"
-    ],
-    "snøfrisk naturell": [
-      "feNA982n2nEe7AeWJo6Fx"
     ],
     "spekeskinke": [
       "yZ6QALaaztorGg4ULCCN2"
@@ -675,7 +665,7 @@
     ],
     "tagliatelle": [
       "WgC2iAd8iBQsFKD75YcaE",
-      "ACN0srGGjz49M2l1_zaK4"
+      "XOeAPx1x5gVzb6CjFCgrZ"
     ],
     "thai chili (små chili)": [
       "_YUvylblAZSu4PW4c5Ra0",
@@ -686,7 +676,7 @@
       "0Ow8CVaIgTl3EVgAAKhYi",
       "n2XlS8e9ad_a-Ow5gPao2",
       "iw72qQPGn1FsQ-FCe9yz-",
-      "LjACH_384Re1aZti206UH",
+      "4BIiq5W2acENye5c4EVdG",
       "s0HZvzvvS4r8Tj2SELYJG",
       "8_r-haIZ5wiLmNwFtLcRL",
       "C55rdsx0cdIXZuDkxA7Qw",
@@ -757,10 +747,10 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "100 g x 4 Grilstad pr. pk 125/KG",
+      "description": "100 g x 4 Grilstad pr. pk 125.00 /KG",
       "heading": "BACONBURGER",
-      "id": "rI3o5rG2bLDclpDn0k3DM",
-      "per_kg": 500.0,
+      "id": "E5qQKjr4VRnlUdaak-a0y",
+      "per_kg": 125.0,
       "pre_price": null,
       "price": 50.0,
       "store": "Bunnpris",
@@ -817,9 +807,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "700 g skåret Kløverbakeriet pr. stk 42.86/KG",
+      "description": "700 g skåret Kløverbakeriet pr. stk 42,86/KG",
       "heading": "BJØRNISBRØD",
-      "id": "NfP0gRKBvPqUiNnlqYF7B",
+      "id": "cfaSqOXMDX16jG7XshF8h",
       "per_kg": 42.857142857142854,
       "pre_price": null,
       "price": 30.0,
@@ -847,9 +837,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "250 ml bx + pant 40/L",
+      "description": "250 ml bx + pant 40.00 /L",
       "heading": "BURN ORIGINAL OG ZERO",
-      "id": "JtvVtdlwhXAzqHoP2EH_w",
+      "id": "DCLRewOO4qB_V4T5sJDzD",
       "per_kg": null,
       "pre_price": null,
       "price": 10.0,
@@ -1007,9 +997,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "0.8 l + pant 25.00 /L Utvalget kan variere fra butikk til butikk.",
+      "description": "0,8 l + pant 25/L",
       "heading": "ET STORT UTVALG FUN LIGHT",
-      "id": "J0tjOQCnoGyrFssuvO7zK",
+      "id": "Dmx-Q6se1ZjkhhsfU1FiG",
       "per_kg": null,
       "pre_price": null,
       "price": 20.0,
@@ -1057,9 +1047,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "Sjekk prisen! Fra 80 g pr. pk",
+      "description": "Fra 80 g pr. pk 181.82 /KG",
       "heading": "ET UTVALG GILDE- OG PRIOR-PÅLEGG",
-      "id": "Q-Fv_fMLDacHa5o1yadc_",
+      "id": "pDxSBbiyoEp2ZOFYKgpZE",
       "per_kg": 250.0,
       "pre_price": null,
       "price": 20.0,
@@ -1137,9 +1127,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "Partivare 300 g pr. pk 66.67 /KG",
+      "description": "Partivare 300 g pr. pk 66,67/KG",
       "heading": "FINDUS FISKEPINNER",
-      "id": "CbtNiuEKF7K2X_wB-d3Hd",
+      "id": "yC1dSzOPDtsyd07L8M3AT",
       "per_kg": 66.66666666666667,
       "pre_price": null,
       "price": 20.0,
@@ -1227,9 +1217,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "450 g pr. pk 55.56 /KG",
+      "description": "450 g pr. pk 55,56/KG",
       "heading": "GILDE SKINNFRI KJØTTPØLSE",
-      "id": "rLjXcTNuaL8J3Y4vDZe4z",
+      "id": "1UorOhiFZZW1Z2eK3hUe1",
       "per_kg": 55.55555555555556,
       "pre_price": null,
       "price": 25.0,
@@ -1257,9 +1247,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "500 g Cevita pr. stk 70/KG",
+      "description": "500 g Cevita pr. stk",
       "heading": "GRØNNE OG RØDE DRUER I BEGER",
-      "id": "z5sa1F5bn5mKWREccUmD2",
+      "id": "inT5WOYckNXit_EEk5E_U",
       "per_kg": 70.0,
       "pre_price": null,
       "price": 35.0,
@@ -1477,9 +1467,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "390 g Findus pr. pk 64,10/KG",
+      "description": "390 g Findus pr. pk 64.10 /KG",
       "heading": "KYSTENS FISKEGRATENG",
-      "id": "5zRICTlDTnuTHqno7iXl9",
+      "id": "KRrrzZSD_beeSnlXfunSy",
       "per_kg": 64.1025641025641,
       "pre_price": null,
       "price": 25.0,
@@ -1547,9 +1537,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "300 g Hoff pr. pk 100.00 /KG",
+      "description": "300 g Hoff pr. pk 100/KG",
       "heading": "LØKRINGER",
-      "id": "u7x9jCFKKjcJmT2miXVnU",
+      "id": "O0TnccKSGQQqtpGX5J0FC",
       "per_kg": 100.0,
       "pre_price": null,
       "price": 30.0,
@@ -1647,9 +1637,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "Ukens nystekte Rett fra ovnen 650 g Kløverbakeriet pr. stk 46.15 /KG",
+      "description": "Rett fra ovnen 650 g Kløverbakeriet pr. stk 46,15/KG",
       "heading": "MELLOMGROVT BRØD",
-      "id": "_7z76i5Rw67EcUEjh8_q7",
+      "id": "2Q9JupHc-FKjxgC60uKRi",
       "per_kg": 46.15384615384615,
       "pre_price": null,
       "price": 30.0,
@@ -3907,9 +3897,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "500 g. Import Ikke-medlem? Se pris i butikk 1% av frukt- og grøntsalget doneres til Rosa sløyfe!",
+      "description": "500 g. Import Ikke-medlem? Se pris i butikk",
       "heading": "COOP JORDBÆR",
-      "id": "mh4EaoiZXXPDC8bQDmZkv",
+      "id": "fr2eIdhdaD7Tc8rUvGDnG",
       "per_kg": 99.8,
       "pre_price": null,
       "price": 49.9,
@@ -4207,9 +4197,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "Gjelder 0,5 l Coca Cola Zero + 1 småsjokolade. Velg mellom Snickers, Twix eller Mars.",
+      "description": "Gjelder 0,5 l Coca Cola Original eller Zero + pizzabolle.",
       "heading": "PAKKEDEAL",
-      "id": "CZx1NLByOtBvHP6k2wAaL",
+      "id": "GmZQanVieie0bhS4PvQfB",
       "per_kg": null,
       "pre_price": null,
       "price": 40.0,
@@ -4339,7 +4329,7 @@
     {
       "description": "Ø:180 cm/140x250 cm/140x320 cm. Ord.pris fra 149,- til 179,-",
       "heading": "ALLE SUPERDUKER",
-      "id": "8xwiKQ4IJk_b3L-Z5aoqL",
+      "id": "b1bCsq1gjgdBAFu8CDVQi",
       "per_kg": null,
       "pre_price": null,
       "price": 100.0,
@@ -5959,7 +5949,7 @@
     {
       "description": "400 g. Pr pk Pr kg 99,75",
       "heading": "Coop hverdagstomater",
-      "id": "LjACH_384Re1aZti206UH",
+      "id": "4BIiq5W2acENye5c4EVdG",
       "per_kg": 99.75,
       "pre_price": null,
       "price": 39.9,
@@ -5989,7 +5979,7 @@
     {
       "description": "Uten skinn. 500 g. Pr pk Pr kg 198,00",
       "heading": "Coop laksefilet",
-      "id": "9-n1KJvtNJEriaGaFaSwf",
+      "id": "V_7p4RGOvcg4ylhu0R8yy",
       "per_kg": 198.0,
       "pre_price": null,
       "price": 99.0,
@@ -6069,7 +6059,7 @@
     {
       "description": "1 kg. Pr pk",
       "heading": "Coop spaghetti",
-      "id": "TYGLtbb18aEy6JsYvG-Zg",
+      "id": "CJ0SIEeveUIoJj4ec086Z",
       "per_kg": 20.0,
       "pre_price": null,
       "price": 20.0,
@@ -6297,9 +6287,9 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "LEGO® Botanicals Prestekrager 11508 LEGO® Botanicals Pyntekorgblomster 11514 Pr stk",
+      "description": "LEGO® Botanicals Prestekrager 11508 LEGO® Botanicals Pyntekorgblomster 11514 Pr stk Ikke-medlem: 199 Spar: 70",
       "heading": "LEGO® Botanicals",
-      "id": "SoTGCZ-rZW8RvtaA3UwF8",
+      "id": "pnypmmAHJ4BlHiQSK4rpq",
       "per_kg": null,
       "pre_price": null,
       "price": 199.0,
@@ -6847,11 +6837,11 @@
       "valid_until": "2026-10-18"
     },
     {
-      "description": "et utvalg, 50–95 g Enh.pris 105,26–200,00 pr. kg Førpris 14,90– 16,90",
+      "description": "et utvalg, 60–140 g Enh.pris 71,43–166,67 pr. kg Førpris 19,90– 24,90",
       "heading": "Bakevarer",
-      "id": "3n0GLKfLy2ShkTsbdnUtF",
-      "per_kg": 200.0,
-      "pre_price": 14.9,
+      "id": "yEjEs0woLQOHOUcEHnUoC",
+      "per_kg": 166.67,
+      "pre_price": 19.9,
       "price": 10.0,
       "store": "Joker",
       "valid_until": "2026-10-17"
@@ -6877,9 +6867,9 @@
       "valid_until": "2026-10-17"
     },
     {
-      "description": "M/L, PRIOR, 378 g Enh.pris 52,91 pr. kg Førpris 34,90 Maks 5 pk. av hver pr. kunde PARTIVARE",
-      "heading": "Egg 6-pk.",
-      "id": "ygqrJUL_OAWnbhS3ugiiN",
+      "description": "M/L, Prior, 378 g Enh.pris 52,91 pr. kg Førpris 34,90 Maks 5 pk. av hver pr. kunde PARTIVARE",
+      "heading": "Egg 6-pk",
+      "id": "iblVI6jJvbhqhCpEneDXU",
       "per_kg": 52.91,
       "pre_price": 34.9,
       "price": 20.0,
@@ -7029,7 +7019,7 @@
     {
       "description": "Server med nystekt brød! Ukens brød Nystekt Bakehuset, 500 g Enh.pris 40,00 pr. kg Førpris 29,90 Gjelder t.o.m. søndag 18.10.",
       "heading": "Gullkorn",
-      "id": "__ugp8WQmuYoXsXHHJ-ll",
+      "id": "PKNCIo7aW28aYK-eAnuP_",
       "per_kg": 40.0,
       "pre_price": 29.9,
       "price": 20.0,
@@ -7449,7 +7439,7 @@
     {
       "description": "et utvalg, 220–330 ml Enh.pris 60,61–90,91 pr. l Førpris 29,90–34,90",
       "heading": "Starbucks",
-      "id": "jKuCASaPB2HtDHAn7JFfj",
+      "id": "ETuDTapckLo1rcCNLEtoL",
       "per_kg": null,
       "pre_price": 29.9,
       "price": 20.0,
@@ -7459,7 +7449,7 @@
     {
       "description": "skivet, Gilde, 140 g Enh.pris 142,86 pr. kg Førpris 39,90 Maks 5 pk. av hver pr. kunde",
       "heading": "Stjernebacon",
-      "id": "IgN21dnbofklOJS1Ghds4",
+      "id": "jQ6VS34o6J6nhB_HOlLzg",
       "per_kg": 142.86,
       "pre_price": 39.9,
       "price": 20.0,
@@ -9549,7 +9539,7 @@
     {
       "description": "BAMA, 500 g, 39,80 pr. kg",
       "heading": "AVOCADO NETT",
-      "id": "FTq1SUTL1Y5hQZJ9RdTkE",
+      "id": "ZP04ep7703Ahf-2IdVjs1",
       "per_kg": 39.8,
       "pre_price": null,
       "price": 19.9,
@@ -9979,7 +9969,7 @@
     {
       "description": "Solvinge, 480 g, 145,63 pr. kg",
       "heading": "KYLLINGFILET",
-      "id": "JYEC7Z4YEhudyIvAFCjfU",
+      "id": "qrQF88BZwcM0_ZMqi21RV",
       "per_kg": 145.63,
       "pre_price": 89.9,
       "price": 69.9,
@@ -10099,7 +10089,7 @@
     {
       "description": "Kolonihagen, 280 g, 124,64 pr. kg",
       "heading": "PASTASAUS ØKO",
-      "id": "CuYcqdIN850uzfje1SanD",
+      "id": "srYWNAiZd9AOQ_ypz602O",
       "per_kg": 124.64,
       "pre_price": null,
       "price": 34.9,
@@ -10159,7 +10149,7 @@
     {
       "description": "Lille skinkefabrikk, 100 g, 599,00 pr. kg",
       "heading": "PROCIUTTO CRUDO",
-      "id": "ZZW77qNcua3H81nCZhBxs",
+      "id": "0ZIrhpF43gy1ASRfOv6zO",
       "per_kg": 599.0,
       "pre_price": null,
       "price": 59.9,
@@ -10309,7 +10299,7 @@
     {
       "description": "Barilla, 500 g, 65,00 pr. kg",
       "heading": "TAGLIATELLE",
-      "id": "ACN0srGGjz49M2l1_zaK4",
+      "id": "XOeAPx1x5gVzb6CjFCgrZ",
       "per_kg": 65.0,
       "pre_price": null,
       "price": 32.5,
@@ -10569,7 +10559,7 @@
     {
       "description": "SPAR, storfe, 400 g 124,75/kg Førpris: 83,90",
       "heading": "Kjøttdeig",
-      "id": "1BC3oDU0T_bniJe4Ua9O5",
+      "id": "fQBskiuQ8afsp6qWSJOAp",
       "per_kg": 124.74999999999999,
       "pre_price": 83.9,
       "price": 49.9,

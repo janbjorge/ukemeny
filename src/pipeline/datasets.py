@@ -23,7 +23,7 @@ from typing import Never, TextIO
 from tqdm import tqdm
 from typesafe_sdk import AsyncTypeSafeClient
 
-from adapters import datasets, profile
+from adapters import datasets
 from app import build
 from core.models import RefreshReport, Snapshot
 from pipeline.jev import Jev, JevIngredientClassifier, JevOfferMatcher
@@ -113,10 +113,9 @@ async def run(progress: build.Progress | None = None, fetching: Callable[[str], 
     key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
         raise SetupError("TYPESAFE_API_KEY is not set. Get a TypeSafe API key at https://console.typesafe.ai")
-    shopping = profile.load().shopping
     async with (
         MatpratRecipeSource.open(CRAWL_WORKERS, fetching) as recipes,
-        TjekOfferSource.open(shopping.lat, shopping.lng, shopping.radius_km, shopping.stores, fetching) as offers,
+        TjekOfferSource.open(fetching=fetching) as offers,
         AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
     ):
         jev = Jev(client, max_in_flight=JEV_IN_FLIGHT)
@@ -143,7 +142,10 @@ def main() -> None:
         sys.exit(f"error: {e}")
     s, r = result.snapshot, result.recipes
     print(f"matprat.no: {r.listed:,} pages, {r.failed:,} failed")
-    print(f"{len(s.dishes):,} dinners, {len(s.traits):,} ingredients, {len(s.offers):,} offers, {len(s.matches):,} ingredients on offer")
+    print(
+        f"{len(s.dishes):,} dinners, {len(s.traits):,} ingredients, {len(s.offers):,} offers in {len(s.places)} places, "
+        f"{len(s.matches):,} ingredients on offer"
+    )
     print(", ".join(f"{name} {size / 1e6:.1f} MB" for name, size in result.sizes.items()))
     print(result.jev)
 

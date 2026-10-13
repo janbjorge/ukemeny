@@ -103,3 +103,27 @@ def test_answers_link_to_each_rule_so_agents_need_not_write_urls() -> None:
     assert found["add"]["uten løk"] == "http://testserver/api/middager?q=kylling+melkefri+uten+l%C3%B8k"
     assert found["plan"] == "http://testserver/api/plan?q=melkefri"  # the week follows the rules only
     assert "melkefri" not in found["add"]
+
+
+def test_a_place_in_answers_and_links() -> None:
+    s = snapshot(
+        KYLLING,
+        offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale", catalog="kiwi-vest")],
+        matches={"kyllingfilet": ["sale"]},
+        places={"Bergen": ["kiwi-vest"], "Tromsø": ["kiwi-nord"]},
+    )
+    api = TestClient(main.create_app(Queries(FakeDatasets(s), Household(), Week(days=1, fish=0))))
+    body = api.get("/api/plan").json()
+    assert (body["place"], body["offers"], body["on_sale"]) == (None, 1, 1)
+    assert body["links"]["places"] == {
+        "Bergen": "http://testserver/api/plan?q=i+bergen",
+        "Tromsø": "http://testserver/api/plan?q=i+troms%C3%B8",
+    }
+    body = api.get(body["links"]["places"]["Tromsø"]).json()
+    assert (body["place"], body["offers"], body["on_sale"]) == ("Tromsø", 0, 0)
+    assert body["links"]["remove"] == {"i tromsø": "http://testserver/api/plan"}
+    assert list(body["links"]["places"]) == ["Bergen"]
+    body = api.get("/api/middager?q=kylling+i+bergen").json()
+    assert body["place"] == "Bergen" and body["search"]["understood"][-1] == {"kind": "place", "text": "i bergen", "label": "I Bergen"}
+    assert body["links"]["plan"] == "http://testserver/api/plan?q=i+bergen"
+    assert "- [Bergen](http://testserver/api/plan?q=i+bergen)" in api.get("/llms.txt").text

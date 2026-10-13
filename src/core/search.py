@@ -1,8 +1,8 @@
 """Search dinners in plain bokmål: «rask kylling uten sopp», «laks eller torsk på tilbud», «glutenfri pasta».
 
-`parse` turns the words into clauses: diet rules (`Diet`), categories (`Tag`), main proteins, and words to
-find or leave out. A diet rule changes which dinners fit and what to swap (`household`); the rest narrow down
-the dinners that fit, which an `Index` holds in ranking order. æ, ø and å may be typed as ae, o and a, and a
+`parse` turns the words into clauses: diet rules (`Diet`), categories (`Tag`), main proteins, a place, and words to
+find or leave out. A diet rule changes which dinners fit and what to swap (`household`), and a place whose offers count;
+the rest narrow down the dinners that fit, which an `Index` holds in ranking order. æ, ø and å may be typed as ae, o and a, and a
 word that matches nothing is swapped for the closest known word (METHOD.md §6).
 """
 
@@ -132,6 +132,8 @@ class Kind(StrEnum):
     """`values[0]` is in no ingredient and not in the name."""
     ORDER = "order"
     """Sort by `values[0]` (Order) instead of the ranking; it leaves no dinner out."""
+    PLACE = "place"
+    """The offers are from the stores near `values[0]` (Snapshot.places); without one, from every store."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -163,6 +165,10 @@ class Search:
         return next((Order(c.values[0]) for c in self.clauses if c.kind is Kind.ORDER), None)
 
     @property
+    def place(self) -> str | None:
+        return next((c.values[0] for c in self.clauses if c.kind is Kind.PLACE), None)
+
+    @property
     def words(self) -> tuple[str, ...]:
         """Every word searched for, to mark in dish names."""
         return tuple(w for c in self.clauses if c.kind is Kind.WITH for w in c.values)
@@ -182,7 +188,7 @@ class Search:
 
 
 def _replaces(new: Clause, old: Clause) -> bool:
-    if new.kind in (Kind.PROTEIN, Kind.ORDER):
+    if new.kind in (Kind.PROTEIN, Kind.ORDER, Kind.PLACE):
         return old.kind is new.kind
     return new.kind is Kind.TAG and old.kind is Kind.TAG and new.values[0] in TIME_TAGS and old.values[0] in TIME_TAGS
 
@@ -197,6 +203,11 @@ def order_clause(order: Order) -> Clause:
 
 def diet_clause(diet: Diet) -> Clause:
     return Clause(Kind.DIET, (diet.value,), diet.value, DIET_LABELS.get(diet, diet.value.capitalize()))
+
+
+def place_clause(place: str) -> Clause:
+    """`place` as Snapshot.places names it: "Bergen"."""
+    return Clause(Kind.PLACE, (place,), f"i {place.lower()}", f"I {place}")
 
 
 def household(diets: Iterable[Diet], base: Household = ANYTHING) -> Household:
@@ -367,8 +378,8 @@ JOINERS = frozenset({"og", "eller", ",", "samt", "pluss"})
 STOP = frozenset(
     """a av da dag de den deilig det digg du en enn er et ei familie familien for forslag fra gi gjerne god gode godt
     ha har hele hva i ide idag ideer ikveld jeg kan kveld lage lager litt lyst mat meg middag middagen middager
-    middagstips mye na noe noen oppskrift oppskrifter oss pa passer personer porsjon porsjoner rett retter sa skal
-    som spise til tips under veldig vi vil ville""".split()  # noqa: SIM905
+    middagstips mye na naer noe noen oppskrift oppskrifter oss pa passer personer porsjon porsjoner rett retter rundt sa
+    skal som spise til tips under veldig vi vil ville""".split()  # noqa: SIM905
 )
 """Words that say nothing about the dinner. Folded: "pa" is «på», "a" is «å»."""
 SYNONYMS: Mapping[str, tuple[str, ...]] = {
@@ -438,9 +449,10 @@ def _known(key: str) -> bool:
     return key in TAG_KEYS or key in PROTEIN_KEYS or key in NEGATED_KEYS
 
 
-def parse(text: str, fix: Callable[[str], str] | None = None) -> Search:
-    """The clauses in a search, in the order written. `fix` swaps a word that is neither a category nor a
-    protein for a known word (Index.fix); without it every other word is searched for as written."""
+def parse(text: str, fix: Callable[[str], str] | None = None, places: Iterable[str] = ()) -> Search:
+    """The clauses in a search, in the order written. `fix` swaps a word that is neither a category, a protein nor
+    one of the `places` for a known word (Index.fix); without it every other word is searched for as written."""
+    place_keys = {fold(p): p for p in places}
     tokens = _tokens(text)
     keys = [fold(t) for t in tokens]
     clauses: list[Clause] = []
@@ -459,7 +471,7 @@ def parse(text: str, fix: Callable[[str], str] | None = None) -> Search:
         elif clause.kind is Kind.WITH and alternative and clauses and clauses[-1].kind is Kind.WITH:
             clauses[-1] = with_clause((*clauses[-1].values, *clause.values))
         elif clause not in clauses:
-            if (clause.kind is Kind.TAG and clause.values[0] in TIME_TAGS) or clause.kind is Kind.ORDER:
+            if (clause.kind is Kind.TAG and clause.values[0] in TIME_TAGS) or clause.kind in (Kind.ORDER, Kind.PLACE):
                 clauses[:] = [c for c in clauses if not _replaces(clause, c)]
             clauses.append(clause)
         chained = clause.kind in (Kind.WITHOUT, Kind.NOT_PROTEIN) or (clause.kind in (Kind.TAG, Kind.DIET) and negate)
@@ -471,6 +483,8 @@ def parse(text: str, fix: Callable[[str], str] | None = None) -> Search:
         return tag_clause(m) if isinstance(m, Tag) else diet_clause(m)
 
     def word_clause(word: str, key: str) -> Clause | None:
+        if key in place_keys:
+            return place_clause(place_keys[key])
         if negate and key in NEGATED_KEYS:
             return meaning(NEGATED_KEYS[key])
         if key in TAG_KEYS:
@@ -591,7 +605,9 @@ class Index:
 
     CACHE = 4096
 
-    def __init__(self, dishes: Sequence[Prepared], traits: Mapping[str, Traits]) -> None:
+    def __init__(self, dishes: Sequence[Prepared], traits: Mapping[str, Traits], places: Iterable[str] = ()) -> None:
+        self.places = tuple(places)
+        """Where the offers can be from (Snapshot.places)."""
         self._id = {p.dish.url: i for i, p in enumerate(dishes)}
         self._protein = [p.protein for p in dishes]
         all_tags = [tags(p.dish, traits) for p in dishes]
@@ -611,7 +627,7 @@ class Index:
                 for w in part_words(part):
                     self._in_parts.setdefault(w, set()).add(i)
         vocabulary: dict[str, str] = {}
-        for w in (*TAG_WORDS, *NEGATED, *PROTEIN_WORDS, *PROTEIN_ALIASES, *self._in_name, *self._in_parts):
+        for w in (*TAG_WORDS, *NEGATED, *PROTEIN_WORDS, *PROTEIN_ALIASES, *self.places, *self._in_name, *self._in_parts):
             if len(w) >= 3 and " " not in w:
                 vocabulary.setdefault(fold(w), w)
         self._vocabulary = vocabulary
@@ -641,7 +657,7 @@ class Index:
         return self._hits[term]
 
     def fix(self, word: str) -> str:
-        """The word if any dish has it, else the closest known word (a category, a protein, a word
+        """The word if any dish has it, else the closest known word (a category, a protein, a place, a word
         in a dish or ingredient name), else the word."""
         if self.hits(word)[1] or len(word) < 3:
             return word
@@ -649,15 +665,15 @@ class Index:
         return self._vocabulary[close[0]] if close else word
 
     def parse(self, text: str) -> Search:
-        return parse(text, self.fix)
+        return parse(text, self.fix, self.places)
 
     def _keep(self, clauses: Iterable[Clause], view: View) -> tuple[set[int], Counter[int]]:
         keep = set(view.rank)
         named: Counter[int] = Counter()
         for c in clauses:
             match c.kind:
-                case Kind.DIET | Kind.ORDER:
-                    pass  # A rule picks the view (Queries.view), and an order sorts (find): neither filters
+                case Kind.DIET | Kind.ORDER | Kind.PLACE:
+                    pass  # A rule and a place pick the view (Queries.view), and an order sorts (find): none filters
                 case Kind.TAG:
                     keep &= view.on_sale if c.values[0] == Tag.ON_SALE else self._tagged[Tag(c.values[0])]
                 case Kind.PROTEIN:

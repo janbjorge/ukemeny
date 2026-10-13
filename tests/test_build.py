@@ -51,14 +51,16 @@ async def test_obvious_offers_are_never_asked_about() -> None:
 async def test_snapshot_holds_every_dinner_and_the_shoppable_matches() -> None:
     source = FakeSource({DINNER.url: DINNER, BROCCOLI_GRATIN.url: BROCCOLI_GRATIN})
     current = [offer("KYLLINGBRYST", 99, pre_price=135, id="bryst"), offer("SALTSTANG", id="snack")]
+    places = {"Tromsø": ("KIWI",), "Bergen": ("KIWI",)}
     s, report = await build.snapshot(
-        source, FakeClassifier(), FakeOffers(current), FakeMatcher({"kyllingfilet": "kylling", "salt": "salt"})
+        source, FakeClassifier(), FakeOffers(current, places), FakeMatcher({"kyllingfilet": "kylling", "salt": "salt"})
     )
     assert [d.name for d in s.dishes] == ["Brokkoligrateng", "Kyllinggryte"]
     assert s.dishes[1].parts[0] == Part("kyllingfilet", "/kjøtt/kylling/høns", 150, "g")  # Per portion
     assert set(s.traits) == {"kyllingfilet", "salt", "brokkoli"}
     assert s.matches == {"kyllingfilet": ("bryst",)}  # Salt is pantry: never looked up
     assert len(s.offers) == 2 and report.dinners == 2
+    assert list(s.places.items()) == [("Bergen", ("KIWI",)), ("Tromsø", ("KIWI",))]  # sorted, as datasets/ has them
 
 
 async def test_snapshot_reports_each_step() -> None:

@@ -200,3 +200,24 @@ def test_head_answers_like_get() -> None:
 def test_the_real_site_renders() -> None:
     html = TestClient(main.app).get("/").text
     assert html.count('<article class="card"') >= 5
+
+
+def test_offers_are_from_every_store_until_a_place_is_searched_for() -> None:
+    s = snapshot(
+        recipe("Kyllinggryte", CHICKEN),
+        recipe("Laks i ovn", SALMON),
+        offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale", catalog="kiwi-vest")],
+        matches={"kyllingfilet": ["sale"]},
+        places={"Bergen": ["kiwi-vest"], "Tromsø": ["kiwi-nord"]},
+    )
+    client = TestClient(main.create_app(Queries(FakeDatasets(s), week=Week(days=2, fish=1))))
+    anywhere = client.get("/").text
+    assert "Tilbudene er fra butikker over hele landet" in anywhere and "\u221227\u00a0%" in anywhere
+    north = client.get("/?q=i+troms%C3%B8").text
+    assert "over hele landet" not in north and "\u221227\u00a0%" not in north  # nothing on sale near Tromsø
+    week = '<section id="uka" hx-swap-oob="true">'
+    moved = client.get("/middager?q=i+bergen", headers=HX | {"HX-Current-URL": "http://testserver/?q=i+troms%C3%B8"}).text
+    assert week in moved and "\u221227\u00a0%" in moved  # another place, another week
+    stayed = client.get("/middager?q=kylling+i+bergen", headers=HX | {"HX-Current-URL": "http://testserver/?q=i+bergen"}).text
+    assert week not in stayed
+    assert "Bergen, Tromsø" in client.get("/om").text

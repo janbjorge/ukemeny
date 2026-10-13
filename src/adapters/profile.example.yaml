@@ -1,5 +1,5 @@
 # What the household can't eat, where it shops, and what a week looks like, for the `matris` CLI.
-# The offline build reads `shopping` from here. The site does not read this file: a visitor picks the diet in the search.
+# The site and the offline build do not read this file: a visitor picks the diet and the place in the search.
 # Edit with `matris profile`. Nothing here is sent to Jev; it only sees ingredient names and offer headings.
 
 diet:
@@ -25,14 +25,9 @@ diet:
 # (whole nuts, sausages, cherry tomatoes, grapes).
 small_kids: true
 
-# Offers are read from grocery chains near here (mattilbud.no).
-shopping:
-  near: Stavanger sentrum
-  lat: 58.9700
-  lng: 5.7331
-  radius_km: 15
-  # Leave out to use every grocery chain. Names as on mattilbud.no.
-  # stores: [REMA 1000, KIWI, Extra, Coop Mega, MENY]
+# Offers are from the grocery stores near here: one of the places in datasets/offers.json
+# (`places`). Leave out for every store. A place in a search («i bergen») goes first.
+place: Stavanger
 
 week:
   dinners: 5

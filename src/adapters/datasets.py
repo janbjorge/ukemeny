@@ -1,14 +1,15 @@
 """The snapshot on disk: datasets/*.json, written by the offline build and read by the site at start-up.
 
 dishes.json holds the facts the rules need from each matprat dinner, per portion, without its wording (docs/plan-web.md);
-traits.json changes when new ingredients appear; offers.json every week.
+traits.json changes when new ingredients appear; offers.json every week. offers.json also says which catalogs reach each
+place (`places`).
 """
 
 from collections.abc import Mapping
 from dataclasses import asdict
 from datetime import date, datetime
 from pathlib import Path
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 import orjson
 
@@ -38,6 +39,8 @@ class DishJSON(TypedDict):
 class OfferJSON(TypedDict):
     id: str
     store: str
+    catalog: NotRequired[str]
+    """Missing in offers.json from before places (2026-10-13), as is `places`: then no place is known."""
     heading: str
     description: str
     price: float
@@ -61,6 +64,7 @@ class JsonDatasets:
             traits={name: Traits.of(t) for name, t in raw["traits.json"].items()},
             offers=tuple(_offer(o) for o in raw["offers.json"]["offers"]),
             matches={name: tuple(ids) for name, ids in raw["offers.json"]["matches"].items()},
+            places={place: tuple(ids) for place, ids in raw["offers.json"].get("places", {}).items()},
         )
 
     def snapshot(self) -> Snapshot:
@@ -77,6 +81,7 @@ def write(snapshot: Snapshot, root: Path = DATASETS) -> dict[str, int]:
             "built": snapshot.built.isoformat(),
             "offers": [asdict(o) for o in snapshot.offers],
             "matches": {name: list(ids) for name, ids in snapshot.matches.items()},
+            "places": {place: list(ids) for place, ids in snapshot.places.items()},
         },
     }
     sizes = {}
@@ -103,6 +108,7 @@ def _offer(o: OfferJSON) -> Offer:
     return Offer(
         id=o["id"],
         store=o["store"],
+        catalog=o.get("catalog", ""),
         heading=o["heading"],
         description=o["description"],
         price=o["price"],

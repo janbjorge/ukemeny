@@ -2,7 +2,7 @@
 
 from collections import Counter
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from core.diet import carbs, fodmap_out, judge
 from core.matching import FISH, cheapest_first, main_protein, weight
@@ -80,9 +80,17 @@ class Prepared:
         )
 
 
+def offered(snapshot: Snapshot, place: str | None = None) -> dict[str, tuple[Offer, ...]]:
+    """Per ingredient name, the offers a cook can buy as it, cheapest first: at the stores near `place`, or at every
+    store."""
+    near = frozenset(snapshot.places[place]) if place else None
+    by_id = {o.id: o for o in snapshot.offers if near is None or o.catalog in near}
+    return {name: cheapest_first([by_id[i] for i in ids if i in by_id]) for name, ids in snapshot.matches.items()}
+
+
 def prepare(snapshot: Snapshot) -> tuple[Prepared, ...]:
-    by_id = {o.id: o for o in snapshot.offers}
-    matched = {name: cheapest_first([by_id[i] for i in ids if i in by_id]) for name, ids in snapshot.matches.items()}
+    """Every dinner with the offers at every store; `nearby` gives one place's."""
+    matched = offered(snapshot)
     prepared = []
     for dish in snapshot.dishes:
         protein, main = main_protein(dish)
@@ -104,6 +112,14 @@ def prepare(snapshot: Snapshot) -> tuple[Prepared, ...]:
 
 
 NO_SWAPS = Verdict(blocked=None, swaps=(), warnings=(), lactose_g=0.0)
+
+
+def nearby(prepared: Sequence[Prepared], snapshot: Snapshot, place: str | None) -> tuple[Prepared, ...]:
+    """The same dinners with the offers at the stores near `place`; None: every store, as `prepare` has them."""
+    if place is None:
+        return tuple(prepared)
+    matched = offered(snapshot, place)
+    return tuple(replace(p, buys=buys(p.dish, NO_SWAPS, matched)) for p in prepared)
 
 
 def dinners(snapshot: Snapshot, household: Household, prepared: Sequence[Prepared] | None = None) -> list[Dinner]:

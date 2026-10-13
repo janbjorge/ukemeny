@@ -20,7 +20,7 @@ from adapters import profile, schema
 from adapters.datasets import DATASETS, JsonDatasets
 from app.queries import Queries
 from core.models import Dinner, Dish, Verdict
-from core.search import Tag, protein_word
+from core.search import Tag, fold, protein_word
 
 app = typer.Typer(
     help="Middager fra matprat.no som passer profile.yaml, med ukens tilbud. `matris build` lager datasets/, "
@@ -51,7 +51,11 @@ def queries(as_json: bool) -> Queries:
         fail("setup", str(e), as_json)
     if not (DATASETS / "dishes.json").exists():
         fail("setup", f"{DATASETS} mangler. Kjør `matris build` først.", as_json)
-    return Queries(JsonDatasets(), p.household, p.week)
+    datasets = JsonDatasets()
+    places = {fold(place): place for place in datasets.snapshot().places}
+    if p.place and fold(p.place) not in places:
+        fail("setup", f"{profile.PROFILE}: place: kjenner ikke {p.place}; kjente steder er {', '.join(places.values())}", as_json)
+    return Queries(datasets, p.household, p.week, places[fold(p.place)] if p.place else None)
 
 
 def _verdict_lines(verdict: Verdict) -> list[str]:
@@ -82,7 +86,7 @@ def _dinner(n: int, d: Dinner) -> str:
 def plan(as_json: JsonOption = False) -> None:
     """Ukens middager: variert, og hovedråvaren er på tilbud."""
     q = queries(as_json)
-    week = q.plan()
+    week = q.plan(place=q.home)
     if as_json:
         return emit(schema.plan(q, week))
     typer.echo(
@@ -160,10 +164,10 @@ def build(
     try:
         with closing(pipeline.Bars(steps)) as bars:
             result = asyncio.run(pipeline.run(bars, bars.fetching))
-    except (pipeline.SetupError, profile.ProfileError) as e:
+    except pipeline.SetupError as e:
         fail("setup", str(e), False)
     s = result.snapshot
-    typer.echo(f"{len(s.dishes):,} middager, {len(s.traits):,} ingredienser, {len(s.offers):,} tilbud.")
+    typer.echo(f"{len(s.dishes):,} middager, {len(s.traits):,} ingredienser, {len(s.offers):,} tilbud på {len(s.places)} steder.")
     typer.echo(result.jev, err=True)
 
 

@@ -1,7 +1,8 @@
 """This week's grocery offers from Tjek, the catalog service behind mattilbud.no.
 
-The public v2 API needs no key for catalogs and offers. Offers are read per catalog, since
-one location search stops at 1,000 offers. Nothing is kept between runs.
+The public v2 API needs no key for catalogs and offers. The catalogs are listed around each place in PLACES, and offers
+are read once per catalog, since one location search stops at 1,000 offers and most catalogs reach many places. Nothing
+is kept between runs.
 """
 
 import asyncio
@@ -16,12 +17,58 @@ from typing import NotRequired, Self, TypedDict
 import httpx2
 
 from core.errors import SourceUnavailableError
-from core.models import Offer
+from core.models import Offer, Offers
 
 API = "https://squid-api.tjek.com/v2"
 PAGE = 100
 USER_AGENT = "matris/0.1 (+https://matris.app)"
 log = logging.getLogger("matris.tjek")
+
+GROCERS = (
+    "Bunnpris",
+    "Coop Extra",
+    "Coop Marked",
+    "Coop Mega",
+    "Coop Prix",
+    "Europris",
+    "Extra",
+    "Joker",
+    "KIWI",
+    "Matkroken",
+    "MENY",
+    "Obs",
+    "REMA 1000",
+    "SPAR",
+)
+"""Grocery chains on mattilbud.no. The same places also have furniture, hardware and electronics
+catalogs; "Spar Kjøp" is building supplies, not SPAR."""
+
+PLACES: Mapping[str, tuple[float, float]] = {
+    "Oslo": (59.9139, 10.7522),
+    "Bergen": (60.3913, 5.3221),
+    "Trondheim": (63.4305, 10.3951),
+    "Stavanger": (58.9700, 5.7331),
+    "Kristiansand": (58.1467, 7.9956),
+    "Drammen": (59.7440, 10.2045),
+    "Fredrikstad": (59.2181, 10.9298),
+    "Tromsø": (69.6492, 18.9553),
+    "Tønsberg": (59.2675, 10.4076),
+    "Ålesund": (62.4722, 6.1495),
+    "Skien": (59.2096, 9.6090),
+    "Bodø": (67.2804, 14.4049),
+    "Haugesund": (59.4138, 5.2680),
+    "Arendal": (58.4615, 8.7725),
+    "Hamar": (60.7945, 11.0680),
+    "Lillehammer": (61.1153, 10.4662),
+    "Molde": (62.7375, 7.1591),
+    "Harstad": (68.7983, 16.5417),
+    "Alta": (69.9689, 23.2716),
+    "Førde": (61.4520, 5.8570),
+}
+"""Where a visitor can say they shop (latitude, longitude): towns spread over the country, one word each, so a search
+reads it (core.search). METHOD.md §4."""
+RADIUS_KM = 15
+"""Stores this near a place count as its stores."""
 
 
 _NUMBER = r"(\d+(?:[ \u00a0]\d{3})*(?:,\d+)?)"
@@ -122,7 +169,7 @@ def before_price(price: float, pre_price: float | None, description: str, kg_pri
     return float(pre_price)
 
 
-def parse_offer(raw: RawOffer) -> Offer:
+def parse_offer(raw: RawOffer, catalog: str) -> Offer:
     description = " ".join((raw.get("description") or "").split())
     price = float(raw["pricing"]["price"])
     kg_price = per_kg(price, description, raw.get("quantity"))
@@ -130,6 +177,7 @@ def parse_offer(raw: RawOffer) -> Offer:
     return Offer(
         id=raw["id"],
         store=raw["dealer"]["name"],
+        catalog=catalog,
         heading=raw["heading"],
         description=description,
         price=price,
@@ -141,23 +189,22 @@ def parse_offer(raw: RawOffer) -> Offer:
 
 @dataclass
 class TjekOfferSource:
-    """Implements core.ports.OfferSource for one location."""
+    """Implements core.ports.OfferSource for every place."""
 
     client: httpx2.AsyncClient
-    lat: float
-    lng: float
+    places: Mapping[str, tuple[float, float]]
+    """Per place, its latitude and longitude (PLACES)."""
     radius_km: float
     stores: tuple[str, ...]
-    """Grocery chains to read (src/adapters/profile.py GROCERS)."""
+    """Grocery chains to read (GROCERS)."""
 
     @classmethod
     @asynccontextmanager
     async def open(
         cls,
-        lat: float,
-        lng: float,
-        radius_km: float,
-        stores: tuple[str, ...],
+        places: Mapping[str, tuple[float, float]] = PLACES,
+        radius_km: float = RADIUS_KM,
+        stores: tuple[str, ...] = GROCERS,
         fetching: Callable[[str], None] | None = None,
     ) -> AsyncGenerator[Self]:
         """`fetching` hears the URL of every request as it goes out."""
@@ -170,28 +217,37 @@ class TjekOfferSource:
         async with httpx2.AsyncClient(
             base_url=API, timeout=30, http2=True, headers={"User-Agent": USER_AGENT}, event_hooks={"request": [tell]}
         ) as client:
-            yield cls(client, lat, lng, radius_km, stores)
+            yield cls(client, places, radius_km, stores)
 
-    async def current(self) -> list[Offer]:
-        geo: dict[str, str | int | float] = {
-            "r_lat": self.lat,
-            "r_lng": self.lng,
-            "r_radius": int(self.radius_km * 1000),
-            "r_locale": "nb_NO",
-        }
+    async def current(self) -> Offers:
+        near = await asyncio.gather(*(self._catalogs(lat, lng) for lat, lng in self.places.values()))
+        catalogs = {c["id"]: c for found in near for c in found}
+        places = {place: tuple(c["id"] for c in found) for place, found in zip(self.places, near, strict=True)}
+        for c in catalogs.values():
+            reach = [place for place, ids in places.items() if c["id"] in ids]
+            log.info(
+                "catalog: %s, %s offers, %s to %s, %s",
+                c["dealer"]["name"],
+                c["offer_count"],
+                c["run_from"][:10],
+                c["run_till"][:10],
+                "every place" if len(reach) == len(places) else ", ".join(reach),
+            )
+        pages = await asyncio.gather(*(self._paged("/offers", {"catalog_ids": catalog}, RawOffer) for catalog in catalogs))
+        offers = {o.id: o for catalog, page in zip(catalogs, pages, strict=True) for o in (parse_offer(raw, catalog) for raw in page)}
+        return Offers(tuple(offers.values()), places)
+
+    async def _catalogs(self, lat: float, lng: float) -> list[RawCatalog]:
+        """The grocery catalogs that run today at stores near this point."""
+        geo: dict[str, str | int | float] = {"r_lat": lat, "r_lng": lng, "r_radius": int(self.radius_km * 1000), "r_locale": "nb_NO"}
         now = datetime.now(UTC)
-        catalogs = [
+        return [
             c
             for c in await self._paged("/catalogs", geo, RawCatalog)
             if c["dealer"]["name"] in self.stores
             and c.get("offer_count")
             and datetime.fromisoformat(c["run_from"]) <= now <= datetime.fromisoformat(c["run_till"])
         ]
-        for c in catalogs:
-            log.info("catalog: %s, %s offers, %s to %s", c["dealer"]["name"], c["offer_count"], c["run_from"][:10], c["run_till"][:10])
-        pages = await asyncio.gather(*(self._paged("/offers", {"catalog_ids": c["id"]}, RawOffer) for c in catalogs))
-        offers = {o.id: o for page in pages for o in map(parse_offer, page)}
-        return list(offers.values())
 
     async def _paged[T](self, path: str, params: Mapping[str, str | int | float], row: type[T]) -> list[T]:
         """Every row behind `path`, page by page. `row` is the shape of a row, for the type checker."""

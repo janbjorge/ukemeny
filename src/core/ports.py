@@ -3,7 +3,7 @@
 from collections.abc import Collection, Iterable, Mapping, Sequence
 from typing import Protocol
 
-from core.models import Ingredient, Levels, Offer, Recipe, RecipeRef, Snapshot
+from core.models import Ingredient, Levels, Offer, Offers, Recipe, RecipeRef, Snapshot
 
 
 class Datasets(Protocol):
@@ -28,10 +28,10 @@ class RecipeSource(Protocol):
 
 
 class OfferSource(Protocol):
-    """This week's grocery offers near home: mattilbud.no's catalogs."""
+    """This week's grocery offers near each place: mattilbud.no's catalogs."""
 
-    async def current(self) -> list[Offer]:
-        """Every offer valid today. Raises SourceUnavailableError."""
+    async def current(self) -> Offers:
+        """Every offer valid today, and which catalogs reach each place. Raises SourceUnavailableError."""
         ...
 
 

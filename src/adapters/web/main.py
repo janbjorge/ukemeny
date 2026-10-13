@@ -25,7 +25,19 @@ from adapters.web import api, fmt, telemetry
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
 from app.queries import Found, Queries
 from core.matching import VEGETARIAN
-from core.search import Diet, Kind, Order, Tag, diet_clause, marked, order_clause, protein_clause, protein_word, tag_clause
+from core.search import (
+    Diet,
+    Kind,
+    Order,
+    Tag,
+    diet_clause,
+    marked,
+    order_clause,
+    place_clause,
+    protein_clause,
+    protein_word,
+    tag_clause,
+)
 
 HERE = Path(__file__).parent
 # The one public address (matris.app). Set on Fly once the certificate and DNS are live; every other
@@ -235,11 +247,12 @@ def create_app(queries: Queries) -> FastAPI:
         return HTMLResponse(body)
 
     def rules_changed(found: Found, current_url: str | None) -> bool:
-        """Did this search change the diet rules from the page's? htmx sends the page's address (HX-Current-URL)."""
+        """Did this search change the diet rules or the place from the page's? htmx sends the page's address
+        (HX-Current-URL)."""
         if not current_url:
             return True
         before = {k: v[0] for k, v in parse_qs(urlsplit(current_url).query).items() if k in ("q", "protein", "tilbud")}
-        return queries.household(DinnerQuery.of(**before).text()) != found.household
+        return queries.rules(queries.parse(DinnerQuery.of(**before).text())) != (found.household, found.place)
 
     def dinner_context(
         found: Found, fragment: bool = False, trigger: str | None = None, current_url: str | None = None
@@ -249,7 +262,10 @@ def create_app(queries: Queries) -> FastAPI:
             "chips": chips(found),
             "relax": [(c, n, found.search.drop(c).text) for c, n in found.relax],
             "shown": len(found.dinners),
-            "week": queries.plan(found.household),
+            "week": queries.plan(found.household, found.place),
+            # Until a search names a place the offers are from every store, which the list says (jb 2026-10-13: "We can
+            # assume all shops until the users narrows by selecting a location, we can show a warning")
+            "anywhere": found.place is None and bool(queries.snapshot.places),
             # A fragment also sends the week when the diet rules changed (the week follows them), and, when a chip or a
             # link changed the search rather than typing, the search box with its new text (both out of band)
             "week_oob": fragment and rules_changed(found, current_url),
@@ -295,7 +311,7 @@ def create_app(queries: Queries) -> FastAPI:
 
     @app.get("/om", response_class=HTMLResponse)
     def about(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse(request, "om.html")
+        return templates.TemplateResponse(request, "om.html", {"places": sorted(queries.snapshot.places)})
 
     @app.get("/llms.txt", response_class=PlainTextResponse)
     def llms_txt(request: Request) -> Response:
@@ -308,6 +324,7 @@ def create_app(queries: Queries) -> FastAPI:
                 "proteins": ", ".join(KNOWN_PROTEINS),
                 "diets": api.DIETS,
                 "rule_links": [(d.value, f"{request.base_url}api/plan?{link(d.value)}") for d in Diet],
+                "place_links": [(p, f"{request.base_url}api/plan?{link(place_clause(p).text)}") for p in queries.snapshot.places],
             },
             media_type="text/plain",
         )

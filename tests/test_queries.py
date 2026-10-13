@@ -121,3 +121,38 @@ def test_allergies_and_vegetar_leave_dinners_out() -> None:
     assert not q.search("vegansk").dinners
     checked = q.check(recipe("Potetsalat", mayo).url, q.household("uten egg"))
     assert checked is not None and checked.verdict.blocked == "inneholder egg (majones)"
+
+
+def test_offers_are_from_the_place_searched_for_or_from_every_store() -> None:
+    west = offer("KYLLINGBRYST", 99, pre_price=135, id="vest", catalog="kiwi-vest")
+    north = offer("LAKSEFILET", 120, pre_price=160, id="nord", catalog="kiwi-nord")
+    s = snapshot(
+        recipe("Kylling", CHICKEN),
+        recipe("Laks", SALMON),
+        offers=[west, north],
+        matches={"kyllingfilet": ["vest"], "laksefilet": ["nord"]},
+        places={"Bergen": ["kiwi-vest", "rema"], "Tromsø": ["kiwi-nord", "rema"]},
+    )
+    q = Queries(FakeDatasets(s), week=Week(days=2, fish=1))
+
+    def on_sale(text: str) -> list[str]:
+        return sorted(d.dish.name for d in q.search(text).dinners)
+
+    assert on_sale("på tilbud") == ["Kylling", "Laks"] and q.search("på tilbud").place is None
+    assert on_sale("på tilbud i bergen") == ["Kylling"]
+    assert on_sale("på tilbud i tromsø") == ["Laks"]
+    assert q.search("i bergen").place == "Bergen"
+    week = q.plan(place="Bergen")
+    assert (week.place, week.offers, week.on_sale) == ("Bergen", 1, 1)
+    assert (q.plan().place, q.plan().offers, q.plan().on_sale) == (None, 2, 2)
+    home = Queries(FakeDatasets(s), home="Tromsø")  # the CLI's place, from profile.yaml
+    assert [d.dish.name for d in home.search("på tilbud").dinners] == ["Laks"]
+    assert [d.dish.name for d in home.search("på tilbud i bergen").dinners] == ["Kylling"]  # a searched place goes first
+
+
+def test_rankings_past_the_limit_are_dropped_and_worked_out_again() -> None:
+    q = queries()
+    q.KEPT = 1
+    first = q.ranked()
+    assert q.ranked(Household(gluten=Rule.OK)) and q.ranked() is not first
+    assert [d.dish.name for d in q.search("på tilbud").dinners] == ["Kylling"]

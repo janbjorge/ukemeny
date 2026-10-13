@@ -5,6 +5,7 @@
 {% from "_ui.html" import go, chip, more_button with context %}
 {% set s = found.search %}
 <div id="forslag-liste" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste">
+  {% if anywhere %}<p class="note">Tilbudene er fra butikker over hele landet. Skriv hvor du handler, for eksempel «i Bergen», så får du tilbudene der.</p>{% endif %}
   <div class="filters">
     <div class="row"><span class="label">Kosthold</span>
       <nav class="chips diet" aria-label="Kosthold">{% for c in chips.diets %}{{ chip(c) }} {% endfor %}</nav></div>

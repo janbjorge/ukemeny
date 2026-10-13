@@ -39,6 +39,8 @@ Every simplification and judgement call behind what the site suggests. Add to it
 - A dinner is on sale when its main protein is discounted; without meat or fish, a vegetable from 100 g per portion. Discounted bacon on the side does not make lutefisk a dinner on sale.
 - How much is on sale: weight times discount, summed. Weight is 3 for meat, fish and shellfish, 1 for eggs, vegetables, potatoes and mushrooms, 0.5 for fruit, cheese and rice/pasta, scaled by amount up to 100 g per portion; liquids (dl, ss) count at most 0.5, since matprat files stock under meat. Moving from 400 g per recipe to 100 g per portion changed recipes for 2 or 6 portions: 639 dinners on sale instead of 626 (2026-10-13).
 - No prices per dinner: jb asked for candidates that fit, not cost estimates (2026-10-13).
+- Places: 20 towns spread over the country, each one word so a search reads it, with the stores within 15 km (the radius Stavanger had). Between them they reach every regional catalog seen around them on 2026-10-13 (Extra's six, Bunnpris's four, KIWI and SPAR north and south). A town not on the list is a search word, not a place.
+- Without a place the offers are those of every catalog in every place, not only those in all places (jb 2026-10-13: "We can assume all shops until the users narrows by selecting a location"): the catalogs in all 20 places listed 260 offers, against 580 to 1 015 in one place. So a card can show a regional price from far away until a place is picked, and the page says so.
 
 ## 5. Ranking
 

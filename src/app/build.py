@@ -155,12 +155,13 @@ async def snapshot(
         progress("catalogs", 1, 1)
     dishes = tuple(dish(r) for r in sorted(dinners, key=lambda r: r.url))
     shoppable = (p.name for d in dishes for p in d.parts if weight(p))
-    matched = await match(shoppable, current, matcher, progress=step("offers"))
+    matched = await match(shoppable, current.offers, matcher, progress=step("offers"))
     built = Snapshot(
         built=datetime.now(UTC),
         dishes=dishes,
         traits=dict(sorted(known.items())),
-        offers=tuple(sorted(current, key=lambda o: (o.store, o.heading, o.id))),
+        offers=tuple(sorted(current.offers, key=lambda o: (o.store, o.heading, o.id))),
         matches=dict(sorted(matched.items())),
+        places={place: tuple(sorted(catalogs)) for place, catalogs in sorted(current.places.items())},
     )
     return built, report

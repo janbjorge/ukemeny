@@ -1,6 +1,6 @@
 """profile.yaml: what the household cannot eat, where it shops, and what a week looks like.
 
-Validated with pydantic, so a typo gets a clear error. The site, the CLI and the offline build read it.
+Validated with pydantic, so a typo gets a clear error. Only the CLI reads it.
 """
 
 from dataclasses import dataclass
@@ -14,25 +14,6 @@ from core.ranking import Week
 
 PROFILE = Path(__file__).parents[2] / "profile.yaml"
 TEMPLATE = Path(__file__).with_name("profile.example.yaml")
-
-GROCERS = (
-    "Bunnpris",
-    "Coop Extra",
-    "Coop Marked",
-    "Coop Mega",
-    "Coop Prix",
-    "Europris",
-    "Extra",
-    "Joker",
-    "KIWI",
-    "Matkroken",
-    "MENY",
-    "Obs",
-    "REMA 1000",
-    "SPAR",
-)
-"""Grocery chains on mattilbud.no. The same area also has furniture, hardware and electronics
-catalogs; "Spar Kjøp" is building supplies, not SPAR."""
 
 
 class ProfileError(Exception):
@@ -50,16 +31,6 @@ class _Diet(BaseModel):
     swaps: bool = True
 
 
-class _Shopping(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    near: str = ""
-    lat: float = Field(ge=-90, le=90)
-    lng: float = Field(ge=-180, le=180)
-    radius_km: float = Field(default=15, gt=0, le=100)
-    stores: list[str] = list(GROCERS)
-
-
 class _Week(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -73,24 +44,16 @@ class _Profile(BaseModel):
 
     diet: _Diet = _Diet()
     small_kids: bool = False
-    shopping: _Shopping
+    place: str | None = None
     week: _Week = _Week()
-
-
-@dataclass(frozen=True, slots=True)
-class Shopping:
-    near: str
-    lat: float
-    lng: float
-    radius_km: float
-    stores: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
 class Profile:
     household: Household
     week: Week
-    shopping: Shopping
+    place: str | None
+    """Where the household shops: the offers are from the stores near it. None: every store."""
 
 
 def load(path: Path = PROFILE) -> Profile:
@@ -105,8 +68,6 @@ def load(path: Path = PROFILE) -> Profile:
     except ValidationError as e:
         problems = "; ".join(f"{'.'.join(map(str, err['loc'])) or 'file'}: {err['msg']}" for err in e.errors())
         raise ProfileError(f"{path}: {problems}") from None
-    if unknown := set(p.shopping.stores) - set(GROCERS):
-        raise ProfileError(f"{path}: shopping.stores: unknown {', '.join(sorted(unknown))}; known are {', '.join(GROCERS)}")
     diet = p.diet
     return Profile(
         household=Household(
@@ -119,5 +80,5 @@ def load(path: Path = PROFILE) -> Profile:
             kid_notes=p.small_kids,
         ),
         week=Week(days=p.week.dinners, fish=p.week.fish, on_sale_only=p.week.on_sale_only),
-        shopping=Shopping(p.shopping.near, p.shopping.lat, p.shopping.lng, p.shopping.radius_km, tuple(p.shopping.stores)),
+        place=p.place or None,
     )

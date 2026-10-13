@@ -57,6 +57,7 @@ HEAD = "matris.head"
 
 _searches = logfire.metric_counter("matris.searches", unit="{search}", description="Searches by route, and whether any dinner matched")
 _rules = logfire.metric_counter("matris.search.rules", unit="{search}", description="Searches naming each diet rule or allergy")
+_places = logfire.metric_counter("matris.search.places", unit="{search}", description="Searches naming each place")
 _clauses = logfire.metric_counter("matris.search.clauses", unit="{clause}", description="What searches are made of, by kind")
 _results = logfire.metric_histogram("matris.search.results", unit="{dinner}", description="Dinners that match a search")
 _fragments = logfire.metric_counter("matris.fragments", unit="{fragment}", description="HTMX fragments, rendered or kept from before")
@@ -216,6 +217,7 @@ def _ready(queries: Queries) -> None:
         "dataset.built": s.built.isoformat(),
         "dataset.dishes": len(s.dishes),
         "dataset.offers": len(s.offers),
+        "dataset.places": len(s.places),
         "offers.until": str(queries.offers_until()),
         "offers.stale": queries.stale(date.today()),
     }
@@ -235,6 +237,7 @@ def search(queries: Queries, text: str, route: str, limit: int, skip_week: bool 
                 "search.understood": s.text,
                 "search.clauses": [c.label for c in s.clauses],
                 "search.rules": sorted(d.value for d in s.diets),
+                "search.place": found.place or "",
                 "search.corrected": [f"{typed} → {used}" for typed, used in s.corrected],
                 "search.total": found.total,
                 "search.shown": len(found.dinners),
@@ -250,6 +253,8 @@ def counted(search: Search, route: str, total: int | None = None) -> None:
     _searches.add(1, {"route": route, "found": total != 0})
     for diet in search.diets:
         _rules.add(1, {"rule": diet.value, "route": route})
+    if search.place:
+        _places.add(1, {"place": search.place, "route": route})
     for clause in search.clauses:
         _clauses.add(1, {"kind": clause.kind.value, "route": route})
     if total is not None:

@@ -1,6 +1,6 @@
 # matris.app
 
-> Dinner ideas from matprat.no, ranked by this week's grocery offers around Stavanger from mattilbud.no. Diet rules and allergies (vegetarian, vegan, gluten-free, milk-free, no onion, low FODMAP, pregnant, the EU allergens, ...) apply when a search names them.
+> Dinner ideas from matprat.no, ranked by this week's grocery offers from mattilbud.no. Diet rules and allergies (vegetarian, vegan, gluten-free, milk-free, no onion, low FODMAP, pregnant, the EU allergens, ...) apply when a search names them, and the offers are from the stores near a place when a search names one; until then, from stores all over Norway.
 
 The site is in Norwegian (bokmål). Recipes belong to matprat.no; link to them, do not copy them. Offers are from the stores' weekly catalogs. What an ingredient holds (gluten, onion, lactose, the allergens, meat, FODMAP, ...) was judged by a small language model and can be wrong; tell people to check the label.
 
@@ -10,17 +10,21 @@ Each link below is the week for one diet rule. Every answer has `links`: `add` a
 
 {% for diet, url in rule_links %}- [{{ diet }}]({{ url }})
 {% endfor %}
+Ask where the person shops. Each link below is the week with the offers from the stores near one place; `links.places` in every answer does the same for any search:
+
+{% for place, url in place_links %}- [{{ place }}]({{ url }})
+{% endfor %}
 ## JSON API
 
 Read-only, no key, CORS open. `{{ base }}api` redirects to the schema. Keys are English; advice is bokmål; prices are kroner.
 
 - [OpenAPI schema]({{ base }}api/openapi.json): every endpoint and field
 - [This week's dinners]({{ base }}api/plan?q=uten+løk+glutenfri): a varied week, picked from dinners whose main protein is on sale; `q` takes diet rules
-- [Search the dinners that fit]({{ base }}api/middager?q=rask+kylling+uten+sopp): best first. `q` is a search in plain bokmål: diet rules and allergies ({{ diets }}; they decide which dinners fit and what to swap, and a rule that leaves something out also leaves out ingredients that may hold it), categories (`under 20 min`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins ({{ proteins }}; also `kjøtt`, `sjømat`), `uten X` to leave X out, `X eller Y` for either, `rabatt i prosent` or `rabatt i kroner` to sort by the biggest discount, and any word in the dish name or an ingredient. Typos are fixed and reported in `search.corrected`; `search.understood` says how `q` was read, and `search.query` is the same search written out. `antall` is 1-100.
+- [Search the dinners that fit]({{ base }}api/middager?q=rask+kylling+uten+sopp): best first. `q` is a search in plain bokmål: diet rules and allergies ({{ diets }}; they decide which dinners fit and what to swap, and a rule that leaves something out also leaves out ingredients that may hold it), categories (`under 20 min`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins ({{ proteins }}; also `kjøtt`, `sjømat`), `uten X` to leave X out, `X eller Y` for either, a place (`i bergen`), `rabatt i prosent` or `rabatt i kroner` to sort by the biggest discount, and any word in the dish name or an ingredient. Typos are fixed and reported in `search.corrected`; `search.understood` says how `q` was read, and `search.query` is the same search written out. `antall` is 1-100.
 - [One recipe]({{ base }}api/oppskrift?url=https://www.matprat.no/oppskrifter/familien/lasagne/): whether it fits, and what to swap. The ingredients and method are on matprat.no; link there
 
 ## Method
 
 - Dinners that need no swaps come first, then those with the biggest discount on what matters most (meat and fish, by amount), then rating and prep time.
-- A dinner is on sale when its main protein (the heaviest meat or fish; without one, a main vegetable) has a before-price in this week's catalog.
+- A dinner is on sale when its main protein (the heaviest meat or fish; without one, a main vegetable) has a before-price in this week's catalog, at the stores near the place searched for or, without one, at any store.
 - [How it works, in Norwegian]({{ base }}om)

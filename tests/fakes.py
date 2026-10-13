@@ -17,6 +17,7 @@ from core.models import (
     Lactose,
     Level,
     Offer,
+    Offers,
     Onion,
     Pregnancy,
     Recipe,
@@ -75,13 +76,16 @@ def offer(
     price: float = 50.0,
     *,
     store: str = "KIWI",
+    catalog: str = "",
     per_kg: float | None = None,
     pre_price: float | None = None,
     id: str | None = None,
 ) -> Offer:
+    """`catalog` defaults to the store's name: one catalog per chain."""
     return Offer(
         id=id or f"{store}:{heading}:{price}",
         store=store,
+        catalog=catalog or store,
         heading=heading,
         description="",
         price=price,
@@ -109,9 +113,10 @@ class FakeClassifier:
 @dataclass
 class FakeOffers:
     offers: list[Offer] = field(default_factory=list)
+    places: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
 
-    async def current(self) -> list[Offer]:
-        return list(self.offers)
+    async def current(self) -> Offers:
+        return Offers(tuple(self.offers), dict(self.places))
 
 
 @dataclass
@@ -149,8 +154,9 @@ def snapshot(
     known: Mapping[str, Traits] | None = None,
     offers: Sequence[Offer] = (),
     matches: Mapping[str, Sequence[str]] | None = None,
+    places: Mapping[str, Sequence[str]] | None = None,
 ) -> Snapshot:
-    """A snapshot where every ingredient is PLAIN unless `known` says otherwise."""
+    """A snapshot where every ingredient is PLAIN unless `known` says otherwise. `places`: per place, its catalogs."""
     names = {i.name for r in recipes for i in r.ingredients}
     traits = {name: (known or {}).get(name, PLAIN) for name in names}
     return Snapshot(
@@ -159,6 +165,7 @@ def snapshot(
         traits=traits,
         offers=tuple(offers),
         matches={name: tuple(ids) for name, ids in (matches or {}).items()},
+        places={place: tuple(ids) for place, ids in (places or {}).items()},
     )
 
 

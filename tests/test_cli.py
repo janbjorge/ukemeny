@@ -72,3 +72,23 @@ def test_missing_profile_is_a_setup_error(monkeypatch: pytest.MonkeyPatch, tmp_p
     monkeypatch.setattr(profile, "PROFILE", tmp_path / "profile.yaml")
     r = runner.invoke(cli.app, ["plan", "--json"])
     assert r.exit_code == 1 and json.loads(r.stdout)["error"]["kind"] == "setup"
+
+
+def test_the_profile_place_is_where_the_cli_shops(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.undo()
+    s = snapshot(
+        KYLLING,
+        offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale", catalog="kiwi-vest")],
+        matches={"kyllingfilet": ["sale"]},
+        places={"Bergen": ["kiwi-vest"], "Tromsø": ["kiwi-nord"]},
+    )
+    monkeypatch.setattr(cli, "JsonDatasets", lambda: FakeDatasets(s))
+    monkeypatch.setattr(profile, "PROFILE", tmp_path / "profile.yaml")
+    profile.PROFILE.write_text("place: tromso\n")
+    body = json.loads(runner.invoke(cli.app, ["plan", "--json"]).stdout)
+    assert (body["place"], body["on_sale"]) == ("Tromsø", 0)
+    body = json.loads(runner.invoke(cli.app, ["candidates", "i", "bergen", "--json"]).stdout)
+    assert (body["place"], body["on_sale"]) == ("Bergen", 1)
+    profile.PROFILE.write_text("place: Gotham\n")
+    r = runner.invoke(cli.app, ["plan", "--json"])
+    assert r.exit_code == 1 and "kjenner ikke Gotham; kjente steder er Bergen, Tromsø" in json.loads(r.stdout)["error"]["message"]

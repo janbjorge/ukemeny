@@ -225,6 +225,8 @@ class RecipeRef:
 class Offer:
     id: str
     store: str
+    catalog: str
+    """The store's catalog it is in (mattilbud.no's id), which says where it holds (Snapshot.places)."""
     heading: str
     description: str
     price: float
@@ -248,6 +250,15 @@ class Offer:
     def unit_price(self) -> float:
         """For ranking offers of the same product: per kg when known."""
         return self.per_kg if self.per_kg is not None else self.price
+
+
+@dataclass(frozen=True, slots=True)
+class Offers:
+    """This week's offers, and the catalogs of the stores near each place."""
+
+    offers: tuple[Offer, ...]
+    places: Mapping[str, tuple[str, ...]]
+    """Per place ("Bergen"), the catalogs (Offer.catalog) of the stores near it. A catalog can reach many places."""
 
 
 class Rule(StrEnum):
@@ -374,6 +385,8 @@ class Dinner:
 @dataclass(frozen=True, slots=True)
 class Plan:
     dinners: tuple[Dinner, ...]
+    place: str | None
+    """Where the offers are from: the stores near this place, or (None) every store."""
     offers: int
     stores: tuple[str, ...]
     considered: int
@@ -403,6 +416,8 @@ class Snapshot:
     traits: Mapping[str, Traits]
     """Per ingredient name."""
     offers: tuple[Offer, ...]
-    """This week's grocery offers."""
+    """This week's grocery offers, from the stores near every place."""
     matches: Mapping[str, tuple[str, ...]]
     """Per ingredient name, the ids of the offers a cook can buy as it."""
+    places: Mapping[str, tuple[str, ...]]
+    """Per place, the catalogs (Offer.catalog) of the stores near it (Offers.places)."""

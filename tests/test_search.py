@@ -13,6 +13,7 @@ from core.search import (
     Counts,
     Diet,
     Index,
+    Kind,
     Order,
     Search,
     Tag,
@@ -22,6 +23,7 @@ from core.search import (
     marked,
     order_clause,
     parse,
+    place_clause,
     protein_clause,
     same,
     tag_clause,
@@ -299,3 +301,29 @@ def test_via_and_marked(index: Bound) -> None:
 
 def test_without_clause_text() -> None:
     assert without_clause("sopp").text == "uten sopp"
+
+
+PLACES = ("Bergen", "Tromsø", "Ålesund")
+
+
+def test_a_place_says_where_the_offers_are_from() -> None:
+    s = parse("kylling i bergen", places=PLACES)
+    assert s.place == "Bergen" and [c.kind for c in s.clauses] == [Kind.PROTEIN, Kind.PLACE]
+    assert s.text == "kylling i bergen" and parse(s.text, places=PLACES).clauses == s.clauses
+    assert parse("nær tromso", places=PLACES).place == "Tromsø"  # æøå as o, and «nær»
+    assert parse("i bergen i ålesund", places=PLACES).place == "Ålesund"  # one place: the last
+    assert parse("bergen").place is None  # a place the snapshot does not know is a word
+    assert s.toggle(place_clause("Tromsø")).text == "kylling i tromsø"
+    assert s.drop(place_clause("Bergen")).text == "kylling"
+    assert place_clause("Ålesund").label == "I Ålesund"
+
+
+def test_a_place_takes_typos_and_leaves_out_no_dinner() -> None:
+    s = snapshot(recipe("Kyllinggryte", CHICKEN), recipe("Bergensk fiskesuppe", COD))
+    every = prepare(s)
+    index = Index(every, s.traits, PLACES)
+    view = index.view(dinners(s, ANYTHING, every))
+    search = index.parse("bregen")
+    assert search.place == "Bergen" and search.corrected == (("bregen", "Bergen"),)
+    assert len(index.find(index.parse("i bergen"), view)) == 2  # a place picks the offers, not the dinners
+    assert [d.dish.name for d in index.find(index.parse("bergensk"), view)] == ["Bergensk fiskesuppe"]

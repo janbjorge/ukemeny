@@ -86,12 +86,11 @@ def parse_recipe(html: str, url: str) -> Recipe | None:
 
 @dataclass
 class MatpratRecipeSource:
-    """Implements core.ports.RecipeSource. At most `workers` requests at a time, each followed by
-    `delay` seconds, so a full first refresh (about 4,500 pages) takes about 20 minutes."""
+    """Implements core.ports.RecipeSource. At most `workers` requests at a time. matprat.no's robots.txt asks for no
+    crawl delay and a page answers in about 0.2 s; a 429 or 5xx is retried with a growing pause."""
 
     client: httpx2.AsyncClient
-    workers: int = 3
-    delay: float = 0.5
+    workers: int = 16
     tries: int = 4
     _slots: asyncio.Semaphore = field(init=False)
 
@@ -100,9 +99,9 @@ class MatpratRecipeSource:
 
     @classmethod
     @asynccontextmanager
-    async def open(cls, workers: int = 3, delay: float = 0.5) -> AsyncGenerator[Self]:
+    async def open(cls, workers: int = 16) -> AsyncGenerator[Self]:
         async with httpx2.AsyncClient(timeout=30, follow_redirects=True, headers={"User-Agent": USER_AGENT}) as client:
-            yield cls(client, workers, delay)
+            yield cls(client, workers)
 
     async def index(self) -> list[RecipeRef]:
         return parse_sitemap(await self._get(SITEMAP))
@@ -116,10 +115,7 @@ class MatpratRecipeSource:
 
     async def _get(self, url: str) -> str:
         async with self._slots:
-            try:
-                return await self._get_with_retry(url)
-            finally:
-                await asyncio.sleep(self.delay)
+            return await self._get_with_retry(url)
 
     async def _get_with_retry(self, url: str) -> str:
         for attempt in range(self.tries):

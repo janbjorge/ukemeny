@@ -88,7 +88,7 @@ def test_pages_without_a_recipe() -> None:
 
 def source(handle: Any) -> MatpratRecipeSource:
     client = httpx2.AsyncClient(transport=httpx2.MockTransport(handle))
-    return MatpratRecipeSource(client, workers=2, delay=0, tries=2)
+    return MatpratRecipeSource(client, workers=2, tries=2)
 
 
 async def test_fetch_and_index() -> None:

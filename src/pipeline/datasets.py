@@ -31,8 +31,8 @@ from pipeline.tjek import TjekOfferSource
 JEV_MODEL = os.environ.get("JEV_MODEL", "jev-latest")
 JEV_IN_FLIGHT = 8
 """Requests to Jev at a time."""
-CRAWL_WORKERS, CRAWL_DELAY = 3, 0.5
-"""matprat.no: at most 3 pages at a time, each followed by half a second."""
+CRAWL_WORKERS = 16
+"""matprat.no: pages at a time (jb 2026-10-13: "Why no concucrent requets?"; it was 3, each followed by half a second)."""
 
 
 class SetupError(Exception):
@@ -102,7 +102,7 @@ async def run(progress: build.Progress | None = None) -> Result:
         raise SetupError("TYPESAFE_API_KEY is not set. Get a TypeSafe API key at https://console.typesafe.ai")
     shopping = profile.load().shopping
     async with (
-        MatpratRecipeSource.open(CRAWL_WORKERS, CRAWL_DELAY) as recipes,
+        MatpratRecipeSource.open(CRAWL_WORKERS) as recipes,
         TjekOfferSource.open(shopping.lat, shopping.lng, shopping.radius_km, shopping.stores) as offers,
         AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
     ):

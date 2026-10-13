@@ -61,6 +61,7 @@ Site quirks:
 - What the probes showed (METHOD.md §2 has the judgement calls): Norwegian examples in the criteria fixed purre, risnudler, tamari and matfløte; the department fixed 28 of 36 wrong answers on rarer words; a single Choice over offers dropped right answers, and questions pointing at `offers[i]` mixed offers up. The new labels, probed on 64 hard ingredients (2026-10-13, /tmp/probe): 126 of 127 expected answers right at first, with vineddik and eggnudler as milk and dijonsennep as egg among the rest; naming them in the criteria made it 127 of 127 and cleared those three. That probe was 64 calls, 221 k tokens, $0.009.
 - Cost: the first full classification and matching of 1 943 dinners was 1 503 calls, about 1.8 M input tokens, $0.074. A weekly rebuild with warm caches was 29 calls.
 - Known wrong answers still in traits.json: hurtigris, malt allehånde and frossen lapskausblanding as gluten; gulbete and strutsevingknopper as onion.
+- The full run of the new labels (2026-10-13, 36 s for 1 148 ingredients) had vann as animal origin (526 uses), every mushroom as maybe meat, animal and milk, sylteagurk as fish, ørretrogn and laksekotelett as egg, and akevitt as milk; a check of each label against matprat's department found them. Naming them in the criteria fixed them in a probe; `--relabel milk egg fish meat animal` puts the fix in traits.json. Still wrong in that probe: portobellosopp and laksekotelett as maybe milk, tortillalefse as milk.
 
 ## 7. Hosting
 

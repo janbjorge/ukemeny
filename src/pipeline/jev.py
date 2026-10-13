@@ -202,17 +202,18 @@ def ingredient_labels() -> Labels:
         yes="melk, laktosefri melk, fløte, matfløte, rømme, crème fraîche, yoghurt, smør, ost, parmesan, kremost, brunost, "
         "myseost, melkepulver, pesto",
         maybe="Processed products where some brands add milk: ferdigsauser, kjøttkaker, fiskekaker, pølser, margarin",
-        # Probe 2026-10-13: vineddik and eggnudler were "yes" until named here
+        # Probe 2026-10-13: vineddik and eggnudler were "yes", and every mushroom "maybe", until named here
         no="kokosmelk, havremelk, soyamelk, mandelmelk, plantebasert smør, peanøttsmør, kakaosmør, egg, eggnudler, vineddik "
-        "and other eddik",
+        "and other eddik, sopp (every mushroom: sjampinjong, aromasopp, portobello, steinsopp), akevitt, vodka, vin, øl",
     )
     labels.contains(
         Item.EGG,
         "egg",
         yes="egg, eggeplomme, eggehvite, majones, aioli, remulade, hollandaise, eggnudler, fersk pasta",
         maybe="Processed products where some brands add egg: fiskekaker, kjøttkaker, panerte produkter, dressinger",
-        # Probe 2026-10-13: dijonsennep was "yes" until named here
-        no="tørket pasta of durum, risnudler, sennep, dijonsennep, everything without egg",
+        # Probe 2026-10-13: dijonsennep, ørretrogn and laksekotelett were "yes" until named here
+        no="tørket pasta of durum, risnudler, sennep, dijonsennep, fish roe (rogn, kaviar: fish, not egg), fish steaks "
+        "(laksekotelett), everything without egg",
     )
     labels.contains(
         Item.FISH,
@@ -220,7 +221,7 @@ def ingredient_labels() -> Labels:
         yes="all fish (laks, torsk, sei, makrell, tunfisk, sild), ansjos, kaviar, fiskesaus, worcestershiresaus, fiskeboller, "
         "fiskekraft, bonito, dashi",
         maybe="Products that sometimes hold fish: caesardressing, asiatiske krydderpastaer",
-        no="skalldyr and bløtdyr (asked separately), tang, nori, everything else",
+        no="skalldyr and bløtdyr (asked separately), tang, nori, sylteagurk and other pickles, everything else",
     )
     labels.contains(
         Item.CRUSTACEAN,
@@ -306,14 +307,18 @@ def ingredient_labels() -> Labels:
         "meat or poultry, or anything made from them",
         yes="all meat and poultry, bacon, pølser, skinke, kjøttkraft, kyllingbuljong, oksebuljong, kalvefond, smult, gelatin",
         maybe="buljong or kraft of unnamed kind, ferdigsauser",
-        no="fish and shellfish (asked separately), dairy, cheese, egg, everything else",
+        no="fish and shellfish (asked separately), dairy, cheese, egg, sopp (every mushroom: aromasopp, portobello, "
+        "steinsopp), everything else",
     )
     labels.contains(
         Item.ANIMAL,
         "anything of animal origin",
         yes="meat, poultry, fish, shellfish, milk, cheese, smør, fløte, egg, majones, honning, gelatin, smult, fiskesaus",
         maybe="ferdigsauser, buljong, pesto, brød, eggnudler",
-        no="vegetables, fruit, grains, tørket pasta, oils, plantebasert smør, kokosmelk, tofu, spices",
+        # Full run 2026-10-13: vann was "yes" (526 uses) and every mushroom "maybe" until named here
+        no="vann, salt, sukker, vegetables, sopp (every mushroom: sjampinjong, aromasopp, portobellosopp, steinsopp), fruit, "
+        "grains, tørket pasta, oils, plantebasert smør, kokosmelk, "
+        "tofu, spices, akevitt and other spirits, tortillalefser",
     )
     labels.contains(
         Item.PORK,

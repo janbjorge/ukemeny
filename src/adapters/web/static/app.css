@@ -126,7 +126,9 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .count { font-size: var(--t-small); color: var(--text-secondary); margin: 8px 0 0; }
 .empty { background: var(--surface-1); border-radius: 16px; padding: 16px 20px; box-shadow: var(--shadow); }
 .empty p { margin: 4px 0; }
-.more { grid-column: 1 / -1; text-align: center; margin: 4px 0 0; }
+.more { grid-column: 1 / -1; text-align: center; margin: 4px 0 0; position: relative; }
+/* The mark that loads the next cards: about two screens before the end of the list */
+.more .ahead { position: absolute; top: -1200px; left: 0; width: 1px; height: 1px; pointer-events: none; }
 .more a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; font-weight: 650; text-decoration: none; color: var(--accent-strong); background: var(--surface-1); border: 2px solid var(--accent-soft); border-radius: 999px; padding: 8px 28px; }
 .more a:active { border-color: var(--accent); }
 .more .n { font-weight: 400; color: var(--text-muted); font-size: var(--t-small); }

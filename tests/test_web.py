@@ -39,7 +39,7 @@ def test_front_page_shows_the_week_with_no_rules_until_picked(client: TestClient
         assert gone not in html
     picked = client.get("/?q=uten+l%C3%B8k").text
     assert "<b>Bytt:</b> vårløk for løk" in picked
-    assert 'hx-get="/middager" aria-current="true">Uten løk</a>' in picked
+    assert 'hx-get="/middager" hx-trigger="mousedown, click" hx-sync="this:drop" aria-current="true">Uten løk</a>' in picked
     for private in ("IBS", "intoleran", "år gammel"):
         assert private not in html
 
@@ -83,15 +83,15 @@ def test_nothing_found_offers_what_to_drop(client: TestClient) -> None:
 
 def test_chips_toggle_and_count(client: TestClient) -> None:
     html = client.get("/middager?q=kylling", headers=HX).text
-    assert 'hx-get="/middager?q=kylling+p%C3%A5+tilbud">På tilbud <span class="n">1</span>' in html
-    assert 'hx-get="/middager?q=fisk" data-protein="fisk">Fisk <span class="n">2</span>' in html
+    assert 'hx-get="/middager?q=kylling+p%C3%A5+tilbud" hx-trigger="mousedown, click" hx-sync="this:drop">På tilbud <span class="n">1</span>' in html
+    assert 'hx-get="/middager?q=fisk" hx-trigger="mousedown, click" hx-sync="this:drop" data-protein="fisk">Fisk <span class="n">2</span>' in html
     assert 'data-protein="kylling" aria-current="true">Kylling</a>' in html
     assert '<span class="off">Godt likt</span>' in html  # nothing would match
-    assert 'hx-get="/middager?q=kylling+uten+l%C3%B8k">Uten løk</a>' in html
-    assert 'aria-label="Allergier">' in html and 'hx-get="/middager?q=kylling+uten+egg">Uten egg</a>' in html
+    assert 'hx-get="/middager?q=kylling+uten+l%C3%B8k" hx-trigger="mousedown, click" hx-sync="this:drop">Uten løk</a>' in html
+    assert 'aria-label="Allergier">' in html and 'hx-get="/middager?q=kylling+uten+egg" hx-trigger="mousedown, click" hx-sync="this:drop">Uten egg</a>' in html
     assert ">Lav FODMAP</a>" in html and ">Vegetar</a>" in html
-    assert 'aria-label="Sorter">' in html and 'hx-get="/middager?q=kylling+rabatt+i+prosent">Rabatt %</a>' in html
-    assert 'hx-get="/middager?q=kylling" aria-current="true">Anbefalt</a>' in html
+    assert 'aria-label="Sorter">' in html and 'hx-get="/middager?q=kylling+rabatt+i+prosent" hx-trigger="mousedown, click" hx-sync="this:drop">Rabatt %</a>' in html
+    assert 'hx-get="/middager?q=kylling" hx-trigger="mousedown, click" hx-sync="this:drop" aria-current="true">Anbefalt</a>' in html
     proteins_row = html[html.index('class="chips proteins"') :]
     assert "Vegetar" not in proteins_row[: proteins_row.index("</nav>")]  # a rule in Kosthold, not a main protein
     proteins = html[html.index('class="chips proteins"') :]
@@ -155,6 +155,7 @@ def test_more_appends_the_next_page(client: TestClient, monkeypatch: pytest.Monk
     assert html.count('<article class="card"') == 2  # the week, and one idea
     assert 'hx-get="/middager/flere?q=laks&amp;fra=1"' in html and 'Vis flere <span class="n">3 til</span>' in html
     assert 'hx-trigger="intersect once, click"' in html  # loads by itself when scrolled to
+    assert '<span class="ahead" hx-get="/middager/flere?q=laks&amp;fra=1" hx-trigger="intersect once"' in html  # and before that
     more = small.get("/middager/flere?q=laks&fra=1", headers=HX).text
     assert more.count('<article class="card"') == 1 and "fra=2" in more and "<html" not in more
     last = small.get("/middager/flere?q=laks&fra=3", headers=HX).text

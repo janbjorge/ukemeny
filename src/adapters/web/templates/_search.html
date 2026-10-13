@@ -1,7 +1,7 @@
-{# The search box. Typing sends the search after a short pause; a chip or a link sends the box its new text out of band. #}
+{# The search box. Typing sends the search after 100 ms without a key (a newer search cancels one on its way); a chip or a link sends the box its new text out of band. #}
 {% macro search_box(value, oob=false) -%}
 <input id="q" name="q" type="search" value="{{ value }}" placeholder="Hva har dere lyst på?" aria-label="Søk blant middagene"
   autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"
-  hx-get="/middager" hx-trigger="input changed delay:300ms" hx-target="#forslag-liste" hx-swap="outerHTML" hx-sync="this:replace"
+  hx-get="/middager" hx-trigger="input changed delay:100ms" hx-target="#forslag-liste" hx-swap="outerHTML" hx-sync="this:replace"
   hx-indicator="#forslag-liste"{% if oob %} hx-swap-oob="true"{% endif %}>
 {%- endmacro %}

@@ -1,5 +1,7 @@
 {# Small pieces the list and "Vis flere" share. Import "with context": they use link(). #}
-{% macro go(text, antall=none) %}{% set qs = link(text, antall) %}href="/{{ '?' ~ qs if qs }}#forslag" hx-get="/middager{{ '?' ~ qs if qs }}"{% endmacro %}
+{# A link that loads the list for a search. It starts on mouse-down, the 80-120 ms before the click a mouse gives; touch
+   (where swiping a chip row must not search) and keys start on the click. #}
+{% macro go(text, antall=none) %}{% set qs = link(text, antall) %}href="/{{ '?' ~ qs if qs }}#forslag" hx-get="/middager{{ '?' ~ qs if qs }}" hx-trigger="mousedown, click" hx-sync="this:drop"{% endmacro %}
 
 {% macro chip(c) -%}
 {# A chip without a count (a diet rule) is always a link; one with a count of 0 would give nothing, so it is not. #}
@@ -7,10 +9,12 @@
 {%- else %}<span class="off"{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}>{{ c.label }}</span>{% endif %}
 {%- endmacro %}
 
-{# The button after the cards, inside the grid: scrolled into view (or clicked) it is replaced by the next cards and a new
-   button, so the list goes on as you scroll (jb 2026-10-13: "we still lack the inf scroll"). Without JavaScript it is a link. #}
+{# The button after the cards, inside the grid: it is replaced by the next cards and a new button, so the list goes on as you
+   scroll (jb 2026-10-13: "we still lack the inf scroll"). A mark well above it starts loading before the end of the list is
+   in view; the button loads when it comes into view or is clicked. Without JavaScript it is a link. #}
 {% macro more_button(found, shown) -%}
-{% set qs = link(found.search.text) %}
-<p class="more"><a href="/?{{ link(found.search.text, shown + page) }}#forslag" hx-get="/middager/flere?{{ qs ~ '&' if qs }}fra={{ shown }}"
-  hx-trigger="intersect once, click" hx-target="closest .more" hx-swap="outerHTML" hx-indicator="closest .more">Vis flere <span class="n">{{ (found.total - shown)|tall }} til</span></a></p>
+{% set qs = link(found.search.text) %}{% set next = "/middager/flere?" ~ (qs ~ "&" if qs) ~ "fra=" ~ shown %}
+<p class="more"><span class="ahead" hx-get="{{ next }}" hx-trigger="intersect once" hx-target="closest .more" hx-swap="outerHTML"
+  hx-sync="closest .more:drop" aria-hidden="true"></span><a href="/?{{ link(found.search.text, shown + page) }}#forslag" hx-get="{{ next }}"
+  hx-trigger="intersect once, click" hx-target="closest .more" hx-swap="outerHTML" hx-sync="closest .more:drop" hx-indicator="closest .more">Vis flere <span class="n">{{ (found.total - shown)|tall }} til</span></a></p>
 {%- endmacro %}

@@ -3,6 +3,7 @@
 import hashlib
 import os
 import threading
+from collections import OrderedDict
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import date
@@ -70,6 +71,9 @@ KIND_CHIPS = (Tag.QUICK, Tag.UNDER_40, Tag.ON_SALE, Tag.LIKED, Tag.MILD)
 SEARCH_BOX = {"q", "sok"}
 # Ideas per page and per "Vis flere": a phone screen holds one or two cards
 PAGE = 12
+# Rendered fragments kept, newest last: the snapshot does not change while the process runs, so a search someone
+# already made (a chip, a combination) is answered without rendering again
+FRAGMENTS = 512
 # Pages may be cached this long. Not stale-while-revalidate: a browser then showed the page from before a deploy
 PAGE_CACHE = "public, max-age=300"
 
@@ -214,6 +218,20 @@ def create_app(queries: Queries) -> FastAPI:
     def ideas(choice: DinnerQuery, count: int) -> Found:
         return queries.search(choice.text(), limit=count, skip_week=True)
 
+    rendered: OrderedDict[tuple[object, ...], bytes] = OrderedDict()
+
+    def fragment(request: Request, template: str, key: tuple[object, ...], context: Callable[[], dict[str, object]]) -> Response:
+        """An HTMX fragment, rendered once per key and kept (FRAGMENTS)."""
+        key = (template, *key)
+        if key in rendered:
+            rendered.move_to_end(key)
+            return HTMLResponse(rendered[key])
+        body = bytes(templates.TemplateResponse(request, template, context()).body)
+        rendered[key] = body
+        if len(rendered) > FRAGMENTS:
+            rendered.popitem(last=False)
+        return HTMLResponse(body)
+
     def rules_changed(found: Found, current_url: str | None) -> bool:
         """Did this search change the diet rules from the page's? htmx sends the page's address (HX-Current-URL)."""
         if not current_url:
@@ -250,10 +268,14 @@ def create_app(queries: Queries) -> FastAPI:
             query = link(choice.text(), choice.antall if antall else None)
             return RedirectResponse(f"/?{query}#forslag" if query else "/#forslag", status_code=303)
         found = ideas(choice, choice.antall if antall else PAGE)
-        context = dinner_context(
-            found, fragment=True, trigger=request.headers.get("hx-trigger"), current_url=request.headers.get("hx-current-url")
+        trigger, current_url = request.headers.get("hx-trigger"), request.headers.get("hx-current-url")
+        week, box = rules_changed(found, current_url), trigger not in SEARCH_BOX
+        response = fragment(
+            request,
+            "_dinners.html",
+            (found.search.text, len(found.dinners), week, box),
+            lambda: dinner_context(found, fragment=True, trigger=trigger, current_url=current_url),
         )
-        response = templates.TemplateResponse(request, "_dinners.html", context)
         query = link(found.search.text)
         response.headers["HX-Replace-Url"] = f"/?{query}#forslag" if query else "/#forslag"
         return response
@@ -265,7 +287,9 @@ def create_app(queries: Queries) -> FastAPI:
         if "hx-request" not in request.headers:
             return RedirectResponse(f"/?{link(choice.text(), start + PAGE)}#forslag", status_code=303)
         found = ideas(choice, start + PAGE)
-        return templates.TemplateResponse(request, "_more.html", {"found": found, "start": start, "shown": len(found.dinners)})
+        return fragment(
+            request, "_more.html", (found.search.text, start), lambda: {"found": found, "start": start, "shown": len(found.dinners)}
+        )
 
     @app.get("/om", response_class=HTMLResponse)
     def about(request: Request) -> HTMLResponse:

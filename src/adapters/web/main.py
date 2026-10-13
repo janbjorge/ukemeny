@@ -218,7 +218,7 @@ def create_app(queries: Queries) -> FastAPI:
 
     @app.get("/om", response_class=HTMLResponse)
     def about(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse(request, "om.html", {"plan": queries.plan()})
+        return templates.TemplateResponse(request, "om.html")
 
     @app.get("/llms.txt", response_class=PlainTextResponse)
     def llms_txt(request: Request) -> Response:

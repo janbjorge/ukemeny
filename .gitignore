@@ -4,5 +4,5 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 *.local.md
-# Local caches of the offline build: recipes, Jev's answers, catalogs. datasets/ is committed.
+# The old build caches (recipes, Jev's answers, catalogs); unused since the build starts from scratch
 data/

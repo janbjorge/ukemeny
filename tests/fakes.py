@@ -16,7 +16,6 @@ from core.models import (
     Kids,
     Lactose,
     Level,
-    Levels,
     Offer,
     Onion,
     Pregnancy,
@@ -93,37 +92,6 @@ def offer(
 
 
 @dataclass
-class FakeRecipes:
-    stored: dict[str, tuple[RecipeRef, Recipe | None]] = field(default_factory=dict)
-
-    async def known(self) -> dict[str, str]:
-        return {url: ref.lastmod for url, (ref, _) in self.stored.items()}
-
-    async def save(self, ref: RecipeRef, recipe: Recipe | None) -> None:
-        self.stored[ref.url] = (ref, recipe)
-
-    async def dinners(self) -> list[Recipe]:
-        return [r for _, r in self.stored.values() if r is not None and r.is_dinner]
-
-    def add(self, *recipes: Recipe) -> FakeRecipes:
-        for r in recipes:
-            self.stored[r.url] = (RecipeRef(r.url, "2026-10-01"), r)
-        return self
-
-
-@dataclass
-class FakeTraits:
-    stored: dict[str, dict[str, str]] = field(default_factory=dict)
-
-    async def get_many(self, names: Iterable[str]) -> dict[str, dict[str, str]]:
-        return {n: dict(self.stored[n]) for n in names if n in self.stored}
-
-    async def save_many(self, levels: Mapping[str, Levels]) -> None:
-        for name, labels in levels.items():
-            self.stored.setdefault(name, {}).update(labels)
-
-
-@dataclass
 class FakeClassifier:
     """Answers from `known`, PLAIN for anything else, and records what was asked: (name, labels)."""
 
@@ -136,17 +104,6 @@ class FakeClassifier:
         self.asked.append((ingredient.name, keys))
         levels = self.known.get(ingredient.name, PLAIN).levels()
         return {key: levels[key] for key in keys} | {"model": "fake"}
-
-
-@dataclass
-class FakeMatches:
-    stored: dict[tuple[str, str], float] = field(default_factory=dict)
-
-    async def get_many(self, pairs: Iterable[tuple[str, str]]) -> dict[tuple[str, str], float]:
-        return {pair: self.stored[pair] for pair in pairs if pair in self.stored}
-
-    async def save_many(self, answers: Mapping[tuple[str, str], float]) -> None:
-        self.stored.update(answers)
 
 
 @dataclass

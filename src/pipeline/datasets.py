@@ -1,10 +1,10 @@
-"""Build datasets/ with Jev. Run on a laptop, then commit datasets/ and push (which deploys).
+"""Build datasets/ from scratch: every recipe from matprat.no, this week's offers from mattilbud.no, and Jev's labels
+for every ingredient and offer. Nothing is kept between runs. Run on a laptop, then commit datasets/ and push
+(which deploys).
 
-    uv run python -m pipeline.datasets            # this week's offers and any new ingredients
-    uv run python -m pipeline.datasets --refresh  # also new and changed recipes from matprat.no
+    uv run python -m pipeline.datasets
 
-Needs TYPESAFE_API_KEY. Caches live in data/ (gitignored): the recipes and Jev's answers in
-data/matris.sqlite3, the offers per catalog in data/tjek/. The site reads only datasets/.
+Needs TYPESAFE_API_KEY. The site reads only datasets/.
 """
 
 import argparse
@@ -13,7 +13,6 @@ import os
 import sys
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from pathlib import Path
 
 from typesafe_sdk import AsyncTypeSafeClient
 
@@ -22,10 +21,8 @@ from app import build
 from core.models import RefreshReport, Snapshot
 from pipeline.jev import Jev, JevIngredientClassifier, JevOfferMatcher
 from pipeline.matprat import MatpratRecipeSource
-from pipeline.store import Sqlite, SqliteOfferMatchStore, SqliteRecipeStore, SqliteTraitsStore
 from pipeline.tjek import TjekOfferSource
 
-DATA = Path(os.environ.get("MATRIS_DATA", Path(__file__).parents[2] / "data"))
 JEV_MODEL = os.environ.get("JEV_MODEL", "jev-latest")
 JEV_IN_FLIGHT = 8
 """Requests to Jev at a time."""
@@ -40,7 +37,7 @@ class SetupError(Exception):
 @dataclass(frozen=True, slots=True)
 class Result:
     snapshot: Snapshot
-    refreshed: RefreshReport | None
+    recipes: RefreshReport
     sizes: dict[str, int]
     jev: str
 
@@ -66,46 +63,29 @@ def reporter(steps: Mapping[str, str], echo: Callable[[str], None]) -> build.Pro
     return report
 
 
-async def run(refresh: bool = False, limit: int | None = None, progress: build.Progress | None = None) -> Result:
+async def run(progress: build.Progress | None = None) -> Result:
     key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
         raise SetupError("TYPESAFE_API_KEY is not set. Get a TypeSafe API key at https://console.typesafe.ai")
     shopping = profile.load().shopping
     async with (
-        Sqlite.open(DATA / "matris.sqlite3") as db,
         MatpratRecipeSource.open(CRAWL_WORKERS, CRAWL_DELAY) as recipes,
-        TjekOfferSource.open(shopping.lat, shopping.lng, shopping.radius_km, shopping.stores, DATA / "tjek") as offers,
+        TjekOfferSource.open(shopping.lat, shopping.lng, shopping.radius_km, shopping.stores) as offers,
         AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
     ):
-        store = SqliteRecipeStore(db)
-        pages = (lambda done, due: progress("recipes", done, due)) if progress else None
-        refreshed = await build.refresh(recipes, store, limit, pages) if refresh else None
         jev = Jev(client, max_in_flight=JEV_IN_FLIGHT)
-        snapshot = await build.snapshot(
-            store,
-            SqliteTraitsStore(db),
-            JevIngredientClassifier(jev),
-            offers,
-            SqliteOfferMatchStore(db),
-            JevOfferMatcher(jev),
-            progress,
-        )
-    return Result(snapshot, refreshed, datasets.write(snapshot), jev.status())
+        snapshot, report = await build.snapshot(recipes, JevIngredientClassifier(jev), offers, JevOfferMatcher(jev), progress)
+    return Result(snapshot, report, datasets.write(snapshot), jev.status())
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build datasets/: this week's offers, and Jev's labels for new ingredients.")
-    parser.add_argument("--refresh", action="store_true", help="also fetch new and changed recipes from matprat.no")
-    args = parser.parse_args()
-
+    argparse.ArgumentParser(description="Build datasets/ from scratch: matprat.no, mattilbud.no and Jev.").parse_args()
     try:
-        result = asyncio.run(run(args.refresh, progress=reporter(STEPS, lambda line: print(line, file=sys.stderr, flush=True))))
+        result = asyncio.run(run(reporter(STEPS, lambda line: print(line, file=sys.stderr, flush=True))))
     except SetupError as e:
         sys.exit(f"error: {e}")
-    s = result.snapshot
-    if result.refreshed:
-        r = result.refreshed
-        print(f"matprat.no: {r.listed:,} recipes listed, {r.fetched:,} fetched, {r.failed:,} failed")
+    s, r = result.snapshot, result.recipes
+    print(f"matprat.no: {r.listed:,} pages, {r.failed:,} failed")
     print(f"{len(s.dishes):,} dinners, {len(s.traits):,} ingredients, {len(s.offers):,} offers, {len(s.matches):,} ingredients on offer")
     print(", ".join(f"{name} {size / 1e6:.1f} MB" for name, size in result.sizes.items()))
     print(result.jev)

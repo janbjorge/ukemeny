@@ -1,19 +1,15 @@
 """This week's grocery offers from Tjek, the catalog service behind mattilbud.no.
 
 The public v2 API needs no key for catalogs and offers. Offers are read per catalog, since
-one location search stops at 1,000 offers. A catalog does not change once published, so
-its offers are kept on disk: a run only lists the catalogs (one request) and fetches the
-offers of catalogs it has not seen.
+one location search stops at 1,000 offers. Nothing is kept between runs.
 """
 
 import asyncio
-import json
 import re
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any, Self
 
 import httpx2
@@ -30,7 +26,6 @@ _NUMBER = r"(\d+(?:[ \u00a0]\d{3})*(?:,\d+)?)"
 _KG_BEFORE = re.compile(_NUMBER + r"\s*pr\.?\s*kg", re.IGNORECASE)
 _KG_AFTER = re.compile(r"pr\.?\s*kg\.?\s*" + _NUMBER, re.IGNORECASE)
 _PER_KG = re.compile(r"pr\.?\s*kg", re.IGNORECASE)
-_CATALOG_ID = re.compile(r"^[A-Za-z0-9_-]+$")
 _BEFORE = re.compile(r"\bfør(?:pris)?\.?:?\s*(?:kr\.?\s*)?" + _NUMBER, re.IGNORECASE)
 
 
@@ -106,12 +101,6 @@ class TjekOfferSource:
     radius_km: float
     stores: tuple[str, ...]
     """Grocery chains to read (src/adapters/profile.py GROCERS)."""
-    cache_dir: Path | None = None
-    """Raw offers per catalog, one JSON file each. None: always fetch."""
-
-    def __post_init__(self) -> None:
-        if self.cache_dir:
-            self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     @classmethod
     @asynccontextmanager
@@ -121,10 +110,9 @@ class TjekOfferSource:
         lng: float,
         radius_km: float,
         stores: tuple[str, ...],
-        cache_dir: Path | None = None,
     ) -> AsyncGenerator[Self]:
         async with httpx2.AsyncClient(base_url=API, timeout=30, headers={"User-Agent": USER_AGENT}) as client:
-            yield cls(client, lat, lng, radius_km, stores, cache_dir)
+            yield cls(client, lat, lng, radius_km, stores)
 
     async def current(self) -> list[Offer]:
         geo = {
@@ -141,33 +129,9 @@ class TjekOfferSource:
             and c.get("offer_count")
             and datetime.fromisoformat(c["run_from"]) <= now <= datetime.fromisoformat(c["run_till"])
         ]
-        pages = await asyncio.gather(*(self._catalog_offers(c) for c in catalogs))
-        self._prune({c["id"] for c in catalogs})
+        pages = await asyncio.gather(*(self._paged("/offers", {"catalog_ids": c["id"]}) for c in catalogs))
         offers = {o.id: o for page in pages for o in map(parse_offer, page)}
         return list(offers.values())
-
-    def _cache_path(self, catalog_id: str) -> Path | None:
-        if self.cache_dir is None or not _CATALOG_ID.match(catalog_id):
-            return None
-        return self.cache_dir / f"{catalog_id}.json"
-
-    async def _catalog_offers(self, catalog: dict[str, Any]) -> list[dict[str, Any]]:
-        """From disk when the catalog was seen with the same number of offers (Tjek's count
-        changes when a catalog is corrected)."""
-        path = self._cache_path(catalog["id"])
-        if path and (offers := _read(path, catalog["offer_count"])) is not None:
-            return offers
-        offers = await self._paged("/offers", {"catalog_ids": catalog["id"]})
-        if path:
-            _write(path, catalog["offer_count"], offers)
-        return offers
-
-    def _prune(self, running: set[str]) -> None:
-        """Forget catalogs that ended or are no longer listed."""
-        if self.cache_dir:
-            for path in self.cache_dir.glob("*.json"):
-                if path.stem not in running:
-                    path.unlink()
 
     async def _paged(self, path: str, params: dict[str, Any]) -> list[dict[str, Any]]:
         rows: list[dict[str, Any]] = []
@@ -181,19 +145,3 @@ class TjekOfferSource:
             rows.extend(page)
             if len(page) < PAGE:
                 return rows
-
-
-def _read(path: Path, offer_count: int) -> list[dict[str, Any]] | None:
-    if not path.exists():
-        return None
-    cached = json.loads(path.read_text())
-    if cached.get("offer_count") != offer_count:
-        return None
-    offers: list[dict[str, Any]] = cached["offers"]
-    return offers
-
-
-def _write(path: Path, offer_count: int, offers: list[dict[str, Any]]) -> None:
-    tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"offer_count": offer_count, "offers": offers}))
-    tmp.replace(path)

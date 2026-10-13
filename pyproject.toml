@@ -25,7 +25,7 @@ packages = ["src/core", "src/app", "src/adapters", "src/pipeline"]
 
 [dependency-groups]
 # Offline build of datasets/ with Jev (src/pipeline). Not needed to serve the site.
-pipeline = ["aiosqlite>=0.22.1", "httpx2[http2]>=2.13.1", "typesafe-sdk>=0.7.2"]
+pipeline = ["httpx2[http2]>=2.13.1", "typesafe-sdk>=0.7.2"]
 dev = ["pytest", "pytest-asyncio", "httpx", "ruff", "ty", "types-pyyaml"]
 
 [tool.uv]

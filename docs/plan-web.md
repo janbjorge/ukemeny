@@ -9,7 +9,7 @@ jb 2026-10-13: "Lets make this into a fly.io service, see ex. over at statsbudsj
 ## What we measured
 
 - The ranking over 1 943 dinners takes well under a second and is done once at start-up; the app used 67 MiB in Docker.
-- A rebuild with warm caches is 1 Tjek request and 29 Jev calls, so a weekly offline build is cheap.
+- Every build starts from scratch (jb 2026-10-13): the matprat crawl and every Jev question, each time.
 - The snapshot is 4.1 MB of JSON (dishes.json 3.6 MB), fine for git and the image.
 
 ## Decisions

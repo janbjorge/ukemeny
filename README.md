@@ -20,8 +20,7 @@ Each read command takes `--json` for agents: one JSON document on stdout, errors
 
 ```sh
 export TYPESAFE_API_KEY=...             # https://console.typesafe.ai
-uv run python -m pipeline.datasets      # this week's offers, new ingredients
-uv run python -m pipeline.datasets --refresh   # also new and changed recipes
+uv run python -m pipeline.datasets      # datasets/ from scratch: matprat, offers, Jev
 ```
 
 Then commit `datasets/` and push; a push to main deploys (.github/workflows/deploy.yml).

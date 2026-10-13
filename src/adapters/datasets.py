@@ -12,7 +12,7 @@ from typing import Any
 
 import orjson
 
-from core.models import Dish, Ingredient, Offer, Part, Recipe, Snapshot, Traits
+from core.models import Dish, Offer, Part, Snapshot, Traits
 
 DATASETS = Path(__file__).parents[2] / "datasets"
 FILES = ("dishes.json", "traits.json", "offers.json")
@@ -54,21 +54,6 @@ def write(snapshot: Snapshot, root: Path = DATASETS) -> dict[str, int]:
         (root / name).write_bytes(data)
         sizes[name] = len(data)
     return sizes
-
-
-def recipe_from_dict(r: dict[str, Any]) -> Recipe:
-    """A full recipe, as the offline build caches it (src/pipeline/store.py). Never in datasets/."""
-    return Recipe(
-        url=r["url"],
-        name=r["name"],
-        dish_types=tuple(r["dish_types"]),
-        main_categories=tuple(r["main_categories"]),
-        portions=r["portions"],
-        prep_time=r["prep_time"],
-        rating=r["rating"],
-        rating_count=r["rating_count"],
-        ingredients=tuple(Ingredient(i["name"], i["text"], i["amount"], i["unit"], i["category"]) for i in r["ingredients"]),
-    )
 
 
 def _dish(d: dict[str, Any]) -> Dish:

@@ -143,10 +143,8 @@ def check(url: Annotated[str, typer.Argument(help="En oppskrift på matprat.no."
 
 
 @app.command()
-def build(
-    refresh: Annotated[bool, typer.Option("--refresh", help="Hent også nye og endrede oppskrifter fra matprat.no.")] = False,
-) -> None:
-    """Lag datasets/ med Jev: ukens tilbud og nye ingredienser. Trenger TYPESAFE_API_KEY."""
+def build() -> None:
+    """Lag datasets/ fra bunnen: matprat.no, mattilbud.no og Jev. Trenger TYPESAFE_API_KEY."""
     from pipeline import datasets as pipeline
 
     steps = {
@@ -156,8 +154,7 @@ def build(
         "offers": "Jev: {due} ingredienser å matche mot tilbud",
     }
     try:
-        report = pipeline.reporter(steps, lambda line: typer.echo(line, err=True))
-        result = asyncio.run(pipeline.run(refresh, progress=report))
+        result = asyncio.run(pipeline.run(pipeline.reporter(steps, lambda line: typer.echo(line, err=True))))
     except (pipeline.SetupError, profile.ProfileError) as e:
         fail("setup", str(e), False)
     s = result.snapshot

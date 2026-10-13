@@ -27,37 +27,6 @@ class RecipeSource(Protocol):
         ...
 
 
-class RecipeStore(Protocol):
-    async def known(self) -> Mapping[str, str]:
-        """lastmod per stored recipe URL, including pages that held no recipe."""
-        ...
-
-    async def save(self, ref: RecipeRef, recipe: Recipe | None) -> None: ...
-
-    async def dinners(self) -> list[Recipe]: ...
-
-
-class TraitsStore(Protocol):
-    """Classified ingredients, per (name, label), so each label is asked about each name only once."""
-
-    async def get_many(self, names: Iterable[str]) -> dict[str, dict[str, str]]:
-        """The labels stored per name (core.models.Levels); a name with none is left out."""
-        ...
-
-    async def save_many(self, levels: Mapping[str, Levels]) -> None:
-        """Add or replace these labels; others stored for the name stay."""
-        ...
-
-
-class OfferMatchStore(Protocol):
-    """Earlier answers to "is this offer that ingredient?", by ingredient name and offer heading.
-    Headings come back week after week, so each pair is asked once."""
-
-    async def get_many(self, pairs: Iterable[tuple[str, str]]) -> dict[tuple[str, str], float]: ...
-
-    async def save_many(self, answers: Mapping[tuple[str, str], float]) -> None: ...
-
-
 class OfferSource(Protocol):
     """This week's grocery offers near home: mattilbud.no's catalogs."""
 

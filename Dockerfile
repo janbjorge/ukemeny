@@ -3,7 +3,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy PATH="/app/.venv/bin:$PATH" PYTHONPATH=/app/src
 COPY pyproject.toml uv.lock ./
-# Runtime dependencies only: the offline pipeline (Jev, httpx2, aiosqlite) and dev tools stay out of the image
+# Runtime dependencies only: the offline pipeline (Jev, httpx2) and dev tools stay out of the image
 RUN uv sync --locked --no-default-groups --no-install-project
 COPY src src
 COPY datasets datasets

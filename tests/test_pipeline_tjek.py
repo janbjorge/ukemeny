@@ -1,5 +1,4 @@
 from datetime import UTC, date, datetime, timedelta
-from pathlib import Path
 from typing import Any
 
 import httpx2
@@ -143,11 +142,7 @@ def test_implausible_discounts_are_ignored() -> None:
     assert before_price(20.0, 99.0, "Pr pk Førpris 99,00") is None
 
 
-def files(directory: Path) -> list[str]:
-    return sorted(p.name for p in directory.iterdir())
-
-
-async def test_offers_are_kept_per_catalog(tmp_path: Path) -> None:
+async def test_offers_are_read_per_catalog_every_time() -> None:
     catalogs = [_catalog("kiwi", "KIWI", offers=2), _catalog("rema", "REMA 1000", offers=1)]
     offers = {
         "kiwi": [_raw("a", "KYLLINGFILET"), _raw("b", "LAKSEFILET")],
@@ -162,16 +157,8 @@ async def test_offers_are_kept_per_catalog(tmp_path: Path) -> None:
         return httpx2.Response(200, json=offers[request.url.params["catalog_ids"]])
 
     async with httpx2.AsyncClient(base_url=API, transport=httpx2.MockTransport(handle)) as client:
-        source = TjekOfferSource(client, 58.97, 5.73, 15, STORES, cache_dir=tmp_path)
+        source = TjekOfferSource(client, 58.97, 5.73, 15, STORES)
         first = await source.current()
         second = await source.current()
-        assert sorted(fetched) == ["kiwi", "rema"]
-        assert sorted(o.heading for o in second) == sorted(o.heading for o in first)
-
-        # A corrected catalog is fetched again; one that ended is forgotten.
-        catalogs = [_catalog("kiwi", "KIWI", offers=3)]
-        offers["kiwi"].append(_raw("d", "TORSKEFILET"))
-        third = await source.current()
-    assert sorted(fetched) == ["kiwi", "kiwi", "rema"]
-    assert len(third) == 3
-    assert files(tmp_path) == ["kiwi.json"]
+    assert sorted(fetched) == ["kiwi", "kiwi", "rema", "rema"]  # nothing kept between runs
+    assert sorted(o.heading for o in first) == sorted(o.heading for o in second) == ["KYLLINGFILET", "LAKSEFILET", "POTETER"]

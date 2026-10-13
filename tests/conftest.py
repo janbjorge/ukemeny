@@ -1,10 +1,14 @@
 """Guards for every test: no Jev tokens and no network. Use fakes or httpx2.MockTransport."""
 
+import os
 import socket
 from collections.abc import Iterator
 from typing import NoReturn
 
 import pytest
+
+# The site configures Logfire when adapters.web.main is imported, before any fixture runs: without a token it sends nothing
+os.environ.pop("LOGFIRE_TOKEN", None)
 
 
 class NetworkUsedError(RuntimeError):

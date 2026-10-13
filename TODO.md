@@ -4,6 +4,7 @@ Every request from jb, with status. Newest first. An item is ticked only when it
 
 ## Open
 
+- [ ] Logfire, every insight the app can see (jb 2026-10-13: "I wanto add logfire, go full tilt on all options. Make sure to understand the runtime in terms of being on fly.io and make sure we get every insight metric we can into logfire"). The code is in (FACTS.md §7) and checked in the Docker image. Left: a `matris` project in Logfire with a write token, `fly secrets set LOGFIRE_TOKEN=… -a matris`, a push, then check that the data arrives.
 - [ ] Tune Lavkarbo's 20 g per portion (METHOD.md §1): it leaves 378 of 1 943 dinners.
 - [ ] Rebuild `datasets/` every week so the offers stay current: by hand (`uv run python -m pipeline.datasets`, commit, push), or a scheduled GitHub Action with a `TYPESAFE_API_KEY` secret (Jev would still run offline, not in the site).
 - [ ] Open question: a minimum rating or a maximum prep time in profile.yaml, since a discount can put a three-star, hour-long dish in the week (METHOD.md §5).
@@ -11,7 +12,6 @@ Every request from jb, with status. Newest first. An item is ticked only when it
 ## Ideas not yet requested
 
 - Fix the known wrong Jev answers (FACTS.md §6) with a small list of overrides.
-- Logfire tracing as in statsbudsjett, once the site is live.
 - Keep one Fly machine running (`min_machines_running = 1`) so the first visit after a quiet spell does not wait for a start; it costs a running machine around the clock.
 - A shopping list for the week, from `check --json` ingredient lists.
 

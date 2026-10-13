@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Annotated
 from urllib.parse import parse_qs, urlsplit
 
+import logfire
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse, Response
@@ -20,7 +21,7 @@ from markupsafe import Markup
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from adapters.datasets import JsonDatasets
-from adapters.web import api, fmt
+from adapters.web import api, fmt, telemetry
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
 from app.queries import Found, Queries
 from core.matching import VEGETARIAN
@@ -144,7 +145,7 @@ class HeadAsGet:
         async def headers_only(message: Message) -> None:
             await send({**message, "body": b""} if message["type"] == "http.response.body" else message)
 
-        await self.app({**scope, "method": "GET"}, receive, headers_only)
+        await self.app({**scope, "method": "GET", telemetry.HEAD: True}, receive, headers_only)
 
 
 # Content hash per static file, read once at start-up: the image is rebuilt for every change
@@ -215,14 +216,15 @@ def create_app(queries: Queries) -> FastAPI:
     templates = Jinja2Templates(directory=HERE / "templates", context_processors=[context])
     templates.env.filters |= {name: getattr(fmt, name) for name in fmt.__all__}
 
-    def ideas(choice: DinnerQuery, count: int) -> Found:
-        return queries.search(choice.text(), limit=count, skip_week=True)
+    def ideas(request: Request, choice: DinnerQuery, count: int) -> Found:
+        return telemetry.search(queries, choice.text(), request.url.path, limit=count, skip_week=True)
 
     rendered: OrderedDict[tuple[object, ...], bytes] = OrderedDict()
 
     def fragment(request: Request, template: str, key: tuple[object, ...], context: Callable[[], dict[str, object]]) -> Response:
         """An HTMX fragment, rendered once per key and kept (FRAGMENTS)."""
         key = (template, *key)
+        telemetry.fragment(template, kept=key in rendered)
         if key in rendered:
             rendered.move_to_end(key)
             return HTMLResponse(rendered[key])
@@ -257,7 +259,7 @@ def create_app(queries: Queries) -> FastAPI:
     @app.get("/", response_class=HTMLResponse)
     def index(request: Request, q: Q = None, protein: Q = None, tilbud: Q = None, antall: Q = None) -> HTMLResponse:
         choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall)
-        found = ideas(choice, choice.antall if antall else PAGE)
+        found = ideas(request, choice, choice.antall if antall else PAGE)
         return templates.TemplateResponse(request, "index.html", dinner_context(found))
 
     @app.get("/middager", response_class=HTMLResponse)
@@ -267,7 +269,7 @@ def create_app(queries: Queries) -> FastAPI:
         if "hx-request" not in request.headers:
             query = link(choice.text(), choice.antall if antall else None)
             return RedirectResponse(f"/?{query}#forslag" if query else "/#forslag", status_code=303)
-        found = ideas(choice, choice.antall if antall else PAGE)
+        found = ideas(request, choice, choice.antall if antall else PAGE)
         trigger, current_url = request.headers.get("hx-trigger"), request.headers.get("hx-current-url")
         week, box = rules_changed(found, current_url), trigger not in SEARCH_BOX
         response = fragment(
@@ -286,7 +288,7 @@ def create_app(queries: Queries) -> FastAPI:
         choice, start = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud), offset(fra)
         if "hx-request" not in request.headers:
             return RedirectResponse(f"/?{link(choice.text(), start + PAGE)}#forslag", status_code=303)
-        found = ideas(choice, start + PAGE)
+        found = ideas(request, choice, start + PAGE)
         return fragment(
             request, "_more.html", (found.search.text, start), lambda: {"found": found, "start": start, "shown": len(found.dinners)}
         )
@@ -375,11 +377,20 @@ def create_app(queries: Queries) -> FastAPI:
 
 
 def _default() -> FastAPI:
-    # No profile: the site starts with no diet rules, and a visitor picks them in the search
-    queries = Queries(JsonDatasets())
+    telemetry.configure()
+    with logfire.span("start-up"):
+        # No profile: the site starts with no diet rules, and a visitor picks them in the search
+        queries = Queries(JsonDatasets())
+        app = create_app(queries)
+    telemetry.instrument(app, queries)
+
+    def warm() -> None:
+        with logfire.span("warm the diet rules"):
+            queries.warm()
+
     # Each rule's ranking and week, worked out after start-up, so a first tap on a chip finds them ready
-    threading.Thread(target=queries.warm, name="warm", daemon=True).start()
-    return create_app(queries)
+    threading.Thread(target=warm, name="warm", daemon=True).start()
+    return app
 
 
 app = HeadAsGet(_default())

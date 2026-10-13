@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from adapters import schema
+from adapters.web import telemetry
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery
 from app.queries import Queries
 from core.search import Diet
@@ -63,6 +64,7 @@ def build(queries: Queries) -> FastAPI:
         """A varied week: one dinner per main protein (fish up to twice, never the same fish twice),
         picked from dinners whose main protein is on sale. `links` adds or takes away a diet rule."""
         search = queries.parse(q or "")
+        telemetry.counted(search, request.url.path)
         return schema.plan(queries, queries.plan(queries.household(q or "")), search, base(request))
 
     @api.get("/middager", response_model=schema.DinnersOut, summary="Search the dinners that fit, best first")
@@ -79,7 +81,8 @@ def build(queries: Queries) -> FastAPI:
         prep time. Without a protein or a word to find, the best 3 of each main protein come first.
         `search` says how `q` was understood, and `links` adds or takes away a diet rule."""
         choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall)
-        return schema.dinners(queries, queries.search(choice.text(), limit=choice.antall), base(request))
+        found = telemetry.search(queries, choice.text(), request.url.path, limit=choice.antall)
+        return schema.dinners(queries, found, base(request))
 
     @api.get("/oppskrift", response_model=schema.CheckOut, summary="Whether one recipe fits, and what to swap")
     def recipe(

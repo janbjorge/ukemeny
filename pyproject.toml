@@ -11,6 +11,8 @@ dependencies = [
     "orjson>=3.13",
     "pyyaml>=6.0.3",
     "typer>=0.27.2",
+    "logfire[fastapi,system-metrics]>=5.2.0",
+    "opentelemetry-instrumentation-jinja2>=0.66b1",
 ]
 
 [project.scripts]

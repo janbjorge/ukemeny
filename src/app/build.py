@@ -5,7 +5,7 @@ the server needs no Jev key and makes no calls to matprat.no or mattilbud.no.
 """
 
 import asyncio
-from collections.abc import Callable, Collection, Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import UTC, datetime
 
 from core.dishes import dish
@@ -68,20 +68,14 @@ async def classify(
     store: TraitsStore,
     classifier: IngredientClassifier,
     progress: Callable[[int, int], None] | None = None,
-    relabel: Collection[str] = (),
 ) -> dict[str, Traits]:
     """Traits per ingredient name. The classifier is asked only for the labels not stored for a name, all in one
-    request per name, and each answer is stored as it comes, so a run that stops halfway keeps what it got. Labels in
-    `relabel` are asked again for every name, stored or not: after a question's criteria change."""
+    request per name, and each answer is stored as it comes, so a run that stops halfway keeps what it got."""
     wanted: dict[str, Ingredient] = {}
     for ingredient in ingredients:
         wanted.setdefault(ingredient.name, ingredient)
     known = await store.get_many(wanted)
-    missing = {
-        name: labels
-        for name in sorted(wanted)
-        if (labels := [k for k in classifier.labels if k in relabel or k not in known.get(name, {})])
-    }
+    missing = {name: labels for name in sorted(wanted) if (labels := [k for k in classifier.labels if k not in known.get(name, {})])}
     done = 0
     if progress:
         progress(done, len(missing))
@@ -153,7 +147,6 @@ async def snapshot(
     matches: OfferMatchStore,
     matcher: OfferMatcher,
     progress: Progress | None = None,
-    relabel: Collection[str] = (),
 ) -> Snapshot:
     """Everything the site needs, for every household: no diet rule is applied here. Recipes become
     Dishes: facts per portion, without matprat's wording (docs/plan-web.md)."""
@@ -162,7 +155,7 @@ async def snapshot(
         return (lambda done, due: progress(name, done, due)) if progress else None
 
     dinners = await recipes.dinners()
-    known = await classify((i for r in dinners for i in r.ingredients), traits, classifier, step("ingredients"), relabel)
+    known = await classify((i for r in dinners for i in r.ingredients), traits, classifier, step("ingredients"))
     if progress:
         progress("catalogs", 0, 1)
     current = await offers.current()

@@ -1,9 +1,7 @@
 """Build datasets/ with Jev. Run on a laptop, then commit datasets/ and push (which deploys).
 
-    uv run python -m pipeline.datasets                    # this week's offers and any new ingredients
-    uv run python -m pipeline.datasets --refresh          # also new and changed recipes from matprat.no
-    uv run python -m pipeline.datasets --relabel          # ask Jev every label of every ingredient again
-    uv run python -m pipeline.datasets --relabel milk egg # only these labels (core.models.LABELS)
+    uv run python -m pipeline.datasets            # this week's offers and any new ingredients
+    uv run python -m pipeline.datasets --refresh  # also new and changed recipes from matprat.no
 
 Needs TYPESAFE_API_KEY. Caches live in data/ (gitignored): the recipes and Jev's answers in
 data/matris.sqlite3, the offers per catalog in data/tjek/. The site reads only datasets/.
@@ -13,7 +11,7 @@ import argparse
 import asyncio
 import os
 import sys
-from collections.abc import Callable, Collection, Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -21,7 +19,7 @@ from typesafe_sdk import AsyncTypeSafeClient
 
 from adapters import datasets, profile
 from app import build
-from core.models import LABELS, RefreshReport, Snapshot
+from core.models import RefreshReport, Snapshot
 from pipeline.jev import Jev, JevIngredientClassifier, JevOfferMatcher
 from pipeline.matprat import MatpratRecipeSource
 from pipeline.store import Sqlite, SqliteOfferMatchStore, SqliteRecipeStore, SqliteTraitsStore
@@ -68,14 +66,10 @@ def reporter(steps: Mapping[str, str], echo: Callable[[str], None]) -> build.Pro
     return report
 
 
-async def run(
-    refresh: bool = False, limit: int | None = None, progress: build.Progress | None = None, relabel: Collection[str] = ()
-) -> Result:
+async def run(refresh: bool = False, limit: int | None = None, progress: build.Progress | None = None) -> Result:
     key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
         raise SetupError("TYPESAFE_API_KEY is not set. Get a TypeSafe API key at https://console.typesafe.ai")
-    if unknown := set(relabel) - set(LABELS):
-        raise SetupError(f"no such label: {', '.join(sorted(unknown))}. The labels: {', '.join(LABELS)}")
     shopping = profile.load().shopping
     async with (
         Sqlite.open(DATA / "matris.sqlite3") as db,
@@ -95,22 +89,17 @@ async def run(
             SqliteOfferMatchStore(db),
             JevOfferMatcher(jev),
             progress,
-            relabel,
         )
     return Result(snapshot, refreshed, datasets.write(snapshot), jev.status())
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(description="Build datasets/: this week's offers, and Jev's labels for new ingredients.")
     parser.add_argument("--refresh", action="store_true", help="also fetch new and changed recipes from matprat.no")
-    parser.add_argument("--relabel", nargs="*", metavar="LABEL", help="ask Jev these labels again for every ingredient (all without names)")
     args = parser.parse_args()
-    relabel = () if args.relabel is None else (args.relabel or LABELS)
 
     try:
-        result = asyncio.run(
-            run(args.refresh, progress=reporter(STEPS, lambda line: print(line, file=sys.stderr, flush=True)), relabel=relabel)
-        )
+        result = asyncio.run(run(args.refresh, progress=reporter(STEPS, lambda line: print(line, file=sys.stderr, flush=True))))
     except SetupError as e:
         sys.exit(f"error: {e}")
     s = result.snapshot

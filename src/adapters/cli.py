@@ -18,7 +18,7 @@ from pydantic import BaseModel
 from adapters import profile, schema
 from adapters.datasets import DATASETS, JsonDatasets
 from app.queries import Queries
-from core.models import LABELS, Dinner, Dish, Verdict
+from core.models import Dinner, Dish, Verdict
 from core.search import Tag, protein_word
 
 app = typer.Typer(
@@ -145,9 +145,6 @@ def check(url: Annotated[str, typer.Argument(help="En oppskrift på matprat.no."
 @app.command()
 def build(
     refresh: Annotated[bool, typer.Option("--refresh", help="Hent også nye og endrede oppskrifter fra matprat.no.")] = False,
-    relabel: Annotated[
-        list[str] | None, typer.Option("--relabel", help="Spør Jev om denne merkelappen igjen for alle ingredienser («all» for alle).")
-    ] = None,
 ) -> None:
     """Lag datasets/ med Jev: ukens tilbud og nye ingredienser. Trenger TYPESAFE_API_KEY."""
     from pipeline import datasets as pipeline
@@ -159,9 +156,8 @@ def build(
         "offers": "Jev: {due} ingredienser å matche mot tilbud",
     }
     try:
-        labels = LABELS if relabel and "all" in relabel else tuple(relabel or ())
         report = pipeline.reporter(steps, lambda line: typer.echo(line, err=True))
-        result = asyncio.run(pipeline.run(refresh, progress=report, relabel=labels))
+        result = asyncio.run(pipeline.run(refresh, progress=report))
     except (pipeline.SetupError, profile.ProfileError) as e:
         fail("setup", str(e), False)
     s = result.snapshot

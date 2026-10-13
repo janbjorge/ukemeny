@@ -1,8 +1,9 @@
 """Read-only queries behind every page, the JSON API and the CLI. They read the snapshot once.
 
 The rules come from the search: «uten løk», «glutenfri» and «lite laktose» are put on top of a base household.
-The site's base has no rules (core.search.ANYTHING); the CLI's is profile.yaml. Rankings, indexes and weeks
-are worked out once per household and kept: there are only a few, and the snapshot only changes on deploy.
+The site's base has no rules (core.search.ANYTHING); the CLI's is profile.yaml. What does not depend on the rules
+(core.ranking.prepare, the search Index) is worked out once; rankings, views and weeks once per set of rules, and kept:
+the snapshot only changes on deploy.
 """
 
 from collections.abc import Mapping
@@ -14,7 +15,7 @@ from core.diet import judge
 from core.models import Dinner, Dish, Household, Plan, Snapshot, Verdict
 from core.ports import Datasets
 from core.ranking import Week
-from core.search import ANYTHING, Clause, Counts, Index, Kind, Search, household, via
+from core.search import ANYTHING, Clause, Counts, Diet, Index, Kind, Search, View, household, via
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,26 +46,28 @@ class Queries:
         self.snapshot: Snapshot = datasets.snapshot()
         self.base = base
         self.week = week or Week()
+        self.prepared = ranking.prepare(self.snapshot)
+        self.index = Index(self.prepared, self.snapshot.traits)
         self._ranked: dict[Household, list[Dinner]] = {}
-        self._index: dict[Household, Index] = {}
+        self._view: dict[Household, View] = {}
         self._plan: dict[Household, Plan] = {}
 
     def ranked(self, h: Household | None = None) -> list[Dinner]:
         """Every dinner that fits, best first (core.ranking.dinners)."""
         h = h or self.base
         if h not in self._ranked:
-            self._ranked[h] = ranking.dinners(self.snapshot, h)
+            self._ranked[h] = ranking.dinners(self.snapshot, h, self.prepared)
         return self._ranked[h]
 
-    def index(self, h: Household | None = None) -> Index:
+    def view(self, h: Household | None = None) -> View:
         h = h or self.base
-        if h not in self._index:
-            self._index[h] = Index(self.ranked(h), self.snapshot.traits)
-        return self._index[h]
+        if h not in self._view:
+            self._view[h] = self.index.view(self.ranked(h))
+        return self._view[h]
 
     def parse(self, text: str) -> Search:
         """The search, with typos fixed against every dinner the base allows."""
-        return self.index().parse(text)
+        return self.index.parse(text)
 
     def household(self, text: str = "") -> Household:
         """The base with the rules a search names: «uten løk glutenfri»."""
@@ -76,8 +79,8 @@ class Queries:
         searched for, the week's dinners are left out (the page shows them above the list)."""
         search = self.parse(text)
         h = household(search.diets, self.base)
-        index = self.index(h)
-        found = index.find(search)
+        view = self.view(h)
+        found = self.index.find(search, view)
         if skip_week and all(c.kind in (Kind.DIET, Kind.ORDER) for c in search.clauses):
             week = {d.dish.url for d in self.plan(h).dinners}
             found = [d for d in found if d.dish.url not in week]
@@ -89,10 +92,17 @@ class Queries:
             household=h,
             dinners=shown,
             total=len(found),
-            counts=index.count(search),
+            counts=self.index.count(search, view),
             via={d.dish.url: names for d in shown if (names := via(d, search))},
-            relax=() if found else tuple(index.relax(search)),
+            relax=() if found else tuple(self.index.relax(search, view)),
         )
+
+    def warm(self) -> None:
+        """Work out the view and the week for each diet rule on its own, ahead of the first search that needs it."""
+        for diet in Diet:
+            h = household([diet], self.base)
+            self.view(h)
+            self.plan(h)
 
     def plan(self, h: Household | None = None) -> Plan:
         """The week for these rules."""

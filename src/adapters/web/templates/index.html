@@ -6,7 +6,7 @@
   <h2>Finn en middag</h2>
   <form class="search" id="sok" action="/#forslag" method="get" role="search"
     hx-get="/middager" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste"
-    hx-on:submit="document.getElementById('q').blur()">
+    onsubmit="document.getElementById('q').blur()">
     {{ search_box(found.search.text) }}
     <button type="submit">Søk</button>
   </form>

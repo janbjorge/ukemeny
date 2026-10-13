@@ -1,5 +1,8 @@
+from adapters.datasets import JsonDatasets
+from core.diet import judge
 from core.models import Gluten, Household, Onion
-from core.ranking import Week, dinners, pick, plan, varied
+from core.ranking import Week, dinners, pick, plan, prepare, varied
+from core.search import Diet, household
 from tests.fakes import ingredient, offer, recipe, snapshot, traits
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
@@ -117,3 +120,13 @@ def test_varied_puts_a_few_of_each_protein_first() -> None:
     ranked = dinners(s, HOUSEHOLD)
     assert [d.dish.name for d in varied(ranked, 2)] == ["Kylling 1", "Kylling 2", "Svinestek", "Kylling 3"]
     assert varied(ranked, 0) == ranked
+
+
+def test_the_shortcut_agrees_with_judge_for_every_rule() -> None:
+    s = JsonDatasets().snapshot()
+    prepared = prepare(s)
+    for diet in Diet:
+        h = household([diet])
+        fast = {d.dish.url for d in dinners(s, h, prepared)}
+        slow = {dish.url for dish in s.dishes if judge(dish, s.traits, h).blocked is None}
+        assert fast == slow, diet

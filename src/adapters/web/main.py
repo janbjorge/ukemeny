@@ -2,11 +2,13 @@
 
 import hashlib
 import os
+import threading
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Annotated
+from urllib.parse import parse_qs, urlsplit
 
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.gzip import GZipMiddleware
@@ -212,16 +214,25 @@ def create_app(queries: Queries) -> FastAPI:
     def ideas(choice: DinnerQuery, count: int) -> Found:
         return queries.search(choice.text(), limit=count, skip_week=True)
 
-    def dinner_context(found: Found, fragment: bool = False, trigger: str | None = None) -> dict[str, object]:
+    def rules_changed(found: Found, current_url: str | None) -> bool:
+        """Did this search change the diet rules from the page's? htmx sends the page's address (HX-Current-URL)."""
+        if not current_url:
+            return True
+        before = {k: v[0] for k, v in parse_qs(urlsplit(current_url).query).items() if k in ("q", "protein", "tilbud")}
+        return queries.household(DinnerQuery.of(**before).text()) != found.household
+
+    def dinner_context(
+        found: Found, fragment: bool = False, trigger: str | None = None, current_url: str | None = None
+    ) -> dict[str, object]:
         return {
             "found": found,
             "chips": chips(found),
             "relax": [(c, n, found.search.drop(c).text) for c, n in found.relax],
             "shown": len(found.dinners),
             "week": queries.plan(found.household),
-            # A fragment also sends the week, which follows the diet rules, and, when a chip or a link changed the
-            # search rather than typing, the search box with its new text (both out of band)
-            "week_oob": fragment,
+            # A fragment also sends the week when the diet rules changed (the week follows them), and, when a chip or a
+            # link changed the search rather than typing, the search box with its new text (both out of band)
+            "week_oob": fragment and rules_changed(found, current_url),
             "box": fragment and trigger not in SEARCH_BOX,
         }
 
@@ -239,7 +250,9 @@ def create_app(queries: Queries) -> FastAPI:
             query = link(choice.text(), choice.antall if antall else None)
             return RedirectResponse(f"/?{query}#forslag" if query else "/#forslag", status_code=303)
         found = ideas(choice, choice.antall if antall else PAGE)
-        context = dinner_context(found, fragment=True, trigger=request.headers.get("hx-trigger"))
+        context = dinner_context(
+            found, fragment=True, trigger=request.headers.get("hx-trigger"), current_url=request.headers.get("hx-current-url")
+        )
         response = templates.TemplateResponse(request, "_dinners.html", context)
         query = link(found.search.text)
         response.headers["HX-Replace-Url"] = f"/?{query}#forslag" if query else "/#forslag"
@@ -326,7 +339,10 @@ def create_app(queries: Queries) -> FastAPI:
 
 def _default() -> FastAPI:
     # No profile: the site starts with no diet rules, and a visitor picks them in the search
-    return create_app(Queries(JsonDatasets()))
+    queries = Queries(JsonDatasets())
+    # Each rule's ranking and week, worked out after start-up, so a first tap on a chip finds them ready
+    threading.Thread(target=queries.warm, name="warm", daemon=True).start()
+    return create_app(queries)
 
 
 app = HeadAsGet(_default())

@@ -4,9 +4,9 @@ from collections import Counter
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from core.diet import judge
+from core.diet import carbs, fodmap_out, judge
 from core.matching import FISH, cheapest_first, main_protein, weight
-from core.models import Buy, Dinner, Dish, Household, Offer, Snapshot, Verdict
+from core.models import Buy, Dinner, Dish, Household, Item, Level, Offer, Pregnancy, Snapshot, Verdict
 
 TIME_BONUS: Mapping[str, float] = {"Under": 1.0, "20": 0.5, "40": 0.0, "Over": -1.0}
 """By the start of matprat's prep time bucket: small kids do not wait for a slow dinner."""
@@ -50,16 +50,74 @@ def buys(dish: Dish, verdict: Verdict, matched: Mapping[str, tuple[Offer, ...]])
     return tuple(sorted(found, key=lambda b: b.weight, reverse=True))
 
 
-def dinners(snapshot: Snapshot, household: Household) -> list[Dinner]:
-    """Every dinner that fits the household, best first (see `rank`)."""
+@dataclass(frozen=True, slots=True)
+class Prepared:
+    """What does not depend on the household, worked out once per snapshot, so a new set of rules only judges."""
+
+    dish: Dish
+    protein: str
+    main: str
+    score: float
+    buys: tuple[Buy, ...]
+    """Every ingredient on offer, as if nothing were swapped."""
+    holds: frozenset[Item]
+    """What some judged ingredient holds or may hold, or was never asked about: a rule that leaves one of these out
+    leaves the dinner out (core.diet.judge says why)."""
+    not_for_pregnant: bool
+    high_fodmap: bool
+    """An ingredient no swap takes care of (core.diet.fodmap_out)."""
+    carbs_g: float
+    """Per portion, as core.diet.judge counts it."""
+
+    def left_out(self, household: Household) -> bool:
+        """Whether a rule leaves the dinner out for sure, without judging it."""
+        limit = household.carbs_g_per_portion
+        return bool(
+            household.avoid & self.holds
+            or (household.pregnant and self.not_for_pregnant)
+            or (household.fodmap and self.high_fodmap)
+            or (limit is not None and self.carbs_g > limit)
+        )
+
+
+def prepare(snapshot: Snapshot) -> tuple[Prepared, ...]:
     by_id = {o.id: o for o in snapshot.offers}
     matched = {name: cheapest_first([by_id[i] for i in ids if i in by_id]) for name, ids in snapshot.matches.items()}
-    found = []
+    prepared = []
     for dish in snapshot.dishes:
-        verdict = judge(dish, snapshot.traits, household)
+        protein, main = main_protein(dish)
+        known = [(p, t) for p in dish.parts if (t := snapshot.traits.get(p.name)) is not None]
+        prepared.append(
+            Prepared(
+                dish,
+                protein,
+                main,
+                score(dish),
+                buys(dish, NO_SWAPS, matched),
+                holds=frozenset(item for item in Item if any(t.contains.get(item, Level.YES) is not Level.NO for _, t in known)),
+                not_for_pregnant=any(t.pregnancy is not Pregnancy.OK for _, t in known),
+                high_fodmap=any(fodmap_out(t, p.category) for p, t in known),
+                carbs_g=sum(carbs(t, p.grams) for p, t in known),
+            )
+        )
+    return tuple(prepared)
+
+
+NO_SWAPS = Verdict(blocked=None, swaps=(), warnings=(), lactose_g=0.0)
+
+
+def dinners(snapshot: Snapshot, household: Household, prepared: Sequence[Prepared] | None = None) -> list[Dinner]:
+    """Every dinner that fits the household, best first (see `rank`). `prepared` (from `prepare`) saves the work that
+    does not depend on the household."""
+    found = []
+    for p in prepared if prepared is not None else prepare(snapshot):
+        if p.left_out(household):
+            continue
+        verdict = judge(p.dish, snapshot.traits, household)
         if verdict.blocked is None:
-            protein, main = main_protein(dish)
-            found.append(Dinner(dish, verdict, buys(dish, verdict, matched), score(dish), protein, main))
+            swapped = {s.ingredient for s in verdict.swaps}
+            kept = tuple(b for b in p.buys if b.part.name not in swapped) if swapped else p.buys
+            found.append(Dinner(p.dish, verdict, kept, p.score, p.protein, p.main))
     found.sort(key=rank)
     return found
 

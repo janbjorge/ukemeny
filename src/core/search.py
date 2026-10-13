@@ -14,7 +14,8 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 
 from core.matching import PROTEINS
-from core.models import Dinner, Household, Item, Kids, Part, Rule, Traits
+from core.models import Dinner, Dish, Household, Item, Kids, Part, Rule, Traits
+from core.ranking import Prepared
 
 
 class Tag(StrEnum):
@@ -513,15 +514,13 @@ def parse(text: str, fix: Callable[[str], str] | None = None) -> Search:
     return Search(tuple(clauses), tuple(corrected))
 
 
-def tags(dinner: Dinner, traits: Mapping[str, Traits]) -> frozenset[Tag]:
-    """The categories a dinner is in. An ingredient never judged keeps it out of «barnevennlig»."""
-    dish = dinner.dish
+def tags(dish: Dish, traits: Mapping[str, Traits]) -> frozenset[Tag]:
+    """The categories a dish is in, whatever the rules; «på tilbud» depends on them (View.on_sale). An ingredient
+    never judged keeps it out of «barnevennlig»."""
     found: set[Tag] = set()
     limit = next((m for k, m in MINUTES.items() if dish.prep_time.startswith(k)), None)
     if limit is not None:
         found |= {tag for tag, most in zip(TIME_TAGS, (20, 40, 60), strict=True) if limit <= most}
-    if dinner.on_sale:
-        found.add(Tag.ON_SALE)
     if (dish.rating or 0.0) >= LIKED_RATING and dish.rating_count >= LIKED_COUNT:
         found.add(Tag.LIKED)
     known = [traits[p.name] for p in dish.parts if p.name in traits]
@@ -576,29 +575,39 @@ DISCOUNT: Mapping[Order, Callable[[Dinner], float]] = {
 """The card's discount, as a share or in kroner; 0 without one."""
 
 
+@dataclass(frozen=True, slots=True)
+class View:
+    """One set of rules over the Index: the dinners that fit, by index id (the dish's place in the snapshot)."""
+
+    dinners: Mapping[int, Dinner]
+    rank: Mapping[int, int]
+    """Index id → place in the ranking."""
+    on_sale: frozenset[int]
+
+
 class Index:
-    """Dinners to search, in ranking order. Built once; a search after that is a lookup per word and set
-    arithmetic."""
+    """Every dish to search, built once per snapshot: words, categories, main proteins. A set of rules only adds a
+    View (which dishes fit, in what order), so a new set of rules is cheap and a word looked up once is known for all."""
 
     CACHE = 4096
 
-    def __init__(self, ranked: Sequence[Dinner], traits: Mapping[str, Traits]) -> None:
-        self.dinners = tuple(ranked)
-        everyone = range(len(self.dinners))
-        all_tags = [tags(d, traits) for d in self.dinners]
-        self._tagged = {tag: frozenset(i for i in everyone if tag in all_tags[i]) for tag in Tag}
+    def __init__(self, dishes: Sequence[Prepared], traits: Mapping[str, Traits]) -> None:
+        self._id = {p.dish.url: i for i, p in enumerate(dishes)}
+        self._protein = [p.protein for p in dishes]
+        all_tags = [tags(p.dish, traits) for p in dishes]
+        self._tagged = {tag: frozenset(i for i, found in enumerate(all_tags) if tag in found) for tag in Tag}
         self._main: dict[str, set[int]] = {}
         self._present: dict[str, set[int]] = {}
-        # Per word, the dinners with it in the name, and with it in an ingredient
+        # Per word, the dishes with it in the name, and with it in an ingredient
         self._in_name: dict[str, set[int]] = {}
         self._in_parts: dict[str, set[int]] = {}
-        for i, d in enumerate(self.dinners):
-            self._main.setdefault(d.protein, set()).add(i)
-            for g in {d.protein, *filter(None, map(group, d.dish.parts))}:
+        for i, p in enumerate(dishes):
+            self._main.setdefault(p.protein, set()).add(i)
+            for g in {p.protein, *filter(None, map(group, p.dish.parts))}:
                 self._present.setdefault(g, set()).add(i)
-            for w in words(d.dish.name):
+            for w in words(p.dish.name):
                 self._in_name.setdefault(w, set()).add(i)
-            for part in d.dish.parts:
+            for part in p.dish.parts:
                 for w in part_words(part):
                     self._in_parts.setdefault(w, set()).add(i)
         vocabulary: dict[str, str] = {}
@@ -608,8 +617,17 @@ class Index:
         self._vocabulary = vocabulary
         self._hits: dict[str, tuple[frozenset[int], frozenset[int]]] = {}
 
+    def view(self, ranked: Sequence[Dinner]) -> View:
+        """The dinners one set of rules lets through, best first (core.ranking.dinners)."""
+        ids = [self._id[d.dish.url] for d in ranked]
+        return View(
+            dinners=dict(zip(ids, ranked, strict=True)),
+            rank={i: n for n, i in enumerate(ids)},
+            on_sale=frozenset(i for i, d in zip(ids, ranked, strict=True) if d.on_sale),
+        )
+
     def hits(self, word: str) -> tuple[frozenset[int], frozenset[int]]:
-        """(dinners with the word in the name, dinners with it in the name or an ingredient), with synonyms."""
+        """(dishes with the word in the name, dishes with it in the name or an ingredient), with synonyms."""
         term = word.lower()
         if term not in self._hits:
             if len(self._hits) > self.CACHE:
@@ -623,7 +641,7 @@ class Index:
         return self._hits[term]
 
     def fix(self, word: str) -> str:
-        """The word if any dinner has it, else the closest known word (a category, a protein, a word
+        """The word if any dish has it, else the closest known word (a category, a protein, a word
         in a dish or ingredient name), else the word."""
         if self.hits(word)[1] or len(word) < 3:
             return word
@@ -633,15 +651,15 @@ class Index:
     def parse(self, text: str) -> Search:
         return parse(text, self.fix)
 
-    def _keep(self, clauses: Iterable[Clause]) -> tuple[set[int], Counter[int]]:
-        keep = set(range(len(self.dinners)))
+    def _keep(self, clauses: Iterable[Clause], view: View) -> tuple[set[int], Counter[int]]:
+        keep = set(view.rank)
         named: Counter[int] = Counter()
         for c in clauses:
             match c.kind:
                 case Kind.DIET | Kind.ORDER:
-                    pass  # A rule picks the index (Queries.index), and an order sorts (find): neither filters
+                    pass  # A rule picks the view (Queries.view), and an order sorts (find): neither filters
                 case Kind.TAG:
-                    keep &= self._tagged[Tag(c.values[0])]
+                    keep &= view.on_sale if c.values[0] == Tag.ON_SALE else self._tagged[Tag(c.values[0])]
                 case Kind.PROTEIN:
                     keep &= set().union(*(self._main.get(g, ()) for g in c.values))
                 case Kind.NOT_PROTEIN:
@@ -654,26 +672,30 @@ class Index:
                     keep -= self.hits(c.values[0])[1]
         return keep, named
 
-    def find(self, search: Search) -> list[Dinner]:
+    def find(self, search: Search, view: View) -> list[Dinner]:
         """Every dinner that meets all clauses: with an order, the biggest discount first (none last); then those
         with a searched word in the name; then in ranking order."""
-        keep, named = self._keep(search.clauses)
+        keep, named = self._keep(search.clauses, view)
         discount = DISCOUNT[search.order] if search.order else (lambda d: 0.0)
-        return [self.dinners[i] for i in sorted(keep, key=lambda i: (-discount(self.dinners[i]), -named[i], i))]
+        return [view.dinners[i] for i in sorted(keep, key=lambda i: (-discount(view.dinners[i]), -named[i], view.rank[i]))]
 
-    def count(self, search: Search) -> Counts:
-        keep, _ = self._keep(search.clauses)
+    def count(self, search: Search, view: View) -> Counts:
+        keep, _ = self._keep(search.clauses, view)
         # A prep time and a protein replace the one chosen, so they count from the search without it
-        any_time, _ = self._keep(c for c in search.clauses if not _replaces(tag_clause(Tag.QUICK), c))
-        any_protein, _ = self._keep(c for c in search.clauses if c.kind is not Kind.PROTEIN)
+        any_time, _ = self._keep((c for c in search.clauses if not _replaces(tag_clause(Tag.QUICK), c)), view)
+        any_protein, _ = self._keep((c for c in search.clauses if c.kind is not Kind.PROTEIN), view)
+
+        def tagged(tag: Tag) -> frozenset[int]:
+            return view.on_sale if tag is Tag.ON_SALE else self._tagged[tag]
+
         return Counts(
-            tags={tag: len((any_time if tag in TIME_TAGS else keep) & self._tagged[tag]) for tag in Tag},
-            proteins=dict(Counter(self.dinners[i].protein for i in any_protein)),
+            tags={tag: len((any_time if tag in TIME_TAGS else keep) & tagged(tag)) for tag in Tag},
+            proteins=dict(Counter(self._protein[i] for i in any_protein)),
         )
 
-    def relax(self, search: Search) -> list[tuple[Clause, int]]:
+    def relax(self, search: Search, view: View) -> list[tuple[Clause, int]]:
         """When nothing matches: which clause to drop, and how many dinners that gives, most first."""
-        found = [(c, len(self._keep(search.drop(c).clauses)[0])) for c in search.clauses]
+        found = [(c, len(self._keep(search.drop(c).clauses, view)[0])) for c in search.clauses]
         return sorted((f for f in found if f[1]), key=lambda f: -f[1])
 
 

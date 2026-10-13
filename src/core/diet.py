@@ -146,10 +146,20 @@ def _left_out(t: Traits, household: Household) -> str | None:
     return None
 
 
-def _swapped(t: Traits, part_category: str) -> bool:
+def fodmap_swapped(t: Traits, part_category: str) -> bool:
     """Does a swap (vårløk, glutenfri, laktosefri) already take the FODMAP out of the ingredient?"""
     dairy = (part_category.startswith(DAIRY) or not part_category) and t.lactose in (Lactose.SOME, Lactose.HIGH)
     return t.onion in (Onion.ONION, Onion.GARLIC) or t.gluten is Gluten.YES or dairy
+
+
+def fodmap_out(t: Traits, part_category: str) -> bool:
+    """High in FODMAP (or never asked), and no swap takes care of it."""
+    return t.fodmap in (None, Fodmap.HIGH) and not fodmap_swapped(t, part_category)
+
+
+def carbs(t: Traits, grams: float | None) -> float:
+    """Grams of carbohydrate in this much of the ingredient; never asked counts as a lot."""
+    return (grams or 0.0) * CARBS_PER_100G[t.carbs or Carbs.HIGH] / 100
 
 
 def judge(dish: Dish, traits: Mapping[str, Traits], household: Household) -> Verdict:
@@ -159,6 +169,8 @@ def judge(dish: Dish, traits: Mapping[str, Traits], household: Household) -> Ver
     lactose_g = onion_g = carbs_g = 0.0
     onion_in_name: str | None = None
     left_out: str | None = None
+    strict = bool(household.avoid) or household.pregnant
+    count_carbs = household.carbs_g_per_portion is not None
     avoid_onion = household.onion is Rule.AVOID
     substitute = (household.onion_substitute or "").lower()
 
@@ -199,11 +211,12 @@ def judge(dish: Dish, traits: Mapping[str, Traits], household: Household) -> Ver
         elif household.kid_notes and t.kids is Kids.CHOKING:
             warnings.append(Note(Problem.KIDS, name, CHOKING_NOTE))
 
-        if left_out is None and (why := _left_out(t, household)):
+        if strict and left_out is None and (why := _left_out(t, household)):
             left_out = f"{why} ({name})"
-        if left_out is None and household.fodmap and t.fodmap in (None, Fodmap.HIGH) and not _swapped(t, part.category):
+        if left_out is None and household.fodmap and fodmap_out(t, part.category):
             left_out = f"mye FODMAP ({name})"
-        carbs_g += (part.grams or 0.0) * CARBS_PER_100G[t.carbs or Carbs.HIGH] / 100
+        if count_carbs:
+            carbs_g += carbs(t, part.grams)
 
     limit = household.lactose_g_per_portion
     if limit is not None and lactose_g > limit:

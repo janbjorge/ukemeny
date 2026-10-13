@@ -1,16 +1,22 @@
 """Search in plain bokmål: what the words mean, and which dinners they find."""
 
+from dataclasses import dataclass
+
 import pytest
 
-from core.models import Gluten, Household, Item, Kids, Onion, Rule
-from core.ranking import dinners
+from core.models import Dinner, Gluten, Household, Item, Kids, Onion, Rule
+from core.ranking import dinners, prepare
 from core.search import (
     ANYTHING,
     MEAT,
+    Clause,
+    Counts,
     Diet,
     Index,
     Order,
+    Search,
     Tag,
+    View,
     diet_clause,
     household,
     marked,
@@ -170,7 +176,7 @@ def test_same(term: str, word: str, found: bool) -> None:
 
 
 @pytest.fixture
-def index() -> Index:
+def index() -> Bound:
     s = snapshot(
         recipe("Kyllinggryte med sopp", CHICKEN, MUSHROOM, ONION, rating=4.8, rating_count=40, prep_time="Under 20 min"),
         recipe("Kylling med vårløk", CHICKEN, SPRING_ONION, prep_time="20\u201340 min"),
@@ -185,10 +191,32 @@ def index() -> Index:
             "rød chili": traits(kids=Kids.SPICY),
         },
     )
-    return Index(dinners(s, HOUSEHOLD), s.traits)
+    every = prepare(s)
+    index = Index(every, s.traits)
+    return Bound(index, index.view(dinners(s, HOUSEHOLD, every)))
 
 
-def names(index: Index, text: str) -> list[str]:
+@dataclass(frozen=True, slots=True)
+class Bound:
+    """The index with one set of rules, as Queries uses it."""
+
+    index: Index
+    view: View
+
+    def parse(self, text: str) -> Search:
+        return self.index.parse(text)
+
+    def find(self, search: Search) -> list[Dinner]:
+        return self.index.find(search, self.view)
+
+    def count(self, search: Search) -> Counts:
+        return self.index.count(search, self.view)
+
+    def relax(self, search: Search) -> list[tuple[Clause, int]]:
+        return self.index.relax(search, self.view)
+
+
+def names(index: Bound, text: str) -> list[str]:
     return [d.dish.name for d in index.find(index.parse(text))]
 
 
@@ -212,44 +240,44 @@ def test_rules_that_leave_things_out() -> None:
     assert household([Diet.GARLIC]).garlic is Rule.AVOID
 
 
-def test_rules_do_not_filter_an_index(index: Index) -> None:
+def test_rules_do_not_filter_an_index(index: Bound) -> None:
     assert names(index, "glutenfri") == names(index, "")  # the rule picks the index (Queries), it does not narrow one
 
 
-def test_barnevennlig(index: Index) -> None:
+def test_barnevennlig(index: Bound) -> None:
     assert "Kyllingsalat" not in names(index, "barnevennlig")  # chili among the ingredients
     assert "Chiliburger" not in names(index, "barnevennlig")  # chili in the name
 
 
-def test_time_rating_and_protein(index: Index) -> None:
+def test_time_rating_and_protein(index: Bound) -> None:
     assert set(names(index, "rask")) == {"Kyllinggryte med sopp", "Pasta med røkelaks"}
     assert names(index, "godt likt") == ["Kyllinggryte med sopp"]
     assert names(index, "fisk") == ["Torsk med bacon", "Pasta med røkelaks"]  # no swap first
 
 
-def test_words_find_names_ingredients_departments_and_synonyms(index: Index) -> None:
+def test_words_find_names_ingredients_departments_and_synonyms(index: Bound) -> None:
     assert names(index, "laks") == ["Pasta med røkelaks"]
     assert names(index, "sopp") == ["Kyllinggryte med sopp"]  # sjampinjong is in /sopp
     assert "Pasta med røkelaks" in names(index, "spagetti eller pasta")
     assert names(index, "salat") == ["Kyllingsalat"]  # not the burger with lettuce: dish kinds are names only
 
 
-def test_dish_name_matches_come_first(index: Index) -> None:
+def test_dish_name_matches_come_first(index: Bound) -> None:
     assert names(index, "isbergsalat eller sopp") == ["Kyllinggryte med sopp", "Chiliburger", "Kyllingsalat"]
 
 
-def test_without_leaves_out_side_ingredients_too(index: Index) -> None:
+def test_without_leaves_out_side_ingredients_too(index: Bound) -> None:
     assert "Torsk med bacon" not in names(index, "uten bacon")
     assert "Kyllingsalat" not in names(index, "uten kylling") and "Torsk med bacon" in names(index, "uten kylling")
 
 
-def test_typos_are_fixed_with_the_index(index: Index) -> None:
+def test_typos_are_fixed_with_the_index(index: Bound) -> None:
     s = index.parse("kyllingrgyte")
     assert s.corrected == (("kyllingrgyte", "kyllinggryte"),)
     assert names(index, "kyllingrgyte") == ["Kyllinggryte med sopp"]
 
 
-def test_counts_and_relax(index: Index) -> None:
+def test_counts_and_relax(index: Bound) -> None:
     s = index.parse("rask kylling")
     counts = index.count(s)
     assert counts.tags[Tag.UNDER_40] == 4  # what switching to under 40 min would give, not the current results
@@ -259,7 +287,7 @@ def test_counts_and_relax(index: Index) -> None:
     assert [(c.text, n) for c, n in index.relax(nothing)] == [("torsk", 2), ("under 20 min", 1)]
 
 
-def test_via_and_marked(index: Index) -> None:
+def test_via_and_marked(index: Bound) -> None:
     s = index.parse("sopp")
     (dinner,) = index.find(s)
     assert via(dinner, s) == ()  # in the name already

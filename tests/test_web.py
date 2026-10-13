@@ -104,6 +104,10 @@ def test_the_box_follows_chips_but_not_typing(client: TestClient) -> None:
     assert '<section id="uka" hx-swap-oob="true">' in clicked  # the week follows the rules
     typed = client.get("/middager?q=fisk", headers=HX | {"HX-Trigger": "q"}).text
     assert 'id="q"' not in typed
+    same_rules = client.get("/middager?q=fisk+rask", headers=HX | {"HX-Current-URL": "http://testserver/?q=fisk#forslag"}).text
+    assert 'id="uka"' not in same_rules  # the week only comes along when the diet rules change
+    new_rules = client.get("/middager?q=fisk+glutenfri", headers=HX | {"HX-Current-URL": "http://testserver/?q=fisk#forslag"}).text
+    assert '<section id="uka" hx-swap-oob="true">' in new_rules
 
 
 def test_unknown_choices_still_show_a_page(client: TestClient) -> None:

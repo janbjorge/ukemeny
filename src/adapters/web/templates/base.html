@@ -7,13 +7,15 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no">
 <title>{% block title %}matris: ukens middager, med tilbudene{% endblock %}</title>
-<meta name="description" content="Middager fra matprat.no, valgt etter hva som er på tilbud denne uka. Velg uten løk, glutenfri eller lite laktose.">
+<meta name="description" content="Middager fra matprat.no, valgt etter hva som er på tilbud denne uka. Velg kosthold og allergier.">
 {% if canonical %}<link rel="canonical" href="{{ canonical }}">
 {% endif %}<link rel="alternate" type="text/markdown" href="/llms.txt" title="For KI-agenter">
 <link rel="service-desc" type="application/json" href="/api/openapi.json">
 <link rel="icon" type="image/svg+xml" href="{{ static_url('icon.svg') }}">
 <link rel="apple-touch-icon" href="{{ static_url('apple-touch-icon.png') }}">
 <link rel="manifest" href="/manifest.webmanifest">
+{# htmx never evaluates code from attributes: the CSP allows no eval, and an hx-on:… handler threw EvalError (jb 2026-10-13) #}
+<meta name="htmx-config" content='{"allowEval":false}'>
 <script src="{{ static_url('htmx.min.js') }}" defer></script>
 <style>{{ style }}</style>
 </head>

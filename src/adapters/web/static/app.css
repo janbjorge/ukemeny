@@ -76,8 +76,6 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
   background: var(--surface-1); border: 1px solid var(--hairline); border-top: 6px solid var(--p, var(--accent));
   border-radius: 16px; padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0;
   box-shadow: var(--shadow);
-  /* Cards off screen are not laid out or painted until scrolled to: a long list costs a phone little */
-  content-visibility: auto; contain-intrinsic-size: auto 240px;
 }
 .card h3 a { color: var(--text-primary); text-decoration: none; overflow-wrap: anywhere; }
 .card .meta { margin: 0; font-size: var(--t-small); color: var(--text-muted); }
@@ -171,7 +169,7 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
     margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter) 12px; scroll-padding-inline: var(--gutter);
   }
   .cards.week::-webkit-scrollbar { display: none; }
-  .cards.week .card { scroll-snap-align: start; content-visibility: visible; }
+  .cards.week .card { scroll-snap-align: start; }
 
   .finder { margin: 32px calc(-1 * var(--gutter)) 0; border-radius: 0; padding: 4px var(--gutter) 24px; }
   .search { position: sticky; top: 0; z-index: 2; margin: 8px calc(-1 * var(--gutter)); padding: 8px var(--gutter); background: var(--surface-2); }

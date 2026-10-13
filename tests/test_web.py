@@ -128,6 +128,7 @@ def test_about_llms_robots_sitemap_health(client: TestClient) -> None:
     assert "- [melkefri](http://testserver/api/plan?q=melkefri)" in llms  # a link per rule: agents need not write URLs
     robots = client.get("/robots.txt").text
     assert "Allow: /api/" in robots and "Sitemap: http://testserver/sitemap.xml" in robots
+    assert robots.startswith("User-agent: ChatGPT-User\nUser-agent: Claude-User\nUser-agent: Perplexity-User\nAllow: /\n")
     assert "<loc>http://testserver/om</loc>" in client.get("/sitemap.xml").text
     assert client.get("/helse").text == "ok"
     assert client.get("/favicon.ico").headers["content-type"] == "image/svg+xml"

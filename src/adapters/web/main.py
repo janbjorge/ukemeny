@@ -312,10 +312,18 @@ def create_app(queries: Queries) -> FastAPI:
 
     @app.get("/robots.txt", response_class=PlainTextResponse)
     def robots_txt(request: Request) -> str:
+        # Agents that fetch for a person in a chat may open everything, searches included (ChatGPT read llms.txt and
+        # never reached the API; `Disallow: /*?` may have stopped it, jb 2026-10-13). Crawlers keep off query strings.
         return (
+            "User-agent: ChatGPT-User\n"
+            "User-agent: Claude-User\n"
+            "User-agent: Perplexity-User\n"
+            "Allow: /\n"
+            "\n"
             "User-agent: *\n"
             "Allow: /api/\n"
-            "Disallow: /*?\n"
+            # Not `/*?`: some parsers (Python's) let that wildcard outrank `Allow: /api/`, closing the API's searches too
+            "Disallow: /?\n"
             "Disallow: /middager\n"
             f"# For AI agents: read {request.base_url}llms.txt, then use the JSON API\n"
             f"Sitemap: {request.base_url}sitemap.xml\n"

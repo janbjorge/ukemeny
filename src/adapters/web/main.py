@@ -167,6 +167,8 @@ def create_app(queries: Queries) -> FastAPI:
             "link": link,
             "marked": marked,
             "page": PAGE,
+            # A card says "Sterk" when the household has small kids and the dinner is not barnevennlig
+            "hot": lambda d: queries.household.kid_notes and not queries.index.has(d, Tag.MILD),
         }
 
     templates = Jinja2Templates(directory=HERE / "templates", context_processors=[context])

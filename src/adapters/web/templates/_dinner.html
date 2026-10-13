@@ -1,28 +1,18 @@
-{# One dinner as a card: what is on sale, what to swap, and what to check. With a search, the searched words are marked. #}
+{# One dinner as a card, calm on purpose: the main discount, what to swap, and whether it is hot. The rest is on
+   matprat.no (the link) and in the API (`notes`). With a search, the searched words are marked. #}
 {% macro card(d, search=none, via=()) %}
+{% set sales = d.buys|selectattr("sale")|list %}
 <article class="card" data-protein="{{ d.protein }}">
   <h3><a href="{{ d.dish.url }}" rel="noopener">{% if search and search.words %}{% for piece, hit in marked(d.dish.name, search) %}{% if hit %}<mark>{{ piece }}</mark>{% else %}{{ piece }}{% endif %}{% endfor %}{% else %}{{ d.dish.name }}{% endif %}</a></h3>
-  <p class="meta"><span class="protein">{{ d.protein }}</span> {{ d.dish.prep_time }}{% if d.dish.rating %} · <span class="star">★</span>&nbsp;{{ "%.1f"|format(d.dish.rating)|replace(".", ",") }} ({{ d.dish.rating_count }}){% endif %}</p>
+  <p class="meta"><span class="protein">{{ d.protein }}</span> {{ d.dish.prep_time }}
+    {%- if d.dish.rating and d.dish.rating_count >= 5 %} · <span class="star">★</span>&nbsp;{{ "%.1f"|format(d.dish.rating)|replace(".", ",") }}{% endif %}
+    {%- if hot(d) %} · <span class="hot">Sterk</span>{% endif %}</p>
   {% if via %}<p class="via">Med {% for name in via %}<mark>{{ name }}</mark>{{ ", " if not loop.last }}{% endfor %}</p>{% endif %}
-  {% set sales = d.buys|selectattr("sale")|list %}
-  {% if sales %}
-  <ul class="sales">
-    {% for b in sales %}<li><span class="pct">{{ b.sale.discount|prosent }}</span> {{ b.part.name }} hos {{ b.sale.store }}
-      <span class="muted">{{ b.sale.price|kr }}, før {{ b.sale.pre_price|kr }}, til {{ b.sale.valid_until|dato }}</span></li>
-    {% endfor %}
-  </ul>
+  {% if sales %}{% set b = sales[0] %}
+  <p class="deal" title="{{ b.sale.price|kr }}, før {{ b.sale.pre_price|kr }}, til {{ b.sale.valid_until|dato }}"><span class="pct">{{ b.sale.discount|prosent }}</span> {{ b.part.name }} hos {{ b.sale.store }}</p>
+  {% if sales|length > 1 %}<p class="also">Også på tilbud: {{ sales[1:]|map(attribute="part.name")|join(", ") }}</p>{% endif %}
   {% endif %}
-  {% if d.verdict.swaps %}
-  <ul class="swaps">
-    {% for s in d.verdict.swaps %}<li><b>Bytt {{ s.ingredient }}:</b> {{ s.advice }}</li>
-    {% endfor %}
-  </ul>
+  {% if d.verdict.swaps %}<p class="swaps"><b>Bytt:</b> {{ d.verdict.swaps|map(attribute="swap")|join(" · ") }}</p>
   {% else %}<p class="fits">Passer som den er</p>{% endif %}
-  {% if d.verdict.warnings %}
-  <details>
-    <summary>{{ d.verdict.warnings|length }} ting å sjekke</summary>
-    <ul>{% for w in d.verdict.warnings %}<li><b>{{ w.ingredient }}:</b> {{ w.advice }}</li>{% endfor %}</ul>
-  </details>
-  {% endif %}
 </article>
 {% endmacro %}

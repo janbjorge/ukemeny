@@ -433,6 +433,7 @@ class Index:
         everyone = range(len(self.dinners))
         all_tags = [tags(d, traits, household) for d in self.dinners]
         self._tagged = {tag: frozenset(i for i in everyone if tag in all_tags[i]) for tag in Tag}
+        self._at = {d.dish.url: i for i, d in enumerate(self.dinners)}
         self._main: dict[str, set[int]] = {}
         self._present: dict[str, set[int]] = {}
         # Per word, the dinners with it in the name, and with it in an ingredient
@@ -453,6 +454,11 @@ class Index:
                 vocabulary.setdefault(fold(w), w)
         self._vocabulary = vocabulary
         self._hits: dict[str, tuple[frozenset[int], frozenset[int]]] = {}
+
+    def has(self, dinner: Dinner, tag: Tag) -> bool:
+        """Is the dinner in this category? False for a dinner the index does not hold."""
+        i = self._at.get(dinner.dish.url)
+        return i is not None and i in self._tagged[tag]
 
     def hits(self, word: str) -> tuple[frozenset[int], frozenset[int]]:
         """(dinners with the word in the name, dinners with it in the name or an ingredient), with synonyms."""

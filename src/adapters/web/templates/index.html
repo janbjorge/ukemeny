@@ -4,7 +4,7 @@
 {% block main %}
 <section class="hero" id="uka">
   <h1>Ukens middager</h1>
-  <p class="lede">{{ week.dinners|length }} middager fra matprat.no der hovedråvaren er på tilbud denne uka, med litt av hvert: ikke samme protein to ganger{% if fish %}, og fisk {{ {1: "én gang", 2: "to ganger", 3: "tre ganger"}.get(fish, fish ~ " ganger") }}{% endif %}.</p>
+  <p class="lede">{{ week.dinners|length }} middager der hovedråvaren er på tilbud denne uka. Litt av hvert{% if fish %}, og fisk {{ {1: "én gang", 2: "to ganger", 3: "tre ganger"}.get(fish, fish ~ " ganger") }}{% endif %}.</p>
   <ul class="rules" aria-label="Kostholdet">
     {% for line in household %}<li>{{ line }}</li>{% endfor %}
   </ul>
@@ -12,8 +12,6 @@
 <div class="cards week" aria-label="Ukens middager">
   {% for d in week.dinners %}{{ card(d) }}{% endfor %}
 </div>
-<p class="muted">{{ week.fitting|tall }} av {{ week.considered|tall }} middager på matprat.no passer, {{ week.on_sale|tall }} av dem med hovedråvaren på tilbud.
-  Tilbudene er fra {{ week.offers|tall }} varer hos {{ week.stores|length }} kjeder.</p>
 
 <section id="forslag" class="finder">
   <h2>Finn en middag</h2>

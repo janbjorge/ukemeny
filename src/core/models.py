@@ -191,6 +191,8 @@ class Note:
     problem: Problem
     ingredient: str
     advice: str
+    swap: str = ""
+    """A swap in a few words, for a card: "glutenfri pasta", "vårløk for løk". Empty for a note."""
 
 
 @dataclass(frozen=True, slots=True)

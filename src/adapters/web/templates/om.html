@@ -11,8 +11,9 @@
   <ul>{% for line in household %}<li>{{ line }}</li>{% endfor %}</ul>
   <p>En middag med løk i navnet, som biff med løk, er tatt bort. Ellers står det hva du kan bytte: løk mot vårløk, vanlig pasta mot glutenfri, fløte mot laktosefri.
     Laktose regnes ut fra mengden melk, fløte, rømme og ost i oppskriften, per porsjon. Smør og hard ost har nesten ingen.</p>
-  <p>Ting som bare noen merker har hvete eller løk i, som buljong, pølser og krydderblandinger, får et «sjekk etiketten».
-    For de minste merkes chili og det som kan sette seg i halsen, som hele nøtter, pølser og cherrytomater.</p>
+  <p>Middager med chili eller sterke krydder merkes «Sterk». Buljong, pølser og krydderblandinger har hvete eller løk i noen merker:
+    sjekk etiketten. Hver middag lenker til oppskriften på matprat.no, med alle ingrediensene.</p>
+  <p>{{ plan.fitting|tall }} av {{ plan.considered|tall }} middager på matprat.no passer. Tilbudene er fra {{ plan.offers|tall }} varer hos {{ plan.stores|length }} kjeder.</p>
 
   <h2>Tilbudene</h2>
   <p>En vare er på tilbud når kundeavisen har en førpris som er høyere enn prisen nå. Det gjelder {{ plan.on_sale }} av {{ plan.fitting }} middager denne uka.

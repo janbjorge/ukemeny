@@ -35,10 +35,21 @@ def test_front_page_shows_the_week_and_the_rules(client: TestClient) -> None:
     assert "<h1>Ukens middager</h1>" in html
     assert "Uten løk (vårløk går fint)" in html and "Glutenfritt" in html
     assert "Kyllinggryte" in html and "\u221227\u00a0%" in html and "kyllingfilet hos KIWI" in html
-    assert "Bytt løk:</b> bruk vårløk i stedet" in html
+    assert "<b>Bytt:</b> vårløk for løk" in html
+    assert "ting å sjekke" not in html  # notes stay in the API, not on the cards
     assert "og fisk én gang" in html
     for private in ("IBS", "intoleran", "år gammel"):
         assert private not in html
+
+
+def test_cards_are_calm(client: TestClient) -> None:
+    hot = recipe("Chili con carne", ingredient("kjøttdeig", 500, "g", "/kjøtt/kjøttdeig/karbonadedeig"))
+    s = snapshot(hot, recipe("Laks i ovn", SALMON, rating=4.6, rating_count=3))
+    page = TestClient(main.create_app(Queries(FakeDatasets(s), Household(), Week(days=2, fish=1)))).get("/").text
+    assert '<span class="hot">Sterk</span>' in page  # chili in the name, and the household has small kids
+    assert "★" not in page  # 3 ratings are too few to show
+    calm = TestClient(main.create_app(Queries(FakeDatasets(s), Household(kid_notes=False), Week(days=2, fish=1)))).get("/").text
+    assert "Sterk" not in calm
 
 
 def test_ideas_leave_out_the_week(client: TestClient) -> None:

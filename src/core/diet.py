@@ -66,6 +66,13 @@ NOTES: Mapping[Problem, str] = {
     Problem.ONION: "inneholder løk",
     Problem.GARLIC: "plager mange med sensitiv mage; hvitløksolje er et trygt bytte",
 }
+SWAP: Mapping[Problem, str] = {
+    Problem.GLUTEN: "glutenfri {}",
+    Problem.ONION: "dropp {}",
+    Problem.GARLIC: "hvitløksolje for {}",
+    Problem.LACTOSE: "laktosefri {}",
+}
+"""The same swaps in a few words, for a card."""
 CHECK_GLUTEN = "sjekk etiketten for hvete"
 CHECK_ONION = "sjekk etiketten for løk"
 SPICY_NOTE = "hold det mildt, og server det sterke ved siden av"
@@ -88,7 +95,7 @@ def _in_name(ingredient: str, recipe: str) -> bool:
 
 def _apply(rule: Rule, problem: Problem, name: str, swaps: list[Note], notes: list[Note]) -> None:
     if rule is Rule.AVOID:
-        swaps.append(Note(problem, name, ADVICE[problem]))
+        swaps.append(Note(problem, name, ADVICE[problem], SWAP[problem].format(name)))
     elif rule is Rule.NOTE:
         notes.append(Note(problem, name, NOTES[problem]))
 
@@ -118,7 +125,7 @@ def judge(dish: Dish, traits: Mapping[str, Traits], household: Household) -> Ver
             pass  # The substitute itself is fine.
         elif t.onion is Onion.ONION:
             if avoid_onion and substitute:
-                swaps.append(Note(Problem.ONION, name, f"bruk {substitute} i stedet"))
+                swaps.append(Note(Problem.ONION, name, f"bruk {substitute} i stedet", f"{substitute} for {name}"))
             else:
                 _apply(household.onion, Problem.ONION, name, swaps, warnings)
             onion_g += part.grams or 0.0
@@ -141,7 +148,7 @@ def judge(dish: Dish, traits: Mapping[str, Traits], household: Household) -> Ver
 
     limit = household.lactose_g_per_portion
     if limit is not None and lactose_g > limit:
-        swaps.extend(Note(Problem.LACTOSE, name, ADVICE[Problem.LACTOSE]) for name in dairy)
+        swaps.extend(Note(Problem.LACTOSE, name, ADVICE[Problem.LACTOSE], SWAP[Problem.LACTOSE].format(name)) for name in dairy)
 
     blocked = None
     if onion_in_name is not None:

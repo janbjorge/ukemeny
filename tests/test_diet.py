@@ -29,6 +29,7 @@ def test_gluten_and_onion_become_swaps() -> None:
         (Problem.GLUTEN, "eggnudler"),
         (Problem.ONION, "rødløk"),
     ]
+    assert [s.swap for s in verdict.swaps] == ["glutenfri eggnudler", "dropp rødløk"]
 
 
 def test_maybe_is_a_warning_to_check_the_label() -> None:
@@ -57,6 +58,7 @@ def test_three_onions_for_four_blocks_without_a_substitute() -> None:
     verdict = judge(r, onion, SPRING_ONION_OK)
     assert verdict.blocked is None
     assert [s.advice for s in verdict.swaps] == ["bruk vårløk i stedet"]
+    assert [s.swap for s in verdict.swaps] == ["vårløk for løk"]
 
 
 def test_spring_onion_is_fine() -> None:

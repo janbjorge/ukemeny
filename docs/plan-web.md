@@ -1,6 +1,6 @@
 # Plan: matris.app on Fly
 
-Status: built and checked locally and in Docker on 2026-10-13. Going online waits for jb (TODO.md).
+Status: done. Online at https://matris.app since 2026-10-13 (FACTS.md §7).
 
 ## Why
 

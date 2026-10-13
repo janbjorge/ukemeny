@@ -53,6 +53,12 @@ def test_cards_are_calm(client: TestClient) -> None:
     assert "Sterk" not in page
 
 
+def test_sorted_by_kroner_the_cards_show_kroner_off(client: TestClient) -> None:
+    ideas, week = client.get("/middager?q=kylling+rabatt+i+kroner", headers=HX).text.split('<section id="uka"')
+    assert '<span class="pct">\u221236\u00a0kr</span>' in ideas  # 135 kr before, 99 kr now
+    assert "\u221227\u00a0%" not in ideas and "\u221227\u00a0%" in week  # the week is not sorted
+
+
 def test_ideas_leave_out_the_week(client: TestClient) -> None:
     html = client.get("/").text
     ideas = html[html.index('id="forslag"') :]

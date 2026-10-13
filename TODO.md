@@ -4,7 +4,7 @@ Every request from jb, with status. Newest first. An item is ticked only when it
 
 ## Open
 
-- [ ] Put matris.app online on Fly (jb 2026-10-13: "Lets make this into a fly.io service … we will use the domain; matris.app"; approved "Yes, do all of it"). Live at https://matris.fly.dev, certificate for matris.app requested (FACTS.md §7). Left: jb sets the A and AAAA records at the registrar; then `fly certs check matris.app` until issued, and `fly secrets set CANONICAL_HOST=matris.app`. Also the public GitHub repo `janbjorge/ukemeny` (jb creates it in the web UI, empty), then push `main`, and the FLY_API_TOKEN secret so pushes deploy.
+- [ ] Put matris.app online on Fly (jb 2026-10-13: "Lets make this into a fly.io service … we will use the domain; matris.app"; approved "Yes, do all of it"). Live at https://matris.fly.dev, certificate for matris.app requested (FACTS.md §7). Code on https://github.com/janbjorge/ukemeny, and pushes to main deploy (checked 2026-10-13). Left: jb sets the A and AAAA records at the registrar; then `fly certs check matris.app` until issued, and `fly secrets set CANONICAL_HOST=matris.app`.
 - [ ] Rebuild `datasets/` every week so the offers stay current: by hand (`uv run python -m pipeline.datasets`, commit, push), or a scheduled GitHub Action with a `TYPESAFE_API_KEY` secret (Jev would still run offline, not in the site).
 - [ ] Open question: a minimum rating or a maximum prep time in profile.yaml, since a discount can put a three-star, hour-long dish in the week (METHOD.md §5).
 - [ ] Let visitors pick their own rules on the page ("for now" the site shows ours).

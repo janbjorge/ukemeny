@@ -3,13 +3,26 @@
 {% block main %}
 <section class="prose">
   <h1>Slik virker det</h1>
-  <p>matris foreslår middager fra matprat.no. Ukens middager er valgt blant dem der hovedråvaren er på tilbud.</p>
+  <p>matris kobler {{ plan.considered|tall }} middagsretter fra matprat.no med kundeavisene på mattilbud.no:
+    {{ plan.offers|tall }} varer hos {{ plan.stores|length }} kjeder denne uka.</p>
 
-  <h2>Tilbudene</h2>
-  <p>En vare er på tilbud når kundeavisen har en førpris. Denne uka er det {{ plan.offers|tall }} varer hos {{ plan.stores|length }} kjeder.</p>
+  <h2>Oppskrifter og tilbud</h2>
+  <p>Hver middag har en hovedråvare: den tyngste kjøtt-, fisk- eller skalldyrsingrediensen, målt i gram. Uten kjøtt og fisk er den vegetar.</p>
+  <p>For hver ingrediens finner vi varer i kundeavisene med samme ord i navnet («laks» finner LAKSEFILET), og en liten språkmodell
+    avgjør om varen er den samme som ingrediensen. En vare er på tilbud når kundeavisen har en førpris som er høyere enn prisen nå.</p>
+  <p>En middag er på tilbud når hovedråvaren er det, så bacon på tilbud gjør ikke lutefisk til et tilbud. Uten kjøtt og fisk teller en grønnsak
+    fra 100 g per porsjon. Denne uka gjelder det {{ plan.on_sale|tall }} middager.</p>
+  <p>Middagene rangeres etter færrest bytter når du har valgt kosthold, så etter hvor mye som er på tilbud, der kjøtt og fisk teller mest,
+    og så etter vurdering og tid. Ukens middager er de beste på tilbud, én per hovedråvare. Fisk kan komme to ganger, men ikke samme fisk.</p>
 
   <h2>Søket</h2>
-  <p>Skriv som du ville sagt det: «rask kylling uten sopp» eller «laks eller torsk på tilbud».</p>
+  <p>Et ord leter i middagens navn og ingredienser, også inne i sammensatte ord: «laks» finner røkelaks og laksefilet, og «pasta» finner
+    spagetti og penne. Middager med ordet i navnet kommer først.</p>
+  <p>Hovedråvarene (kylling, fisk, svin, vegetar, …) velger hovedråvaren, så «kylling» gir ikke pannbiff med kyllingbuljong. «rask» er under 20 minutter,
+    «godt likt» er minst 4,5 stjerner fra minst 20 vurderinger, og «barnevennlig» er uten chili og sterke ingredienser.</p>
+  <p>«uten» tar bort («uten sopp og paprika»), «eller» gir det ene eller det andre («laks eller torsk»), og alle andre ord må passe.
+    Ord som «jeg vil ha middag» hoppes over. Staver du feil, bytter søket til det nærmeste ordet og sier fra. Gir søket ingenting,
+    foreslår det hva du kan ta bort.</p>
 
   <h2>Sjekk etiketten</h2>
   <p>Om en ingrediens har gluten, løk eller laktose er vurdert av en liten språkmodell, og den kan ta feil.</p>

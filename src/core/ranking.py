@@ -104,13 +104,13 @@ def plan(ranked: Sequence[Dinner], week: Week) -> list[Dinner]:
 
 
 def varied(ranked: Sequence[Dinner], per_protein: int) -> list[Dinner]:
-    """The ranking with at most `per_protein` dinners per main protein (0: no limit)."""
+    """The ranking with the best `per_protein` dinners per main protein first, then the rest (0: as ranked).
+    The top of a list has a bit of everything, and nothing is lost further down."""
     if per_protein <= 0:
         return list(ranked)
     seen: Counter[str] = Counter()
-    kept = []
+    first, rest = [], []
     for dinner in ranked:
-        if seen[dinner.protein] < per_protein:
-            seen[dinner.protein] += 1
-            kept.append(dinner)
-    return kept
+        seen[dinner.protein] += 1
+        (first if seen[dinner.protein] <= per_protein else rest).append(dinner)
+    return first + rest

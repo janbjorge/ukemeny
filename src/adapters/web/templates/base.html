@@ -15,8 +15,9 @@
 <body>
 <nav class="top" aria-label="Sider">
   <div class="in">
-    <a class="brand" href="/">matris</a>
+    <a class="brand" href="/"><img src="{{ static_url('icon.svg') }}" alt="">matris</a>
     <a href="/"{% if request.url.path == "/" %} aria-current="page"{% endif %}>Ukens middager</a>
+    <a href="/#forslag">Finn en middag</a>
     <a href="/om"{% if request.url.path == "/om" %} aria-current="page"{% endif %}>Slik virker det</a>
   </div>
 </nav>

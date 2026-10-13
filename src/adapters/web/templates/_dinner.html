@@ -1,8 +1,9 @@
-{# One dinner as a card: what is on sale, what to swap, and what to check. #}
-{% macro card(d) %}
-<article class="card">
-  <h3><a href="{{ d.dish.url }}" rel="noopener">{{ d.dish.name }}</a></h3>
-  <p class="meta"><span class="protein">{{ d.protein }}</span> · {{ d.dish.prep_time }}{% if d.dish.rating %} · ★&nbsp;{{ "%.1f"|format(d.dish.rating)|replace(".", ",") }} ({{ d.dish.rating_count }}){% endif %}</p>
+{# One dinner as a card: what is on sale, what to swap, and what to check. With a search, the searched words are marked. #}
+{% macro card(d, search=none, via=()) %}
+<article class="card" data-protein="{{ d.protein }}">
+  <h3><a href="{{ d.dish.url }}" rel="noopener">{% if search and search.words %}{% for piece, hit in marked(d.dish.name, search) %}{% if hit %}<mark>{{ piece }}</mark>{% else %}{{ piece }}{% endif %}{% endfor %}{% else %}{{ d.dish.name }}{% endif %}</a></h3>
+  <p class="meta"><span class="protein">{{ d.protein }}</span> {{ d.dish.prep_time }}{% if d.dish.rating %} · <span class="star">★</span>&nbsp;{{ "%.1f"|format(d.dish.rating)|replace(".", ",") }} ({{ d.dish.rating_count }}){% endif %}</p>
+  {% if via %}<p class="via">Med {% for name in via %}<mark>{{ name }}</mark>{{ ", " if not loop.last }}{% endfor %}</p>{% endif %}
   {% set sales = d.buys|selectattr("sale")|list %}
   {% if sales %}
   <ul class="sales">

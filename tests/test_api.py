@@ -46,6 +46,25 @@ def test_dinners_filters() -> None:
     assert len(client.get("/api/middager?antall=1").json()["dinners"]) == 1
 
 
+def test_dinners_search() -> None:
+    body = client.get("/api/middager", params={"q": "laksefilt i ovn"}).json()
+    assert [d["name"] for d in body["dinners"]] == ["Laks i ovn"]
+    assert body["search"]["query"] == "laksefilet ovn"
+    assert body["search"]["corrected"] == [{"typed": "laksefilt", "used": "laksefilet"}]
+    assert body["search"]["understood"][0] == {"kind": "with", "text": "laksefilet", "label": "Med laksefilet"}
+    assert body["dinners"][0]["matched"] == ["laksefilet"]
+    body = client.get("/api/middager", params={"q": "kylling", "tilbud": "1"}).json()
+    assert body["search"]["query"] == "kylling på tilbud" and body["search"]["total"] == 1
+    body = client.get("/api/middager", params={"q": "fisk på tilbud"}).json()
+    assert body["dinners"] == [] and [c["text"] for c in body["search"]["without"]] == ["fisk", "på tilbud"]
+
+
+def test_api_root_points_at_the_schema() -> None:
+    for path in ("/api", "/api/"):
+        r = client.get(path, follow_redirects=False)
+        assert r.status_code == 302 and r.headers["location"] == "/api/openapi.json"
+
+
 def test_recipe_and_not_found() -> None:
     body = client.get("/api/oppskrift", params={"url": KYLLING.url}).json()
     assert body["fits"] is True and body["recipe"]["protein"] == "kylling"

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% from "_dinner.html" import card %}
+{% from "_dinner.html" import card with context %}
+{% from "_search.html" import search_box %}
 {% block main %}
 <section class="hero" id="uka">
   <h1>Ukens middager</h1>
@@ -11,12 +12,19 @@
 <div class="cards week">
   {% for d in week.dinners %}{{ card(d) }}{% endfor %}
 </div>
-<p class="muted">{{ week.fitting }} av {{ week.considered }} middager på matprat.no passer, {{ week.on_sale }} av dem med hovedråvaren på tilbud.
-  Tilbudene er fra {{ week.offers }} varer hos {{ week.stores|length }} kjeder.</p>
+<p class="muted">{{ week.fitting|tall }} av {{ week.considered|tall }} middager på matprat.no passer, {{ week.on_sale|tall }} av dem med hovedråvaren på tilbud.
+  Tilbudene er fra {{ week.offers|tall }} varer hos {{ week.stores|length }} kjeder.</p>
 
-<section id="forslag">
-  <h2>Flere forslag</h2>
-  <p>Middagene som passer best først: de som trenger færrest bytter, så de med mest rabatt, så de best likte og raskeste.</p>
+<section id="forslag" class="finder">
+  <h2>Finn en middag</h2>
+  <form class="search" id="sok" action="/#forslag" method="get" role="search"
+    hx-get="/middager" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste">
+    {{ search_box(found.search.text) }}
+    <button type="submit">Søk</button>
+  </form>
+  <p class="examples">Skriv det som du ville sagt det, for eksempel
+    {% for e in examples %}<a href="/?{{ link(e) }}#forslag" hx-get="/middager?{{ link(e) }}" hx-target="#forslag-liste" hx-swap="outerHTML">«{{ e }}»</a>{{ ", " if not loop.last else "." }}
+    {% endfor %}</p>
   {% include "_dinners.html" %}
 </section>
 {% endblock %}

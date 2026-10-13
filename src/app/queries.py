@@ -1,6 +1,6 @@
 """Read-only queries behind every page, the JSON API and the CLI. They read the snapshot once."""
 
-from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
 
@@ -9,6 +9,7 @@ from core.diet import judge
 from core.models import Dinner, Dish, Household, Plan, Rule, Snapshot, Verdict
 from core.ports import Datasets
 from core.ranking import Week
+from core.search import Clause, Counts, Index, Kind, Search, via
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,18 +18,49 @@ class Check:
     verdict: Verdict
 
 
+@dataclass(frozen=True, slots=True)
+class Found:
+    search: Search
+    """What the words were understood as."""
+    dinners: tuple[Dinner, ...]
+    """At most the limit asked for, best first."""
+    total: int
+    """Every dinner that matches."""
+    counts: Counts
+    via: Mapping[str, tuple[str, ...]]
+    """Per dish URL shown, the ingredients that hold a searched word the name does not."""
+    relax: tuple[tuple[Clause, int], ...]
+    """With nothing found: which clause to drop, and how many dinners that gives."""
+
+
 class Queries:
     def __init__(self, datasets: Datasets, household: Household, week: Week) -> None:
         self.snapshot: Snapshot = datasets.snapshot()
         self.household = household
         self.week = week
-        # The snapshot and household only change on deploy, so the ranking is worked out once
+        # The snapshot and household only change on deploy, so the ranking and the index are worked out once
         self.ranked = ranking.dinners(self.snapshot, household)
+        self.index = Index(self.ranked, self.snapshot.traits, household)
 
-    def dinners(self, protein: str | None = None, on_sale: bool = False, per_protein: int = 3, limit: int = 30) -> list[Dinner]:
-        """Dinners that fit, best first, at most `per_protein` per main protein unless one is chosen."""
-        found = [d for d in self.ranked if (protein is None or d.protein == protein) and (d.on_sale or not on_sale)]
-        return ranking.varied(found, 0 if protein else per_protein)[:limit]
+    def search(self, text: str = "", limit: int = 30, per_protein: int = 3, skip: frozenset[str] = frozenset()) -> Found:
+        """Dinners that fit and match a search in plain bokmål (core.search), best first. Without a protein
+        or a word to find, the best `per_protein` of each main protein come first. `skip` holds dish URLs
+        to leave out when nothing is searched for (the week, shown above the list)."""
+        search = self.index.parse(text)
+        found = self.index.find(search)
+        if not search.clauses:
+            found = [d for d in found if d.dish.url not in skip]
+        if not any(c.kind in (Kind.PROTEIN, Kind.WITH) for c in search.clauses):
+            found = ranking.varied(found, per_protein)
+        shown = tuple(found[:limit])
+        return Found(
+            search=search,
+            dinners=shown,
+            total=len(found),
+            counts=self.index.count(search),
+            via={d.dish.url: names for d in shown if (names := via(d, search))},
+            relax=() if found else tuple(self.index.relax(search)),
+        )
 
     def plan(self) -> Plan:
         offers = self.snapshot.offers
@@ -44,10 +76,6 @@ class Queries:
     def check(self, url: str) -> Check | None:
         dish = next((d for d in self.snapshot.dishes if d.url == url), None)
         return Check(dish, judge(dish, self.snapshot.traits, self.household)) if dish else None
-
-    def proteins(self) -> list[tuple[str, int]]:
-        """Main proteins among the dinners that fit, most first."""
-        return Counter(d.protein for d in self.ranked).most_common()
 
     def offers_until(self) -> date | None:
         """When most of this week's offers end (the median; a few catalogs run for months)."""

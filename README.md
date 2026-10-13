@@ -9,6 +9,7 @@ Code: https://github.com/janbjorge/ukemeny. The household's rules live in `profi
 ```sh
 uv run matris plan                      # this week's dinners
 uv run matris candidates --on-sale      # more ideas; also --protein fisk, --top 50
+uv run matris candidates rask kylling uten sopp   # search in plain bokmål
 uv run matris check <matprat-url>       # how one recipe fits
 uv run uvicorn adapters.web.main:app    # the site on http://127.0.0.1:8000
 ```

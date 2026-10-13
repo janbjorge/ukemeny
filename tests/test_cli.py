@@ -49,6 +49,16 @@ def test_candidates_and_check_json() -> None:
     assert "ingredients" not in body["recipe"]  # The recipe stays on matprat.no
 
 
+def test_candidates_search_without_quotes() -> None:
+    out = runner.invoke(cli.app, ["candidates", "kyllign", "på", "tilbud"]).stdout
+    assert "Søker etter: Kylling · På tilbud" in out and "Fant ikke «kyllign», så søker etter «kylling»." in out
+    assert "1 middag passer" in out and "1. Kyllinggryte" in out
+    body = json.loads(runner.invoke(cli.app, ["candidates", "fisk", "--json"]).stdout)
+    assert body["dinners"] == [] and body["search"]["without"][0]["text"] == "fisk"
+    out = runner.invoke(cli.app, ["candidates", "kylling", "uten", "kylling"]).stdout
+    assert "Ingen middager passer alt dette. Prøv å fjerne" in out
+
+
 def test_errors_are_json_in_json_mode() -> None:
     r = runner.invoke(cli.app, ["check", "https://www.matprat.no/oppskrifter/kos/nei/", "--json"])
     assert r.exit_code == 1

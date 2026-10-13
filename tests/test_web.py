@@ -52,13 +52,44 @@ def test_ideas_leave_out_the_week(client: TestClient) -> None:
 def test_fragment_filters_and_falls_back_to_the_page(client: TestClient) -> None:
     r = client.get("/middager?protein=fisk", headers=HX)
     assert r.status_code == 200 and "<html" not in r.text
-    assert r.headers["HX-Replace-Url"] == "/?protein=fisk#forslag"
+    assert r.headers["HX-Replace-Url"] == "/?q=fisk#forslag"
     r = client.get("/middager?protein=fisk&tilbud=ja", follow_redirects=False)
-    assert r.status_code == 303 and r.headers["location"] == "/?protein=fisk&tilbud=1#forslag"
+    assert r.status_code == 303 and r.headers["location"] == "/?q=fisk+p%C3%A5+tilbud#forslag"
+
+
+def test_search_page_says_what_it_understood(client: TestClient) -> None:
+    html = client.get("/?q=laks+i+ovnn").text
+    assert 'value="laks ovn"' in html  # the box shows the search as understood
+    assert "Søker etter" in html and "Med laks" in html and "Med ovn" in html
+    assert "<mark>Laks</mark> i <mark>ovn</mark>" in html
+    assert "Fant ikke «ovnn», så viser treff for «ovn»." in html
+    assert "1 middag passer" in html
+
+
+def test_nothing_found_offers_what_to_drop(client: TestClient) -> None:
+    html = client.get("/?q=fisk+p%C3%A5+tilbud").text
+    assert "Ingen middager passer alt dette." in html
+    assert 'href="/?q=p%C3%A5+tilbud#forslag"' in html  # drop «fisk»
+
+
+def test_chips_toggle_and_count(client: TestClient) -> None:
+    html = client.get("/middager?q=kylling", headers=HX).text
+    assert 'hx-get="/middager?q=kylling+p%C3%A5+tilbud">På tilbud <span class="n">1</span>' in html
+    assert 'hx-get="/middager?q=fisk" data-protein="fisk">fisk <span class="n">2</span>' in html
+    assert 'data-protein="kylling" aria-current="true">kylling</a>' in html
+    assert '<span class="off">Godt likt</span>' in html  # nothing would match
+
+
+def test_the_box_follows_chips_but_not_typing(client: TestClient) -> None:
+    clicked = client.get("/middager?q=fisk", headers=HX).text
+    assert 'id="q"' in clicked and 'hx-swap-oob="true"' in clicked
+    typed = client.get("/middager?q=fisk", headers=HX | {"HX-Trigger": "q"}).text
+    assert 'id="q"' not in typed
 
 
 def test_unknown_choices_still_show_a_page(client: TestClient) -> None:
     assert client.get("/?protein=enhjørning&antall=abc&tilbud=kanskje").status_code == 200
+    assert client.get("/?q=" + "x" * 5000 + "&antall=99999999999").status_code == 200
 
 
 def test_about_llms_robots_sitemap_health(client: TestClient) -> None:
@@ -89,6 +120,11 @@ def test_canonical_host_redirects_everything_but_health(client: TestClient, monk
     assert client.get("/helse").status_code == 200
 
 
+def test_light_always() -> None:
+    css = (main.HERE / "static" / "app.css").read_text()
+    assert "prefers-color-scheme" not in css and "color-scheme: light" in css
+
+
 def test_head_answers_like_get() -> None:
     client = TestClient(main.app)
     r = client.head("/")
@@ -97,4 +133,4 @@ def test_head_answers_like_get() -> None:
 
 def test_the_real_site_renders() -> None:
     html = TestClient(main.app).get("/").text
-    assert html.count('<article class="card">') >= 5
+    assert html.count('<article class="card"') >= 5

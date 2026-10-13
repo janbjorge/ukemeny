@@ -11,9 +11,10 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
-from app.queries import Check, Queries
+from app.queries import Check, Found, Queries
 from core.matching import main_protein
 from core.models import Dinner, Dish, Note, Plan
+from core.search import Clause, Search
 
 
 class Out(BaseModel):
@@ -60,6 +61,8 @@ class DinnerOut(RecipeOut):
     swaps: list[NoteOut]
     notes: list[NoteOut]
     discounts: list[DiscountOut]
+    matched: list[str] = []
+    """Ingredients that hold a searched word the dish name does not."""
 
 
 class CheckOut(Out):
@@ -72,7 +75,34 @@ class CheckOut(Out):
     lactose_g_per_portion: float
 
 
-class DinnersOut(Out):
+class ClauseOut(Out):
+    kind: str
+    """tag (a category), protein (the main protein is one of these), not_protein, with (a word in the
+    name or an ingredient) or without."""
+    text: str
+    """How the search writes it."""
+    label: str
+    """In bokmål, for people."""
+
+
+class CorrectionOut(Out):
+    typed: str
+    used: str
+
+
+class SearchOut(Out):
+    query: str
+    """The search as understood. Send it back as `q` for the same dinners."""
+    understood: list[ClauseOut]
+    corrected: list[CorrectionOut]
+    """Words that matched nothing and were swapped for the closest known word."""
+    total: int
+    """Dinners that match, before `antall`."""
+    without: list[ClauseOut] = []
+    """With nothing found: clauses to drop for some matches, most matches first."""
+
+
+class SnapshotOut(Out):
     considered: int
     fitting: int
     on_sale: int
@@ -83,7 +113,11 @@ class DinnersOut(Out):
     dinners: list[DinnerOut]
 
 
-class PlanOut(DinnersOut):
+class DinnersOut(SnapshotOut):
+    search: SearchOut
+
+
+class PlanOut(SnapshotOut):
     stores: list[str]
 
 
@@ -105,7 +139,7 @@ def _dish(dish: Dish) -> dict[str, Any]:
     }
 
 
-def dinner(d: Dinner, rank: int) -> DinnerOut:
+def dinner(d: Dinner, rank: int, matched: tuple[str, ...] = ()) -> DinnerOut:
     discounts = [
         DiscountOut(
             ingredient=b.part.name,
@@ -127,10 +161,25 @@ def dinner(d: Dinner, rank: int) -> DinnerOut:
         swaps=[_note(s) for s in d.verdict.swaps],
         notes=[_note(w) for w in d.verdict.warnings],
         discounts=discounts,
+        matched=list(matched),
     )
 
 
-def dinners(queries: Queries, found: list[Dinner]) -> DinnersOut:
+def _clause(c: Clause) -> ClauseOut:
+    return ClauseOut(kind=c.kind.value, text=c.text, label=c.label)
+
+
+def _search(search: Search, total: int, relax: tuple[tuple[Clause, int], ...]) -> SearchOut:
+    return SearchOut(
+        query=search.text,
+        understood=[_clause(c) for c in search.clauses],
+        corrected=[CorrectionOut(typed=t, used=u) for t, u in search.corrected],
+        total=total,
+        without=[_clause(c) for c, _ in relax],
+    )
+
+
+def dinners(queries: Queries, found: Found) -> DinnersOut:
     plan = queries.plan()
     return DinnersOut(
         considered=plan.considered,
@@ -139,7 +188,8 @@ def dinners(queries: Queries, found: list[Dinner]) -> DinnersOut:
         offers=plan.offers,
         built=queries.snapshot.built,
         offers_until=queries.offers_until(),
-        dinners=[dinner(d, n) for n, d in enumerate(found, 1)],
+        dinners=[dinner(d, n, found.via.get(d.dish.url, ())) for n, d in enumerate(found.dinners, 1)],
+        search=_search(found.search, found.total, found.relax),
     )
 
 

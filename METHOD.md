@@ -25,7 +25,7 @@ Every simplification and judgement call behind what the site suggests. Add to it
 
 - A dinner's main protein is its heaviest meat, fish or shellfish ingredient by grams, grouped by matprat department (fisk, skalldyr, kylling, kalkun, and, kjøttdeig, svin, pølser, storfe, lam, vilt; other meat is "kjøtt"; none is "vegetar"). matprat's own main-ingredient label is not used, since it files "Kyllingfilet med spekeskinke" under pork.
 - The week has one dinner per protein, except fish, which may come `week.fish` times but never the same fish ingredient twice (jb 2026-10-13: "load of chicken options"). If too few proteins fit, the rest is filled with repeats.
-- "Flere forslag" shows at most 3 per protein unless one protein is chosen, and leaves out the week's dinners.
+- The list under the week puts the best 3 of each protein first and the rest after, unless a protein or a word is searched for; with nothing searched it leaves out the week's dinners. It used to stop at 3 per protein, which showed 39 of the 1 908 dinners at most.
 
 ## 4. Offers and discounts
 
@@ -41,3 +41,19 @@ Every simplification and judgement call behind what the site suggests. Add to it
 - The week (`on_sale_only`) is picked from dinners on sale; others only fill in when there are too few.
 - Because discounts come before rating, a three-star dish over an hour can make the week when its meat is heavily discounted (open question in TODO.md).
 - "De fleste til" on the site is the median end date of the offers, since a few catalogs run for months.
+
+## 6. Search (src/core/search.py)
+
+jb 2026-10-13: "more categories like; uten løk, glutenfree etc… an epic search… highly fit to our need, but it needs to be human friendly".
+
+- The household's rules apply first; a search only narrows the dinners that already fit profile.yaml. No search word changes the rules (AGENTS.md).
+- The diet categories describe the recipe as written, with no swaps (of 1 908 dinners on 2026-10-13: glutenfri 994, uten løk 845, lite laktose 1 735, uten hvitløk 1 027, ingen bytter 405): «glutenfri» has no ingredient Jev calls gluten, «uten løk» no onion except the household's substitute (vårløk), «uten hvitløk» no garlic, «lite laktose» at most the profile's limit (3 g per portion when it has none), «ingen bytter» needs no swap at all. Every dinner on the site fits the diet, some only after a swap, so these say "nothing to buy specially". An ingredient Jev never judged makes no diet promise.
+- Prep time uses matprat's buckets: «rask», «kjapp», «enkel» and «hverdag» are under 20 min; «under N min» is the strictest bucket that keeps within N (under 30 → under 20, under 45 → under 40, under en time → up to 60); over 90 min is ignored.
+- «Godt likt» is a rating of 4.5 or more from at least 20 ratings (508 of 1 908 dinners). «Barnevennlig» has no ingredient Jev calls spicy and no chili, spicy or sterk in the name (1 368 dinners). «På tilbud» is `on_sale` (§4).
+- Protein words (kylling, fisk, svin, gris, elg, vegetarisk, …) pick the main protein (§3); several mean either. «kjøtt» is any meat, «sjømat» fish or shellfish, «annet kjøtt» the group of other meat. «uten svin» leaves out any pork ingredient, so torsk med bacon goes too; «uten kjøtt» leaves fish and vegetarian.
+- Other words must be in the dish name or an ingredient name: «laks» finds røkelaks and laksefilet (Norwegian compounds: a word of 5+ letters anywhere, 3–4 letters at the start, or at the end of a word at least 4 letters longer, so «ris» finds jasminris but not kapris), and «tacos» finds taco. Dish kinds (suppe, gryte, salat, taco, pizza, wok, …) look at the name only, so «salat» is not every burger with lettuce. «sopp», «ost», «nøtter», «egg», «bær» and «skalldyr» also find matprat's department of that name (sjampinjong is /sopp). «pasta» also finds spagetti, tagliatelle, penne and the like.
+- «uten X», «ikke X», «ingen X» and «-X» leave X out, and «og»/«eller» carry it on («uten sopp og paprika»). «uten løk», «uten gluten», «ikke sterk» and «ingen bytter» are the categories, not words. «X eller Y» is either; other words all have to match.
+- Words that say nothing (jeg, vil, ha, middag, til, med, …) are skipped. æ, ø and å may be typed as ae, o and a; a word typed with them is matched as written («kål» does not find kalkun).
+- A word that matches nothing is swapped for the closest known word (difflib, at least 75 % alike) and the page says so: «kyllign» becomes kylling.
+- Dinners with a searched word in the name come before those with it only among the ingredients, then the ranking (§5) decides.
+- When nothing matches, the page offers to drop each part of the search, with how many dinners that would give, most first.

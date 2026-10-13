@@ -6,11 +6,11 @@ The site is in Norwegian (bokmål). Recipes belong to matprat.no; link to them, 
 
 ## JSON API
 
-Read-only, no key, CORS open. Keys are English; advice and notes are bokmål; prices are kroner.
+Read-only, no key, CORS open. `{{ base }}api` redirects to the schema. Keys are English; advice and notes are bokmål; prices are kroner.
 
 - [OpenAPI schema]({{ base }}api/openapi.json): every endpoint and field
 - [This week's dinners]({{ base }}api/plan): a varied week, picked from dinners whose main protein is on sale
-- [Dinners that fit]({{ base }}api/middager?tilbud=1): best first. `protein` takes one of: {{ proteins }}. `tilbud=1` keeps only dinners whose main protein is on sale; `antall` is 1-100.
+- [Search the dinners that fit]({{ base }}api/middager?q=rask+kylling+uten+sopp): best first. `q` is a search in plain bokmål: categories (`under 20 min`, `på tilbud`, `godt likt`, `barnevennlig`, `ingen bytter`, `glutenfri`, `uten løk`, `lite laktose`, `uten hvitløk`), main proteins ({{ proteins }}; also `kjøtt`, `sjømat`), `uten X` to leave X out, `X eller Y` for either, and any word in the dish name or an ingredient. Typos are fixed and reported in `search.corrected`; `search.understood` says how `q` was read, and `search.query` is the same search written out. `antall` is 1-100.
 - [One recipe]({{ base }}api/oppskrift?url=https://www.matprat.no/oppskrifter/familien/lasagne/): how it fits, with swaps, notes and every ingredient, for a shopping list
 
 ## Method

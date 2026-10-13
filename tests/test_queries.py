@@ -20,9 +20,31 @@ def test_plan_and_dinners() -> None:
     week = q.plan()
     assert (week.considered, week.fitting, week.on_sale, week.offers, week.stores) == (2, 2, 1, 1, ("KIWI",))
     assert {d.dish.name for d in week.dinners} == {"Kylling", "Laks"}
-    assert [d.dish.name for d in q.dinners(on_sale=True)] == ["Kylling"]
-    assert [d.dish.name for d in q.dinners(protein="fisk")] == ["Laks"]
-    assert q.proteins() == [("kylling", 1), ("fisk", 1)]
+
+
+def test_search() -> None:
+    q = queries()
+    assert [d.dish.name for d in q.search("på tilbud").dinners] == ["Kylling"]
+    found = q.search("fisk")
+    assert [d.dish.name for d in found.dinners] == ["Laks"] and found.total == 1
+    assert found.counts.proteins == {"kylling": 1, "fisk": 1}
+    assert [d.dish.name for d in q.search("laks").dinners] == ["Laks"]
+    assert q.search("laksefilet").via == {recipe("Laks", SALMON).url: ("laksefilet",)}
+
+
+def test_search_skips_the_week_only_when_browsing_and_relaxes_when_empty() -> None:
+    q = queries()
+    kylling = recipe("Kylling", CHICKEN).url
+    assert [d.dish.name for d in q.search("", skip=frozenset({kylling})).dinners] == ["Laks"]
+    assert [d.dish.name for d in q.search("kylling", skip=frozenset({kylling})).dinners] == ["Kylling"]
+    found = q.search("fisk på tilbud")
+    assert found.dinners == () and found.total == 0
+    assert [(c.text, n) for c, n in found.relax] == [("fisk", 1), ("på tilbud", 1)]
+
+
+def test_search_limit_and_variety() -> None:
+    q = queries()
+    assert len(q.search("", limit=1).dinners) == 1 and q.search("", limit=1).total == 2
 
 
 def test_check_finds_dinners_in_the_snapshot_only() -> None:

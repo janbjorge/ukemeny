@@ -1,23 +1,37 @@
+@charset "utf-8";
 :root {
   color-scheme: light;
-  /* Warm kitchen: oat-white page, tomato accent, basil green for "fits", fjord blue for discounts */
-  --surface-0: #faf6f0; --surface-1: #ffffff; --surface-2: #f1e9df;
-  --text-primary: #2a211c; --text-secondary: #4f443d; --text-muted: #6f6259;
-  --hairline: #e6dccf;
-  --accent: #b3412a; --good: #2f6e3b; --sale: #1d5f8a;
+  /* A fresh market, light always (jb 2026-10-13: "its pretty dark"): cream page, tomato for what you can
+     click, basil for what fits, lemon price tags for discounts, and a colour per main protein below.
+     Text colours keep at least 4.5:1 against what they sit on. */
+  --surface-0: #fffaf3; --surface-1: #ffffff; --surface-2: #fff0dc;
+  --text-primary: #2b2118; --text-secondary: #54463a; --text-muted: #76665a;
+  --hairline: #efe1cd;
+  --accent: #c43d1f; --accent-strong: #a8321a; --accent-soft: #ffe4da;
+  --good: #2f7d32; --good-ink: #256b29; --good-soft: #e4f3df;
+  --sale: #ffd23f; --sale-ink: #3b2c00;
+  --mark: #fff0a8;
+  --shadow: 0 1px 2px rgb(80 40 0 / 6%), 0 6px 18px rgb(80 40 0 / 6%);
+  --shadow-lift: 0 2px 4px rgb(80 40 0 / 8%), 0 14px 30px rgb(80 40 0 / 12%);
   /* The type scale: every font-size uses one of these, at weight 400 or 650 (as in statsbudsjett) */
   --t-display: clamp(32px, 5.5vw, 52px); --t-title: clamp(26px, 4vw, 36px); --t-heading: clamp(20px, 2.4vw, 24px);
   --t-body: 17px; --t-small: 14px; --t-chart: 12px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --surface-0: #1a1512; --surface-1: #241d19; --surface-2: #2f2621;
-    --text-primary: #f3ebe3; --text-secondary: #d2c4b8; --text-muted: #a8988b;
-    --hairline: #3a2f29;
-    --accent: #f08a6d; --good: #7fcf8e; --sale: #7ab8e6;
-  }
-}
+/* One colour per main protein: the card's top edge, its protein label and the protein chips */
+[data-protein="fisk"] { --p: #1d6fa5; --p-soft: #e2effa; }
+[data-protein="skalldyr"] { --p: #b83a4b; --p-soft: #fde4e7; }
+[data-protein="kylling"] { --p: #8f6200; --p-soft: #fff1c7; }
+[data-protein="kalkun"] { --p: #975a17; --p-soft: #fbead6; }
+[data-protein="and"] { --p: #1f6f66; --p-soft: #dcf2ee; }
+[data-protein="kjøttdeig"] { --p: #a63446; --p-soft: #f9e0e4; }
+[data-protein="svin"] { --p: #b03c63; --p-soft: #fce3ec; }
+[data-protein="pølser"] { --p: #a9520f; --p-soft: #fde8d5; }
+[data-protein="storfe"] { --p: #8f2a2a; --p-soft: #f6dddd; }
+[data-protein="lam"] { --p: #6a4a9b; --p-soft: #ece5f6; }
+[data-protein="vilt"] { --p: #4a6620; --p-soft: #e6efd9; }
+[data-protein="kjøtt"] { --p: #7a4c2c; --p-soft: #f2e5da; }
+[data-protein="vegetar"] { --p: #2b742e; --p-soft: #e4f3df; }
+
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
@@ -32,40 +46,93 @@ h1 { font-size: var(--t-display); margin: 0 0 12px; }
 h2 { font-size: var(--t-title); margin: 48px 0 8px; }
 h3 { font-size: var(--t-heading); margin: 0 0 4px; }
 .muted { color: var(--text-muted); font-size: var(--t-small); }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
 
-nav.top { border-bottom: 1px solid var(--hairline); background: var(--surface-0); }
+/* A market-stall stripe over the menu: tomato, carrot, lemon, basil, fjord */
+nav.top { background: var(--surface-1); border-top: 5px solid; border-image: linear-gradient(90deg, #c43d1f, #ef8a17, #ffd23f, #6fb33f, #1d6fa5) 1; border-bottom: 1px solid var(--hairline); }
 nav.top .in { max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 8px 16px; }
-nav.top a { color: var(--text-secondary); text-decoration: none; font-size: var(--t-small); padding: 6px 10px; border-radius: 6px; }
+nav.top a { color: var(--text-secondary); text-decoration: none; font-size: var(--t-small); padding: 6px 10px; border-radius: 8px; }
 nav.top a:hover { background: var(--surface-2); color: var(--text-primary); }
-nav.top a[aria-current] { color: var(--text-primary); font-weight: 650; }
-nav.top .brand { font-weight: 650; font-size: var(--t-body); color: var(--accent); margin-right: 8px; }
+nav.top a[aria-current] { color: var(--accent-strong); font-weight: 650; background: var(--accent-soft); }
+nav.top .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 650; font-size: var(--t-body); color: var(--accent); margin-right: 8px; }
+nav.top .brand:hover { background: none; }
+nav.top .brand img { width: 26px; height: 26px; }
 
 main { max-width: 1120px; margin: 0 auto; padding: 24px 16px 64px; }
-.banner { background: var(--surface-2); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 8px; }
-.hero { padding: 16px 0 8px; }
+.banner { background: var(--mark); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 10px; }
+.hero { background: linear-gradient(135deg, #fff0dc 0%, #ffe3d6 55%, #e6f4dc 100%); border-radius: 24px; padding: 28px 28px 24px; }
 .lede { font-size: var(--t-heading); color: var(--text-secondary); max-width: 60ch; margin: 0 0 16px; }
 .rules { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.rules li { font-size: var(--t-small); background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 999px; padding: 4px 12px; }
+.rules li { font-size: var(--t-small); font-weight: 650; background: var(--surface-1); color: var(--good-ink); border-radius: 999px; padding: 4px 12px; box-shadow: var(--shadow); }
+.rules li::before { content: "✓ "; }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 16px 0; }
-.card { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.card {
+  background: var(--surface-1); border: 1px solid var(--hairline); border-top: 6px solid var(--p, var(--accent));
+  border-radius: 16px; padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 8px;
+  box-shadow: var(--shadow); transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
 .card h3 a { color: var(--text-primary); text-decoration: none; }
 .card h3 a:hover { color: var(--accent); text-decoration: underline; }
 .card .meta { margin: 0; font-size: var(--t-small); color: var(--text-muted); }
-.card .protein { text-transform: capitalize; color: var(--text-secondary); font-weight: 650; }
+.card .protein { display: inline-block; text-transform: capitalize; color: var(--p, var(--text-secondary)); background: var(--p-soft, var(--surface-2)); font-weight: 650; border-radius: 999px; padding: 1px 10px; margin-right: 2px; }
+.card .star { color: #c98a00; }
 .card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: var(--t-small); }
-.card .pct { display: inline-block; min-width: 3.6em; font-weight: 650; color: var(--sale); }
-.card .swaps li::before { content: "↺ "; color: var(--accent); }
-.card .fits { margin: 0; font-size: var(--t-small); color: var(--good); font-weight: 650; }
+.card .pct { display: inline-block; font-weight: 650; color: var(--sale-ink); background: var(--sale); border-radius: 6px; padding: 0 7px; margin-right: 4px; }
+.card .swaps li::before { content: "↺ "; color: var(--accent); font-weight: 650; }
+.card .fits { margin: 0; font-size: var(--t-small); color: var(--good-ink); font-weight: 650; }
+.card .fits::before { content: "✓ "; }
+.card .via { margin: 0; font-size: var(--t-small); color: var(--text-secondary); }
 .card details { font-size: var(--t-small); color: var(--text-secondary); }
 .card summary { cursor: pointer; color: var(--text-muted); }
 .card details ul { margin-top: 6px; }
 
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 8px; }
-.chips a { font-size: var(--t-small); text-decoration: none; color: var(--text-secondary); background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 999px; padding: 6px 12px; text-transform: capitalize; }
-.chips a[aria-current] { background: var(--accent); border-color: var(--accent); color: #fff; }
-.chips a[aria-current] .muted { color: #ffe5dc; }
-.toggle { font-size: var(--t-small); margin: 0; }
+/* Finn en middag: the search box, the chips, what the search understood */
+.finder { margin-top: 48px; background: var(--surface-2); border-radius: 24px; padding: 8px 24px 24px; }
+.finder h2 { margin-top: 20px; }
+.search { display: flex; gap: 8px; margin: 12px 0 8px; }
+.search input {
+  flex: 1; min-width: 0; font: inherit; font-size: var(--t-heading); color: var(--text-primary);
+  padding: 12px 18px 12px 50px; border: 2px solid var(--hairline); border-radius: 999px; box-shadow: var(--shadow);
+  background: var(--surface-1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c43d1f' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M15.5 15.5 21 21'/%3E%3C/svg%3E") no-repeat 18px center / 22px;
+}
+.search input::placeholder { color: var(--text-muted); }
+.search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.search button { font: inherit; font-weight: 650; padding: 0 24px; border: 0; border-radius: 999px; background: var(--accent); color: #fff; cursor: pointer; }
+.search button:hover { background: var(--accent-strong); }
+.examples { font-size: var(--t-small); color: var(--text-secondary); margin: 0 0 8px; }
+
+.filters { display: grid; gap: 8px; margin: 16px 0 8px; }
+.filters .row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.filters .label { font-size: var(--t-small); color: var(--text-muted); min-width: 8.5em; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.chips a, .chips .off { font-size: var(--t-small); text-decoration: none; color: var(--text-secondary); background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 999px; padding: 4px 12px; }
+.chips a:hover { border-color: var(--accent); color: var(--accent-strong); }
+.chips a[aria-current] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 650; }
+.chips .off { opacity: 0.45; }
+.chips .n { font-size: var(--t-chart); color: var(--text-muted); margin-left: 2px; }
+.chips.diet a[aria-current] { background: var(--good); border-color: var(--good); }
+.chips.proteins a, .chips.proteins .off { text-transform: capitalize; }
+.chips [data-protein]::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--p); margin-right: 6px; }
+.chips a[data-protein][aria-current] { background: var(--p); border-color: var(--p); }
+.chips a[data-protein][aria-current]::before { background: #fff; }
+
+.understood { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0 4px; font-size: var(--t-small); }
+.understood .pill { background: var(--accent-soft); color: var(--accent-strong); text-decoration: none; border-radius: 999px; padding: 3px 6px 3px 12px; font-weight: 650; }
+.understood .pill .x { display: inline-block; margin-left: 4px; width: 1.4em; text-align: center; border-radius: 50%; }
+.understood .pill:hover { background: var(--accent); color: #fff; }
+.understood .reset { margin-left: 4px; }
+.note { background: var(--mark); border-radius: 10px; padding: 8px 12px; font-size: var(--t-small); margin: 8px 0; }
+.count { font-size: var(--t-small); color: var(--text-secondary); margin: 8px 0 0; }
+.empty { background: var(--surface-1); border-radius: 16px; padding: 16px 20px; box-shadow: var(--shadow); }
+.empty p { margin: 4px 0; }
+.more { text-align: center; margin: 8px 0 0; }
+.more a { display: inline-block; font-weight: 650; text-decoration: none; color: var(--accent-strong); background: var(--surface-1); border: 2px solid var(--accent-soft); border-radius: 999px; padding: 8px 24px; }
+.more a:hover { border-color: var(--accent); }
+/* While a search is on its way */
+#forslag-liste.htmx-request .cards { opacity: 0.55; transition: opacity 0.2s; }
 
 .prose { max-width: 70ch; }
 .prose h2 { font-size: var(--t-heading); margin-top: 32px; }

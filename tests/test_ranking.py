@@ -107,7 +107,7 @@ def test_pick_repeats_proteins_only_when_it_must() -> None:
     assert len(pick(dinners(s, HOUSEHOLD), days=2, fish=2)) == 2
 
 
-def test_varied_caps_each_protein() -> None:
+def test_varied_puts_a_few_of_each_protein_first() -> None:
     s = snapshot(
         recipe("Kylling 1", CHICKEN, rating=5.0, rating_count=10),
         recipe("Kylling 2", CHICKEN, rating=4.9, rating_count=10),
@@ -115,5 +115,5 @@ def test_varied_caps_each_protein() -> None:
         recipe("Svinestek", PORK),
     )
     ranked = dinners(s, HOUSEHOLD)
-    assert [d.dish.name for d in varied(ranked, 2)] == ["Kylling 1", "Kylling 2", "Svinestek"]
-    assert len(varied(ranked, 0)) == 4
+    assert [d.dish.name for d in varied(ranked, 2)] == ["Kylling 1", "Kylling 2", "Svinestek", "Kylling 3"]
+    assert varied(ranked, 0) == ranked

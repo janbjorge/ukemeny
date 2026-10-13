@@ -1,4 +1,4 @@
-{# One dinner as a card, calm on purpose: the main discount, what to swap, and whether it is hot. The rest is on
+{# One dinner as a card, calm on purpose: the main discount, what to swap (nothing when nothing needs it), and whether it is hot. The rest is on
    matprat.no (the link) and in the API (`notes`). With a search, the searched words are marked. #}
 {% macro card(d, search=none, via=()) %}
 {% set sales = d.buys|selectattr("sale")|list %}
@@ -12,7 +12,6 @@
   <p class="deal" title="{{ b.sale.price|kr }}, før {{ b.sale.pre_price|kr }}, til {{ b.sale.valid_until|dato }}"><span class="pct">{{ b.sale.discount|prosent }}</span> {{ b.part.name }} hos {{ b.sale.store }}</p>
   {% if sales|length > 1 %}<p class="also">Også på tilbud: {{ sales[1:]|map(attribute="part.name")|join(", ") }}</p>{% endif %}
   {% endif %}
-  {% if d.verdict.swaps %}<p class="swaps"><b>Bytt:</b> {{ d.verdict.swaps|map(attribute="swap")|join(" · ") }}</p>
-  {% else %}<p class="fits">Passer som den er</p>{% endif %}
+  {% if d.verdict.swaps %}<p class="swaps"><b>Bytt:</b> {{ d.verdict.swaps|map(attribute="swap")|join(" · ") }}</p>{% endif %}
 </article>
 {% endmacro %}

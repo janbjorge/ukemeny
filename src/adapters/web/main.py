@@ -34,7 +34,13 @@ PAGES = ("", "om")
 
 # Category chips above the ideas: what a dinner is like, then the diet as the recipe is written
 KIND_CHIPS = (Tag.QUICK, Tag.UNDER_40, Tag.ON_SALE, Tag.LIKED, Tag.MILD)
-DIET_CHIPS = (Tag.AS_IS, Tag.GLUTEN_FREE, Tag.ONION_FREE, Tag.LOW_LACTOSE, Tag.GARLIC_FREE)
+# "Ingen bytter" is left out: with our rules it is these together, and the name puzzled (jb 2026-10-13). A search still knows it.
+DIET_CHIPS: dict[Tag, str] = {
+    Tag.GLUTEN_FREE: "Glutenfri slik oppskriften står",
+    Tag.ONION_FREE: "Ingen løk i oppskriften",
+    Tag.LOW_LACTOSE: "Lite laktose slik oppskriften står",
+    Tag.GARLIC_FREE: "Ingen hvitløk i oppskriften",
+}
 # Searches to try, shown under the search box
 EXAMPLES = ("rask kylling uten sopp", "laks eller torsk på tilbud", "barnevennlig vegetar", "suppe under 40 min", "godt likt lam")
 # The elements that send a search as it is typed; their own answer must not replace the search box
@@ -56,15 +62,17 @@ class Chip:
     count: int | None
     """Dinners after a click, for a chip that is off."""
     protein: str = ""
+    title: str = ""
+    """What the chip means, on hover."""
 
 
 def chips(found: Found) -> dict[str, list[Chip]]:
     s = found.search
 
-    def tag(t: Tag) -> Chip:
+    def tag(t: Tag, title: str = "") -> Chip:
         clause = tag_clause(t)
         on = s.has(clause)
-        return Chip(clause.label, s.toggle(clause).text, on, None if on else found.counts.tags[t])
+        return Chip(clause.label, s.toggle(clause).text, on, None if on else found.counts.tags[t], title=title)
 
     chosen = next((c for c in s.clauses if c.kind is Kind.PROTEIN), None)
     every = sum(found.counts.proteins.values())
@@ -81,7 +89,7 @@ def chips(found: Found) -> dict[str, list[Chip]]:
 
     return {
         "kinds": on_first([tag(t) for t in KIND_CHIPS]),
-        "diets": on_first([tag(t) for t in DIET_CHIPS]),
+        "diets": on_first([tag(t, title) for t, title in DIET_CHIPS.items()]),
         "proteins": on_first(proteins),
     }
 

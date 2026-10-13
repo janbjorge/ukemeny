@@ -11,8 +11,7 @@
     avgjør om varen er den samme som ingrediensen. En vare er på tilbud når kundeavisen har en førpris som er høyere enn prisen nå.</p>
   <p>En middag er på tilbud når hovedråvaren er det, så bacon på tilbud gjør ikke lutefisk til et tilbud. Uten kjøtt og fisk teller en grønnsak
     fra 100 g per porsjon.</p>
-  <p>Middagene rangeres etter færrest bytter når du har valgt kosthold, så etter hvor mye som er på tilbud, der kjøtt og fisk teller mest,
-    og så etter vurdering og tid. Ukens middager er de beste på tilbud, én per hovedråvare. Fisk kan komme to ganger, men ikke samme fisk.</p>
+  <p>Middagene rangeres etter hvor mye som er på tilbud, der kjøtt og fisk teller mest, og så etter vurdering og tid. Ukens middager er de beste på tilbud, én per hovedråvare. Fisk kan komme to ganger, men ikke samme fisk.</p>
 
   <h2>Søket</h2>
   <p>Et ord leter i middagens navn og ingredienser, også inne i sammensatte ord: «laks» finner røkelaks og laksefilet, og «pasta» finner
@@ -31,6 +30,6 @@
   <pre class="prompt">Hjelp meg å velge middager for uka.
 Les {{ request.base_url }}llms.txt først, spør hva vi ikke spiser,
 og foreslå middager derfra.</pre>
-  <p>llms.txt forklarer søket, kostholdet og API-et, så agenten svarer fra matris i stedet for å gjette.</p>
+  <p>llms.txt forklarer søket og API-et, så agenten svarer fra matris i stedet for å gjette.</p>
 </section>
 {% endblock %}

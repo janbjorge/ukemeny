@@ -301,7 +301,12 @@ def create_app(queries: Queries) -> FastAPI:
         return templates.TemplateResponse(
             request,
             "llms.txt",
-            {"base": str(request.base_url), "proteins": ", ".join(KNOWN_PROTEINS), "diets": api.DIETS},
+            {
+                "base": str(request.base_url),
+                "proteins": ", ".join(KNOWN_PROTEINS),
+                "diets": api.DIETS,
+                "rule_links": [(d.value, f"{request.base_url}api/plan?{link(d.value)}") for d in Diet],
+            },
             media_type="text/plain",
         )
 

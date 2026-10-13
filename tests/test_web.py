@@ -125,6 +125,7 @@ def test_about_llms_robots_sitemap_health(client: TestClient) -> None:
     assert "Les http://testserver/llms.txt først" in about  # a prompt to paste into an agent (jb 2026-10-13)
     llms = client.get("/llms.txt").text
     assert "http://testserver/api/plan" in llms and "kjøttdeig" in llms
+    assert "- [melkefri](http://testserver/api/plan?q=melkefri)" in llms  # a link per rule: agents need not write URLs
     robots = client.get("/robots.txt").text
     assert "Allow: /api/" in robots and "Sitemap: http://testserver/sitemap.xml" in robots
     assert "<loc>http://testserver/om</loc>" in client.get("/sitemap.xml").text

@@ -4,6 +4,12 @@
 
 The site is in Norwegian (bokmål). Recipes belong to matprat.no; link to them, do not copy them. Offers are from the stores' weekly catalogs. What an ingredient holds (gluten, onion, lactose, the allergens, meat, FODMAP, ...) was judged by a small language model and can be wrong; tell people to check the label.
 
+## Start here
+
+Each link below is the week for one diet rule. Every answer has `links`: `add` and `remove` give the same answer with one more rule or one fewer, `plan` the week and `dinners` the full list for the same search. Combine rules by following those links, one rule at a time; you never need to write a URL yourself. With no rules: [the week]({{ base }}api/plan) or [every dinner]({{ base }}api/middager).
+
+{% for diet, url in rule_links %}- [{{ diet }}]({{ url }})
+{% endfor %}
 ## JSON API
 
 Read-only, no key, CORS open. `{{ base }}api` redirects to the schema. Keys are English; advice is bokmål; prices are kroner.

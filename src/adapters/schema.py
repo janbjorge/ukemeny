@@ -9,13 +9,14 @@ ingredient, so they stay in the CLI's text output, on this machine.
 
 from datetime import date, datetime
 from typing import TypedDict
+from urllib.parse import urlencode
 
 from pydantic import BaseModel, ConfigDict
 
 from app.queries import Check, Found, Queries
 from core.matching import main_protein
 from core.models import Dinner, Dish, Note, Plan
-from core.search import Clause, Search
+from core.search import Clause, Diet, Kind, Search, diet_clause
 
 
 class Out(BaseModel):
@@ -101,6 +102,35 @@ class SearchOut(Out):
     """With nothing found: clauses to drop for some matches, most matches first."""
 
 
+class LinksOut(Out):
+    """Where to go next, so an agent can combine rules by following links instead of writing URLs (ChatGPT, for one,
+    opens only addresses it has seen; jb 2026-10-13)."""
+
+    add: dict[str, str]
+    """Per diet rule not in this search: this answer (the week or the list) with it."""
+    remove: dict[str, str]
+    """Per diet rule in this search: this answer without it."""
+    plan: str
+    """The week for this search's diet rules."""
+    dinners: str
+    """Every dinner for this search."""
+
+
+def links(base: str, search: Search, path: str) -> LinksOut:
+    """`base` is the API's address, ending in "/" (https://matris.app/api/); `path` is this answer's ("plan", "middager")."""
+    rules = Search(tuple(c for c in search.clauses if c.kind is Kind.DIET))
+
+    def url(path: str, s: Search) -> str:
+        return f"{base}{path}" + (f"?{urlencode({'q': s.text})}" if s.text else "")
+
+    return LinksOut(
+        add={d.value: url(path, search.toggle(diet_clause(d))) for d in Diet if d not in search.diets},
+        remove={d.value: url(path, search.drop(diet_clause(d))) for d in search.diets},
+        plan=url("plan", rules),
+        dinners=url("middager", search),
+    )
+
+
 class SnapshotOut(Out):
     considered: int
     fitting: int
@@ -110,6 +140,8 @@ class SnapshotOut(Out):
     """When the snapshot was built; offers are from that week."""
     offers_until: date | None
     dinners: list[DinnerOut]
+    links: LinksOut | None = None
+    """From the API: the same search with a diet rule added or taken away, and the week or the list for it."""
 
 
 class DinnersOut(SnapshotOut):
@@ -188,7 +220,7 @@ def _search(search: Search, total: int, relax: tuple[tuple[Clause, int], ...]) -
     )
 
 
-def dinners(queries: Queries, found: Found) -> DinnersOut:
+def dinners(queries: Queries, found: Found, base: str | None = None) -> DinnersOut:
     plan = queries.plan(found.household)
     return DinnersOut(
         considered=plan.considered,
@@ -199,10 +231,11 @@ def dinners(queries: Queries, found: Found) -> DinnersOut:
         offers_until=queries.offers_until(),
         dinners=[dinner(d, n, found.via.get(d.dish.url, ())) for n, d in enumerate(found.dinners, 1)],
         search=_search(found.search, found.total, found.relax),
+        links=links(base, found.search, "middager") if base else None,
     )
 
 
-def plan(queries: Queries, week: Plan) -> PlanOut:
+def plan(queries: Queries, week: Plan, search: Search | None = None, base: str | None = None) -> PlanOut:
     return PlanOut(
         considered=week.considered,
         fitting=week.fitting,
@@ -212,6 +245,7 @@ def plan(queries: Queries, week: Plan) -> PlanOut:
         built=queries.snapshot.built,
         offers_until=queries.offers_until(),
         dinners=[dinner(d, n) for n, d in enumerate(week.dinners, 1)],
+        links=links(base, Search(tuple(c for c in (search or Search()).clauses if c.kind is Kind.DIET)), "plan") if base else None,
     )
 
 

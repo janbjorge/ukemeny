@@ -54,14 +54,20 @@ def build(queries: Queries) -> FastAPI:
         base = request.url.replace(path=request.url.path.removesuffix("/openapi.json"), query="")
         return {**api.openapi(), "servers": [{"url": str(base)}]}
 
+    def base(request: Request) -> str:
+        """This API's address, ending in "/", for the links in an answer."""
+        return str(request.url.replace(path=request.url.path.rsplit("/", 1)[0] + "/", query=""))
+
     @api.get("/plan", response_model=schema.PlanOut, summary="This week's dinners")
-    def plan(q: Annotated[str | None, Query(description=f"Diet rules and allergies: {DIETS}")] = None) -> schema.PlanOut:
+    def plan(request: Request, q: Annotated[str | None, Query(description=f"Diet rules and allergies: {DIETS}")] = None) -> schema.PlanOut:
         """A varied week: one dinner per main protein (fish up to twice, never the same fish twice),
-        picked from dinners whose main protein is on sale."""
-        return schema.plan(queries, queries.plan(queries.household(q or "")))
+        picked from dinners whose main protein is on sale. `links` adds or takes away a diet rule."""
+        search = queries.parse(q or "")
+        return schema.plan(queries, queries.plan(queries.household(q or "")), search, base(request))
 
     @api.get("/middager", response_model=schema.DinnersOut, summary="Search the dinners that fit, best first")
     def dinners(
+        request: Request,
         q: Annotated[str | None, Query(description=SEARCH)] = None,
         protein: Annotated[str | None, Query(description=f"One of: {', '.join(KNOWN_PROTEINS)}. Same as the word in `q`.")] = None,
         tilbud: Annotated[
@@ -71,9 +77,9 @@ def build(queries: Queries) -> FastAPI:
     ) -> schema.DinnersOut:
         """Dinners whose name has a searched word first, then fewest swaps, the biggest discount, rating and
         prep time. Without a protein or a word to find, the best 3 of each main protein come first.
-        `search` says how `q` was understood."""
+        `search` says how `q` was understood, and `links` adds or takes away a diet rule."""
         choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall)
-        return schema.dinners(queries, queries.search(choice.text(), limit=choice.antall))
+        return schema.dinners(queries, queries.search(choice.text(), limit=choice.antall), base(request))
 
     @api.get("/oppskrift", response_model=schema.CheckOut, summary="Whether one recipe fits, and what to swap")
     def recipe(

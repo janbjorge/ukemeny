@@ -92,3 +92,14 @@ def test_openapi_names_this_server() -> None:
     schema = client.get("/api/openapi.json").json()
     assert schema["servers"] == [{"url": "http://testserver/api"}]
     assert {"/plan", "/middager", "/oppskrift"} <= set(schema["paths"])
+
+
+def test_answers_link_to_each_rule_so_agents_need_not_write_urls() -> None:
+    week = client.get("/api/plan", params={"q": "melkefri"}).json()["links"]
+    assert week["add"]["glutenfri"] == "http://testserver/api/plan?q=melkefri+glutenfri"
+    assert week["remove"] == {"melkefri": "http://testserver/api/plan"}
+    assert week["dinners"] == "http://testserver/api/middager?q=melkefri"
+    found = client.get("/api/middager", params={"q": "kylling melkefri"}).json()["links"]
+    assert found["add"]["uten løk"] == "http://testserver/api/middager?q=kylling+melkefri+uten+l%C3%B8k"
+    assert found["plan"] == "http://testserver/api/plan?q=melkefri"  # the week follows the rules only
+    assert "melkefri" not in found["add"]

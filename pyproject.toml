@@ -27,7 +27,11 @@ packages = ["src/core", "src/app", "src/adapters", "src/pipeline"]
 
 [dependency-groups]
 # Offline build of datasets/ with Jev (src/pipeline). Not needed to serve the site.
-pipeline = ["httpx2[http2]>=2.13.1", "typesafe-sdk>=0.7.2"]
+pipeline = [
+    "httpx2[http2]>=2.13.1",
+    "tqdm>=4.70.1",
+    "typesafe-sdk>=0.7.2",
+]
 dev = [
     "pytest",
     "pytest-asyncio",
@@ -36,6 +40,7 @@ dev = [
     "ty",
     "types-pyyaml",
     "mypy>=2.4.0",
+    "types-tqdm>=4.70.0.20260906",
 ]
 
 [tool.uv]

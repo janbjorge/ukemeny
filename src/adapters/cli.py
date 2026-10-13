@@ -8,6 +8,7 @@ one JSON document on stdout (src/adapters/schema.py) and nothing else; errors ar
 import asyncio
 import shutil
 import sys
+from contextlib import closing
 from typing import Annotated, NoReturn
 
 import click
@@ -151,13 +152,14 @@ def build(
 
     pipeline.configure(verbose)
     steps = {
-        "recipes": "matprat.no: {due} sider å hente",
-        "ingredients": "Jev: {due} ingredienser å vurdere",
-        "catalogs": "mattilbud.no: leser ukens kundeaviser",
-        "offers": "Jev: {due} ingredienser å matche mot tilbud",
+        "recipes": "sider fra matprat.no",
+        "ingredients": "ingredienser hos Jev",
+        "catalogs": "kundeaviser fra mattilbud.no",
+        "offers": "tilbudsmatcher hos Jev",
     }
     try:
-        result = asyncio.run(pipeline.run(pipeline.reporter(steps, lambda line: typer.echo(line, err=True), verbose)))
+        with closing(pipeline.Bars(steps)) as bars:
+            result = asyncio.run(pipeline.run(bars, bars.fetching))
     except (pipeline.SetupError, profile.ProfileError) as e:
         fail("setup", str(e), False)
     s = result.snapshot

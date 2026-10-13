@@ -7,7 +7,7 @@ one location search stops at 1,000 offers. Nothing is kept between runs.
 import asyncio
 import logging
 import re
-from collections.abc import AsyncGenerator, Mapping
+from collections.abc import AsyncGenerator, Callable, Mapping
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -158,9 +158,18 @@ class TjekOfferSource:
         lng: float,
         radius_km: float,
         stores: tuple[str, ...],
+        fetching: Callable[[str], None] | None = None,
     ) -> AsyncGenerator[Self]:
+        """`fetching` hears the URL of every request as it goes out."""
+
+        async def tell(request: httpx2.Request) -> None:
+            if fetching:
+                fetching(str(request.url))
+
         # One client for the run, so connections are reused; Tjek speaks HTTP/2, so the catalogs share one
-        async with httpx2.AsyncClient(base_url=API, timeout=30, http2=True, headers={"User-Agent": USER_AGENT}) as client:
+        async with httpx2.AsyncClient(
+            base_url=API, timeout=30, http2=True, headers={"User-Agent": USER_AGENT}, event_hooks={"request": [tell]}
+        ) as client:
             yield cls(client, lat, lng, radius_km, stores)
 
     async def current(self) -> list[Offer]:

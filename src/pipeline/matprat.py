@@ -11,7 +11,7 @@ import json
 import logging
 import re
 import xml.etree.ElementTree as ET
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from typing import Self, TypedDict
@@ -112,10 +112,18 @@ class MatpratRecipeSource:
 
     @classmethod
     @asynccontextmanager
-    async def open(cls, workers: int = 16) -> AsyncGenerator[Self]:
+    async def open(cls, workers: int = 16, fetching: Callable[[str], None] | None = None) -> AsyncGenerator[Self]:
+        """`fetching` hears the URL of every request as it goes out."""
+
+        async def tell(request: httpx2.Request) -> None:
+            if fetching:
+                fetching(str(request.url))
+
         # One client for the run: its pool keeps a connection per worker alive, so 100 pages took 16 TLS handshakes
         # (2026-10-13). matprat.no speaks only HTTP/1.1, so HTTP/2 would not share them further.
-        async with httpx2.AsyncClient(timeout=30, follow_redirects=True, headers={"User-Agent": USER_AGENT}) as client:
+        async with httpx2.AsyncClient(
+            timeout=30, follow_redirects=True, headers={"User-Agent": USER_AGENT}, event_hooks={"request": [tell]}
+        ) as client:
             yield cls(client, workers)
 
     async def index(self) -> list[RecipeRef]:

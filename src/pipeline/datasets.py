@@ -2,8 +2,8 @@
 for every ingredient and offer. Nothing is kept between runs. Run on a laptop, then commit datasets/ and push
 (which deploys).
 
-    uv run python -m pipeline.datasets       # a line per step and a count about every tenth
-    uv run python -m pipeline.datasets -v    # also speed, time left, time and Jev cost per step, failures, catalogs
+    uv run python -m pipeline.datasets       # a progress bar per step, and under it the URL being fetched
+    uv run python -m pipeline.datasets -v    # also Jev's cost after each Jev step, failures, retries, catalogs
     uv run python -m pipeline.datasets -vv   # also a line per page, ingredient, offer match and Jev call
     uv run python -m pipeline.datasets -vvv  # also every HTTP request
 
@@ -15,10 +15,12 @@ import asyncio
 import logging
 import os
 import sys
-import time
 from collections.abc import Callable, Mapping
+from contextlib import closing
 from dataclasses import dataclass
+from typing import Never, TextIO
 
+from tqdm import tqdm
 from typesafe_sdk import AsyncTypeSafeClient
 
 from adapters import datasets, profile
@@ -48,62 +50,73 @@ class Result:
 
 
 STEPS = {
-    "recipes": "matprat.no: {due} pages to fetch",
-    "ingredients": "Jev: {due} ingredients to label",
-    "catalogs": "mattilbud.no: reading this week's catalogs",
-    "offers": "Jev: {due} ingredients to match with offers",
+    "recipes": "matprat.no pages",
+    "ingredients": "Jev ingredient labels",
+    "catalogs": "mattilbud.no catalogs",
+    "offers": "Jev offer matches",
 }
-"""What each step of the build says as it starts (app.build.Progress)."""
+"""What each step's bar is called (app.build.Progress)."""
 
 
-def reporter(
-    steps: Mapping[str, str], echo: Callable[[str], None], verbose: int = 0, clock: Callable[[], float] = time.monotonic
-) -> build.Progress:
-    """A line as each step starts, then done/due about every tenth; with `verbose`, also the speed, the time left, and
-    how long the step took."""
-    started: dict[str, float] = {}
+class Bars:
+    """A tqdm bar per step of the build (app.build.Progress), and under it the URL being fetched (jb 2026-10-13: "add
+    tqdm and use that to track progress of the diffrent phases, also use to to how the current url getting fetched")."""
 
-    def report(step: str, done: int, due: int) -> None:
+    def __init__(self, steps: Mapping[str, str], file: TextIO | None = None) -> None:
+        self.steps = steps
+        self.file = file
+        self._bar: tqdm[Never] | None = None
+        self._url: tqdm[Never] | None = None
+
+    def __call__(self, step: str, done: int, due: int) -> None:
         if done == 0:
-            started[step] = clock()
-            echo(steps[step].format(due=f"{due:,}"))
+            self.close()
+            self._bar = tqdm(desc=self.steps[step], total=due, file=self.file, dynamic_ncols=True)
+        elif self._bar is not None:
+            self._bar.update(done - self._bar.n)
+        if done == due:
+            self.close()
+
+    def fetching(self, url: str) -> None:
+        """Shows `url` on the line under the step's bar."""
+        if self._bar is None:
             return
-        if due <= 1 or not (done == due or done % max(1, due // 10) == 0):
-            return
-        line = f"  {done:,}/{due:,}"
-        if verbose:
-            seconds = clock() - started[step]
-            per_second = done / seconds if seconds else 0.0
-            if done == due:
-                line += f" in {_duration(seconds)}"
-            elif per_second:
-                line += f" · {per_second:.1f}/s · {_duration((due - done) / per_second)} left"
-        echo(line)
+        if self._url is None:
+            self._url = tqdm(bar_format="{desc}", file=self.file, dynamic_ncols=True, leave=False)
+        self._url.set_description_str(url)
 
-    return report
+    def close(self) -> None:
+        """The bar stays as the step's line; the URL goes."""
+        if self._url is not None:
+            self._url.close()
+            self._url = None
+        if self._bar is not None:
+            self._bar.close()
+            self._bar = None
 
 
-def _duration(seconds: float) -> str:
-    minutes, seconds = divmod(round(seconds), 60)
-    return f"{minutes} min {seconds:02d} s" if minutes else f"{seconds} s"
+class _AboveTheBars(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        tqdm.write(self.format(record), file=sys.stderr)
 
 
 def configure(verbose: int) -> None:
-    """Where the build's log lines go: -v info, -vv debug for the build, -vvv debug for every library too."""
-    handler = logging.StreamHandler(sys.stderr)
+    """Where the build's log lines go: above the bars, -v info, -vv debug for the build, -vvv debug for every library too."""
+    handler = _AboveTheBars()
     handler.setFormatter(logging.Formatter("%(asctime)s %(message)s", "%H:%M:%S"))
     logging.basicConfig(level=logging.DEBUG if verbose >= 3 else logging.WARNING, handlers=[handler], force=True)
     logging.getLogger("matris").setLevel(logging.WARNING if verbose == 0 else logging.INFO if verbose == 1 else logging.DEBUG)
 
 
-async def run(progress: build.Progress | None = None) -> Result:
+async def run(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None) -> Result:
+    """`fetching` hears every URL matprat.no and mattilbud.no are asked for."""
     key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
         raise SetupError("TYPESAFE_API_KEY is not set. Get a TypeSafe API key at https://console.typesafe.ai")
     shopping = profile.load().shopping
     async with (
-        MatpratRecipeSource.open(CRAWL_WORKERS) as recipes,
-        TjekOfferSource.open(shopping.lat, shopping.lng, shopping.radius_km, shopping.stores) as offers,
+        MatpratRecipeSource.open(CRAWL_WORKERS, fetching) as recipes,
+        TjekOfferSource.open(shopping.lat, shopping.lng, shopping.radius_km, shopping.stores, fetching) as offers,
         AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
     ):
         jev = Jev(client, max_in_flight=JEV_IN_FLIGHT)
@@ -124,7 +137,8 @@ def main() -> None:
     verbose = parser.parse_args().verbose
     configure(verbose)
     try:
-        result = asyncio.run(run(reporter(STEPS, lambda line: print(line, file=sys.stderr, flush=True), verbose)))
+        with closing(Bars(STEPS)) as bars:
+            result = asyncio.run(run(bars, bars.fetching))
     except SetupError as e:
         sys.exit(f"error: {e}")
     s, r = result.snapshot, result.recipes

@@ -120,7 +120,7 @@ def test_headers(client: TestClient) -> None:
     r = client.get("/")
     assert r.headers["X-Content-Type-Options"] == "nosniff"
     assert 'rel="service-desc"' in r.headers["Link"]
-    assert r.headers["Cache-Control"] == "public, max-age=300, stale-while-revalidate=86400"
+    assert r.headers["Cache-Control"] == "public, max-age=300"
     assert "HX-Request" in r.headers["Vary"]
     css = client.get(main.static_url("app.css"))
     assert css.headers["Cache-Control"].endswith("immutable")

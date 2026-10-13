@@ -19,7 +19,7 @@ fit for small kids), ranked by this week's grocery offers in Stavanger from matt
 plain bokmål (`/middager?q=`).
 Not an official source; recipes belong to matprat.no and offers to the stores.
 
-Keys are English; advice and notes are bokmål. Prices are kroner. `protein` is the main protein group,
+Keys are English; advice is bokmål. Prices are kroner. `protein` is the main protein group,
 worked out from the heaviest meat or fish in the recipe. A dinner is `on_sale` when that protein
 (or, without meat or fish, a main vegetable) has a before-price this week.
 """

@@ -3,7 +3,8 @@
 No ingredient lists: the recipes belong to matprat.no, and every dinner links there.
 
 pydantic v2 models, so the OpenAPI schema documents every field. Keys are English, for agents;
-the text inside (advice, notes) is bokmål, like the site.
+the text inside (advice) is bokmål, like the site. No label or kid notes either: they named ingredient after
+ingredient, so they stay in the CLI's text output, on this machine.
 """
 
 from datetime import date, datetime
@@ -24,7 +25,7 @@ class Out(BaseModel):
 class NoteOut(Out):
     ingredient: str
     problem: str
-    """gluten, onion, garlic, lactose, kids or unknown."""
+    """gluten, onion, garlic or lactose."""
     advice: str
 
 
@@ -59,7 +60,6 @@ class DinnerOut(RecipeOut):
     """The main protein (or, without meat or fish, a main vegetable) is discounted this week."""
     fits_as_is: bool
     swaps: list[NoteOut]
-    notes: list[NoteOut]
     discounts: list[DiscountOut]
     matched: list[str] = []
     """Ingredients that hold a searched word the dish name does not."""
@@ -71,7 +71,6 @@ class CheckOut(Out):
     fits: bool
     blocked: str | None
     swaps: list[NoteOut]
-    notes: list[NoteOut]
     lactose_g_per_portion: float
 
 
@@ -159,7 +158,6 @@ def dinner(d: Dinner, rank: int, matched: tuple[str, ...] = ()) -> DinnerOut:
         on_sale=d.on_sale,
         fits_as_is=not d.verdict.swaps,
         swaps=[_note(s) for s in d.verdict.swaps],
-        notes=[_note(w) for w in d.verdict.warnings],
         discounts=discounts,
         matched=list(matched),
     )
@@ -213,6 +211,5 @@ def check(found: Check) -> CheckOut:
         fits=verdict.blocked is None,
         blocked=verdict.blocked,
         swaps=[_note(s) for s in verdict.swaps],
-        notes=[_note(w) for w in verdict.warnings],
         lactose_g_per_portion=round(verdict.lactose_g, 1),
     )

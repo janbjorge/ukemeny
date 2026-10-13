@@ -65,6 +65,13 @@ def test_api_root_points_at_the_schema() -> None:
         assert r.status_code == 302 and r.headers["location"] == "/api/openapi.json"
 
 
+def test_no_notes_name_ingredients() -> None:
+    for path in ("/api/plan", "/api/middager", f"/api/oppskrift?url={KYLLING.url}"):
+        body = client.get(path).json()
+        for d in body.get("dinners", [body]):
+            assert "notes" not in d
+
+
 def test_recipe_and_not_found() -> None:
     body = client.get("/api/oppskrift", params={"url": KYLLING.url}).json()
     assert body["fits"] is True and body["recipe"]["protein"] == "kylling"

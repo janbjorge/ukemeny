@@ -10,7 +10,7 @@ Every simplification and judgement call behind what the site suggests. Add to it
 - Garlic: a note by default; `avoid` makes it a swap to garlic oil.
 - Lactose: grams per portion from the parts' grams per portion, counting only matprat's dairy departments (`/melk/melkeprodukter`, `/ost`, or no department), at 0 / 0.1 / 3.0 / 4.7 g per 100 g for none / trace / some / high. Jev called akevitt, vineddik and riseddik lactose-rich; matprat's departments are set by hand, so they decide. Above the profile's limit (3 g, a conservative choice; many tolerate far more in one meal), every some/high dairy ingredient gets a lactose-free swap.
 - Units to grams are rough (`GRAMS_PER_UNIT`): 1 dl = 100 g, 1 ss = 15 g, 1 stk = 100 g (a medium onion or carrot), 1 beger = 300 g. Grams per portion are rounded to 5 g in dishes.json (src/core/dishes.py), which moves a few small amounts to 0.
-- Kids: with `small_kids`, chili heat and choking risks (whole nuts, sausages, cherry tomatoes, grapes) are notes in the API and the CLI. On the site a card only says «Sterk», for a dinner that is not barnevennlig (§6); the notes were too many to read (jb 2026-10-13). The profile says only that there are small kids, not their ages.
+- Kids: with `small_kids`, chili heat and choking risks (whole nuts, sausages, cherry tomatoes, grapes) are notes in the CLI's text output. On the site a card only says «Sterk», for a dinner that is not barnevennlig (§6); the notes were too many to read, and as they name ingredient after ingredient, they are not in the API either (jb 2026-10-13). The profile says only that there are small kids, not their ages.
 - `swaps: false` leaves out any dinner needing a swap other than lactose-free dairy.
 
 ## 2. Asking Jev

@@ -41,8 +41,8 @@ EXAMPLES = ("rask kylling uten sopp", "laks eller torsk på tilbud", "barnevennl
 SEARCH_BOX = {"q", "sok"}
 # Ideas per page and per "Vis flere": a phone screen holds one or two cards
 PAGE = 12
-# Pages may be cached this long, and served stale while the cache fetches a new copy (the data changes weekly)
-PAGE_CACHE = "public, max-age=300, stale-while-revalidate=86400"
+# Pages may be cached this long. Not stale-while-revalidate: a browser then showed the page from before a deploy
+PAGE_CACHE = "public, max-age=300"
 
 type Q = Annotated[str | None, Query()]
 

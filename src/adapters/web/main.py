@@ -20,7 +20,7 @@ from adapters.datasets import JsonDatasets
 from adapters.web import api, fmt
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
 from app.queries import Found, Queries
-from core.search import LACTOSE_G, Diet, Kind, Tag, diet_clause, marked, protein_clause, protein_word, tag_clause
+from core.search import Diet, Kind, Tag, diet_clause, marked, protein_clause, protein_word, tag_clause
 
 HERE = Path(__file__).parent
 # The one public address (matris.app). Set on Fly once the certificate and DNS are live; every other
@@ -218,7 +218,7 @@ def create_app(queries: Queries) -> FastAPI:
 
     @app.get("/om", response_class=HTMLResponse)
     def about(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse(request, "om.html", {"plan": queries.plan(), "lactose_g": LACTOSE_G})
+        return templates.TemplateResponse(request, "om.html", {"plan": queries.plan()})
 
     @app.get("/llms.txt", response_class=PlainTextResponse)
     def llms_txt(request: Request) -> Response:

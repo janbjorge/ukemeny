@@ -160,7 +160,6 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
 
 /* Phones: one column, rows of chips to swipe, the week as cards to swipe, and a search box that stays on top */
 @media (max-width: 640px) {
-  nav.top .wide { display: none; }
   main { padding-top: 16px; }
   h2 { margin-top: 32px; }
 

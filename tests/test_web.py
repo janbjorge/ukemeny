@@ -107,6 +107,8 @@ def test_unknown_choices_still_show_a_page(client: TestClient) -> None:
 
 def test_about_llms_robots_sitemap_health(client: TestClient) -> None:
     about = client.get("/om").text
+    nav = about[about.index('<nav class="top"') : about.index("</nav>")]
+    assert nav.count("<a ") == 2 and 'href="/om" aria-current="page"' in nav  # one page for the week and the search (jb 2026-10-13)
     assert "Slik virker det" in about
     assert "Les http://testserver/llms.txt først" in about  # a prompt to paste into an agent (jb 2026-10-13)
     llms = client.get("/llms.txt").text

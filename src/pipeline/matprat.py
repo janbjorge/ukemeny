@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import Any, Self
+from typing import Self, TypedDict
 
 import httpx2
 
@@ -45,8 +45,21 @@ def _split(value: object) -> tuple[str, ...]:
     return tuple(part.strip() for part in str(value or "").split(",") if part.strip())
 
 
-def _ingredient(raw: dict[str, Any]) -> Ingredient:
-    words = [raw.get(k) for k in ("preText", "middleText", "name", "postText", "postText2")]
+class RawIngredient(TypedDict, total=False):
+    """An ingredient in a matprat page's __NEXT_DATA__: the parts that are read."""
+
+    preText: str | None
+    middleText: str | None
+    name: str | None
+    postText: str | None
+    postText2: str | None
+    amount: float | None
+    unit: str | None
+    category: str | None
+
+
+def _ingredient(raw: RawIngredient) -> Ingredient:
+    words = [raw.get("preText"), raw.get("middleText"), raw.get("name"), raw.get("postText"), raw.get("postText2")]
     amount = raw.get("amount")
     unit = raw.get("unit") or ""
     line = " ".join(w.strip() for w in words if w and w.strip())
@@ -100,6 +113,8 @@ class MatpratRecipeSource:
     @classmethod
     @asynccontextmanager
     async def open(cls, workers: int = 16) -> AsyncGenerator[Self]:
+        # One client for the run: its pool keeps a connection per worker alive, so 100 pages took 16 TLS handshakes
+        # (2026-10-13). matprat.no speaks only HTTP/1.1, so HTTP/2 would not share them further.
         async with httpx2.AsyncClient(timeout=30, follow_redirects=True, headers={"User-Agent": USER_AGENT}) as client:
             yield cls(client, workers)
 

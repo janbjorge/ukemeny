@@ -26,7 +26,15 @@ packages = ["src/core", "src/app", "src/adapters", "src/pipeline"]
 [dependency-groups]
 # Offline build of datasets/ with Jev (src/pipeline). Not needed to serve the site.
 pipeline = ["httpx2[http2]>=2.13.1", "typesafe-sdk>=0.7.2"]
-dev = ["pytest", "pytest-asyncio", "httpx", "ruff", "ty", "types-pyyaml"]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "httpx",
+    "ruff",
+    "ty",
+    "types-pyyaml",
+    "mypy>=2.4.0",
+]
 
 [tool.uv]
 default-groups = ["pipeline", "dev"]
@@ -36,12 +44,25 @@ line-length = 140
 target-version = "py314"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "ASYNC", "SIM", "RUF"]
+select = ["E", "F", "W", "I", "UP", "B", "ASYNC", "SIM", "RUF", "TID"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+# jb 2026-10-13: "our application is mypy in strict mode and any is banned!" (also [tool.mypy] disallow_any_explicit)
+"typing.Any".msg = "Any is banned: name the type (a TypedDict for JSON, object for anything)"
+"typing_extensions.Any".msg = "Any is banned: name the type (a TypedDict for JSON, object for anything)"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
 asyncio_mode = "auto"
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]
+disallow_any_explicit = true
+mypy_path = "src"
+explicit_package_bases = true
+files = ["src", "tests"]
 
 [tool.ty.environment]
 python = ".venv"

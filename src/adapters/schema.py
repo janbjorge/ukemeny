@@ -8,7 +8,7 @@ ingredient, so they stay in the CLI's text output, on this machine.
 """
 
 from datetime import date, datetime
-from typing import Any
+from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict
 
@@ -124,7 +124,18 @@ def _note(note: Note) -> NoteOut:
     return NoteOut(ingredient=note.ingredient, problem=note.problem.value, advice=note.advice)
 
 
-def _dish(dish: Dish) -> dict[str, Any]:
+class _DishFields(TypedDict):
+    name: str
+    url: str
+    protein: str
+    protein_ingredient: str | None
+    prep_time: str
+    rating: float | None
+    rating_count: int
+    portions: int
+
+
+def _dish(dish: Dish) -> _DishFields:
     protein, main = main_protein(dish)
     return {
         "name": dish.name,

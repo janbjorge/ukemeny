@@ -109,7 +109,8 @@ def varied(ranked: Sequence[Dinner], per_protein: int) -> list[Dinner]:
     if per_protein <= 0:
         return list(ranked)
     seen: Counter[str] = Counter()
-    first, rest = [], []
+    first: list[Dinner] = []
+    rest: list[Dinner] = []
     for dinner in ranked:
         seen[dinner.protein] += 1
         (first if seen[dinner.protein] <= per_protein else rest).append(dinner)

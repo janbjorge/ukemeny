@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from collections.abc import Callable
 
 import httpx2
 import pytest
@@ -17,7 +17,24 @@ SITEMAP = f"""<?xml version="1.0" encoding="utf-8"?>
   <url><loc>https://www.matprat.no/artikler/noe/</loc><lastmod>2026-10-01</lastmod></url>
 </urlset>"""
 
-PAGE_DATA: dict[str, Any] = {
+INGREDIENTS: list[dict[str, object]] = [
+    {
+        "name": "laksefilet",
+        "middleText": "skinn- og beinfri",
+        "amount": 800,
+        "unit": "g",
+        "category": "/fisk og sjømat",
+    },
+    {
+        "name": "rapsolje",
+        "postText": "eller annen smaksnøytral matolje",
+        "amount": 2,
+        "unit": "ss",
+        "category": "/margarin/olje/majones",
+    },
+    {"name": "Salt", "amount": None, "unit": None, "category": "/krydder"},
+]
+PAGE_DATA: dict[str, object] = {
     "isRecipe": True,
     "name": "Stekt laks med kokosris",
     "portions": 4,
@@ -25,27 +42,11 @@ PAGE_DATA: dict[str, Any] = {
     "ratingPrecise": 4.8,
     "ratingCount": 21,
     "gtmDimensions": {"dimension1": "Fisk og sjømat", "dimension8": "Middagsrett"},
-    "ingredients": [
-        {
-            "name": "laksefilet",
-            "middleText": "skinn- og beinfri",
-            "amount": 800,
-            "unit": "g",
-            "category": "/fisk og sjømat",
-        },
-        {
-            "name": "rapsolje",
-            "postText": "eller annen smaksnøytral matolje",
-            "amount": 2,
-            "unit": "ss",
-            "category": "/margarin/olje/majones",
-        },
-        {"name": "Salt", "amount": None, "unit": None, "category": "/krydder"},
-    ],
+    "ingredients": INGREDIENTS,
 }
 
 
-def page(data: dict[str, Any]) -> str:
+def page(data: dict[str, object]) -> str:
     props = {"props": {"pageProps": {"pageData": data}}}
     return f'<html><script id="__NEXT_DATA__" type="application/json">{json.dumps(props)}</script>'
 
@@ -75,7 +76,7 @@ def test_parse_recipe() -> None:
 def test_parse_recipe_reads_ingredient_groups() -> None:
     grouped = PAGE_DATA | {
         "ingredients": [],
-        "ingredientGroups": [{"ingredients": PAGE_DATA["ingredients"][:1]}],
+        "ingredientGroups": [{"ingredients": INGREDIENTS[:1]}],
     }
     recipe = parse_recipe(page(grouped), URL)
     assert recipe is not None and [i.name for i in recipe.ingredients] == ["laksefilet"]
@@ -86,7 +87,7 @@ def test_pages_without_a_recipe() -> None:
     assert parse_recipe(page({"isRecipe": False}), URL) is None
 
 
-def source(handle: Any) -> MatpratRecipeSource:
+def source(handle: Callable[[httpx2.Request], httpx2.Response]) -> MatpratRecipeSource:
     client = httpx2.AsyncClient(transport=httpx2.MockTransport(handle))
     return MatpratRecipeSource(client, workers=2, tries=2)
 

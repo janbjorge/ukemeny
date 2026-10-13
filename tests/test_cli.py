@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from adapters import cli
+from adapters import cli, profile
 from app.queries import Queries
 from core.models import Household, Onion
 from core.ranking import Week
@@ -69,6 +69,6 @@ def test_errors_are_json_in_json_mode() -> None:
 
 def test_missing_profile_is_a_setup_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.undo()
-    monkeypatch.setattr(cli.profile, "PROFILE", tmp_path / "profile.yaml")
+    monkeypatch.setattr(profile, "PROFILE", tmp_path / "profile.yaml")
     r = runner.invoke(cli.app, ["plan", "--json"])
     assert r.exit_code == 1 and json.loads(r.stdout)["error"]["kind"] == "setup"

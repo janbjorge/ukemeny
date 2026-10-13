@@ -124,7 +124,7 @@ class FakeMatcher:
     async def rank(self, ingredient: str, offers: Sequence[Offer]) -> dict[str, float]:
         self.asked.append((ingredient, len(offers)))
         word = self.matches.get(ingredient)
-        return {o.id: float(bool(word) and word in o.heading.lower()) for o in offers}
+        return {o.id: float(bool(word and word in o.heading.lower())) for o in offers}
 
 
 @dataclass

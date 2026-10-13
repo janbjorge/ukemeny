@@ -8,13 +8,44 @@ from collections.abc import Mapping
 from dataclasses import asdict
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any
+from typing import TypedDict
 
 import orjson
 
 from core.models import Dish, Offer, Part, Snapshot, Traits
 
 DATASETS = Path(__file__).parents[2] / "datasets"
+
+
+# The shapes of the files, as written by `write`
+class PartJSON(TypedDict):
+    name: str
+    category: str
+    grams: float | None
+    unit: str
+
+
+class DishJSON(TypedDict):
+    url: str
+    name: str
+    portions: int
+    prep_time: str
+    rating: float | None
+    rating_count: int
+    parts: list[PartJSON]
+
+
+class OfferJSON(TypedDict):
+    id: str
+    store: str
+    heading: str
+    description: str
+    price: float
+    pre_price: float | None
+    per_kg: float | None
+    valid_until: str
+
+
 FILES = ("dishes.json", "traits.json", "offers.json")
 _JSON = orjson.OPT_INDENT_2 | orjson.OPT_APPEND_NEWLINE | orjson.OPT_SORT_KEYS
 
@@ -39,7 +70,7 @@ class JsonDatasets:
 def write(snapshot: Snapshot, root: Path = DATASETS) -> dict[str, int]:
     """Write the snapshot, formatted like `jq .` so diffs show what changed. Returns bytes per file."""
     root.mkdir(parents=True, exist_ok=True)
-    documents: Mapping[str, Any] = {
+    documents: Mapping[str, object] = {
         "dishes.json": [asdict(d) for d in snapshot.dishes],
         "traits.json": {name: t.levels() for name, t in snapshot.traits.items()},
         "offers.json": {
@@ -56,7 +87,7 @@ def write(snapshot: Snapshot, root: Path = DATASETS) -> dict[str, int]:
     return sizes
 
 
-def _dish(d: dict[str, Any]) -> Dish:
+def _dish(d: DishJSON) -> Dish:
     return Dish(
         url=d["url"],
         name=d["name"],
@@ -68,7 +99,7 @@ def _dish(d: dict[str, Any]) -> Dish:
     )
 
 
-def _offer(o: dict[str, Any]) -> Offer:
+def _offer(o: OfferJSON) -> Offer:
     return Offer(
         id=o["id"],
         store=o["store"],

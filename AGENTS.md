@@ -20,7 +20,8 @@
 - JSON goes through orjson. JSON in the repo is formatted like `jq .` (src/adapters/datasets.py `write`).
 - Jev runs offline only, in `src/pipeline/`. The site reads `datasets/` and needs no key; the Docker image does not even contain `src/pipeline/`.
 - Tests never reach the network or Jev (tests/conftest.py). Use the fakes in tests/fakes.py or httpx2.MockTransport.
-- Before commit: `uvx ruff check .`, `uv run ty check src tests`, `uv run pytest tests/<files you touched>`. Then run the app and look at it.
+- mypy in strict mode, and `Any` is banned (jb 2026-10-13: "our application is mypy in strict mode and any is banned!"): name the type, a TypedDict for JSON or `object` for anything. mypy (`disallow_any_explicit`) and ruff (TID251) both refuse it.
+- Before commit: `uvx ruff check .`, `uv run ty check src tests`, `uv run mypy`, `uv run pytest tests/<files you touched>`. Then run the app and look at it.
 
 ## Git and hosting
 

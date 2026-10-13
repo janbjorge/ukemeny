@@ -26,6 +26,7 @@ jobs:
       - run: uv sync --locked
       - run: uvx ruff check .
       - run: uv run ty check src tests
+      - run: uv run mypy
       # The tests never reach the network or Jev (tests/conftest.py); the build of datasets/ stays local
       - run: uv run pytest -q
 

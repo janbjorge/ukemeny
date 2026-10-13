@@ -1,5 +1,4 @@
 from datetime import UTC, date, datetime, timedelta
-from typing import Any
 
 import httpx2
 import pytest
@@ -8,6 +7,9 @@ from adapters.profile import GROCERS as STORES
 from core.errors import SourceUnavailableError
 from pipeline.tjek import (
     API,
+    Quantity,
+    RawCatalog,
+    RawOffer,
     TjekOfferSource,
     before_price,
     parse_offer,
@@ -35,17 +37,17 @@ KG = {
         (10.0, "Ukens Beste norske, løsvekt pr. kg Se oppskrift på joker.no", None, 10.0),
     ],
 )
-def test_per_kg(price: float, description: str, quantity: dict[str, Any] | None, expected: float | None) -> None:
+def test_per_kg(price: float, description: str, quantity: Quantity | None, expected: float | None) -> None:
     result = per_kg(price, description, quantity)
     assert result == pytest.approx(expected) if expected is not None else result is None
 
 
-def _raw(id: str, heading: str, dealer: str = "KIWI", pre_price: float | None = None) -> dict[str, Any]:
+def _raw(id: str, heading: str, dealer: str = "KIWI", pre_price: float | None = None) -> RawOffer:
     return {
         "id": id,
         "heading": heading,
         "description": "700 g,\nPrior, pr. kg 141,43",
-        "pricing": {"price": 99, "pre_price": pre_price, "currency": "NOK"},
+        "pricing": {"price": 99, "pre_price": pre_price},
         "quantity": None,
         "run_till": "2026-10-18T21:59:59+0000",
         "dealer": {"name": dealer},
@@ -61,7 +63,7 @@ def test_parse_offer() -> None:
     assert offer.valid_until == date(2026, 10, 18)
 
 
-def _catalog(id: str, dealer: str, offers: int = 2, days_left: int = 3) -> dict[str, Any]:
+def _catalog(id: str, dealer: str, offers: int = 2, days_left: int = 3) -> RawCatalog:
     now = datetime.now(UTC)
     return {
         "id": id,

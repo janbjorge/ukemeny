@@ -35,9 +35,9 @@ def wcag(fg: str, bg: str) -> float:
 
 def apca(fg: str, bg: str) -> float:
     def y(h: str) -> float:
-        r, g, b = (c**2.4 for c in rgb(h))
+        r, g, b = (float(c**2.4) for c in rgb(h))
         v = 0.2126729 * r + 0.7151522 * g + 0.0721750 * b
-        return v + (0.022 - v) ** 1.414 if v < 0.022 else v
+        return v + float((0.022 - v) ** 1.414) if v < 0.022 else v
 
     t, b = y(fg), y(bg)
     if b > t:

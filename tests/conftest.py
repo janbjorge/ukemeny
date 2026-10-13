@@ -2,7 +2,7 @@
 
 import socket
 from collections.abc import Iterator
-from typing import Any
+from typing import NoReturn
 
 import pytest
 
@@ -11,7 +11,7 @@ class NetworkUsedError(RuntimeError):
     pass
 
 
-def _blocked(*args: Any, **kwargs: Any) -> Any:
+def _blocked(*args: object, **kwargs: object) -> NoReturn:
     raise NetworkUsedError("Tests must not use the network or Jev. Use a fake or httpx2.MockTransport instead.")
 
 
@@ -20,7 +20,7 @@ def _no_jev_and_no_network(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.delenv("TYPESAFE_API_KEY", raising=False)
     real_connect = socket.socket.connect
 
-    def connect(self: socket.socket, address: Any) -> Any:
+    def connect(self: socket.socket, address: socket._Address) -> None:
         if self.family in (socket.AF_INET, socket.AF_INET6):
             _blocked()
         return real_connect(self, address)

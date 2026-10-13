@@ -1,10 +1,10 @@
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any
 
 import pytest
 from typesafe_sdk import (
     ChoiceAnswer,
+    JSONContent,
     NoulAnswer,
     SystemOneResponse,
     TypeSafeAPIConnectionError,
@@ -37,10 +37,10 @@ class FakeClient:
     """Answers every call with the same choices and records what was asked."""
 
     answers: Mapping[str, Mapping[str, float]]
-    calls: list[tuple[Any, Mapping[str, Question]]] = field(default_factory=list)
+    calls: list[tuple[JSONContent, Mapping[str, Question]]] = field(default_factory=list)
     error: Exception | None = None
 
-    async def system_one(self, state: Any, questions: Mapping[str, Question]) -> SystemOneResponse:
+    async def system_one(self, state: JSONContent, questions: Mapping[str, Question]) -> SystemOneResponse:
         self.calls.append((state, questions))
         if self.error:
             raise self.error
@@ -56,9 +56,9 @@ class FakeNoulClient:
     """Answers each yes/no question by name; unnamed questions get 0."""
 
     answers: Mapping[str, float]
-    calls: list[tuple[Any, Mapping[str, Question]]] = field(default_factory=list)
+    calls: list[tuple[JSONContent, Mapping[str, Question]]] = field(default_factory=list)
 
-    async def system_one(self, state: Any, questions: Mapping[str, Question]) -> SystemOneResponse:
+    async def system_one(self, state: JSONContent, questions: Mapping[str, Question]) -> SystemOneResponse:
         self.calls.append((state, questions))
         return SystemOneResponse(
             model="jev-1.13.0",
@@ -182,7 +182,7 @@ async def test_matcher_asks_once_per_heading_and_scores_each_offer() -> None:
     state, questions = client.calls[0]
     assert state == {"ingredient": "kyllingfilet"}
     assert set(questions) == {"0", "1"}
-    assert "KYLLINGPØLSER" in str(questions["1"].instructions)  # type: ignore[union-attr]
+    assert "KYLLINGPØLSER" in str(questions["1"].instructions)
 
 
 async def test_matcher_splits_long_lists() -> None:

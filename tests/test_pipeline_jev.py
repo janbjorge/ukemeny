@@ -12,13 +12,14 @@ from typesafe_sdk import (
 )
 
 from core.errors import ClassifierUnavailableError
-from core.models import Gluten, Kids, Lactose, Onion
+from core.models import LABELS, Carbs, Fodmap, Gluten, Kids, Lactose, Level, Onion, Pregnancy, Traits
 from pipeline.jev import (
     QUESTIONS_PER_CALL,
     Jev,
     JevIngredientClassifier,
     JevOfferMatcher,
     Question,
+    ingredient_labels,
 )
 from tests.fakes import ingredient, offer
 
@@ -72,12 +73,14 @@ PLAIN = {
     "lactose": {"none": 0.9, "trace": 0.1},
     "kids": {"ok": 0.95, "spicy": 0.05},
 }
+FOUR = tuple(PLAIN)
 
 
 async def test_classifier_sends_only_the_ingredient_name() -> None:
     client = FakeClient(PLAIN)
     jev = Jev(client)
-    traits = await JevIngredientClassifier(jev).classify(KYLLING)
+    levels = await JevIngredientClassifier(jev).classify(KYLLING, FOUR)
+    traits = Traits.of(levels)
     assert (traits.gluten, traits.onion, traits.lactose, traits.kids) == (
         Gluten.NO,
         Onion.NONE,
@@ -87,8 +90,28 @@ async def test_classifier_sends_only_the_ingredient_name() -> None:
     assert traits.model == "jev-1.13.0"
     state, questions = client.calls[0]
     assert state == {"ingredient": "kyllingfilet", "category": "/kjøtt/kylling/høns"}
-    assert set(questions) == {"gluten", "onion", "lactose", "kids"}
+    assert set(questions) == set(FOUR)
     assert jev.tokens == 900 and jev.calls == 1
+
+
+async def test_the_registry_holds_every_label_and_asks_them_in_one_request() -> None:
+    classifier = JevIngredientClassifier(Jev(client := FakeClient({key: {"no": 1.0} for key in LABELS})))
+    assert classifier.labels == LABELS
+    levels = await classifier.classify(X, LABELS)
+    assert len(client.calls) == 1 and set(levels) == {*LABELS, "model"}
+    with pytest.raises(ValueError, match="twice"):
+        ingredient_labels().contains("egg", "egg", yes="", maybe="", no="")
+
+
+async def test_only_the_labels_asked_for_are_sent() -> None:
+    client = FakeClient({"egg": {"yes": 0.9, "no": 0.1}, "fodmap": {"low": 0.8, "high": 0.2}})
+    levels = await JevIngredientClassifier(Jev(client)).classify(X, ["egg", "fodmap"])
+    assert set(client.calls[0][1]) == {"egg", "fodmap"}
+    assert levels == {"egg": "yes", "fodmap": "low", "model": "jev-1.13.0"}
+
+
+async def level(key: str, answer: dict[str, float]) -> str:
+    return (await JevIngredientClassifier(Jev(FakeClient({key: answer}))).classify(X, [key]))[key]
 
 
 @pytest.mark.parametrize(
@@ -100,8 +123,7 @@ async def test_classifier_sends_only_the_ingredient_name() -> None:
     ],
 )
 async def test_gluten_labels(answer: dict[str, float], expected: Gluten) -> None:
-    traits = await JevIngredientClassifier(Jev(FakeClient(PLAIN | {"gluten": answer}))).classify(X)
-    assert traits.gluten is expected
+    assert await level("gluten", answer) == expected
 
 
 @pytest.mark.parametrize(
@@ -114,8 +136,7 @@ async def test_gluten_labels(answer: dict[str, float], expected: Gluten) -> None
     ],
 )
 async def test_onion_labels(answer: dict[str, float], expected: Onion) -> None:
-    traits = await JevIngredientClassifier(Jev(FakeClient(PLAIN | {"onion": answer}))).classify(X)
-    assert traits.onion is expected
+    assert await level("onion", answer) == expected
 
 
 @pytest.mark.parametrize(
@@ -129,14 +150,26 @@ async def test_onion_labels(answer: dict[str, float], expected: Onion) -> None:
     ],
 )
 async def test_lactose_labels(answer: dict[str, float], expected: Lactose) -> None:
-    traits = await JevIngredientClassifier(Jev(FakeClient(PLAIN | {"lactose": answer}))).classify(X)
-    assert traits.lactose is expected
+    assert await level("lactose", answer) == expected
 
 
 async def test_kids_label() -> None:
-    answer = {"ok": 0.2, "spicy": 0.75, "choking": 0.05}
-    traits = await JevIngredientClassifier(Jev(FakeClient(PLAIN | {"kids": answer}))).classify(X)
-    assert traits.kids is Kids.SPICY
+    assert await level("kids", {"ok": 0.2, "spicy": 0.75, "choking": 0.05}) == Kids.SPICY
+
+
+@pytest.mark.parametrize(
+    ("key", "answer", "expected"),
+    [
+        ("milk", {"yes": 0.6, "maybe": 0.1, "no": 0.3}, Level.YES),
+        ("celery", {"yes": 0.2, "maybe": 0.35, "no": 0.45}, Level.MAYBE),  # buljong: some brands add it
+        ("egg", {"yes": 0.1, "maybe": 0.2, "no": 0.7}, Level.NO),
+        ("fodmap", {"high": 0.3, "moderate": 0.3, "low": 0.4}, Fodmap.MODERATE),
+        ("carbs", {"none": 0.1, "low": 0.2, "medium": 0.3, "high": 0.4}, Carbs.HIGH),
+        ("pregnancy", {"avoid": 0.6, "limit": 0.1, "ok": 0.3}, Pregnancy.AVOID),
+    ],
+)
+async def test_new_labels(key: str, answer: dict[str, float], expected: str) -> None:
+    assert await level(key, answer) == expected
 
 
 async def test_matcher_asks_once_per_heading_and_scores_each_offer() -> None:
@@ -163,4 +196,4 @@ async def test_matcher_splits_long_lists() -> None:
 async def test_errors_become_classifier_unavailable() -> None:
     client = FakeClient(PLAIN, error=TypeSafeAPIConnectionError("down"))
     with pytest.raises(ClassifierUnavailableError):
-        await JevIngredientClassifier(Jev(client)).classify(X)
+        await JevIngredientClassifier(Jev(client)).classify(X, FOUR)

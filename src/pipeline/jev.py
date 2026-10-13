@@ -10,7 +10,7 @@ is done here, in code.
 
 import asyncio
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Protocol
 
@@ -18,15 +18,7 @@ import httpx2
 from typesafe_sdk import Choice, JSONContent, Noul, Score, SystemOneResponse, TypeSafeError
 
 from core.errors import ClassifierUnavailableError
-from core.models import (
-    Gluten,
-    Ingredient,
-    Kids,
-    Lactose,
-    Offer,
-    Onion,
-    Traits,
-)
+from core.models import Ingredient, Item, Offer
 
 type Question = Noul | Choice | Score
 
@@ -71,52 +63,16 @@ class Jev:
             return response
 
 
-GLUTEN = Choice(
-    instructions="Does the Norwegian grocery ingredient `ingredient`, sold in the `category` "
-    "department, contain gluten as normally sold in Norway?",
-    criteria={
-        "yes": "Made from wheat (hvete), rye (rug), barley (bygg), spelt or malt: mel, pasta, "
-        "spaghetti, nudler av hvete, brød, lefser, tortilla, couscous, bulgur, panko, kavring, "
-        "soyasaus, østerssaus, øl",
-        "maybe": "Processed products where some brands add wheat: buljong, kraft, "
-        "krydderblandinger, pølser, fiskeboller, kjøttkaker, sauser, havre that is not "
-        "labelled gluten-free",
-        "no": "Naturally gluten-free: meat, fish, eggs, dairy, vegetables, fruit, rice, "
-        "risnudler, glassnudler, maize/mais, maisenna, potet, potetmel, quinoa, oils, plain "
-        "spices (malt kanel, malt ingefær: «malt» means ground), tamari, and anything "
-        "labelled glutenfri",
-    },
-)
-ONION = Choice(
-    instructions="Is the Norwegian grocery ingredient `ingredient`, sold in the `category` "
-    "department, an onion-family vegetable, or does it normally contain one?",
-    criteria={
-        "onion": "Onion family: løk, gul løk, rødløk, sjalottløk, vårløk, purre, purreløk, "
-        "perleløk, løkpulver, stekt løk, and products with onion in them",
-        "garlic": "Garlic: hvitløk, hvitløkspulver, and products where garlic is the main flavour",
-        "maybe": "Processed products that often contain onion powder: buljong, kraft, krydderblandinger, ferdigsauser, pølser",
-        "none": "No onion or garlic: gressløk (chives), meat, fish, dairy, grains, other vegetables, fruit, plain spices",
-    },
-)
-LACTOSE = Choice(
-    instructions="How much lactose does the Norwegian grocery ingredient `ingredient`, sold in the `category` department, contain?",
-    criteria={
-        # "vann" was "high" until water, salt and sugar were named here.
-        "none": "No lactose: anything that is not dairy (vann, salt, sukker, egg, oils, coconut "
-        "milk, meat, fish, vegetables, rice, noodles, stock), or dairy labelled laktosefri",
-        "trace": "Almost none: butter (smør), aged hard cheese (parmesan, norvegia, jarlsberg, revet ost, cheddar), feta, mozzarella",
-        "some": "Some lactose: matfløte, kremfløte, rømme, crème fraîche, kremost, kesam, cottage cheese",
-        "high": "A lot of lactose: melk, lettmelk, helmelk, kulturmelk, yoghurt, milk powder, brunost",
-    },
-)
-KIDS = Choice(
-    instructions="Is the Norwegian grocery ingredient `ingredient`, sold in the `category` department, a problem in a dinner for toddlers?",
-    criteria={
-        "spicy": "Hot chili heat: chili, chilipepper, cayenne, jalapeño, sriracha, sambal oelek, harissa, tabasco",
-        "choking": "A choking risk when whole: whole nuts, peanøtter, mandler, cashewnøtter, pinjekjerner",
-        "ok": "Fine for small children: everything else, including mild spices, paprika, pepper, ginger, muskatnøtt and sweet chili sauce",
-    },
-)
+type Reader = Callable[[Mapping[str, float]], str]
+"""Turns Jev's probabilities for one label into its level."""
+
+
+@dataclass(frozen=True, slots=True)
+class Label:
+    """One question about an ingredient, and how its answer becomes a level."""
+
+    choice: Choice
+    read: Reader
 
 
 def _label(probabilities: Mapping[str, float], hard: str, maybe: str) -> str | None:
@@ -132,35 +88,305 @@ def _likeliest(probabilities: Mapping[str, float], labels: Sequence[str]) -> str
     return max(labels, key=lambda label: probabilities.get(label, 0.0))
 
 
-def _traits(response: SystemOneResponse) -> Traits:
-    gluten = response.choices["gluten"].probabilities
-    onion = response.choices["onion"].probabilities
-    lactose = response.choices["lactose"].probabilities
-    kids = response.choices["kids"].probabilities
-    dairy = lactose.get("some", 0.0) + lactose.get("high", 0.0) >= 0.5
-    worst = _likeliest(kids, ("spicy", "choking"))
-    return Traits(
-        gluten=Gluten(_label(gluten, "yes", "maybe") or "no"),
-        onion=Onion(_label(onion, "onion", "maybe") or ("garlic" if onion.get("garlic", 0.0) >= 0.5 else "none")),
-        lactose=Lactose(_likeliest(lactose, ("some", "high") if dairy else ("none", "trace"))),
-        kids=Kids(worst if kids.get(worst, 0.0) >= 0.5 else "ok"),
-        model=response.model,
+def _strict(probabilities: Mapping[str, float]) -> str:
+    return _label(probabilities, "yes", "maybe") or "no"
+
+
+def _onion(p: Mapping[str, float]) -> str:
+    return _label(p, "onion", "maybe") or ("garlic" if p.get("garlic", 0.0) >= 0.5 else "none")
+
+
+def _lactose(p: Mapping[str, float]) -> str:
+    dairy = p.get("some", 0.0) + p.get("high", 0.0) >= 0.5
+    return _likeliest(p, ("some", "high") if dairy else ("none", "trace"))
+
+
+def _kids(p: Mapping[str, float]) -> str:
+    worst = _likeliest(p, ("spicy", "choking"))
+    return worst if p.get(worst, 0.0) >= 0.5 else "ok"
+
+
+class Labels:
+    """The registry of questions asked about an ingredient, by label key (core.models.LABELS). Each answer is
+    stored per (ingredient, label), so a label added later is only asked for the pairs not stored."""
+
+    def __init__(self) -> None:
+        self._labels: dict[str, Label] = {}
+
+    def add(self, key: str, instructions: str, criteria: Mapping[str, str], read: Reader) -> None:
+        if key in self._labels:
+            raise ValueError(f"label {key} added twice")
+        self._labels[key] = Label(Choice(instructions=instructions, criteria=dict(criteria)), read)
+
+    def contains(self, key: str, what: str, *, yes: str, maybe: str, no: str) -> None:
+        """The common shape: does it hold `what`? Yes, maybe (some brands add it), or no."""
+        self.add(
+            key,
+            f"Does the Norwegian grocery ingredient `ingredient`, sold in the `category` department, contain {what} "
+            "as normally sold in Norway?",
+            {"yes": yes, "maybe": maybe, "no": no},
+            _strict,
+        )
+
+    def keys(self) -> tuple[str, ...]:
+        return tuple(self._labels)
+
+    def questions(self, keys: Iterable[str]) -> dict[str, Question]:
+        return {key: self._labels[key].choice for key in keys}
+
+    def read(self, response: SystemOneResponse, keys: Iterable[str]) -> dict[str, str]:
+        return {key: self._labels[key].read(response.choices[key].probabilities) for key in keys}
+
+
+def ingredient_labels() -> Labels:
+    """Every question about an ingredient. Criteria name Norwegian examples (see the module docstring)."""
+    labels = Labels()
+    labels.add(
+        "gluten",
+        "Does the Norwegian grocery ingredient `ingredient`, sold in the `category` department, contain gluten as normally sold in Norway?",
+        {
+            "yes": "Made from wheat (hvete), rye (rug), barley (bygg), spelt or malt: mel, pasta, "
+            "spaghetti, nudler av hvete, brød, lefser, tortilla, couscous, bulgur, panko, kavring, "
+            "soyasaus, østerssaus, øl",
+            "maybe": "Processed products where some brands add wheat: buljong, kraft, "
+            "krydderblandinger, pølser, fiskeboller, kjøttkaker, sauser, havre that is not "
+            "labelled gluten-free",
+            "no": "Naturally gluten-free: meat, fish, eggs, dairy, vegetables, fruit, rice, "
+            "risnudler, glassnudler, maize/mais, maisenna, potet, potetmel, quinoa, oils, plain "
+            "spices (malt kanel, malt ingefær: «malt» means ground), tamari, and anything "
+            "labelled glutenfri",
+        },
+        _strict,
     )
+    labels.add(
+        "onion",
+        "Is the Norwegian grocery ingredient `ingredient`, sold in the `category` department, an onion-family vegetable, "
+        "or does it normally contain one?",
+        {
+            "onion": "Onion family: løk, gul løk, rødløk, sjalottløk, vårløk, purre, purreløk, "
+            "perleløk, løkpulver, stekt løk, and products with onion in them",
+            "garlic": "Garlic: hvitløk, hvitløkspulver, and products where garlic is the main flavour",
+            "maybe": "Processed products that often contain onion powder: buljong, kraft, krydderblandinger, ferdigsauser, pølser",
+            "none": "No onion or garlic: gressløk (chives), meat, fish, dairy, grains, other vegetables, fruit, plain spices",
+        },
+        _onion,
+    )
+    labels.add(
+        "lactose",
+        "How much lactose does the Norwegian grocery ingredient `ingredient`, sold in the `category` department, contain?",
+        {
+            # "vann" was "high" until water, salt and sugar were named here.
+            "none": "No lactose: anything that is not dairy (vann, salt, sukker, egg, oils, coconut "
+            "milk, meat, fish, vegetables, rice, noodles, stock), or dairy labelled laktosefri",
+            "trace": "Almost none: butter (smør), aged hard cheese (parmesan, norvegia, jarlsberg, revet ost, cheddar), feta, mozzarella",
+            "some": "Some lactose: matfløte, kremfløte, rømme, crème fraîche, kremost, kesam, cottage cheese",
+            "high": "A lot of lactose: melk, lettmelk, helmelk, kulturmelk, yoghurt, milk powder, brunost",
+        },
+        _lactose,
+    )
+    labels.add(
+        "kids",
+        "Is the Norwegian grocery ingredient `ingredient`, sold in the `category` department, a problem in a dinner for toddlers?",
+        {
+            "spicy": "Hot chili heat: chili, chilipepper, cayenne, jalapeño, sriracha, sambal oelek, harissa, tabasco",
+            "choking": "A choking risk when whole: whole nuts, peanøtter, mandler, cashewnøtter, pinjekjerner",
+            "ok": "Fine for small children: everything else, including mild spices, paprika, pepper, ginger, muskatnøtt and "
+            "sweet chili sauce",
+        },
+        _kids,
+    )
+    # The EU allergens besides gluten (Mattilsynet's list), jb 2026-10-13: "We need a shiton of kosthold filters"
+    labels.contains(
+        Item.MILK,
+        "milk or anything made from milk",
+        yes="melk, laktosefri melk, fløte, matfløte, rømme, crème fraîche, yoghurt, smør, ost, parmesan, kremost, brunost, "
+        "myseost, melkepulver, pesto",
+        maybe="Processed products where some brands add milk: ferdigsauser, kjøttkaker, fiskekaker, pølser, margarin",
+        # Probe 2026-10-13: vineddik and eggnudler were "yes" until named here
+        no="kokosmelk, havremelk, soyamelk, mandelmelk, plantebasert smør, peanøttsmør, kakaosmør, egg, eggnudler, vineddik "
+        "and other eddik",
+    )
+    labels.contains(
+        Item.EGG,
+        "egg",
+        yes="egg, eggeplomme, eggehvite, majones, aioli, remulade, hollandaise, eggnudler, fersk pasta",
+        maybe="Processed products where some brands add egg: fiskekaker, kjøttkaker, panerte produkter, dressinger",
+        # Probe 2026-10-13: dijonsennep was "yes" until named here
+        no="tørket pasta of durum, risnudler, sennep, dijonsennep, everything without egg",
+    )
+    labels.contains(
+        Item.FISH,
+        "fish",
+        yes="all fish (laks, torsk, sei, makrell, tunfisk, sild), ansjos, kaviar, fiskesaus, worcestershiresaus, fiskeboller, "
+        "fiskekraft, bonito, dashi",
+        maybe="Products that sometimes hold fish: caesardressing, asiatiske krydderpastaer",
+        no="skalldyr and bløtdyr (asked separately), tang, nori, everything else",
+    )
+    labels.contains(
+        Item.CRUSTACEAN,
+        "crustaceans (skalldyr)",
+        yes="reker, krabbe, hummer, kreps, sjøkreps, scampi, rekepasta",
+        maybe="sjømatblanding, thailandsk karripasta (often holds shrimp paste), fiskesuppebase",
+        no="blåskjell, kamskjell, blekksprut (asked separately), fish, everything else",
+    )
+    labels.contains(
+        Item.MOLLUSC,
+        "molluscs (bløtdyr)",
+        yes="blåskjell, kamskjell, østers, hjerteskjell, blekksprut, akkar, snegler, østerssaus",
+        maybe="sjømatblanding",
+        no="reker, krabbe (asked separately), fish, everything else",
+    )
+    labels.contains(
+        Item.TREE_NUT,
+        "tree nuts",
+        yes="mandler, hasselnøtter, valnøtter, cashewnøtter, pistasjnøtter, pekannøtter, paranøtter, macadamianøtter, marsipan, nøtteolje",
+        maybe="pinjekjerner, pesto, müsli, nøtteblandinger",
+        no="kokos, muskatnøtt, peanøtter (asked separately), everything else",
+    )
+    labels.contains(
+        Item.PEANUT,
+        "peanuts",
+        yes="peanøtter, peanøttsmør, peanøttolje, sataysaus",
+        maybe="asiatiske sauser and krydderpastaer, nøtteblandinger",
+        no="other nuts, everything else",
+    )
+    labels.contains(
+        Item.SOY,
+        "soy",
+        yes="soyasaus, tamari, tofu, edamame, soyabønner, miso, soyamelk, teriyakisaus, hoisinsaus",
+        maybe="østerssaus, ferdigsauser, pølser, vegetarprodukter",
+        no="fiskesaus, everything else",
+    )
+    labels.contains(
+        Item.SESAME,
+        "sesame",
+        yes="sesamfrø, sesamolje, tahini, hummus",
+        maybe="dukkah, za'atar, asiatiske sauser, hamburgerbrød",
+        no="everything else",
+    )
+    labels.contains(
+        Item.CELERY,
+        "celery",
+        yes="stangselleri, sellerirot, sellerisalt, selleripulver, suppegrønnsaker",
+        maybe="buljong, kraft, ferdigsupper, krydderblandinger",
+        no="other vegetables, everything else",
+    )
+    labels.contains(
+        Item.MUSTARD,
+        "mustard",
+        yes="sennep, dijonsennep, grov sennep, sennepsfrø, sennepspulver",
+        maybe="majones, remulade, dressinger, karri (karripulver often holds sennepsfrø), krydderblandinger, pølser",
+        no="everything else",
+    )
+    labels.contains(
+        Item.SULPHITE,
+        "sulphites (svoveldioksid)",
+        yes="vin, hvitvin, rødvin, portvin, sherry, tørket aprikos, rosiner, vineddik, balsamico",
+        maybe="syltede grønnsaker, sylteagurk, sitronsaft på flaske, ferdige potetprodukter",
+        no="fresh food, everything else",
+    )
+    labels.contains(
+        Item.LUPIN,
+        "lupin",
+        yes="lupinmel, lupinbønner",
+        maybe="glutenfrie melblandinger",
+        no="everything else",
+    )
+    labels.contains(
+        Item.LEGUME,
+        "legumes (belgfrukter)",
+        yes="erter, sukkererter, kidneybønner, hvite bønner, svarte bønner, brekkbønner, linser, kikerter, hummus, edamame, "
+        "soyabønner, peanøtter",
+        maybe="vegetarprodukter, ferdigsupper",
+        no="everything else",
+    )
+    # For vegetar, vegansk, pescetarianer, uten svin and uten alkohol
+    labels.contains(
+        Item.MEAT,
+        "meat or poultry, or anything made from them",
+        yes="all meat and poultry, bacon, pølser, skinke, kjøttkraft, kyllingbuljong, oksebuljong, kalvefond, smult, gelatin",
+        maybe="buljong or kraft of unnamed kind, ferdigsauser",
+        no="fish and shellfish (asked separately), dairy, cheese, egg, everything else",
+    )
+    labels.contains(
+        Item.ANIMAL,
+        "anything of animal origin",
+        yes="meat, poultry, fish, shellfish, milk, cheese, smør, fløte, egg, majones, honning, gelatin, smult, fiskesaus",
+        maybe="ferdigsauser, buljong, pesto, brød, eggnudler",
+        no="vegetables, fruit, grains, tørket pasta, oils, plantebasert smør, kokosmelk, tofu, spices",
+    )
+    labels.contains(
+        Item.PORK,
+        "pork",
+        yes="svinekjøtt, bacon, skinke, pancetta, chorizo, salami, medisterdeig, svor, smult",
+        maybe="pølser, gelatin, kjøttboller, leverpostei",
+        no="kjøttdeig and karbonadedeig of beef, everything else",
+    )
+    labels.contains(
+        Item.ALCOHOL,
+        "alcohol",
+        yes="vin, øl, sherry, portvin, cognac, akevitt, rom, vodka, likør, mirin, sake",
+        maybe="vaniljeekstrakt",
+        no="vineddik, balsamico, alkoholfri, everything else",
+    )
+    labels.add(
+        "fodmap",
+        "How much FODMAP does the Norwegian grocery ingredient `ingredient`, sold in the `category` department, hold in a "
+        "normal serving, as rated by Monash University?",
+        {
+            "high": "løk, hvitløk, the white part of purre, hvete, rug, bønner, linser, kikerter, epler, pærer, mango, vannmelon, "
+            "honning, sopp, blomkål, asparges, melk, yoghurt, cashewnøtter, pistasj",
+            "moderate": "fine in small amounts: avokado, søtpotet, brokkoli, mais, kokosmelk, mandler",
+            "low": "meat, fish, egg, ris, potet, gulrot, squash, tomat, agurk, paprika, spinat, havre, laktosefri melk, "
+            "hard cheese, the green part of vårløk and purre, gressløk, oils, plain spices",
+        },
+        lambda p: _label(p, "high", "moderate") or "low",
+    )
+    labels.add(
+        "carbs",
+        "How many grams of carbohydrate per 100 g does the Norwegian grocery ingredient `ingredient`, sold in the `category` "
+        "department, have as sold?",
+        {
+            "none": "under 2 g: meat, fish, egg, oils, smør, cheese, salad leaves, spices",
+            "low": "2-10 g: most vegetables (brokkoli, paprika, tomat, løk, gulrot), melk, fløte, nuts",
+            "medium": "10-40 g: poteter, søtpotet, mais, kokte bønner, linser, frukt",
+            "high": "over 40 g: mel, ris, pasta, nudler, brød, sukker, honning, sirup, havregryn, couscous",
+        },
+        lambda p: _likeliest(p, ("none", "low", "medium", "high")),
+    )
+    labels.add(
+        "pregnancy",
+        "Does Mattilsynet advise pregnant women against the Norwegian grocery ingredient `ingredient`, sold in the `category` department?",
+        {
+            "avoid": "røkelaks, gravlaks, rakfisk, raw fish for sushi, lever, leverpostei, spekeskinke, salami, fenalår, "
+            "hvalkjøtt, unpasteurised cheese",
+            "limit": "tunfisk, stor kveite, gjedde, abbor",
+            "ok": "everything else, including fresh fish, meat, pasteurised dairy and egg",
+        },
+        lambda p: _label(p, "avoid", "limit") or "ok",
+    )
+    return labels
 
 
 @dataclass
 class JevIngredientClassifier:
-    """Implements core.ports.IngredientClassifier: four Choices in one request per ingredient."""
+    """Implements core.ports.IngredientClassifier: the labels asked for, one Choice each, in one request."""
 
     jev: Jev
+    registry: Labels = field(default_factory=ingredient_labels)
 
-    async def classify(self, ingredient: Ingredient) -> Traits:
+    @property
+    def labels(self) -> tuple[str, ...]:
+        return self.registry.keys()
+
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str]:
+        keys = tuple(labels)
         response = await self.jev.ask(
             "ingredient",
             {"ingredient": ingredient.name, "category": ingredient.category},
-            {"gluten": GLUTEN, "onion": ONION, "lactose": LACTOSE, "kids": KIDS},
+            self.registry.questions(keys),
         )
-        return _traits(response)
+        return {**self.registry.read(response, keys), "model": response.model}
 
 
 QUESTIONS_PER_CALL = 100

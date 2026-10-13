@@ -13,8 +13,8 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from enum import StrEnum
 
-from core.matching import PROTEINS, VEGETARIAN
-from core.models import Dinner, Household, Kids, Part, Rule, Traits
+from core.matching import PROTEINS
+from core.models import Dinner, Household, Item, Kids, Part, Rule, Traits
 
 
 class Tag(StrEnum):
@@ -31,9 +31,59 @@ class Tag(StrEnum):
 class Diet(StrEnum):
     """A rule the visitor picks. The value is how a search writes it."""
 
-    ONION = "uten løk"
+    VEGETARIAN = "vegetar"
+    VEGAN = "vegansk"
+    PESCETARIAN = "pescetarianer"
     GLUTEN = "glutenfri"
+    MILK = "melkefri"
     LACTOSE = "lite laktose"
+    ONION = "uten løk"
+    GARLIC = "uten hvitløk"
+    FODMAP = "lav fodmap"
+    LOW_CARB = "lavkarbo"
+    PORK = "uten svin"
+    ALCOHOL = "uten alkohol"
+    PREGNANT = "gravid"
+    # The EU allergens besides gluten and milk
+    EGG = "uten egg"
+    FISH = "uten fisk"
+    CRUSTACEAN = "uten skalldyr"
+    MOLLUSC = "uten bløtdyr"
+    TREE_NUT = "uten nøtter"
+    PEANUT = "uten peanøtter"
+    SOY = "uten soya"
+    SESAME = "uten sesam"
+    CELERY = "uten selleri"
+    MUSTARD = "uten sennep"
+    SULPHITE = "uten sulfitt"
+    LUPIN = "uten lupin"
+    LEGUME = "uten belgfrukter"
+
+
+DIET_LABELS: Mapping[Diet, str] = {Diet.FODMAP: "Lav FODMAP"}
+"""Labels that are not the search text with a capital letter."""
+AVOID: Mapping[Diet, frozenset[Item]] = {
+    Diet.VEGETARIAN: frozenset({Item.MEAT, Item.FISH, Item.CRUSTACEAN, Item.MOLLUSC}),
+    Diet.VEGAN: frozenset({Item.ANIMAL, Item.MEAT, Item.FISH, Item.CRUSTACEAN, Item.MOLLUSC, Item.MILK, Item.EGG}),
+    Diet.PESCETARIAN: frozenset({Item.MEAT}),
+    Diet.MILK: frozenset({Item.MILK}),
+    Diet.PORK: frozenset({Item.PORK}),
+    Diet.ALCOHOL: frozenset({Item.ALCOHOL}),
+    Diet.EGG: frozenset({Item.EGG}),
+    Diet.FISH: frozenset({Item.FISH}),
+    Diet.CRUSTACEAN: frozenset({Item.CRUSTACEAN}),
+    Diet.MOLLUSC: frozenset({Item.MOLLUSC}),
+    Diet.TREE_NUT: frozenset({Item.TREE_NUT}),
+    Diet.PEANUT: frozenset({Item.PEANUT}),
+    Diet.SOY: frozenset({Item.SOY}),
+    Diet.SESAME: frozenset({Item.SESAME}),
+    Diet.CELERY: frozenset({Item.CELERY}),
+    Diet.MUSTARD: frozenset({Item.MUSTARD}),
+    Diet.SULPHITE: frozenset({Item.SULPHITE}),
+    Diet.LUPIN: frozenset({Item.LUPIN}),
+    Diet.LEGUME: frozenset({Item.LEGUME}),
+}
+"""What a rule leaves out. Vegan also names what «animal» covers, so one wrong answer does not let it through."""
 
 
 ANYTHING = Household(onion=Rule.OK, gluten=Rule.OK, garlic=Rule.OK, lactose_g_per_portion=None, kid_notes=False)
@@ -50,6 +100,8 @@ LIKED_COUNT = 20
 """Godt likt: at least this rating from at least this many ratings."""
 LACTOSE_G = 3.0
 """«Lite laktose»: grams per portion, when the household sets no limit of its own."""
+CARBS_G = 20.0
+"""«Lavkarbo»: grams of carbohydrate per portion, a guess to tune once the labels are in."""
 NOT_MILD = ("chili", "spicy", "sterk")
 """In a dish name, these make it not barnevennlig whatever the ingredients say."""
 
@@ -122,30 +174,39 @@ def tag_clause(tag: Tag) -> Clause:
 
 
 def diet_clause(diet: Diet) -> Clause:
-    return Clause(Kind.DIET, (diet.value,), diet.value, diet.value.capitalize())
+    return Clause(Kind.DIET, (diet.value,), diet.value, DIET_LABELS.get(diet, diet.value.capitalize()))
 
 
 def household(diets: Iterable[Diet], base: Household = ANYTHING) -> Household:
     """The base household with the chosen rules on top. The site's base is ANYTHING; the CLI's is profile.yaml."""
     diets = set(diets)
     h = base
-    if Diet.ONION in diets:
+    if diets & {Diet.ONION, Diet.FODMAP}:
         h = replace(h, onion=Rule.AVOID, onion_substitute=h.onion_substitute or ONION_SUBSTITUTE)
-    if Diet.GLUTEN in diets:
+    if diets & {Diet.GLUTEN, Diet.FODMAP}:
         h = replace(h, gluten=Rule.AVOID)
-    if Diet.LACTOSE in diets and h.lactose_g_per_portion is None:
+    if diets & {Diet.GARLIC, Diet.FODMAP}:
+        h = replace(h, garlic=Rule.AVOID)
+    if diets & {Diet.LACTOSE, Diet.FODMAP} and h.lactose_g_per_portion is None:
         h = replace(h, lactose_g_per_portion=LACTOSE_G)
-    return h
+    if Diet.FODMAP in diets:
+        h = replace(h, fodmap=True)
+    if Diet.LOW_CARB in diets:
+        h = replace(h, carbs_g_per_portion=CARBS_G)
+    if Diet.PREGNANT in diets:
+        h = replace(h, pregnant=True)
+    avoid = frozenset().union(*(AVOID[d] for d in diets if d in AVOID))
+    return replace(h, avoid=h.avoid | avoid) if avoid else h
 
 
 MEAT = (*dict.fromkeys(g for g in PROTEINS.values() if g not in ("fisk", "skalldyr")), "kjøtt")
 PROTEIN_WORDS: Mapping[str, tuple[str, ...]] = {
-    **{group: (group,) for group in (*dict.fromkeys(PROTEINS.values()), VEGETARIAN)},
+    **{group: (group,) for group in dict.fromkeys(PROTEINS.values())},
     "annet kjøtt": ("kjøtt",),
     "kjøtt": MEAT,
     "sjømat": ("fisk", "skalldyr"),
 }
-"""What a search can say about the main protein: a group from core.matching, or several."""
+"""What a search can say about the main protein: a group from core.matching, or several. «vegetar» is a rule (Diet)."""
 PROTEIN_ALIASES: Mapping[str, str] = {
     "høns": "kylling",
     "høne": "kylling",
@@ -166,12 +227,6 @@ PROTEIN_ALIASES: Mapping[str, str] = {
     "rein": "vilt",
     "reinsdyr": "vilt",
     "rådyr": "vilt",
-    "vegetarisk": "vegetar",
-    "vegetariske": "vegetar",
-    "vegetarmiddag": "vegetar",
-    "veggis": "vegetar",
-    "kjøttfri": "vegetar",
-    "kjøttfritt": "vegetar",
 }
 
 
@@ -211,6 +266,25 @@ TAG_WORDS: Mapping[str, Tag | Diet] = {
     **dict.fromkeys(("glutenfri", "glutenfritt", "glutenfrie"), Diet.GLUTEN),
     **dict.fromkeys(("løkfri", "løkfritt", "løkfrie"), Diet.ONION),
     **dict.fromkeys(("laktosefri", "laktosefritt", "laktosefrie"), Diet.LACTOSE),
+    **dict.fromkeys(
+        ("vegetar", "vegetarisk", "vegetariske", "vegetarianer", "vegetarmiddag", "veggis", "kjøttfri", "kjøttfritt", "kjøttfrie"),
+        Diet.VEGETARIAN,
+    ),
+    **dict.fromkeys(("vegansk", "veganske", "veganer", "vegan", "plantebasert", "plantebaserte"), Diet.VEGAN),
+    **dict.fromkeys(("pescetarianer", "pescetariansk", "pescetarisk", "pescetar"), Diet.PESCETARIAN),
+    **dict.fromkeys(("melkefri", "melkefritt", "melkefrie"), Diet.MILK),
+    **dict.fromkeys(("fodmap", "lavfodmap"), Diet.FODMAP),
+    **dict.fromkeys(("lavkarbo", "lowcarb", "keto", "lchf"), Diet.LOW_CARB),
+    **dict.fromkeys(("gravid", "gravide"), Diet.PREGNANT),
+    **dict.fromkeys(("alkoholfri", "alkoholfritt", "alkoholfrie"), Diet.ALCOHOL),
+    **dict.fromkeys(("eggfri", "eggfritt", "eggfrie"), Diet.EGG),
+    **dict.fromkeys(("fiskefri", "fiskefritt", "fiskefrie"), Diet.FISH),
+    **dict.fromkeys(("nøttefri", "nøttefritt", "nøttefrie"), Diet.TREE_NUT),
+    **dict.fromkeys(("peanøttfri", "peanøttfritt", "peanøttfrie"), Diet.PEANUT),
+    **dict.fromkeys(("soyafri", "soyafritt", "soyafrie"), Diet.SOY),
+    **dict.fromkeys(("sesamfri", "sesamfritt", "sesamfrie"), Diet.SESAME),
+    **dict.fromkeys(("sellerifri", "sellerifritt", "sellerifrie"), Diet.CELERY),
+    **dict.fromkeys(("sennepsfri", "sennepsfritt", "sennepsfrie"), Diet.MUSTARD),
 }
 PHRASES: Mapping[str, Tag | Diet | str] = {
     "på tilbud": Tag.ON_SALE,
@@ -218,6 +292,11 @@ PHRASES: Mapping[str, Tag | Diet | str] = {
     "mest likt": Tag.LIKED,
     "lite laktose": Diet.LACTOSE,
     "lav laktose": Diet.LACTOSE,
+    "lav fodmap": Diet.FODMAP,
+    "lite fodmap": Diet.FODMAP,
+    "lav karbo": Diet.LOW_CARB,
+    "lite karbo": Diet.LOW_CARB,
+    "lite karbohydrater": Diet.LOW_CARB,
     "annet kjøtt": "annet kjøtt",
 }
 """Several words that mean one thing: a rule, a category, or a key of PROTEIN_WORDS."""
@@ -225,6 +304,31 @@ NEGATED: Mapping[str, Tag | Diet] = {
     "løk": Diet.ONION,
     "gluten": Diet.GLUTEN,
     "laktose": Diet.LACTOSE,
+    "hvitløk": Diet.GARLIC,
+    "melk": Diet.MILK,
+    "melkeprodukter": Diet.MILK,
+    "kjøtt": Diet.PESCETARIAN,
+    "svin": Diet.PORK,
+    "svinekjøtt": Diet.PORK,
+    "gris": Diet.PORK,
+    "alkohol": Diet.ALCOHOL,
+    "egg": Diet.EGG,
+    "fisk": Diet.FISH,
+    "skalldyr": Diet.CRUSTACEAN,
+    "bløtdyr": Diet.MOLLUSC,
+    "skjell": Diet.MOLLUSC,
+    "nøtter": Diet.TREE_NUT,
+    "nøtt": Diet.TREE_NUT,
+    "peanøtter": Diet.PEANUT,
+    "peanøtt": Diet.PEANUT,
+    "soya": Diet.SOY,
+    "sesam": Diet.SESAME,
+    "selleri": Diet.CELERY,
+    "sennep": Diet.MUSTARD,
+    "sulfitt": Diet.SULPHITE,
+    "sulfitter": Diet.SULPHITE,
+    "lupin": Diet.LUPIN,
+    "belgfrukter": Diet.LEGUME,
     "chili": Tag.MILD,
     "sterk": Tag.MILD,
     "sterkt": Tag.MILD,

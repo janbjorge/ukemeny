@@ -12,10 +12,15 @@ from fastapi.responses import RedirectResponse
 from adapters import schema
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery
 from app.queries import Queries
+from core.search import Diet
 
-DESCRIPTION = """\
+DIETS = ", ".join(f"`{d}`" for d in Diet)
+"""Every diet rule and allergy a search can name."""
+
+DESCRIPTION = f"""\
 Dinner ideas from matprat.no, ranked by this week's grocery offers in Stavanger from mattilbud.no, searchable
-in plain bokmål (`q`). No diet rule applies unless `q` names one: `uten løk`, `glutenfri`, `lite laktose`.
+in plain bokmål (`q`). No diet rule applies unless `q` names one: {DIETS}. A rule that leaves something out
+(vegetar, melkefri, uten egg, ...) also leaves out dinners with an ingredient that may hold it, such as a stock cube.
 Not an official source; recipes belong to matprat.no and offers to the stores.
 
 Keys are English; advice is bokmål. Prices are kroner. `protein` is the main protein group,
@@ -24,8 +29,8 @@ worked out from the heaviest meat or fish in the recipe. A dinner is `on_sale` w
 """
 
 
-SEARCH = """A search in plain bokmål, such as `rask kylling uten sopp`, `laks eller torsk på tilbud` or `glutenfri pasta`.
-Understood: diet rules (`uten løk`, `glutenfri`, `lite laktose`: which dinners fit and what to swap), categories
+SEARCH = f"""A search in plain bokmål, such as `rask kylling uten sopp`, `laks eller torsk på tilbud` or `glutenfri pasta`.
+Understood: diet rules and allergies ({DIETS}: which dinners fit and what to swap), categories
 (`under 20 min`, `under 40 min`, `under en time`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins (`kylling`,
 `fisk`, `kjøtt`, `sjømat`, `vegetar`, ...), `uten`/`ikke` before a word to leave it out, `eller` between words for either.
 Any other word must be in the dish name or an ingredient; a word that matches nothing is swapped for the closest known
@@ -48,7 +53,7 @@ def build(queries: Queries) -> FastAPI:
         return {**api.openapi(), "servers": [{"url": str(base)}]}
 
     @api.get("/plan", response_model=schema.PlanOut, summary="This week's dinners")
-    def plan(q: Annotated[str | None, Query(description="Diet rules: `uten løk`, `glutenfri`, `lite laktose`")] = None) -> schema.PlanOut:
+    def plan(q: Annotated[str | None, Query(description=f"Diet rules and allergies: {DIETS}")] = None) -> schema.PlanOut:
         """A varied week: one dinner per main protein (fish up to twice, never the same fish twice),
         picked from dinners whose main protein is on sale."""
         return schema.plan(queries, queries.plan(queries.household(q or "")))
@@ -71,7 +76,7 @@ def build(queries: Queries) -> FastAPI:
     @api.get("/oppskrift", response_model=schema.CheckOut, summary="Whether one recipe fits, and what to swap")
     def recipe(
         url: Annotated[str, Query(description="A matprat.no recipe URL from `dinners[].url`")],
-        q: Annotated[str | None, Query(description="Diet rules to check against: `uten løk`, `glutenfri`, `lite laktose`")] = None,
+        q: Annotated[str | None, Query(description=f"Diet rules and allergies to check against: {DIETS}")] = None,
     ) -> schema.CheckOut:
         found = queries.check(url, queries.household(q or ""))
         if found is None:

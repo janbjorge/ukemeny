@@ -20,6 +20,7 @@ from adapters.datasets import JsonDatasets
 from adapters.web import api, fmt
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
 from app.queries import Found, Queries
+from core.matching import VEGETARIAN
 from core.search import Diet, Kind, Tag, diet_clause, marked, protein_clause, protein_word, tag_clause
 
 HERE = Path(__file__).parent
@@ -31,8 +32,37 @@ LINK = '</llms.txt>; rel="alternate"; type="text/markdown", </api/openapi.json>;
 # The pages a crawler should index; the query-string variants and fragments stay out (see robots_txt)
 PAGES = ("", "om")
 
-# The chips above the ideas: the diet rules a visitor picks (none to start with), then what a dinner is like
-DIET_CHIPS = (Diet.ONION, Diet.GLUTEN, Diet.LACTOSE)
+# The chips above the ideas: the diet rules and allergies a visitor picks (none to start with), then what a dinner is like
+DIET_CHIPS = (
+    Diet.VEGETARIAN,
+    Diet.VEGAN,
+    Diet.PESCETARIAN,
+    Diet.GLUTEN,
+    Diet.MILK,
+    Diet.LACTOSE,
+    Diet.ONION,
+    Diet.GARLIC,
+    Diet.FODMAP,
+    Diet.LOW_CARB,
+    Diet.PORK,
+    Diet.ALCOHOL,
+    Diet.PREGNANT,
+)
+ALLERGY_CHIPS = (
+    Diet.EGG,
+    Diet.FISH,
+    Diet.CRUSTACEAN,
+    Diet.MOLLUSC,
+    Diet.TREE_NUT,
+    Diet.PEANUT,
+    Diet.SOY,
+    Diet.SESAME,
+    Diet.CELERY,
+    Diet.MUSTARD,
+    Diet.SULPHITE,
+    Diet.LUPIN,
+    Diet.LEGUME,
+)
 KIND_CHIPS = (Tag.QUICK, Tag.UNDER_40, Tag.ON_SALE, Tag.LIKED, Tag.MILD)
 # The elements that send a search as it is typed; their own answer must not replace the search box
 SEARCH_BOX = {"q", "sok"}
@@ -71,6 +101,8 @@ def chips(found: Found) -> dict[str, list[Chip]]:
     every = sum(found.counts.proteins.values())
     proteins = [Chip("Alle", s.drop(chosen).text if chosen else s.text, chosen is None, every if chosen else None)]
     for p in KNOWN_PROTEINS:
+        if p == VEGETARIAN:
+            continue  # «Vegetar» is a rule in Kosthold: no meat or fish in any ingredient, not just the main one
         if n := found.counts.proteins.get(p):
             clause = protein_clause(protein_word(p))
             on = chosen is not None and chosen.values == (p,)
@@ -81,7 +113,8 @@ def chips(found: Found) -> dict[str, list[Chip]]:
         return sorted(row, key=lambda c: not c.on)
 
     return {
-        "diets": [diet(d) for d in DIET_CHIPS],
+        "diets": on_first([diet(d) for d in DIET_CHIPS]),
+        "allergies": on_first([diet(d) for d in ALLERGY_CHIPS]),
         "kinds": on_first([tag(t) for t in KIND_CHIPS]),
         "proteins": on_first(proteins),
     }
@@ -224,7 +257,10 @@ def create_app(queries: Queries) -> FastAPI:
     def llms_txt(request: Request) -> Response:
         """Entry point for AI agents (llmstxt.org): what the site is and the JSON API."""
         return templates.TemplateResponse(
-            request, "llms.txt", {"base": str(request.base_url), "proteins": ", ".join(KNOWN_PROTEINS)}, media_type="text/plain"
+            request,
+            "llms.txt",
+            {"base": str(request.base_url), "proteins": ", ".join(KNOWN_PROTEINS), "diets": api.DIETS},
+            media_type="text/plain",
         )
 
     @app.get("/robots.txt", response_class=PlainTextResponse)

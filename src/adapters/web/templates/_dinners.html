@@ -8,6 +8,8 @@
   <div class="filters">
     <div class="row"><span class="label">Kosthold</span>
       <nav class="chips diet" aria-label="Kosthold">{% for c in chips.diets %}{{ chip(c) }} {% endfor %}</nav></div>
+    <div class="row"><span class="label">Allergier</span>
+      <nav class="chips diet" aria-label="Allergier">{% for c in chips.allergies %}{{ chip(c) }} {% endfor %}</nav></div>
     <div class="row"><span class="label">Hva slags</span>
       <nav class="chips" aria-label="Hva slags middag">{% for c in chips.kinds %}{{ chip(c) }} {% endfor %}</nav></div>
     <div class="row"><span class="label">Hovedråvare</span>

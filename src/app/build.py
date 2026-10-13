@@ -58,19 +58,23 @@ async def refresh(
 
 
 async def classify(ingredients: Iterable[Ingredient], store: TraitsStore, classifier: IngredientClassifier) -> dict[str, Traits]:
-    """Traits per ingredient name. Only names not seen before go to the classifier."""
+    """Traits per ingredient name. The classifier is asked only for the labels not stored for a name, all in one
+    request per name, and each answer is stored as it comes, so a run that stops halfway keeps what it got."""
     wanted: dict[str, Ingredient] = {}
     for ingredient in ingredients:
         wanted.setdefault(ingredient.name, ingredient)
     known = await store.get_many(wanted)
-    missing = sorted(wanted.keys() - known.keys())
-    if missing:
-        async with asyncio.TaskGroup() as tg:
-            tasks = {name: tg.create_task(classifier.classify(wanted[name])) for name in missing}
-        new = {name: task.result() for name, task in tasks.items()}
-        await store.save_many(new)
-        known |= new
-    return known
+    missing = {name: labels for name in sorted(wanted) if (labels := [k for k in classifier.labels if k not in known.get(name, {})])}
+
+    async def one(name: str) -> None:
+        levels = await classifier.classify(wanted[name], missing[name])
+        await store.save_many({name: levels})
+        known[name] = {**known.get(name, {}), **levels}
+
+    async with asyncio.TaskGroup() as tg:
+        for name in missing:
+            tg.create_task(one(name))
+    return {name: Traits.of(levels) for name, levels in known.items()}
 
 
 async def match(

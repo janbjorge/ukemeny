@@ -1,7 +1,7 @@
 from datetime import date
 
 from app.queries import Queries
-from core.models import Gluten, Household, Onion, Rule
+from core.models import Gluten, Household, Item, Level, Onion, Rule
 from core.ranking import Week
 from tests.fakes import FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
@@ -84,3 +84,25 @@ def test_the_site_starts_with_no_rules_and_the_search_adds_them() -> None:
     assert q.plan(found.household).fitting == 2 and q.plan().fitting == 3
     checked = q.check(recipe("Pasta", pasta).url, q.household("glutenfri"))
     assert checked is not None and checked.verdict.swaps
+
+
+def test_allergies_and_vegetar_leave_dinners_out() -> None:
+    mayo = ingredient("majones", 1, "dl", "/margarin/olje/majones")
+    stock = ingredient("kyllingbuljong", 5, "dl", "/diverse")
+    s = snapshot(
+        recipe("Potetsalat", mayo),
+        recipe("Grønnsakssuppe", stock),
+        recipe("Laks", SALMON),
+        known={
+            "majones": traits(contains={Item.EGG: Level.YES, Item.ANIMAL: Level.YES}),
+            "kyllingbuljong": traits(contains={Item.MEAT: Level.YES, Item.ANIMAL: Level.YES}),
+            "laksefilet": traits(contains={Item.FISH: Level.YES, Item.ANIMAL: Level.YES}),
+        },
+    )
+    q = Queries(FakeDatasets(s))
+    assert {d.dish.name for d in q.search("uten egg").dinners} == {"Grønnsakssuppe", "Laks"}
+    assert {d.dish.name for d in q.search("vegetar").dinners} == {"Potetsalat"}  # the stock is chicken
+    assert {d.dish.name for d in q.search("uten kjøtt").dinners} == {"Potetsalat", "Laks"}
+    assert not q.search("vegansk").dinners
+    checked = q.check(recipe("Potetsalat", mayo).url, q.household("uten egg"))
+    assert checked is not None and checked.verdict.blocked == "inneholder egg (majones)"

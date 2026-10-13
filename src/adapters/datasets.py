@@ -12,7 +12,7 @@ from typing import Any
 
 import orjson
 
-from core.models import Dish, Gluten, Ingredient, Kids, Lactose, Offer, Onion, Part, Recipe, Snapshot, Traits
+from core.models import Dish, Ingredient, Offer, Part, Recipe, Snapshot, Traits
 
 DATASETS = Path(__file__).parents[2] / "datasets"
 FILES = ("dishes.json", "traits.json", "offers.json")
@@ -27,7 +27,7 @@ class JsonDatasets:
         self._snapshot = Snapshot(
             built=datetime.fromisoformat(raw["offers.json"]["built"]),
             dishes=tuple(_dish(d) for d in raw["dishes.json"]),
-            traits={name: _traits(t) for name, t in raw["traits.json"].items()},
+            traits={name: Traits.of(t) for name, t in raw["traits.json"].items()},
             offers=tuple(_offer(o) for o in raw["offers.json"]["offers"]),
             matches={name: tuple(ids) for name, ids in raw["offers.json"]["matches"].items()},
         )
@@ -41,7 +41,7 @@ def write(snapshot: Snapshot, root: Path = DATASETS) -> dict[str, int]:
     root.mkdir(parents=True, exist_ok=True)
     documents: Mapping[str, Any] = {
         "dishes.json": [asdict(d) for d in snapshot.dishes],
-        "traits.json": {name: asdict(t) for name, t in snapshot.traits.items()},
+        "traits.json": {name: t.levels() for name, t in snapshot.traits.items()},
         "offers.json": {
             "built": snapshot.built.isoformat(),
             "offers": [asdict(o) for o in snapshot.offers],
@@ -81,10 +81,6 @@ def _dish(d: dict[str, Any]) -> Dish:
         rating_count=d["rating_count"],
         parts=tuple(Part(p["name"], p["category"], p["grams"], p["unit"]) for p in d["parts"]),
     )
-
-
-def _traits(t: dict[str, Any]) -> Traits:
-    return Traits(Gluten(t["gluten"]), Onion(t["onion"]), Lactose(t["lactose"]), Kids(t["kids"]), t["model"])
 
 
 def _offer(o: dict[str, Any]) -> Offer:

@@ -1,6 +1,22 @@
 from core import diet
 from core.dishes import dish
-from core.models import Gluten, Household, Kids, Lactose, Onion, Problem, Recipe, Rule, Traits, Verdict
+from core.models import (
+    Carbs,
+    Fodmap,
+    Gluten,
+    Household,
+    Item,
+    Kids,
+    Lactose,
+    Level,
+    Onion,
+    Pregnancy,
+    Problem,
+    Recipe,
+    Rule,
+    Traits,
+    Verdict,
+)
 from tests.fakes import PLAIN, ingredient, recipe, traits
 
 
@@ -180,3 +196,44 @@ def test_an_ingredient_listed_twice_gives_one_swap() -> None:
     r = recipe("Taco", ingredient("tortilla", 4, "stk."), ingredient("tortilla", 4, "stk."))
     verdict = judge(r, {"tortilla": traits(gluten=Gluten.YES)}, HOUSEHOLD)
     assert len(verdict.swaps) == 1
+
+
+def test_a_rule_that_leaves_an_item_out_leaves_out_maybe_and_unknown_too() -> None:
+    r = recipe("Pasta carbonara", ingredient("spagetti", 400, "g"), ingredient("buljongterning", 1, "stk."))
+    plain = {"spagetti": PLAIN}
+    no_egg = Household(avoid=frozenset({Item.EGG}))
+    assert judge(r, plain | {"buljongterning": traits(contains={Item.EGG: Level.NO})}, no_egg).blocked is None
+    maybe = judge(r, plain | {"buljongterning": traits(contains={Item.EGG: Level.MAYBE})}, no_egg)
+    assert maybe.blocked == "inneholder egg (buljongterning)"
+    never_asked = Traits(Gluten.NO, Onion.NONE, Lactose.NONE, Kids.OK)
+    assert judge(r, plain | {"buljongterning": never_asked}, no_egg).blocked == "inneholder egg (buljongterning)"
+
+
+def test_fodmap_leaves_out_what_no_swap_takes_care_of() -> None:
+    low_fodmap = Household(onion_substitute="vårløk", garlic=Rule.AVOID, fodmap=True)
+    r = recipe("Kyllinggryte", ingredient("kyllingfilet", 600, "g"), ingredient("løk", 1, "stk."), ingredient("kikerter", 1, "boks"))
+    onion = traits(onion=Onion.ONION, fodmap=Fodmap.HIGH)
+    verdict = judge(r, {"kyllingfilet": PLAIN, "løk": onion, "kikerter": traits(fodmap=Fodmap.LOW)}, low_fodmap)
+    assert verdict.blocked is None and [s.swap for s in verdict.swaps] == ["vårløk for løk"]  # the swap takes the onion out
+    chickpeas = judge(r, {"kyllingfilet": PLAIN, "løk": onion, "kikerter": traits(fodmap=Fodmap.HIGH)}, low_fodmap)
+    assert chickpeas.blocked == "mye FODMAP (kikerter)"
+
+
+def test_low_carb_counts_grams_per_portion() -> None:
+    low_carb = Household(carbs_g_per_portion=20)
+    r = recipe("Laks med brokkoli", ingredient("laksefilet", 600, "g"), ingredient("brokkoli", 400, "g"))
+    known = {"laksefilet": traits(carbs=Carbs.NONE), "brokkoli": traits(carbs=Carbs.LOW)}
+    assert judge(r, known, low_carb).blocked is None  # 150 g fish and 100 g broccoli: about 7 g
+    with_rice = recipe("Laks med ris", ingredient("laksefilet", 600, "g"), ingredient("ris", 3, "dl"))
+    assert judge(with_rice, {"laksefilet": known["laksefilet"], "ris": traits(carbs=Carbs.HIGH)}, low_carb).blocked == (
+        "rundt 54 g karbohydrater per porsjon"
+    )
+
+
+def test_pregnant_leaves_out_avoid_and_limit() -> None:
+    r = recipe("Pasta med røkelaks", ingredient("røkelaks", 200, "g"))
+    pregnant = Household(pregnant=True)
+    assert judge(r, {"røkelaks": traits(pregnancy=Pregnancy.AVOID)}, pregnant).blocked == "frarådes for gravide (røkelaks)"
+    assert judge(r, {"røkelaks": traits(pregnancy=Pregnancy.LIMIT)}, pregnant).blocked is not None
+    assert judge(r, {"røkelaks": traits(pregnancy=Pregnancy.OK)}, pregnant).blocked is None
+    assert judge(r, {"røkelaks": traits(pregnancy=Pregnancy.AVOID)}, Household()).blocked is None

@@ -1,7 +1,9 @@
-"""SQLite caches for the offline build: recipes, Jev's ingredient traits and offer matches. One file, no server.
+"""SQLite caches for the offline build: recipes, Jev's ingredient labels and offer matches. One file, no server.
 
 Recipes are stored as JSON, since they are only ever read whole. Pages that held no recipe
 are stored too (data NULL), so a refresh does not fetch them again until they change.
+Ingredient labels are one row per (name, label): a label added to the registry (src/pipeline/jev.py) is only asked
+for. The older `traits` table, one row per name with four labels, is copied into `label` once and no longer written.
 """
 
 import asyncio
@@ -17,15 +19,7 @@ import aiosqlite
 import orjson
 
 from adapters.datasets import recipe_from_dict
-from core.models import (
-    Gluten,
-    Kids,
-    Lactose,
-    Onion,
-    Recipe,
-    RecipeRef,
-    Traits,
-)
+from core.models import Levels, Recipe, RecipeRef
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS recipe (
@@ -50,6 +44,18 @@ CREATE TABLE IF NOT EXISTS traits (
     model TEXT NOT NULL,
     classified_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS label (
+    name TEXT NOT NULL,
+    key TEXT NOT NULL,  -- a key of core.models.LABELS, or "model"
+    level TEXT NOT NULL,
+    asked_at TEXT NOT NULL,
+    PRIMARY KEY (name, key)
+);
+INSERT OR IGNORE INTO label SELECT name, 'gluten', gluten, classified_at FROM traits;
+INSERT OR IGNORE INTO label SELECT name, 'onion', onion, classified_at FROM traits;
+INSERT OR IGNORE INTO label SELECT name, 'lactose', lactose, classified_at FROM traits;
+INSERT OR IGNORE INTO label SELECT name, 'kids', kids, classified_at FROM traits;
+INSERT OR IGNORE INTO label SELECT name, 'model', model, classified_at FROM traits;
 """
 
 _CHUNK = 500
@@ -116,25 +122,25 @@ class SqliteTraitsStore:
 
     sqlite: Sqlite
 
-    async def get_many(self, names: Iterable[str]) -> dict[str, Traits]:
+    async def get_many(self, names: Iterable[str]) -> dict[str, dict[str, str]]:
         wanted = list(dict.fromkeys(names))
-        found: dict[str, Traits] = {}
+        found: dict[str, dict[str, str]] = {}
         for start in range(0, len(wanted), _CHUNK):
             chunk = wanted[start : start + _CHUNK]
             async with self.sqlite.db.execute(
-                f"SELECT name, gluten, onion, lactose, kids, model FROM traits WHERE name IN ({', '.join('?' * len(chunk))})",
+                f"SELECT name, key, level FROM label WHERE name IN ({', '.join('?' * len(chunk))})",
                 chunk,
             ) as rows:
-                async for name, gluten, onion, lactose, kids, model in rows:
-                    found[name] = Traits(Gluten(gluten), Onion(onion), Lactose(lactose), Kids(kids), model)
+                async for name, key, level in rows:
+                    found.setdefault(name, {})[key] = level
         return found
 
-    async def save_many(self, traits: Mapping[str, Traits]) -> None:
+    async def save_many(self, levels: Mapping[str, Levels]) -> None:
         now = datetime.now(UTC).isoformat()
         async with self.sqlite.lock:
             await self.sqlite.db.executemany(
-                "INSERT OR REPLACE INTO traits (name, gluten, onion, lactose, kids, model, classified_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                [(name, t.gluten, t.onion, t.lactose, t.kids, t.model, now) for name, t in traits.items()],
+                "INSERT OR REPLACE INTO label (name, key, level, asked_at) VALUES (?, ?, ?, ?)",
+                [(name, key, level, now) for name, labels in levels.items() for key, level in labels.items()],
             )
             await self.sqlite.db.commit()
 

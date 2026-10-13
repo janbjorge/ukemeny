@@ -1,9 +1,9 @@
 """Output ports: what the core and the use cases need from the outside world."""
 
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Collection, Iterable, Mapping, Sequence
 from typing import Protocol
 
-from core.models import Ingredient, Offer, Recipe, RecipeRef, Snapshot, Traits
+from core.models import Ingredient, Levels, Offer, Recipe, RecipeRef, Snapshot
 
 
 class Datasets(Protocol):
@@ -38,11 +38,15 @@ class RecipeStore(Protocol):
 
 
 class TraitsStore(Protocol):
-    """Classified ingredients, so each name is classified only once."""
+    """Classified ingredients, per (name, label), so each label is asked about each name only once."""
 
-    async def get_many(self, names: Iterable[str]) -> dict[str, Traits]: ...
+    async def get_many(self, names: Iterable[str]) -> dict[str, dict[str, str]]:
+        """The labels stored per name (core.models.Levels); a name with none is left out."""
+        ...
 
-    async def save_many(self, traits: Mapping[str, Traits]) -> None: ...
+    async def save_many(self, levels: Mapping[str, Levels]) -> None:
+        """Add or replace these labels; others stored for the name stay."""
+        ...
 
 
 class OfferMatchStore(Protocol):
@@ -67,10 +71,15 @@ class OfferSource(Protocol):
 
 
 class IngredientClassifier(Protocol):
-    """Does this ingredient hold gluten, onion, lactose, or anything hard for small kids?"""
+    """What an ingredient holds: gluten, onion, lactose, allergens, meat, FODMAP and more (core.models.LABELS)."""
 
-    async def classify(self, ingredient: Ingredient) -> Traits:
-        """Traits of the ingredient's name; its grocery category is context."""
+    @property
+    def labels(self) -> Collection[str]:
+        """Every label it can answer."""
+        ...
+
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> Levels:
+        """These labels of the ingredient's name, and "model"; its grocery category is context."""
         ...
 
 

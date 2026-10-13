@@ -2,7 +2,7 @@
 
 import pytest
 
-from core.models import Gluten, Household, Kids, Onion, Rule
+from core.models import Gluten, Household, Item, Kids, Onion, Rule
 from core.ranking import dinners
 from core.search import (
     ANYTHING,
@@ -10,6 +10,7 @@ from core.search import (
     Diet,
     Index,
     Tag,
+    diet_clause,
     household,
     marked,
     parse,
@@ -57,7 +58,13 @@ def tags_of(text: str) -> list[str]:
         ("lok", ["lok"]),  # Not a category without «uten», just a word
         ("uten lok", ["uten løk"]),
         ("gris og elg", ["svin eller vilt"]),
-        ("uten kjøtt", ["uten kjøtt"]),
+        ("uten kjøtt", ["pescetarianer"]),
+        ("uten kylling", ["uten kylling"]),
+        ("vegetarisk", ["vegetar"]),
+        ("kjøttfri vegansk", ["vegetar", "vegansk"]),
+        ("uten egg, nøtter og peanøtter", ["uten egg", "uten nøtter", "uten peanøtter"]),
+        ("lav fodmap gravid lavkarbo", ["lav fodmap", "gravid", "lavkarbo"]),
+        ("melkefri uten svin", ["melkefri", "uten svin"]),
         ("annet kjøtt", ["annet kjøtt"]),
         ("laks laks", ["laks"]),
         ("", []),
@@ -104,8 +111,11 @@ def test_toggle_adds_removes_and_replaces() -> None:
 
 
 def test_clause_kinds_and_labels() -> None:
-    assert parse("uten kjøtt").clauses == (protein_clause("kjøtt", negated=True),)
-    assert parse("uten kjøtt").clauses[0].values == MEAT
+    assert parse("uten kylling").clauses == (protein_clause("kylling", negated=True),)
+    assert parse("uten sjømat").clauses[0].values == ("fisk", "skalldyr")
+    assert protein_clause("kjøtt").values == MEAT
+    assert parse("uten kjøtt").clauses == (diet_clause(Diet.PESCETARIAN),)
+    assert diet_clause(Diet.FODMAP).label == "Lav FODMAP" and diet_clause(Diet.EGG).label == "Uten egg"
     assert parse("laks eller torsk").clauses == (with_clause(("laks", "torsk")),)
     assert parse("uten sopp").clauses[0].label == "Uten sopp"
     assert parse("kylling fisk").clauses[0].label == "Kylling eller fisk"
@@ -171,6 +181,17 @@ def test_diet_words_are_rules_on_top_of_a_base() -> None:
     assert household([Diet.ONION], Household(onion_substitute="purre")).onion_substitute == "purre"  # a profile's own
 
 
+def test_rules_that_leave_things_out() -> None:
+    assert household([Diet.VEGETARIAN]).avoid == {Item.MEAT, Item.FISH, Item.CRUSTACEAN, Item.MOLLUSC}
+    assert household([Diet.PESCETARIAN, Diet.EGG]).avoid == {Item.MEAT, Item.EGG}
+    assert {Item.ANIMAL, Item.MILK, Item.EGG} <= household([Diet.VEGAN]).avoid
+    fodmap = household([Diet.FODMAP])
+    assert fodmap.fodmap and fodmap.onion is Rule.AVOID and fodmap.garlic is Rule.AVOID and fodmap.gluten is Rule.AVOID
+    assert fodmap.lactose_g_per_portion == 3.0 and fodmap.onion_substitute == "vårløk"
+    assert household([Diet.LOW_CARB]).carbs_g_per_portion == 20.0 and household([Diet.PREGNANT]).pregnant
+    assert household([Diet.GARLIC]).garlic is Rule.AVOID
+
+
 def test_rules_do_not_filter_an_index(index: Index) -> None:
     assert names(index, "glutenfri") == names(index, "")  # the rule picks the index (Queries), it does not narrow one
 
@@ -198,9 +219,8 @@ def test_dish_name_matches_come_first(index: Index) -> None:
 
 
 def test_without_leaves_out_side_ingredients_too(index: Index) -> None:
-    assert "Torsk med bacon" not in names(index, "uten svin")  # bacon is pork, though the main is fish
     assert "Torsk med bacon" not in names(index, "uten bacon")
-    assert names(index, "uten kjøtt") == ["Pasta med røkelaks"]
+    assert "Kyllingsalat" not in names(index, "uten kylling") and "Torsk med bacon" in names(index, "uten kylling")
 
 
 def test_typos_are_fixed_with_the_index(index: Index) -> None:

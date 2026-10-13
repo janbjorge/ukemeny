@@ -1,7 +1,7 @@
 """The offline build (src/app/build.py) with in-memory ports."""
 
 from app import build
-from core.models import Onion, Part, Recipe, RecipeRef
+from core.models import LABELS, Item, Level, Onion, Part, Recipe, RecipeRef
 from tests.fakes import (
     FakeClassifier,
     FakeMatcher,
@@ -54,9 +54,20 @@ async def test_ingredients_are_classified_once() -> None:
     store = FakeTraits()
     onion = ingredient("løk", 1, "stk.", "/grønnsaker")
     await build.classify([CHICKEN, onion, CHICKEN], store, classifier)
-    await build.classify([CHICKEN, onion], store, classifier)
-    assert sorted(classifier.asked) == ["kyllingfilet", "løk"]
-    assert store.stored["løk"].onion is Onion.ONION
+    known = await build.classify([CHICKEN, onion], store, classifier)
+    assert sorted(name for name, _ in classifier.asked) == ["kyllingfilet", "løk"]
+    assert known["løk"].onion is Onion.ONION and store.stored["løk"]["onion"] == "onion"
+
+
+async def test_only_labels_not_stored_are_asked_for() -> None:
+    store = FakeTraits({"løk": {"gluten": "no", "onion": "onion", "lactose": "none", "kids": "ok", "model": "old"}})
+    classifier = FakeClassifier({"løk": traits(onion=Onion.ONION, contains={Item.EGG: Level.NO})})
+    known = await build.classify([ingredient("løk", 1, "stk.", "/grønnsaker")], store, classifier)
+    [(name, asked)] = classifier.asked
+    assert name == "løk" and "onion" not in asked and set(asked) == set(LABELS) - {"gluten", "onion", "lactose", "kids"}
+    assert known["løk"].contains[Item.EGG] is Level.NO and known["løk"].onion is Onion.ONION
+    await build.classify([ingredient("løk")], store, classifier)
+    assert len(classifier.asked) == 1  # everything is stored now
 
 
 async def test_offer_answers_are_asked_once_and_obvious_ones_never() -> None:

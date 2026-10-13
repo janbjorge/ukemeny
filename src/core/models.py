@@ -1,7 +1,7 @@
 """The domain's types. Frozen and slotted; nothing here does I/O."""
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from enum import StrEnum
 
@@ -41,15 +41,110 @@ class Kids(StrEnum):
     """Whole nuts and similar."""
 
 
+class Item(StrEnum):
+    """Something an ingredient can hold, asked about one by one: the EU allergens besides gluten, and what
+    vegetarians, vegans, pork-free and alcohol-free diets leave out (METHOD.md §1)."""
+
+    MILK = "milk"
+    EGG = "egg"
+    FISH = "fish"
+    CRUSTACEAN = "crustacean"
+    MOLLUSC = "mollusc"
+    TREE_NUT = "tree_nut"
+    PEANUT = "peanut"
+    SOY = "soy"
+    SESAME = "sesame"
+    CELERY = "celery"
+    MUSTARD = "mustard"
+    SULPHITE = "sulphite"
+    LUPIN = "lupin"
+    LEGUME = "legume"
+    MEAT = "meat"
+    """Meat or poultry, or made from them: kjøttkraft, gelatin, smult."""
+    ANIMAL = "animal"
+    """Anything of animal origin, honey included."""
+    PORK = "pork"
+    ALCOHOL = "alcohol"
+
+
+class Level(StrEnum):
+    NO = "no"
+    MAYBE = "maybe"
+    """Some brands add it (buljong, ferdigsauser): a rule that leaves the item out leaves this out too."""
+    YES = "yes"
+
+
+class Fodmap(StrEnum):
+    LOW = "low"
+    MODERATE = "moderate"
+    HIGH = "high"
+
+
+class Carbs(StrEnum):
+    """Carbohydrate per 100 g as sold."""
+
+    NONE = "none"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+
+class Pregnancy(StrEnum):
+    """Mattilsynet's advice for pregnant women."""
+
+    OK = "ok"
+    LIMIT = "limit"
+    AVOID = "avoid"
+
+
+type Levels = Mapping[str, str]
+"""An ingredient's labels as stored and written: level per label key ("gluten": "no", "egg": "maybe"),
+and "model": the model that answered."""
+LABELS = ("gluten", "onion", "lactose", "kids", *Item, "fodmap", "carbs", "pregnancy")
+"""Every label key an ingredient is asked about."""
+
+
 @dataclass(frozen=True, slots=True)
 class Traits:
-    """What an ingredient is, regardless of recipe. Classified once per ingredient name."""
+    """What an ingredient is, regardless of recipe. Each label is asked once per ingredient name."""
 
     gluten: Gluten
     onion: Onion
     lactose: Lactose
     kids: Kids
     model: str = ""
+    contains: Mapping[Item, Level] = field(default_factory=dict, hash=False)
+    """Per item, whether the ingredient holds it. An item not here was never asked about."""
+    fodmap: Fodmap | None = None
+    carbs: Carbs | None = None
+    pregnancy: Pregnancy | None = None
+    """None: never asked about."""
+
+    @classmethod
+    def of(cls, levels: Levels) -> Traits:
+        return cls(
+            gluten=Gluten(levels["gluten"]),
+            onion=Onion(levels["onion"]),
+            lactose=Lactose(levels["lactose"]),
+            kids=Kids(levels["kids"]),
+            model=levels.get("model", ""),
+            contains={item: Level(levels[item]) for item in Item if item in levels},
+            fodmap=Fodmap(levels["fodmap"]) if "fodmap" in levels else None,
+            carbs=Carbs(levels["carbs"]) if "carbs" in levels else None,
+            pregnancy=Pregnancy(levels["pregnancy"]) if "pregnancy" in levels else None,
+        )
+
+    def levels(self) -> dict[str, str]:
+        optional = {"fodmap": self.fodmap, "carbs": self.carbs, "pregnancy": self.pregnancy}
+        return {
+            "gluten": self.gluten.value,
+            "onion": self.onion.value,
+            "lactose": self.lactose.value,
+            "kids": self.kids.value,
+            **{item.value: level.value for item, level in self.contains.items()},
+            **{key: value.value for key, value in optional.items() if value is not None},
+            "model": self.model,
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -175,6 +270,14 @@ class Household:
     """False: skip any recipe that needs a swap other than lactose-free dairy."""
     kid_notes: bool = True
     """Notes on chili heat and choking risks."""
+    avoid: frozenset[Item] = frozenset()
+    """Leave out any dinner with an ingredient that holds one of these, or may (Level.MAYBE)."""
+    fodmap: bool = False
+    """Leave out dinners with a high-FODMAP ingredient that no swap above takes care of."""
+    carbs_g_per_portion: float | None = None
+    """Leave out dinners with more carbohydrate per portion than this. None: no limit."""
+    pregnant: bool = False
+    """Leave out dinners with an ingredient Mattilsynet advises pregnant women against or to limit."""
 
 
 class Problem(StrEnum):

@@ -7,23 +7,42 @@ from datetime import UTC, date, datetime
 from core.dishes import dish
 from core.errors import SourceUnavailableError
 from core.models import (
+    LABELS,
+    Carbs,
+    Fodmap,
     Gluten,
     Ingredient,
+    Item,
     Kids,
     Lactose,
+    Level,
+    Levels,
     Offer,
     Onion,
+    Pregnancy,
     Recipe,
     RecipeRef,
     Snapshot,
     Traits,
 )
 
-PLAIN = Traits(Gluten.NO, Onion.NONE, Lactose.NONE, Kids.OK)
+
+def traits(
+    gluten: Gluten = Gluten.NO,
+    onion: Onion = Onion.NONE,
+    lactose: Lactose = Lactose.NONE,
+    kids: Kids = Kids.OK,
+    *,
+    contains: Mapping[Item, Level] | None = None,
+    fodmap: Fodmap | None = Fodmap.LOW,
+    carbs: Carbs | None = Carbs.NONE,
+    pregnancy: Pregnancy | None = Pregnancy.OK,
+) -> Traits:
+    """An ingredient with every label asked: it holds nothing, unless told otherwise."""
+    return Traits(gluten, onion, lactose, kids, "", {item: Level.NO for item in Item} | dict(contains or {}), fodmap, carbs, pregnancy)
 
 
-def traits(gluten: Gluten = Gluten.NO, onion: Onion = Onion.NONE, lactose: Lactose = Lactose.NONE, kids: Kids = Kids.OK) -> Traits:
-    return Traits(gluten, onion, lactose, kids)
+PLAIN = traits()
 
 
 def ingredient(name: str, amount: float | None = None, unit: str = "", category: str = "/diverse") -> Ingredient:
@@ -94,25 +113,29 @@ class FakeRecipes:
 
 @dataclass
 class FakeTraits:
-    stored: dict[str, Traits] = field(default_factory=dict)
+    stored: dict[str, dict[str, str]] = field(default_factory=dict)
 
-    async def get_many(self, names: Iterable[str]) -> dict[str, Traits]:
-        return {n: self.stored[n] for n in names if n in self.stored}
+    async def get_many(self, names: Iterable[str]) -> dict[str, dict[str, str]]:
+        return {n: dict(self.stored[n]) for n in names if n in self.stored}
 
-    async def save_many(self, traits: Mapping[str, Traits]) -> None:
-        self.stored.update(traits)
+    async def save_many(self, levels: Mapping[str, Levels]) -> None:
+        for name, labels in levels.items():
+            self.stored.setdefault(name, {}).update(labels)
 
 
 @dataclass
 class FakeClassifier:
-    """Answers from `known`, PLAIN for anything else, and records what was asked."""
+    """Answers from `known`, PLAIN for anything else, and records what was asked: (name, labels)."""
 
     known: Mapping[str, Traits] = field(default_factory=dict)
-    asked: list[str] = field(default_factory=list)
+    asked: list[tuple[str, tuple[str, ...]]] = field(default_factory=list)
+    labels: tuple[str, ...] = LABELS
 
-    async def classify(self, ingredient: Ingredient) -> Traits:
-        self.asked.append(ingredient.name)
-        return self.known.get(ingredient.name, PLAIN)
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str]:
+        keys = tuple(labels)
+        self.asked.append((ingredient.name, keys))
+        levels = self.known.get(ingredient.name, PLAIN).levels()
+        return {key: levels[key] for key in keys} | {"model": "fake"}
 
 
 @dataclass

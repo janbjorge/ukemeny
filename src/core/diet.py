@@ -4,14 +4,19 @@ import re
 from collections.abc import Mapping
 
 from core.models import (
+    Carbs,
     Dish,
+    Fodmap,
     Gluten,
     Household,
     Ingredient,
+    Item,
     Kids,
     Lactose,
+    Level,
     Note,
     Onion,
+    Pregnancy,
     Problem,
     Rule,
     Traits,
@@ -53,6 +58,36 @@ Jev called akevitt, vineddik and riseddik lactose-rich, and matprat's labels are
 
 HEAVY_ONION_G_PER_PORTION = 75
 """Three medium onions for four: with nothing to use instead, leaving it out changes the dish."""
+
+CARBS_PER_100G: Mapping[Carbs, float] = {
+    Carbs.NONE: 1.0,
+    Carbs.LOW: 6.0,
+    Carbs.MEDIUM: 25.0,
+    Carbs.HIGH: 70.0,
+}
+"""The middle of each of Jev's buckets (under 2 g, 2-10, 10-40, over 40 g per 100 g)."""
+
+# Why a dinner is left out, in bokmål
+ITEM_WORDS: Mapping[Item, str] = {
+    Item.MILK: "melk",
+    Item.EGG: "egg",
+    Item.FISH: "fisk",
+    Item.CRUSTACEAN: "skalldyr",
+    Item.MOLLUSC: "bløtdyr",
+    Item.TREE_NUT: "nøtter",
+    Item.PEANUT: "peanøtter",
+    Item.SOY: "soya",
+    Item.SESAME: "sesam",
+    Item.CELERY: "selleri",
+    Item.MUSTARD: "sennep",
+    Item.SULPHITE: "sulfitt",
+    Item.LUPIN: "lupin",
+    Item.LEGUME: "belgfrukter",
+    Item.MEAT: "kjøtt",
+    Item.ANIMAL: "noe fra dyr",
+    Item.PORK: "svin",
+    Item.ALCOHOL: "alkohol",
+}
 
 # What users read is bokmål.
 ADVICE: Mapping[Problem, str] = {
@@ -100,12 +135,30 @@ def _apply(rule: Rule, problem: Problem, name: str, swaps: list[Note], notes: li
         notes.append(Note(problem, name, NOTES[problem]))
 
 
+def _left_out(t: Traits, household: Household) -> str | None:
+    """Why the ingredient alone leaves the dinner out, by the strict rules: an item it holds or may hold, or advice
+    for pregnant women. A label never asked about counts against it."""
+    for item in sorted(household.avoid):
+        if t.contains.get(item, Level.YES) is not Level.NO:
+            return f"inneholder {ITEM_WORDS[item]}"
+    if household.pregnant and t.pregnancy is not Pregnancy.OK:
+        return "frarådes for gravide"
+    return None
+
+
+def _swapped(t: Traits, part_category: str) -> bool:
+    """Does a swap (vårløk, glutenfri, laktosefri) already take the FODMAP out of the ingredient?"""
+    dairy = (part_category.startswith(DAIRY) or not part_category) and t.lactose in (Lactose.SOME, Lactose.HIGH)
+    return t.onion in (Onion.ONION, Onion.GARLIC) or t.gluten is Gluten.YES or dairy
+
+
 def judge(dish: Dish, traits: Mapping[str, Traits], household: Household) -> Verdict:
     swaps: list[Note] = []
     warnings: list[Note] = []
     dairy: list[str] = []
-    lactose_g = onion_g = 0.0
+    lactose_g = onion_g = carbs_g = 0.0
     onion_in_name: str | None = None
+    left_out: str | None = None
     avoid_onion = household.onion is Rule.AVOID
     substitute = (household.onion_substitute or "").lower()
 
@@ -146,15 +199,26 @@ def judge(dish: Dish, traits: Mapping[str, Traits], household: Household) -> Ver
         elif household.kid_notes and t.kids is Kids.CHOKING:
             warnings.append(Note(Problem.KIDS, name, CHOKING_NOTE))
 
+        if left_out is None and (why := _left_out(t, household)):
+            left_out = f"{why} ({name})"
+        if left_out is None and household.fodmap and t.fodmap in (None, Fodmap.HIGH) and not _swapped(t, part.category):
+            left_out = f"mye FODMAP ({name})"
+        carbs_g += (part.grams or 0.0) * CARBS_PER_100G[t.carbs or Carbs.HIGH] / 100
+
     limit = household.lactose_g_per_portion
     if limit is not None and lactose_g > limit:
         swaps.extend(Note(Problem.LACTOSE, name, ADVICE[Problem.LACTOSE], SWAP[Problem.LACTOSE].format(name)) for name in dairy)
 
     blocked = None
+    carb_limit = household.carbs_g_per_portion
     if onion_in_name is not None:
         blocked = f"løk er poenget med retten ({onion_in_name})"
     elif avoid_onion and not substitute and onion_g >= HEAVY_ONION_G_PER_PORTION:
         blocked = f"mye løk (rundt {onion_g:.0f} g per porsjon)"
+    elif left_out is not None:
+        blocked = left_out
+    elif carb_limit is not None and carbs_g > carb_limit:
+        blocked = f"rundt {carbs_g:.0f} g karbohydrater per porsjon"
     elif not household.swaps and any(s.problem is not Problem.LACTOSE for s in swaps):
         blocked = "trenger et bytte"
 

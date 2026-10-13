@@ -2,7 +2,7 @@
 
 Dinner ideas from [matprat.no](https://www.matprat.no) that fit one household's diet, with the week picked from dinners whose main protein is on sale in Stavanger ([mattilbud.no](https://mattilbud.no)). The site is at https://matris.app (in Norwegian).
 
-The household's rules live in `profile.yaml`. FACTS.md says how everything works, METHOD.md every judgement call, TODO.md what is open.
+Code: https://github.com/janbjorge/ukemeny. The household's rules live in `profile.yaml`. FACTS.md says how everything works, METHOD.md every judgement call, TODO.md what is open.
 
 ## Run it
 

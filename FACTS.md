@@ -4,7 +4,7 @@ Read this first on a cold start. Facts were checked on 2026-10-13 unless a secti
 
 ## 1. What this is
 
-matris.app: dinner ideas from matprat.no that fit one household's diet, with the week picked from dinners whose main protein is on sale in Stavanger (mattilbud.no). jb's project, built on 2026-10-13, meant to be hosted on Fly.io at https://matris.app.
+matris.app: dinner ideas from matprat.no that fit one household's diet, with the week picked from dinners whose main protein is on sale in Stavanger (mattilbud.no). jb's project, built on 2026-10-13, hosted on Fly.io at https://matris.app. The code is at https://github.com/janbjorge/ukemeny (jb 2026-10-13: `janbjorge/matris` is an older project); the app, the CLI and the Fly app are called matris.
 
 - `/` is "Ukens middager": the week (five dinners, one per main protein, fish up to twice but never the same fish), the household's rules as chips, then "Flere forslag" with protein chips and an on-sale toggle. The chips and toggle load `/middager` as an HTMX fragment; without the `HX-Request` header it 303s to `/?protein=…&tilbud=1#forslag`, and with it the answer carries `HX-Replace-Url`, so the address bar is always a shareable link.
 - `/om` ("Slik virker det") explains the rules, the offers and how ingredients were judged.
@@ -63,5 +63,5 @@ Site quirks:
 - Dockerfile: python:3.14-slim plus uv, runtime dependencies only, no `src/pipeline/`, runs as `nobody`. The image is 406 MB and the app used 67 MiB of memory locally (2026-10-13). fly.toml: app `matris`, region arn, health check /helse, machines stop when idle, shared-cpu-1x with 256 MB.
 - The app adds gzip, security headers and cache headers itself (src/adapters/web/main.py `headers`): hashed static files are immutable, pages 5 minutes. HEAD is answered like GET.
 - When `CANONICAL_HOST` is set (to matris.app), every other host name 301s to it, except /helse. Nothing else in the code names the host.
-- Pushes to main run ruff, ty and pytest and then `flyctl deploy` (.github/workflows/deploy.yml, needs the FLY_API_TOKEN repository secret); there is no GitHub repo yet, so deploys are `fly deploy --remote-only` from the laptop.
+- Pushes to main run ruff, ty and pytest and then `flyctl deploy` (.github/workflows/deploy.yml, needs the FLY_API_TOKEN repository secret); until the repo has that secret, deploys are `fly deploy --remote-only` from the laptop.
 - Deployed 2026-10-13 to https://matris.fly.dev (Fly app `matris`, org personal, one machine in arn). IPs: shared IPv4 66.241.124.233, dedicated IPv6 2a09:8280:1::1b4:b71b:0. A certificate for matris.app is requested; it needs `A matris.app → 66.241.124.233` and `AAAA matris.app → 2a09:8280:1::1b4:b71b:0` at the registrar (DNS at ns1/ns2.hyp.net; matris.app pointed at 66.241.125.158 on 2026-10-13). `CANONICAL_HOST` is not set yet.

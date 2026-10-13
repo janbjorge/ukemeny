@@ -106,7 +106,9 @@ def test_unknown_choices_still_show_a_page(client: TestClient) -> None:
 
 
 def test_about_llms_robots_sitemap_health(client: TestClient) -> None:
-    assert "Slik virker det" in client.get("/om").text
+    about = client.get("/om").text
+    assert "Slik virker det" in about
+    assert "Les http://testserver/llms.txt først" in about  # a prompt to paste into an agent (jb 2026-10-13)
     llms = client.get("/llms.txt").text
     assert "http://testserver/api/plan" in llms and "kjøttdeig" in llms
     robots = client.get("/robots.txt").text

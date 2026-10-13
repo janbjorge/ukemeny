@@ -3,28 +3,26 @@
 {% block main %}
 <section class="prose">
   <h1>Slik virker det</h1>
-  <p>matris foreslår middager fra matprat.no og velger ukens middager blant de der hovedråvaren er på tilbud.</p>
+  <p>matris foreslår middager fra matprat.no. Ukens middager er valgt blant dem der hovedråvaren er på tilbud.</p>
 
   <h2>Kosthold</h2>
-  <p>Velg «Uten løk», «Glutenfri» eller «Lite laktose» i søket. Da vises bare middager som passer, og kortet sier hva du må bytte:
-    løk mot vårløk, vanlig pasta mot glutenfri, fløte mot laktosefri. En middag med løk i navnet, som biff med løk, blir borte.
-    Lite laktose er under {{ lactose_g|round|int }} g per porsjon, regnet ut fra melk, fløte, rømme og ost i oppskriften.</p>
+  <p>Velg «Uten løk», «Glutenfri» eller «Lite laktose» i søket. Da vises bare middager som passer, og kortet sier hva du bytter.
+    Lite laktose er under {{ lactose_g|round|int }} g per porsjon.</p>
 
   <h2>Tilbudene</h2>
-  <p>En vare er på tilbud når kundeavisen har en førpris som er høyere enn prisen nå. Bunnpris og Matkroken oppgir ingen førpriser,
-    så rabatter der vises ikke. Tilbudene er fra {{ plan.offers|tall }} varer hos {{ plan.stores|length }} kjeder.</p>
-  <p>Ukens middager har ikke samme protein to ganger. Fisk kan komme to ganger, men ikke samme fisk.</p>
+  <p>En vare er på tilbud når kundeavisen har en førpris. Denne uka er det {{ plan.offers|tall }} varer hos {{ plan.stores|length }} kjeder.</p>
 
   <h2>Søket</h2>
-  <p>Skriv som du ville sagt det: «rask kylling uten sopp», «laks eller torsk på tilbud», «glutenfri vegetar».
-    «uten» foran et ord tar bort middager med det, og «eller» gir det ene eller det andre. Staver du feil, prøver søket det nærmeste ordet.</p>
+  <p>Skriv som du ville sagt det: «rask kylling uten sopp» eller «laks eller torsk på tilbud».</p>
 
-  <h2>Hvordan ingrediensene er vurdert</h2>
-  <p>Om en ingrediens har gluten, løk eller laktose, og hvilke tilbud som er samme vare som i oppskriften, er vurdert på forhånd med en liten språkmodell.
-    Siden selv bruker ingen KI. Vurderingene kan ta feil, så sjekk alltid etiketten.</p>
+  <h2>Sjekk etiketten</h2>
+  <p>Om en ingrediens har gluten, løk eller laktose er vurdert av en liten språkmodell, og den kan ta feil.</p>
 
-  <h2>For KI-agenter</h2>
-  <p>Det samme finnes som JSON: <a href="/api/plan">/api/plan</a>, <a href="/api/middager">/api/middager</a> og <a href="/api/openapi.json">skjemaet</a>.
-    <a href="/llms.txt">llms.txt</a> forklarer resten.</p>
+  <h2>La en KI-agent hjelpe deg</h2>
+  <p>Bruker du ChatGPT, Claude eller en annen KI-agent, lim inn dette:</p>
+  <pre class="prompt">Hjelp meg å velge middager for uka.
+Les {{ request.base_url }}llms.txt først, spør hva vi ikke spiser,
+og foreslå middager derfra.</pre>
+  <p>llms.txt forklarer søket, kostholdet og API-et, så agenten svarer fra matris i stedet for å gjette.</p>
 </section>
 {% endblock %}

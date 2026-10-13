@@ -90,6 +90,8 @@ def test_chips_toggle_and_count(client: TestClient) -> None:
     assert 'hx-get="/middager?q=kylling+uten+l%C3%B8k">Uten løk</a>' in html
     assert 'aria-label="Allergier">' in html and 'hx-get="/middager?q=kylling+uten+egg">Uten egg</a>' in html
     assert ">Lav FODMAP</a>" in html and ">Vegetar</a>" in html
+    assert 'aria-label="Sorter">' in html and 'hx-get="/middager?q=kylling+rabatt+i+prosent">Rabatt %</a>' in html
+    assert 'hx-get="/middager?q=kylling" aria-current="true">Anbefalt</a>' in html
     proteins_row = html[html.index('class="chips proteins"') :]
     assert "Vegetar" not in proteins_row[: proteins_row.index("</nav>")]  # a rule in Kosthold, not a main protein
     proteins = html[html.index('class="chips proteins"') :]

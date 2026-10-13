@@ -32,7 +32,9 @@ worked out from the heaviest meat or fish in the recipe. A dinner is `on_sale` w
 SEARCH = f"""A search in plain bokmål, such as `rask kylling uten sopp`, `laks eller torsk på tilbud` or `glutenfri pasta`.
 Understood: diet rules and allergies ({DIETS}: which dinners fit and what to swap), categories
 (`under 20 min`, `under 40 min`, `under en time`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins (`kylling`,
-`fisk`, `kjøtt`, `sjømat`, `vegetar`, ...), `uten`/`ikke` before a word to leave it out, `eller` between words for either.
+`fisk`, `kjøtt`, `sjømat`, ...), `uten`/`ikke` before a word to leave it out, `eller` between words for either, and a sort
+order instead of the ranking: `rabatt i prosent` or `rabatt i kroner` (the biggest discount first, as a share or in kroner
+off; dinners without one last).
 Any other word must be in the dish name or an ingredient; a word that matches nothing is swapped for the closest known
 one (see `search.corrected`). æøå may be written as ae/o/a."""
 

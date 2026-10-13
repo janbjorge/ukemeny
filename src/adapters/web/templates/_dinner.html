@@ -1,13 +1,12 @@
 {# One dinner as a card: the main discount, and what to swap for the diet rules picked. With a search, the searched words
    are marked. The rest is on matprat.no (the link). #}
 {% macro card(d, search=none, via=()) %}
-{% set sales = d.buys|selectattr("sale")|list %}
 <article class="card" data-protein="{{ d.protein }}">
   <h3><a href="{{ d.dish.url }}" rel="noopener">{% if search and search.words %}{% for piece, hit in marked(d.dish.name, search) %}{% if hit %}<mark>{{ piece }}</mark>{% else %}{{ piece }}{% endif %}{% endfor %}{% else %}{{ d.dish.name }}{% endif %}</a></h3>
   <p class="meta"><span class="protein">{{ d.protein }}</span> {{ d.dish.prep_time }}
     {%- if d.dish.rating and d.dish.rating_count >= 5 %} · <span class="star">★</span>&nbsp;{{ "%.1f"|format(d.dish.rating)|replace(".", ",") }}{% endif %}</p>
   {% if via %}<p class="via">Med {% for name in via %}<mark>{{ name }}</mark>{{ ", " if not loop.last }}{% endfor %}</p>{% endif %}
-  {% if sales %}{% set b = sales[0] %}
+  {% set b = d.deal %}{% if b %}
   <p class="deal" title="{{ b.sale.price|kr }}, før {{ b.sale.pre_price|kr }}, til {{ b.sale.valid_until|dato }}"><span class="pct">{{ b.sale.discount|prosent }}</span> {{ b.part.name }} hos {{ b.sale.store }}</p>
   {% endif %}
   {% if d.verdict.swaps %}<p class="swaps"><b>Bytt:</b> {{ d.verdict.swaps|map(attribute="swap")|join(" · ") }}</p>{% endif %}

@@ -62,3 +62,4 @@ jb 2026-10-13: "more categories like; uten løk, glutenfree etc… an epic searc
 - A word that matches nothing is swapped for the closest known word (difflib, at least 75 % alike) and the page says so: «kyllign» becomes kylling.
 - Dinners with a searched word in the name come before those with it only among the ingredients, then the ranking (§5) decides.
 - When nothing matches, the page offers to drop each part of the search, with how many dinners that would give, most first.
+- «rabatt i prosent» (also «mest rabatt», «størst rabatt») and «rabatt i kroner» («mest spart», «spar mest») sort instead of ranking, by the discount the card shows (core.models.Dinner.deal: the most important ingredient on sale, its biggest discount): as a share, or in kroner off as the catalog has it (before-price minus price, per pack, not per recipe). Dinners without a discount come last in ranking order; nothing is left out.

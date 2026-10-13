@@ -78,10 +78,10 @@ class Queries:
         h = household(search.diets, self.base)
         index = self.index(h)
         found = index.find(search)
-        if skip_week and all(c.kind is Kind.DIET for c in search.clauses):
+        if skip_week and all(c.kind in (Kind.DIET, Kind.ORDER) for c in search.clauses):
             week = {d.dish.url for d in self.plan(h).dinners}
             found = [d for d in found if d.dish.url not in week]
-        if not any(c.kind in (Kind.PROTEIN, Kind.WITH) for c in search.clauses):
+        if not any(c.kind in (Kind.PROTEIN, Kind.WITH, Kind.ORDER) for c in search.clauses):
             found = ranking.varied(found, per_protein)
         shown = tuple(found[:limit])
         return Found(

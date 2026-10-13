@@ -240,6 +240,11 @@ class Offer:
         return None
 
     @property
+    def saving(self) -> float | None:
+        """Kroner off, as the catalog has it: the price before minus the price now."""
+        return self.pre_price - self.price if self.pre_price and self.pre_price > self.price else None
+
+    @property
     def unit_price(self) -> float:
         """For ranking offers of the same product: per kg when known."""
         return self.per_kg if self.per_kg is not None else self.price
@@ -346,6 +351,11 @@ class Dinner:
     """The main protein's group: fisk, kylling, svin, ... (core.matching.main_protein)."""
     main: str = ""
     """The main protein ingredient ("kyllingfilet"), or "" for a dish without meat or fish."""
+
+    @property
+    def deal(self) -> Buy | None:
+        """The discount the card shows: the most important ingredient with one (its `sale`)."""
+        return next((b for b in self.buys if b.sale), None)
 
     @property
     def sale(self) -> float:

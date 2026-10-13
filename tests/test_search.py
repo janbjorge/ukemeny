@@ -9,10 +9,12 @@ from core.search import (
     MEAT,
     Diet,
     Index,
+    Order,
     Tag,
     diet_clause,
     household,
     marked,
+    order_clause,
     parse,
     protein_clause,
     same,
@@ -66,6 +68,8 @@ def tags_of(text: str) -> list[str]:
         ("lav fodmap gravid lavkarbo", ["lav fodmap", "gravid", "lavkarbo"]),
         ("melkefri uten svin", ["melkefri", "uten svin"]),
         ("annet kjøtt", ["annet kjøtt"]),
+        ("kylling størst rabatt", ["kylling", "rabatt i prosent"]),
+        ("mest spart rabatt i prosent", ["rabatt i prosent"]),  # a later order replaces an earlier one
         ("laks laks", ["laks"]),
         ("", []),
         ("og og eller ,", []),
@@ -97,9 +101,25 @@ def test_a_later_prep_time_replaces_an_earlier_one() -> None:
 
 
 def test_the_written_search_parses_back_to_the_same_clauses() -> None:
-    for text in ("rask kylling uten sopp", "laks eller torsk på tilbud", "gris elg", "uten kjøtt barnevennlig", "annet kjøtt", *Tag, *Diet):
+    for text in (
+        "rask kylling uten sopp",
+        "laks eller torsk på tilbud",
+        "gris elg",
+        "uten kjøtt barnevennlig",
+        "annet kjøtt",
+        *Tag,
+        *Diet,
+        *Order,
+    ):
         once = parse(text)
         assert parse(once.text).clauses == once.clauses
+
+
+def test_an_order_toggles_and_replaces_the_other() -> None:
+    s = parse("kylling rabatt i kroner")
+    assert s.order is Order.KRONER and order_clause(Order.KRONER).label == "Rabatt kr"
+    assert s.toggle(order_clause(Order.PERCENT)).text == "kylling rabatt i prosent"
+    assert s.toggle(order_clause(Order.KRONER)).text == "kylling"
 
 
 def test_toggle_adds_removes_and_replaces() -> None:

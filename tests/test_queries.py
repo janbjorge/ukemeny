@@ -86,6 +86,21 @@ def test_the_site_starts_with_no_rules_and_the_search_adds_them() -> None:
     assert checked is not None and checked.verdict.swaps
 
 
+def test_sort_by_discount_in_percent_or_kroner() -> None:
+    lamb = ingredient("lammekotelett", 600, "g", "/kjøtt/lamme-/fåre-/sauekjøtt")
+    s = snapshot(
+        recipe("Kylling", CHICKEN),
+        recipe("Laks", SALMON),
+        recipe("Lam", lamb),
+        offers=[offer("KYLLINGFILET", 60, pre_price=100, id="k"), offer("LAMMEKOTELETT", 200, pre_price=300, id="l")],
+        matches={"kyllingfilet": ["k"], "lammekotelett": ["l"]},
+    )
+    q = Queries(FakeDatasets(s))
+    assert [d.dish.name for d in q.search("rabatt i prosent").dinners] == ["Kylling", "Lam", "Laks"]  # 40 % before 33 %
+    assert [d.dish.name for d in q.search("rabatt i kroner").dinners] == ["Lam", "Kylling", "Laks"]  # 100 kr before 40 kr
+    assert q.search("rabatt i kroner").total == 3  # sorting leaves nothing out
+
+
 def test_allergies_and_vegetar_leave_dinners_out() -> None:
     mayo = ingredient("majones", 1, "dl", "/margarin/olje/majones")
     stock = ingredient("kyllingbuljong", 5, "dl", "/diverse")

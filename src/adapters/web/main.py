@@ -21,7 +21,7 @@ from adapters.web import api, fmt
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
 from app.queries import Found, Queries
 from core.matching import VEGETARIAN
-from core.search import Diet, Kind, Tag, diet_clause, marked, protein_clause, protein_word, tag_clause
+from core.search import Diet, Kind, Order, Tag, diet_clause, marked, order_clause, protein_clause, protein_word, tag_clause
 
 HERE = Path(__file__).parent
 # The one public address (matris.app). Set on Fly once the certificate and DNS are live; every other
@@ -108,6 +108,10 @@ def chips(found: Found) -> dict[str, list[Chip]]:
             on = chosen is not None and chosen.values == (p,)
             proteins.append(Chip(protein_word(p).capitalize(), s.toggle(clause).text, on, None if on else n, p))
 
+    sorted_by = next((c for c in s.clauses if c.kind is Kind.ORDER), None)
+    orders = [Chip("Anbefalt", s.drop(sorted_by).text if sorted_by else s.text, sorted_by is None, None)]
+    orders += [Chip(order_clause(o).label, s.toggle(order_clause(o)).text, s.has(order_clause(o)), None) for o in Order]
+
     def on_first(row: list[Chip]) -> list[Chip]:
         """Chosen chips lead their row, so a phone, which shows a row as one line to swipe, shows them."""
         return sorted(row, key=lambda c: not c.on)
@@ -117,6 +121,7 @@ def chips(found: Found) -> dict[str, list[Chip]]:
         "allergies": on_first([diet(d) for d in ALLERGY_CHIPS]),
         "kinds": on_first([tag(t) for t in KIND_CHIPS]),
         "proteins": on_first(proteins),
+        "orders": orders,
     }
 
 

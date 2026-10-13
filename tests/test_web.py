@@ -144,6 +144,7 @@ def test_more_appends_the_next_page(client: TestClient, monkeypatch: pytest.Monk
     html = small.get("/?q=laks").text
     assert html.count('<article class="card"') == 2  # the week, and one idea
     assert 'hx-get="/middager/flere?q=laks&amp;fra=1"' in html and 'Vis flere <span class="n">3 til</span>' in html
+    assert 'hx-trigger="intersect once, click"' in html  # loads by itself when scrolled to
     more = small.get("/middager/flere?q=laks&fra=1", headers=HX).text
     assert more.count('<article class="card"') == 1 and "fra=2" in more and "<html" not in more
     last = small.get("/middager/flere?q=laks&fra=3", headers=HX).text

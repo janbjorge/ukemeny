@@ -1,0 +1,43 @@
+# What the household can't eat, where it shops, and what a week looks like.
+# Every matprat.no dinner is checked against this. Edit with `matris profile`.
+# Nothing here is sent to Jev; it only sees ingredient names and offer headings.
+# The site shows the rules in plain words, never why (src/app/queries.py household_lines).
+
+diet:
+  # avoid: swap it out, and skip dishes built on it
+  # note:  mention it, nothing more
+  # ok:    ignore it
+  onion: avoid
+  # Spring onion is fine for us and stands in for onion in most dishes: recipes with it
+  # fit as is, and onion swaps say "use vårløk instead". Dishes with onion in the name are
+  # still skipped. Leave out to also skip dishes with about three onions for four.
+  onion_substitute: vårløk  # spring onion
+  gluten: avoid
+  garlic: note   # avoid swaps it for garlic oil
+
+  # Grams of lactose per adult portion that are still fine. Above it, cream, milk and
+  # the like get a lactose-free swap. Leave empty for no limit.
+  lactose: 3
+
+  # false: only dinners that need no swaps at all (lactose-free dairy still allowed)
+  swaps: true
+
+# Small kids at the table: notes for chili heat and choking risks
+# (whole nuts, sausages, cherry tomatoes, grapes).
+small_kids: true
+
+# Offers are read from grocery chains near here (mattilbud.no).
+shopping:
+  near: Stavanger sentrum
+  lat: 58.9700
+  lng: 5.7331
+  radius_km: 15
+  # Leave out to use every grocery chain. Names as on mattilbud.no.
+  # stores: [REMA 1000, KIWI, Extra, Coop Mega, MENY]
+
+week:
+  dinners: 5
+  fish: 2   # of those, fish dinners when enough fit
+  # Pick dinners whose main meat, fish or vegetable is discounted this week (has a
+  # before-price). Others only fill in when there are too few.
+  on_sale_only: true

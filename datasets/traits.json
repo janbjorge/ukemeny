@@ -1,0 +1,8038 @@
+{
+  "7-krydder": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "aci biber salçasi (tyrkisk paprikapuré)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "agar agar": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "agurk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ajvar": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "akevitt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "alfalfaspirer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ananas": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ananasjuice": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ancho chili": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "and (ca. 2,5 kg)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "andebryst": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "andefett": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "andelår": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "anisfrø": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ansjosfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "appelsin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "appelsinjuice": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "appelsinmarmelade": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "aprikos": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "aprikossyltetøy": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "arborioris (risottoris)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "aromasopp": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "asiatisk basilikum (thai basil)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "aspargesbønner": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "aspargestopper": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "aspik (lys buljong-gelé)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "aubergine": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "auberginedip": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "avokado": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "aïoli": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "baby gulrot": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "babyspinat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bacon": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "baconost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "baguette": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bakepotet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bakepulver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "balsamicoeddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "banan": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bankekjøtt av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "basmatiris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bbq-saus": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "belugalinser": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "benfri høyrygg av storfekjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "benfri nakkekotelett": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "benfritt grytekjøtt av kalv": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "benfritt grytekjøtt av lam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "benfritt kjekjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "benfritt lammekjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "berbere": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "beter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bibringe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "biff av entrecôte storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "biff av indrefilet storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "biff av mørbrad": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "biff av ytrefilet storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "biffkjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "biffkjøtt i strimler": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "biffkjøtt i terninger": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bifftomat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "biryani masala": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "bjørkeblader": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "black bean paste (chunjang)": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "black bean-saus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "bladpersille": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "blandet babybladsalat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "blank rom": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "blodappelsin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "blodpudding": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "blomkål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "blå druer": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "blåbær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "blåbærsirup": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "blåmuggost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bog av storfe uten ben": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bog av svin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "boil-in-bag ris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bonitoflak": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bratwurst": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "breiflabbfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brekkbønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bretagnesaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "brie": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bringebær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bringebæreddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bringebærhonning": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brioche hamburgerbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brisket": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brokkoli": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brokkolini": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brosmefilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brun saus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "brunost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brunt perlesukker": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brunt sukker": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brødkrutonger": {
+    "gluten": "yes",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "brødrasp": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bukkehornkløver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bulgur": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "buljongpulver": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "burrata": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "butterdeig": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "byggmel": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "byggris": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "byggryn": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "béarnaisesaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "bønnemiks av kokte bønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "bønnespirer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "cajunkrydder": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "calvados": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "cantaloupe melon": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "carnaroli-ris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "cashewnøtter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "cheddar ost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "cherrytomat": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chevre (hvit geitost)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chicken rice sauce": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "chili crisp (lao gan ma)": {
+    "gluten": "yes",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chili de arbol": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chilibønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chiliflakes": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chiliolje": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chilipaste (gochujang)": {
+    "gluten": "yes",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chilipaste (sambal oelek)": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chilipulver": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chilipølse": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "chinkiang (svart vineddik)": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chipotle chili i adobosaus": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chipotle chilipulver": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "chorizopølse": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "ciabattabrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "cola": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "coppa spekeskinke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "corn flakes": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "cornichonagurker": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "cottage cheese": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "couscous": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "crabsticks": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "crispisalat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "crème fraîche lett, 18 %": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "crème fraîche orginal, 35 %": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "culotte": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "curry paste": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "curry pulver": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "cæsar dressing": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "côte de boeuf": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "dadler": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "dashi pulver": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "dijonsennep": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "druejuice": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "durumhvete": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "edamamebønner (soyabønner)": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "edamer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eddik, 7 %": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "egg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eggehvite": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eggeplomme": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eggnudler": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "einebær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ekstra finmalt pizzamel": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ekstra lett rømme (rømmekolle)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ekte geitost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "elghakk (kvernet elgkjøtt)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "elgstek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "endivesalat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "entrecôte av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eple": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eplecider": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eplecidereddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eplejuice": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eplemost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "eplesyltetøy": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ertespirer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ertesuppe": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "espressokaffe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fajitaskrydder": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "falukorv": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "familieribbe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "feldsalat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fenalår": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fennikel": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fennikelfrø": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fenugreek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdig indian korma saus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "ferdig paideig": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdig pinsabunn": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdig pizzadeig (rå), langpanne": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdig potetmos": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdig stekt lammeskank": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdig utvannet klippfisk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdig woksaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "ferdigdampet pinnekjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdiggrillet kylling lårklubbe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdigkokte nudler": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdigkuttet grønnsaksblanding": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "ferdigkuttet salatblanding": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdigstekt hamburger": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdigstekt kyllingkjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ferdigstrimlet råkostblanding": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fermentert plommesaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fersk kokos (fra kokosnøtt)": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fersk pizzabunn, rund": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fersk pizzadeig (á ca. 250 g)": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fersk tagliatelle": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fersk tortellini": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fersken": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fetaost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fetaost med oliven": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "filodeig": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fin sammalt hvete": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fin sammalt rug": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fiskeben": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fiskeboller": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fiskebuljong (terning)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "fiskebuljong (utblandet)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "fiskeburger": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fiskefilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fiskekraft": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fiskepudding": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fiskesaus (asiatisk)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "five spice powder (kinesisk krydderblanding)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flaksalt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flankestek av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flaskegresskar": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flat iron av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flatbiff av elg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flatbiff av kalv": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flatbiff av lam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flatbiff av reinsdyr": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flatbiff av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flatbiff av svin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flatbird (ca 1.5 kg)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flatbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flintstek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flyndrefilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flytende honning": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "flytende margarin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fransk dressing": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "frisk ananas": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk babymais": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk basilikum": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk dill": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk estragon": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk fiken": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk gressløk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk grønn asparges": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk hvit asparges": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk ingefær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk kjørvel": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk koriander": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk kruspersille": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk mynte": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk oregano": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk pepperrot": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk persille": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk rosmarin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk salvie": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk sjampinjong": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk spinat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frisk timian": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "friske blåskjell": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "friske hjerteskjell": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "friske nesleskudd": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "friske urter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "friséesalat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frityrolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frosne aspargesbønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frosne blåbær": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frosne erter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frosne kirsebær": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frosne potetbåter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frossen grønnsaksblanding": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frossen lapskausblanding": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frossen spinat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "frossen wokblanding": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "fullkornbulgur": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fullkornpasta": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fullkornpastaskruer": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fullkornris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fullkornshvetemel": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fullkornsnudler": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fullkornspagetti": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fullkornsris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "furikake": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fårefilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fårekjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fåretarm": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "fårikålkjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "galangarot": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "galiamelon": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "garam masala": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "geitost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gelatinplater": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gjær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "glassnudler": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "glutenfrie havregryn": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gnocchi": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gorgonzola": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "granateple": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grapefrukt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gresk yoghurt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gresskar": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gresskarkjerner": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gresskarpuré": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "griljermel": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grillet kylling": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grillet kyllinglår": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grillet rød paprika": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grillolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grillpølse": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "grov sammalt hvete": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grov sennep": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grovbakstmel": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grove hamburgerbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grove tortillalefser": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grovt brød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grovt chilikrydder": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "grovt rugbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grovt rundstykke": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grovt salt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gryr til matlaging": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grytekjøtt av elg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grytekjøtt av hjort": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grytekjøtt av kje med ben": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grytekjøtt av lam med bein": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grytekjøtt av reinsdyr": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønn chili": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønn curry paste": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "grønn papaya": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønn paprika": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønn squash": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønn te": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønn tomat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønne druer": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønne linser": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønne linser (ferdig kokt)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønne oliven": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønne pepperkorn": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønnkål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønnsakbuljong (terning)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "grønnsakbuljong (utblandet)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "grønnsakschips": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grønt eple": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "grøtris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "guacamole": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "guajillo chili": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gul cherrytomat": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gul karripaste": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "gul konditorfarge": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gul paprika": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gul squash": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gulbete": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "gule linser (tørre)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gullhøne (gourmethøne), ca. 3 kg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gulløye": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gulrot": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gurkemeie": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "gyoza ark (dumplings ark)": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "gyoza dumplings": {
+    "gluten": "yes",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "gyroskrydder": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "gåsefett": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hakkede tomater": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "halloumiost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "halvfet hvitost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hamburger": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hamburgerbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hamburgerdressing": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "harissa": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "hasselnøtter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "havremelk": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "havreris": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hel hvit pepper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hel kanel": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hel kardemomme": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hel nellik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hel pepper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hel spelt": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hel sylteagurk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hel ørret": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "helmelk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetisk ananas i biter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetisk ananas i ringer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetisk ananas, finskåret": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetisk grillet paprika": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetisk jalapeño": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetisk sjampinjong i skiver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetisk tunfisk i vann": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske aprikoser": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske artiskokker": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske bambusskudd": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske brune bønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske cherrytomater": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske fiskeboller": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske kidneybønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske kikerter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske kirsebær": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske limabønner (butter beans)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske maiskolber": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske maiskorn": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske maiskorn, liten boks": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske røde bønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske svarte bønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske tomatbønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske tomater": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hermetiske vannkastanjer": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hjemmelaget kimchi": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hjerte": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hjertesalat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hjortestek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hodekål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hodesalat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hoisinsaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "hokkaidogresskar": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hollandaisesaus": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "honning": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "honningsennep": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hot curry": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "hot krydderolje": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hp-saus": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "hummer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hummerhale": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hummerkjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hurtigris": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "husholdningssaft": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvalkjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvetelefse": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvetemel": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvetetortilla": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvit geitost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvit pizzasaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "hvit saus": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvitbete": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvite bønner (ferdig kokt)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvite bønner (tørre)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvitløk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "hvitløkdressing": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "hvitløkpølse": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "hvitløksmajones": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "hvitløksmør": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "hvitløkspepper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "hvitløkspulver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "hvitost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvitvin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hvitvinseddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hyse-/koljefilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "høne": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hønsebuljong (utblandet)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "hønsebuljongterning": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "hønsekjøtt (kjøtt fra kokt høne)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "hønsekraft (kraft fra kokt høne)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "indrefilet av elg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "indrefilet av lam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "indrefilet av reinsdyr": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "indrefilet av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "indrefilet av svin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "innmatpose fra kalkun": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "isbergsalat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "isot biber": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "jalapeño": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "japansk soyasaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "jarlsberg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "jasminris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "jordbær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "jordskokk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "julepølse": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "julerub": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "juleskinke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kaffe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kaffefløte": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kaffirlimeblader": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kajennepepper": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kakaopulver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalamataoliven": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkun overlår": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkun, ca. 5 kg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkun, ca. 6 kg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkunbiff": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkunfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkunfilet, ca. 1500 g": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkunfilet, ca. 1500 g (med skinn)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkunfilet, ca. 750 g": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkunkjøtt (rester)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkunkraft (laget på innmatposen i kalkunen)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalkunmedaljong": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalvekraft": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalvenyrer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalveskank": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kalvestek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kamskjell": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kantarell": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kapers": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kapers med stilk": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "karbonade": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "karbonadedeig": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "karri": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "karripasta": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "karse": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "karve": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kavring": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kebabkrydder": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kefir": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kesam mager, 1 %": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kesam original, 8 %": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ketchup": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kewra-vann": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kikertmel": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kimchi": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kinakål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kinesisk aubergine": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kjebog": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kjelår": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kjøttboller": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kjøttbuljong (utblandet)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kjøttbuljongterning": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kjøttdeig": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kjøttdeig av lam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kjøttdeig av reinsdyr": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kjøttdeig av svin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kjøttkraft": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kjøttpølse": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "klementin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "klippfisk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "klippfisk loin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "knaskegulrøtter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "knekkebrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "knutekål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokekjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokekjøtt av storfe, f.eks bog eller høyrygg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokevann": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokosflak": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokoskrem": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokosmasse": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokosmelk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokosnøtt": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokt fårikålkjøtt (rester)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokt høne": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokt krabbe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokt pasta": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokt ris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokt rødbete": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokt skinke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kokte poteter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "konjakk": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "konsentrert oksefond": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "korianderfrø": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "korianderrot": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kotelett av svin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "krabbeklo": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kraft fra fiskeboller": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kraft fra koking": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kraft fra steken": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kremfløte": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kremost med krydder": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kremost med pepper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kremost med urter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kremost naturell": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "krepsehaler": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "krydderblanding (ras el hanout)": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kryddersildfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kryddersmør": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kveite i skiver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kveitefilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kvernet pepper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kylling (800 g)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kylling (ca. 1000 g)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kylling (ca. 1200 g)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kylling (ca. 1300 g)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kylling (ca. 1500 g)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kylling lårfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kylling overlår": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kyllingbryst (med skinn og vingeben)": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kyllingbuljong (utblandet)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kyllingbuljongterning": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kyllingfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kyllingkjøttdeig": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kyllingkraft": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "kyllinglår naturell": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kyllingvinger": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "kålrot": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lake av syltet agurk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lake fra syltet jalapeños": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "laks": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "laksefilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "laksefilet uten bein": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "laksekotelett": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammebog": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammebog i skiver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammecarré": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammekjøtt i strimler": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammekotelett": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammekraft": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "lammelår": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammelår i skiver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammenyre": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammepølser": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "lammesadel": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammeside": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammeskank": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammeskav": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lammestek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "landbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "langefilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "langkornet middagsris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lasagneplater": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "laurbærblad": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lefse": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lett kokosmelk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettkokte havregryn": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettmelk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettrømme": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettsaltet lammekjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettsaltet sideflesk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettsaltet sideflesk uten svor": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettsaltet svineknoke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettsaltet torsk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettsaltet, røkt lammelår": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettsaltet, røkt skinke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lettsaltet, røkt svineknoke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lever av kalv": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lever av svin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "libanesisk krydderblanding": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "lime": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "limejuice": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "limesaft": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "linfrø": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "linguine pasta": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "liquid smoke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "loff": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lompe": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lungemos": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lunger": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lutefisk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lys sirup": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lys soyasaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "lysingfilet (uten skinn og ben)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "lyst brød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "løk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "løkpulver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "lønnesirup": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "løvbiff": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "macadamianøtter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "madeira": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "magerost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "maisenna": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "maiskolbe": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "maiskorn": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "maismel": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "maisolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "maistortilla": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "majones": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "makaroni": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "makrell": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "makrell i tomat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "makrellfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt allehånde": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt anis": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt chilipepper": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt hvit pepper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt ingefær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt kanel": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt kardemomme": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt koriander": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt muskat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt nellik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "malt spisskummen": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "manchego": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mandelflak": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mandelpotet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mandler": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mango": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mangochutney": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mangold": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "margarin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "margbein av reinsdyr": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "marinert fetaost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "marinert grillribbe av kam": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "marinert grillribbe i skiver": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "marokkansk krydderblanding (se egen oppskrift)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "mascarponeost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "matblod": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "matfarge": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "matfløte": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "matyoghurt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "medisterdeig": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "medisterfarse": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "medisterkake": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "medisterpølse": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "meksikansk gryte": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "melis": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "melk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "meterbønner, yardbeans": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mini tortillalefser": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "miso (soyabønnepasta)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "moreller": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "morning glory": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mortadella": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mozzarella": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "msg (monosodiumglutamat)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "multer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "muskatblomme": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mørbrad av lam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mørbrad av rein": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mørbrad av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mørk kokesjokolade": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mørk sirup": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mørk soyasaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "mørkt øl": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nachochips": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nakkekoteletter av svin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nanbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "natron": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "naturell kalkunpålegg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "naturris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nduja": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nektarin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nepe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nori ark": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "norzola": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nudler": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nykål, sommerkål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nypotet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nyretapp": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "næringsgjær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "nøytral olje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "okonomiyakisaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "oksebryst": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "oksehale": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "oksekraft": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "okseskank": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "oksestek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "oliven": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "olivenolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "oransje paprika": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "oumph": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "paellaris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pak choy": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "palmesukker": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pancetta": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pancit canton nudler": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "panko brødkrum": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pannekake": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "papaya": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "paprika": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "paprikapulver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "parmesan": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pasjonsfrukt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "passata (finmoste tomater)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pasta": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pasta di parma": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pasta penne": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pastasaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "pastaskjell": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pastaskruer": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pastavann": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pastinakk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "peanøtter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "peanøttolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "peanøttsmør": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pecannøtter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pecorino": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "peking duck pannekaker": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pepper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pepperkake": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "peppermiks": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pepperonipølse": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "pepperskinke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "persille": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "persillerot": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pesto": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "philadelphia kremost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pidebrød (tyrkisk brød)": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pigwings (pork wings)": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pillede reker": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pinjekjerner": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pinnekjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pinnekjøtt av reinsdyr": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pistasjnøtter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pitabrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pizzabunn": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pizzasaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "plomme": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "plommetomat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "polarbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "polenta": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "polkabete": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pommes frites": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pommes noisettes": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "portobellosopp": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "portvin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "portvinsgelé": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "potet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "potetchips": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "potetmel": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "potetmospulver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "provencekrydder": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pul biber": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pulled pork": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pulverkaffe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "purre": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "puylinser": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pære": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "pølse": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "pølsebrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "queso fresco": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "quinoa": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rabarbra": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "radicchio rosso": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ramsløk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "ramsløk (på glass)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "rapsolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ravigottesaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "red rhubarb småbladet salat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reddikspirer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reinsdyrblod": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reinsdyrkraft": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reinsdyrlår": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reinsdyrskank": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reinsdyrskav": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reinsdyrstek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rekechips": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rekepasta": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reker": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "reker i lake": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "remulade": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "renskåret svinekjøtt fra flatbiff eller filet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "renskåret svinekjøtt i strimler": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rester av kalkun": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rester av lammestek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rettich": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "revet appelsinskall": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "revet limeskall": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "revet mozzarella": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "revet muskatnøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "revet ost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "revet sitronskall": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ribbe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ribbenstek med svor": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ricotta": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ripsgelé": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "riseddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "risnudler": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "risoni (orzo)": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rispapir": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "risvin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rognebærgelé": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "romanesco": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "romanosalat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rosenkål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rosettkål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rosevann": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rosiner": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rosépepper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rub-a-dub (krydderblanding)": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "ruccula": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "russiske erter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rype": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rå chorizopølse": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "rå salsicciapølse": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "rød cherrytomat": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rød chili": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rød curry paste": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "rød grønnkål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rød lollo salat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rød paprika": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rød quinoa": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rød shiso": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rød spisskål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rød stjerneløk (delikatesseløk)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "rødbetblader": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rødbete": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rødbetlake": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røde druer": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røde linser (ferdig kokt)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røde linser (tørre)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rødkål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rødløk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "rødspette": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rødvin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rødvinsaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "rødvinseddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røkelaks": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røkt kolje /hyse": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røkt og kokt svinekam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røkt paprikapulver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røkt skinke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røkt svinekam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røkt svinekam uten ben": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røkt torsk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rørosrømme": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rørsukker": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "rørt tyttebær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "røye": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "safran": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sagtang": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "salami": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "salatmix": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "salatost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "salsa": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "salt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "salt storfekjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "salte kjeks": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "salte peanøtter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "scampi": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "seifilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sellerirot": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "semper grov mix": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "semulegryn": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sennep": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sennepsfrø": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sennepspulver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sesamfrø": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sesamolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "seterrømme": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "shawarma krydder": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "sherry": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sherryeddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "shisoblad": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sichuanpepper": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sikorisalat (endivie)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "siktet rugmel": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sitron": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sitrongress": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sitronpepper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sitronsaft": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sivri biber (tyrkisk paprika)": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sjalottløk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "sjy/kraft": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "sjysaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "sjøkreps": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "skinkebiff": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "skinkestek med svor": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "skinkestek uten ben": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "skinnfri kjøttpølse": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "skirt steak av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "skogsopp": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "skrei i skiver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "skreifilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "skummet melk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "skvallerkålskudd": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "smalahove": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "smult": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "små hamburgerbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "småflesk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "smågris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "småpoteter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "smårettbacon": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "smårettskinke": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "smør": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "smøreost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "smørflyndre": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "snackpaprika (spiss paprika)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "snittebønner": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "snøfrisk med gressløk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "snøfrisk naturell": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sobanudler": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "solbærgelé": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "solbærsaft": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "solbærsirup": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "solbærsyltetøy": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "solsikkekjerner": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "solsikkeolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "soltørkede tomater": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "soltørkede tomater i olje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sommerkoteletter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sommerskinke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sopp": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "soppsaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "sorte oliven": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "soyaolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "soyasaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "spagetti": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "spagettigresskar": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "spareribs": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "spekepølse": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "spekeskinke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "spekk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "spiselige blomster": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "spisskummenfrø": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "spisskål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sprøstekt løk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "sriracha (asiatisk chilisaus)": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "garlic"
+  },
+  "sriracha majones": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "steinbitfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "steinsopp": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "stekepoteter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "stekesjy": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "stekt ribbe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "stilkselleri (stangselleri)": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "stjerneanis": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "stjerneløk (delikatesseløk)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "stor fullkorntorilla": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "strimlet kyllingkjøtt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "strutsevingknopper": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "sukker": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sukkererter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sukkerertspirer": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sukkerkulør": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sultanrosiner": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sumak": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "suovas (røkt reinsdyrskav)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "suppeboller": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "surdeigsbrød": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "surkål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sushiris": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "svarte sesamfrø": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "svartkål": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "svinebog": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "svinecarré": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "svinekam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "svinenakke": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "svinestek": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "svinetarm": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "svisker": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sweet basilikum": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "sylteagurk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "syltede rødbeter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "syltelabb": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "syltet kålrot": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "syltet rødløk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "sølvløk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "søt chilisaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "søt eddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "søt soyasaus (ketjap manis)": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "søtpotet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "t-benstek": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tabasco": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tacokrydder": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "tacosaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "tacoskjell": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "tagliatelle": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tahini": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tamarindsaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tamarindvann": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tandoorikrydder": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "tapenade": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tempero baiano": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "tequila": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "teriyakisaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "terteskjell": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "thai chili (små chili)": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "thai curry saus": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "thaibasilikum": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "thailandsk aubergine": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tikka masala krydder": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "tikka masala saus": {
+    "gluten": "maybe",
+    "kids": "spicy",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "tofu/ soyapudding": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tomahawk (côte de boeuf)": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tomat": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tomatjuice": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tomatpesto": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tomatpuré": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tomatsaus": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "tomatsuppe": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "torsk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "torsk i skiver": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "torskefilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "torskelever": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "torskeloin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "torskerogn": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tortillachips": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tortillalefse": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tortillalefse, stor": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tranebær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tri-tip av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "trøffelolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tynnribbe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tyttebær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tyttebærsyltetøy": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tzatziki": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørkede dadler": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørkede fiken": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørkede grønne erter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørkede gule erter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørkede kikerter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørkede svarte bønner": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørkede tranebær": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørkede urter": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket aprikos": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket basilikum": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket dill": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket estragon": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket frukt": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket hel chili": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket merian": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket mynte": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket oregano": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket persille": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket rosmarin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket salvie": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket sopp": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket steinsopp": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørket timian": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørr hvitvin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørr sennep": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørre limabønner (butter beans)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørrfisk": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "tørrgjær": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "udon-nudler": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "uerfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "urtekrydder": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "urtesalt": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "usaltede peanøtter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "usaltede pistasjnøtter": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "usaltet smør": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "valmuefrø": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "valnøttkjerner": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "valnøttolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vaniljestang": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vann": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vannmelon": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "varmrøkt laks": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "varmrøkt makrell": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "varmrøkt reinsdyrhjerte": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vegansk smør": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vellagret ost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vikingmelk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "viltkraft": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vineddik": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "some",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "virgin olivenolje": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vodka": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vongole": {
+    "gluten": "no",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vossakorv": {
+    "gluten": "maybe",
+    "kids": "choking",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "västerbottensost": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "trace",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "vårløk": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "onion"
+  },
+  "wasabi": {
+    "gluten": "no",
+    "kids": "spicy",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "wokgrønnsaker": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "worchestershiresaus": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "maybe"
+  },
+  "yoghurt naturell": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "high",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ytrefilet av elg": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ytrefilet av hjort": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ytrefilet av kalv": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ytrefilet av lam": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ytrefilet av reinsdyr": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ytrefilet av storfe": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ytrefilet av svin": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ytrefilet av svin i skiver (svinefilet)": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "za’atar krydderblanding": {
+    "gluten": "maybe",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "øl": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ørret": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ørretfilet": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "ørretrogn": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "østerssaus (oyster sauce)": {
+    "gluten": "yes",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  },
+  "østerssopp": {
+    "gluten": "no",
+    "kids": "ok",
+    "lactose": "none",
+    "model": "jev-1.13.0",
+    "onion": "none"
+  }
+}

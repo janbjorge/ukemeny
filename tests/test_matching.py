@@ -1,0 +1,64 @@
+from core.dishes import dish
+from core.matching import (
+    candidates,
+    cheapest_first,
+    heading_key,
+    main_protein,
+    obvious,
+    stems,
+    weight,
+)
+from core.models import Part
+from tests.fakes import ingredient, offer, recipe
+
+
+def test_weight_by_category_and_amount_per_portion() -> None:
+    assert weight(Part("kyllingfilet", "/kjøtt/kylling/høns", 150, "g")) == 3.0
+    assert weight(Part("laks", "/fisk og sjømat", 100, "g")) == 3.0
+    assert weight(Part("bacon", "/kjøtt/svinekjøtt", 25, "g")) == 0.75
+    assert weight(Part("poteter", "/poteter", 100, "stk")) == 1.0
+    assert weight(Part("kjøttbuljong", "/kjøtt/storfekjøtt", 250, "l")) == 0.5
+    assert weight(Part("kylling", "/kjøtt/kylling/høns", None, "")) == 1.5
+    assert weight(Part("pepper", "/krydder", 0, "ts")) == 0.0
+
+
+def test_stems_drop_filler_words() -> None:
+    assert stems("skinn- og beinfri laksefilet") == {"lakse"}
+    assert stems("frisk grønn asparges") == {"aspar"}
+
+
+def test_candidates_share_a_stem_with_the_heading() -> None:
+    offers = [offer("LAKSEFILET"), offer("RØKT LAKS"), offer("KYLLINGFILET"), offer("TOMATER")]
+    found = candidates("laksefilet", offers)
+    assert [o.heading for o in found] == ["LAKSEFILET"]
+    assert [o.heading for o in candidates("kyllingbryst", offers)] == ["KYLLINGFILET"]
+
+
+def test_short_words_need_the_whole_word() -> None:
+    offers = [offer("EGG"), offer("EGGNUDLER"), offer("VEGGIEBURGER")]
+    assert [o.heading for o in candidates("egg", offers)] == ["EGG", "EGGNUDLER", "VEGGIEBURGER"]
+
+
+def test_cheapest_per_kg_first() -> None:
+    dear = offer("KYLLINGFILET", 99, per_kg=141.0)
+    cheap = offer("KYLLINGFILET", 139, per_kg=139.0, store="REMA 1000")
+    assert cheapest_first([dear, cheap]) == (cheap, dear)
+
+
+def test_obvious_answers() -> None:
+    assert heading_key("  Kylling  FILET ") == "kylling filet"
+    assert obvious("poteter", "POTETER") == 1.0
+    assert obvious("kyllingfilet", "Coop kyllingpålegg") == 0.0
+    assert obvious("hamburgerbrød", "HAMBURGERBRØD GROVE") is None
+    assert obvious("kyllingfilet", "KYLLINGBRYST") is None
+
+
+def test_main_protein_is_the_heaviest_meat_or_fish() -> None:
+    chicken = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
+    ham = ingredient("spekeskinke", 100, "g", "/kjøtt/spekemat")
+    assert main_protein(dish(recipe("A", chicken, ham))) == ("kylling", "kyllingfilet")
+    assert main_protein(dish(recipe("B", ham))) == ("kjøtt", "spekeskinke")
+    assert main_protein(dish(recipe("C", ingredient("brokkoli", 300, "g", "/grønnsaker")))) == (
+        "vegetar",
+        "",
+    )

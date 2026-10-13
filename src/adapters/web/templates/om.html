@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Slik virker matris{% endblock %}
+{% block main %}
+<section class="hero">
+  <h1>Slik virker det</h1>
+  <p class="lede">matris foreslår middager fra matprat.no som passer kostholdet vårt, og velger de der hovedråvaren er på tilbud denne uka.</p>
+</section>
+
+<section class="prose">
+  <h2>Kostholdet</h2>
+  <ul>{% for line in household %}<li>{{ line }}</li>{% endfor %}</ul>
+  <p>En middag med løk i navnet, som biff med løk, er tatt bort. Ellers står det hva du kan bytte: løk mot vårløk, vanlig pasta mot glutenfri, fløte mot laktosefri.
+    Laktose regnes ut fra mengden melk, fløte, rømme og ost i oppskriften, per porsjon. Smør og hard ost har nesten ingen.</p>
+  <p>Ting som bare noen merker har hvete eller løk i, som buljong, pølser og krydderblandinger, får et «sjekk etiketten».
+    For de minste merkes chili og det som kan sette seg i halsen, som hele nøtter, pølser og cherrytomater.</p>
+
+  <h2>Tilbudene</h2>
+  <p>En vare er på tilbud når kundeavisen har en førpris som er høyere enn prisen nå. Det gjelder {{ plan.on_sale }} av {{ plan.fitting }} middager denne uka.
+    Bunnpris og Matkroken oppgir ingen førpriser, så rabatter der vises ikke.</p>
+  <p>Ukens middager har ikke samme protein to ganger. Fisk kan komme to ganger, men ikke samme fisk.</p>
+
+  <h2>Hvordan ingrediensene er vurdert</h2>
+  <p>Om en ingrediens har gluten, løk eller laktose, og hvilke tilbud som er samme vare som i oppskriften, er vurdert på forhånd med en liten språkmodell,
+    med matprat.no sin varekategori som hjelp. Siden selv bruker ingen KI; den leser en ferdig liste som lages på nytt hver uke.
+    Vurderingene kan ta feil, så sjekk alltid etiketten.</p>
+
+  <h2>For KI-agenter</h2>
+  <p>Det samme finnes som JSON: <a href="/api/plan">/api/plan</a>, <a href="/api/middager">/api/middager</a> og <a href="/api/openapi.json">skjemaet</a>.
+    <a href="/llms.txt">llms.txt</a> forklarer resten.</p>
+</section>
+{% endblock %}

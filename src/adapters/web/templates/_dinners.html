@@ -1,0 +1,18 @@
+{# The ideas under the week, filtered by protein and sale. An HTMX fragment of index.html (/middager). #}
+{% from "_dinner.html" import card %}
+<div id="forslag-liste">
+  <nav class="chips" aria-label="Velg protein">
+    {% set sale = "&tilbud=1" if choice.tilbud else "" %}
+    <a href="/?{{ sale[1:] }}#forslag" hx-get="/middager?{{ sale[1:] }}" hx-target="#forslag-liste" hx-swap="outerHTML"{% if not choice.protein %} aria-current="true"{% endif %}>Alle</a>
+    {% for p, n in proteins %}<a href="/?protein={{ p }}{{ sale }}#forslag" hx-get="/middager?protein={{ p }}{{ sale }}" hx-target="#forslag-liste" hx-swap="outerHTML"{% if choice.protein == p %} aria-current="true"{% endif %}>{{ p }} <span class="muted">{{ n }}</span></a>
+    {% endfor %}
+  </nav>
+  {% set protein = "protein=" ~ choice.protein ~ "&" if choice.protein else "" %}
+  <p class="toggle">
+    {% if choice.tilbud %}<a href="/?{{ protein }}#forslag" hx-get="/middager?{{ protein }}" hx-target="#forslag-liste" hx-swap="outerHTML">Vis alle, også uten tilbud</a>
+    {% else %}<a href="/?{{ protein }}tilbud=1#forslag" hx-get="/middager?{{ protein }}tilbud=1" hx-target="#forslag-liste" hx-swap="outerHTML">Bare de med hovedråvaren på tilbud</a>{% endif %}
+  </p>
+  <div class="cards">
+    {% for d in dinners %}{{ card(d) }}{% else %}<p>Ingen middager her denne uka.</p>{% endfor %}
+  </div>
+</div>

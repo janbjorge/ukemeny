@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.local.md
+# Local caches of the offline build: recipes, Jev's answers, catalogs. datasets/ is committed.
+data/

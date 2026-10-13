@@ -1,0 +1,20 @@
+# matris.app
+
+> Dinner ideas from matprat.no for one household's diet (no onion, though spring onion is fine; gluten-free; little lactose; fit for small kids), ranked by this week's grocery offers around Stavanger from mattilbud.no.
+
+The site is in Norwegian (bokmål). Recipes belong to matprat.no; link to them, do not copy them. Offers are from the stores' weekly catalogs. Whether an ingredient holds gluten, onion or lactose was judged by a small language model and can be wrong; tell people to check the label.
+
+## JSON API
+
+Read-only, no key, CORS open. Keys are English; advice and notes are bokmål; prices are kroner.
+
+- [OpenAPI schema]({{ base }}api/openapi.json): every endpoint and field
+- [This week's dinners]({{ base }}api/plan): a varied week, picked from dinners whose main protein is on sale
+- [Dinners that fit]({{ base }}api/middager?tilbud=1): best first. `protein` takes one of: {{ proteins }}. `tilbud=1` keeps only dinners whose main protein is on sale; `antall` is 1-100.
+- [One recipe]({{ base }}api/oppskrift?url=https://www.matprat.no/oppskrifter/familien/lasagne/): how it fits, with swaps, notes and every ingredient, for a shopping list
+
+## Method
+
+- Dinners that need no swaps come first, then those with the biggest discount on what matters most (meat and fish, by amount), then rating and prep time.
+- A dinner is on sale when its main protein (the heaviest meat or fish; without one, a main vegetable) has a before-price in this week's catalog.
+- [How it works, in Norwegian]({{ base }}om)

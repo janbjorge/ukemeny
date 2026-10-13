@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_dinner.html" import card %}
+{% block main %}
+<section class="hero" id="uka">
+  <h1>Ukens middager</h1>
+  <p class="lede">{{ week.dinners|length }} middager fra matprat.no der hovedråvaren er på tilbud denne uka, med litt av hvert: ikke samme protein to ganger{% if fish %}, og fisk {{ {1: "én gang", 2: "to ganger", 3: "tre ganger"}.get(fish, fish ~ " ganger") }}{% endif %}.</p>
+  <ul class="rules" aria-label="Kostholdet">
+    {% for line in household %}<li>{{ line }}</li>{% endfor %}
+  </ul>
+</section>
+<div class="cards week">
+  {% for d in week.dinners %}{{ card(d) }}{% endfor %}
+</div>
+<p class="muted">{{ week.fitting }} av {{ week.considered }} middager på matprat.no passer, {{ week.on_sale }} av dem med hovedråvaren på tilbud.
+  Tilbudene er fra {{ week.offers }} varer hos {{ week.stores|length }} kjeder.</p>
+
+<section id="forslag">
+  <h2>Flere forslag</h2>
+  <p>Middagene som passer best først: de som trenger færrest bytter, så de med mest rabatt, så de best likte og raskeste.</p>
+  {% include "_dinners.html" %}
+</section>
+{% endblock %}

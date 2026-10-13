@@ -1,0 +1,32 @@
+# matris
+
+Dinner ideas from [matprat.no](https://www.matprat.no) that fit one household's diet, with the week picked from dinners whose main protein is on sale in Stavanger ([mattilbud.no](https://mattilbud.no)). The site is at https://matris.app (in Norwegian).
+
+The household's rules live in `profile.yaml`. FACTS.md says how everything works, METHOD.md every judgement call, TODO.md what is open.
+
+## Run it
+
+```sh
+uv run matris plan                      # this week's dinners
+uv run matris candidates --on-sale      # more ideas; also --protein fisk, --top 50
+uv run matris check <matprat-url>       # how one recipe fits
+uv run uvicorn adapters.web.main:app    # the site on http://127.0.0.1:8000
+```
+
+Each read command takes `--json` for agents: one JSON document on stdout, errors as `{"error": {"kind", "message"}}` with exit code 1. The site's `/api` returns the same shape; `/llms.txt` and `/api/openapi.json` describe it.
+
+## Rebuild the data (weekly)
+
+```sh
+export TYPESAFE_API_KEY=...             # https://console.typesafe.ai
+uv run python -m pipeline.datasets      # this week's offers, new ingredients
+uv run python -m pipeline.datasets --refresh   # also new and changed recipes
+```
+
+Then commit `datasets/` and push; a push to main deploys (.github/workflows/deploy.yml).
+
+## Check
+
+```sh
+uvx ruff check . && uv run ty check src tests && uv run pytest -q
+```

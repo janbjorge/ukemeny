@@ -114,3 +114,11 @@ async def test_snapshot_reports_each_step() -> None:
         ("offers", 0, 1),
         ("offers", 1, 1),
     ]
+
+
+async def test_relabel_asks_stored_labels_again() -> None:
+    store = FakeTraits()
+    classifier = FakeClassifier()
+    await build.classify([CHICKEN], store, classifier)
+    await build.classify([CHICKEN], store, classifier, relabel=["milk", "egg"])
+    assert classifier.asked[-1] == ("kyllingfilet", ("milk", "egg"))

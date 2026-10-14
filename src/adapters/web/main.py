@@ -2,7 +2,6 @@
 
 import hashlib
 import os
-import threading
 from collections import OrderedDict
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
@@ -414,14 +413,9 @@ def _default() -> FastAPI:
         # No profile: the site starts with no diet rules, and a visitor picks them in the search
         queries = Queries(JsonDatasets())
         app = create_app(queries)
+    # No ranking is worked out ahead of a search: every rule and place at start-up took 60 MiB more than the 256 MB
+    # machine had with godt.no, and it was killed (2026-10-14, FACTS.md §7)
     telemetry.instrument(app, queries)
-
-    def warm() -> None:
-        with logfire.span("warm the diet rules"):
-            queries.warm()
-
-    # Each rule's ranking, worked out after start-up, so a first tap on a chip finds it ready
-    threading.Thread(target=warm, name="warm", daemon=True).start()
     return app
 
 

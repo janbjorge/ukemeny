@@ -9,6 +9,7 @@ from collections.abc import Mapping
 from dataclasses import asdict
 from datetime import date, datetime
 from pathlib import Path
+from sys import intern
 from typing import NotRequired, TypedDict
 
 import orjson
@@ -49,7 +50,6 @@ class OfferJSON(TypedDict):
     valid_until: str
 
 
-FILES = ("dishes.json", "traits.json", "offers.json")
 _JSON = orjson.OPT_INDENT_2 | orjson.OPT_APPEND_NEWLINE | orjson.OPT_SORT_KEYS
 
 
@@ -57,14 +57,18 @@ class JsonDatasets:
     """Implements core.ports.Datasets. Read once at start-up; the files only change on deploy."""
 
     def __init__(self, root: Path = DATASETS) -> None:
-        raw = {name: orjson.loads((root / name).read_bytes()) for name in FILES}
+        # One file at a time, each let go before the next is read, and one copy of each ingredient name and department:
+        # 7 MiB less on the 256 MB machine than all three at once (2026-10-14, FACTS.md §7)
+        dishes = tuple(_dish(d) for d in orjson.loads((root / "dishes.json").read_bytes()))
+        traits = {intern(name): Traits.of(t) for name, t in orjson.loads((root / "traits.json").read_bytes()).items()}
+        offers = orjson.loads((root / "offers.json").read_bytes())
         self._snapshot = Snapshot(
-            built=datetime.fromisoformat(raw["offers.json"]["built"]),
-            dishes=tuple(_dish(d) for d in raw["dishes.json"]),
-            traits={name: Traits.of(t) for name, t in raw["traits.json"].items()},
-            offers=tuple(_offer(o) for o in raw["offers.json"]["offers"]),
-            matches={name: tuple(ids) for name, ids in raw["offers.json"]["matches"].items()},
-            places={place: tuple(ids) for place, ids in raw["offers.json"].get("places", {}).items()},
+            built=datetime.fromisoformat(offers["built"]),
+            dishes=dishes,
+            traits=traits,
+            offers=tuple(_offer(o) for o in offers["offers"]),
+            matches={intern(name): tuple(ids) for name, ids in offers["matches"].items()},
+            places={place: tuple(ids) for place, ids in offers.get("places", {}).items()},
         )
 
     def snapshot(self) -> Snapshot:
@@ -97,10 +101,10 @@ def _dish(d: DishJSON) -> Dish:
         url=d["url"],
         name=d["name"],
         portions=d["portions"],
-        prep_time=d["prep_time"],
+        prep_time=intern(d["prep_time"]),
         rating=d["rating"],
         rating_count=d["rating_count"],
-        parts=tuple(Part(p["name"], p["category"], p["grams"], p["unit"]) for p in d["parts"]),
+        parts=tuple(Part(intern(p["name"]), intern(p["category"]), p["grams"], intern(p["unit"])) for p in d["parts"]),
     )
 
 

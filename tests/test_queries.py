@@ -153,3 +153,11 @@ def test_rankings_past_the_limit_are_dropped_and_worked_out_again() -> None:
     first = q.ranked()
     assert q.ranked(Household(gluten=Rule.OK)) and q.ranked() is not first
     assert [d.dish.name for d in q.search("på tilbud").dinners] == ["Kylling"]
+
+
+def test_a_places_offers_are_dropped_with_the_rankings() -> None:
+    q = Queries(FakeDatasets(snapshot(recipe("Kylling", CHICKEN), places={"Bergen": ["kiwi-vest"]})))
+    q.KEPT = 1
+    bergen = q.nearby("Bergen")
+    assert q.ranked(place="Bergen") and q.nearby("Bergen") is bergen
+    assert q.ranked() and q.nearby("Bergen") is not bergen

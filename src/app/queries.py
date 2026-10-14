@@ -3,9 +3,9 @@
 The rules come from the search: «uten løk», «glutenfri» and «lite laktose» are put on top of a base household.
 The site's base has no rules (core.search.ANYTHING); the CLI's is profile.yaml. The offers are from the stores near the
 place picked with the search (the site's «Sted»), else near the base place (the CLI's, from profile.yaml), else from every
-store. What does not depend on the rules (core.ranking.prepare, the search Index) is worked out once, and the offers once per place;
-rankings, views and the week's counts once per set of rules and place, and kept: the snapshot only changes on deploy.
-The week's dinners are drawn each time (core.ranking.plan).
+store. What does not depend on the rules (core.ranking.prepare, the search Index) is worked out once. The offers per place,
+and rankings, views and the week's counts per set of rules and place, are worked out when first asked for and kept, a few
+at a time (Queries.KEPT): the snapshot only changes on deploy. The week's dinners are drawn each time (core.ranking.plan).
 """
 
 import random
@@ -18,7 +18,7 @@ from core.diet import judge
 from core.models import Dinner, Dish, Household, Offer, Plan, Snapshot, Verdict
 from core.ports import Datasets
 from core.ranking import Week
-from core.search import ANYTHING, Clause, Counts, Diet, Index, Kind, Order, Search, View, fold, household, via
+from core.search import ANYTHING, Clause, Counts, Index, Kind, Order, Search, View, fold, household, via
 
 type Rules = tuple[Household, str | None]
 """What a ranking depends on: the household, and the place whose offers count (None: every store)."""
@@ -52,9 +52,10 @@ class Found:
 
 
 class Queries:
-    KEPT = 128
-    """Rankings kept, about 0.7 MiB each with 20 places (2026-10-13): with places there are many more sets of rules and
-    place than the 256 MB machine holds, so past this many they are all dropped and worked out again as asked."""
+    KEPT = 8
+    """Rankings kept. With godt.no a ranking takes 1.3 MiB and a place's offers 1.1 MiB, and the 256 MB machine has room
+    for a few (2026-10-14, FACTS.md §7): past this many they are all dropped, the places' offers too, and worked out
+    again as asked, in about 40 ms locally."""
 
     def __init__(self, datasets: Datasets, base: Household = ANYTHING, week: Week | None = None, home: str | None = None) -> None:
         self.snapshot: Snapshot = datasets.snapshot()
@@ -85,8 +86,9 @@ class Queries:
                 self._ranked.clear()
                 self._view.clear()
                 self._plan.clear()
+                self._nearby = {None: self.prepared}
             ranked = self._ranked[key] = ranking.dinners(self.snapshot, key[0], self.nearby(place))
-        return ranked  # Not self._ranked[key]: warm() in its thread may have dropped it already
+        return ranked  # Not self._ranked[key]: another request's thread may have dropped it already
 
     def view(self, h: Household | None = None, place: str | None = None) -> View:
         key = (h or self.base, place)
@@ -141,14 +143,6 @@ class Queries:
             via={d.dish.url: names for d in shown if (names := via(d, search))},
             relax=() if found else tuple(self.index.relax(search, view)),
         )
-
-    def warm(self) -> None:
-        """Work out the view for each diet rule on its own, and for each place without rules, ahead of the first search
-        that needs it."""
-        for diet in Diet:
-            self.view(household([diet], self.base), self.home)
-        for place in self.snapshot.places:
-            self.view(self.base, place)
 
     def offers(self, place: str | None = None) -> list[Offer]:
         """This week's offers at the stores near `place`, or at every store."""

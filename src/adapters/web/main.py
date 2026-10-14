@@ -99,7 +99,7 @@ class Chip:
     """The search after a click: the chip toggled."""
     on: bool
     count: int | None
-    """Dinners after a click, for a chip that is off."""
+    """Dinners after a click, for a chip that is off; for a main protein, the dinners it adds."""
     order: Order | None
     """The sort after a click: the one now, but for a sort chip, which toggles it."""
     protein: str = ""
@@ -125,7 +125,7 @@ def chips(found: Found) -> dict[str, list[Chip]]:
             continue  # «Vegetar» is a rule in Kosthold: no meat or fish in any ingredient, not just the main one
         if n := found.counts.proteins.get(p):
             clause = protein_clause(protein_word(p))
-            on = chosen is not None and chosen.values == (p,)
+            on = chosen is not None and p in chosen.values
             proteins.append(Chip(protein_word(p).capitalize(), s.toggle(clause).text, on, None if on else n, order, p))
 
     # On or off, neither on is the ranking (jb 2026-10-14: no «Anbefalt», "makes no sense")

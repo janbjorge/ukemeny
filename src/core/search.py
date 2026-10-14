@@ -170,16 +170,29 @@ class Search:
         return Search(tuple(c for c in self.clauses if c != clause))
 
     def toggle(self, clause: Clause) -> Search:
-        """Without the clause if it is there; otherwise with it, in place of a clause it rules out
-        (another prep time, another main protein)."""
+        """Without the clause if it is there; otherwise with it, in place of a clause it rules out (another prep time).
+        A main protein joins or leaves the ones chosen: «fisk» on «kylling» is «kylling eller fisk», and back."""
+        if clause.kind is Kind.PROTEIN:
+            return self._toggle_protein(clause)
         if self.has(clause):
             return self.drop(clause)
         return Search((*(c for c in self.clauses if not _replaces(clause, c)), clause))
 
+    def _toggle_protein(self, clause: Clause) -> Search:
+        chosen = next((c for c in self.clauses if c.kind is Kind.PROTEIN), None)
+        if chosen is None:
+            return Search((*self.clauses, clause))
+        if set(clause.values) <= set(chosen.values):
+            rest = [protein_word(g) for g in chosen.values if g not in clause.values]
+            if not rest:
+                return self.drop(chosen)
+            joined = proteins_clause(rest)
+        else:
+            joined = proteins_clause((*chosen.text.split(" eller "), clause.text))
+        return Search(tuple(joined if c == chosen else c for c in self.clauses))
+
 
 def _replaces(new: Clause, old: Clause) -> bool:
-    if new.kind is Kind.PROTEIN:
-        return old.kind is new.kind
     return new.kind is Kind.TAG and old.kind is Kind.TAG and new.values[0] in TIME_TAGS and old.values[0] in TIME_TAGS
 
 
@@ -248,7 +261,13 @@ def protein_clause(word: str, negated: bool = False) -> Clause:
     """`word` is a key of PROTEIN_WORDS."""
     if negated:
         return Clause(Kind.NOT_PROTEIN, PROTEIN_WORDS[word], f"uten {word}", f"Uten {word}")
-    return Clause(Kind.PROTEIN, PROTEIN_WORDS[word], word, word.capitalize())
+    return proteins_clause((word,))
+
+
+def proteins_clause(words: Sequence[str]) -> Clause:
+    """The main protein is any of these keys of PROTEIN_WORDS: «kylling eller fisk»."""
+    text = " eller ".join(words)
+    return Clause(Kind.PROTEIN, tuple(dict.fromkeys(g for w in words for g in PROTEIN_WORDS[w])), text, text.capitalize())
 
 
 def protein_word(group: str) -> str:
@@ -439,9 +458,7 @@ def parse(text: str, fix: Callable[[str], str] | None = None) -> Search:
         if clause.kind is Kind.PROTEIN and protein is not None:
             # A dinner has one main protein, so «kylling fisk» can only mean either
             if clause.text not in protein.text.split(" eller "):
-                text = f"{protein.text} eller {clause.text}"
-                values = tuple(dict.fromkeys(protein.values + clause.values))
-                clauses[clauses.index(protein)] = Clause(Kind.PROTEIN, values, text, text.capitalize())
+                clauses[clauses.index(protein)] = proteins_clause((*protein.text.split(" eller "), clause.text))
         elif clause.kind is Kind.WITH and alternative and clauses and clauses[-1].kind is Kind.WITH:
             clauses[-1] = with_clause((*clauses[-1].values, *clause.values))
         elif clause not in clauses:

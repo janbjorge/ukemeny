@@ -121,8 +121,19 @@ def test_toggle_adds_removes_and_replaces() -> None:
     s = parse("rask kylling")
     assert s.toggle(tag_clause(Tag.QUICK)).text == "kylling"
     assert s.toggle(tag_clause(Tag.UNDER_40)).text == "kylling under 40 min"
-    assert s.toggle(protein_clause("fisk")).text == "under 20 min fisk"
     assert s.toggle(tag_clause(Tag.ON_SALE)).text == "under 20 min kylling på tilbud"
+
+
+def test_toggle_picks_several_main_proteins() -> None:
+    s = parse("rask kylling på tilbud")
+    both = s.toggle(protein_clause("fisk"))
+    assert both.text == "under 20 min kylling eller fisk på tilbud"
+    assert both.clauses == parse(both.text).clauses
+    assert both.toggle(protein_clause("kylling")).text == "under 20 min fisk på tilbud"
+    assert s.toggle(protein_clause("kylling")).text == "under 20 min på tilbud"
+    assert parse("sjømat").toggle(protein_clause("fisk")).text == "skalldyr"
+    assert parse("kjøtt").toggle(protein_clause("kylling")).clauses[0].values == tuple(g for g in MEAT if g != "kylling")
+    assert parse("svin").toggle(protein_clause("annet kjøtt")).text == "svin eller annet kjøtt"
 
 
 def test_clause_kinds_and_labels() -> None:

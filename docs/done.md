@@ -4,6 +4,8 @@ Finished requests from jb, newest first. Each quotes the request and says what w
 
 ## 2026-10-14
 
+- [x] **Several main proteins at once** ("We need to allow multi select on ; Hovedråvare"): a chip in «Hovedråvare» joins the ones chosen instead of replacing them, and a chosen one leaves: «Kylling» then «Fisk» is `q=kylling+eller+fisk`, both lit, 485 dinners (306 + 179). «Alle» still clears them.
+
 - [x] **No Ukens middager on the site** ("lets kill the 'Ukens middager' banner hero cards"): the week's cards, its heading and «Nye middager» are gone from the front page, and with them the visit's draw (`uke`): the list under the search leaves nothing out, fragments are always kept, and the front page is cached for 5 minutes again. «Finn en middag» is the page's h1, and the title says «matris: middager med ukens tilbud». /api/plan and `matris plan` still give the week.
 
 - [x] **The week no longer shifts the page** ("Button works, however, the page shifts up and down depend on the size of the ukes middags hero cards"): over 60 draws the week was 429–513 px tall at 1280 px, 532–609 px at 820 and 277–301 px at 390. Its cards now keep two lines for the name and for the deal and one for the swaps when a rule is picked, so every draw is one height (513, 683 and 301 px without rules); «Nye middager» stayed on the same pixel over 8 clicks at 1280 and 390 px.

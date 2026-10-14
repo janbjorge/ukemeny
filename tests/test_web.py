@@ -86,7 +86,7 @@ def test_nothing_found_offers_what_to_drop(client: TestClient) -> None:
 def test_chips_toggle_and_count(client: TestClient) -> None:
     html = client.get("/middager?q=kylling", headers=HX).text
     assert f'hx-get="/middager?q=kylling+p%C3%A5+tilbud"{GO}>På tilbud <span class="n">1</span>' in html
-    assert f'hx-get="/middager?q=fisk"{GO} data-protein="fisk">Fisk <span class="n">2</span>' in html
+    assert f'hx-get="/middager?q=kylling+eller+fisk"{GO} data-protein="fisk">Fisk <span class="n">2</span>' in html
     assert 'data-protein="kylling" aria-current="true">Kylling</a>' in html
     assert '<span class="off">Godt likt</span>' in html  # nothing would match
     assert 'hx-get="/middager?q=kylling+uten+l%C3%B8k" hx-trigger="mousedown, click" hx-sync="this:drop">Uten løk</a>' in html
@@ -103,6 +103,9 @@ def test_chips_toggle_and_count(client: TestClient) -> None:
     assert "Vegetar" not in proteins_row[: proteins_row.index("</nav>")]  # a rule in Kosthold, not a main protein
     proteins = html[html.index('class="chips proteins"') :]
     assert proteins.index(">Kylling<") < proteins.index(">Alle ")  # a chosen chip leads its row
+    both = client.get("/middager?q=kylling+eller+fisk", headers=HX).text
+    assert f'hx-get="/middager?q=fisk"{GO} data-protein="kylling" aria-current="true">Kylling</a>' in both
+    assert f'hx-get="/middager?q=kylling"{GO} data-protein="fisk" aria-current="true">Fisk</a>' in both
 
 
 def test_the_box_follows_chips_but_not_typing(client: TestClient) -> None:

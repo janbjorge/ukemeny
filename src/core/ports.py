@@ -16,7 +16,7 @@ class Datasets(Protocol):
 
 
 class RecipeSource(Protocol):
-    """Where recipes come from: matprat.no. Raises SourceUnavailableError."""
+    """Where recipes come from: matprat.no and godt.no. Raises SourceUnavailableError."""
 
     async def index(self) -> Sequence[RecipeRef]:
         """Every recipe page the source lists, with when it last changed."""
@@ -47,8 +47,17 @@ class IngredientClassifier(Protocol):
         """Every label it can answer."""
         ...
 
-    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> Levels:
-        """These labels of the ingredient's name, and "model"; its grocery category is context."""
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str], dish: str = "") -> Levels:
+        """These labels of the ingredient's name, and "model"; its grocery category is context, and so is `dish`, a dinner
+        it is in, for an ingredient without one."""
+        ...
+
+
+class DepartmentClassifier(Protocol):
+    """Which grocery department an ingredient is filed under, for a source that names none (godt.no)."""
+
+    async def department(self, ingredient: str, departments: Mapping[str, Sequence[str]], dish: str = "") -> str:
+        """One of `departments`, each given with ingredient names filed there; `dish`, a dinner it is in, is context."""
         ...
 
 

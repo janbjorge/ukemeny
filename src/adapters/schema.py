@@ -1,6 +1,6 @@
 """The JSON shape of dinners, plans and recipe checks, shared by the API (/api) and `matris --json`.
 
-No ingredient lists: the recipes belong to matprat.no, and every dinner links there.
+No ingredient lists: the recipes belong to matprat.no and godt.no, and every dinner links there.
 
 pydantic v2 models, so the OpenAPI schema documents every field. Keys are English, for agents;
 the text inside (advice) is bokmål, like the site. No label or kid notes either: they named ingredient after
@@ -69,7 +69,7 @@ class DinnerOut(RecipeOut):
 
 class CheckOut(Out):
     recipe: RecipeOut
-    """The recipe itself is on matprat.no (`recipe.url`); its ingredients are not repeated here."""
+    """The recipe itself is on matprat.no or godt.no (`recipe.url`); its ingredients are not repeated here."""
     fits: bool
     blocked: str | None
     swaps: list[NoteOut]

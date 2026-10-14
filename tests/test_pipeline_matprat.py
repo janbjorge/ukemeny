@@ -7,6 +7,7 @@ import pytest
 from core.errors import SourceUnavailableError
 from core.models import RecipeRef
 from pipeline.matprat import MatpratRecipeSource, parse_recipe, parse_sitemap
+from pipeline.pages import Pages
 
 URL = "https://www.matprat.no/oppskrifter/familien/stekt-laks-med-kokosris/"
 
@@ -89,7 +90,7 @@ def test_pages_without_a_recipe() -> None:
 
 def source(handle: Callable[[httpx2.Request], httpx2.Response]) -> MatpratRecipeSource:
     client = httpx2.AsyncClient(transport=httpx2.MockTransport(handle))
-    return MatpratRecipeSource(client, workers=2, tries=2)
+    return MatpratRecipeSource(Pages(client, "matprat.no", workers=2, tries=2))
 
 
 async def test_fetch_and_index() -> None:
@@ -118,7 +119,12 @@ async def test_gone_page_is_none_and_errors_raise(monkeypatch: pytest.MonkeyPatc
     async def no_sleep(seconds: float) -> None:
         pass
 
-    monkeypatch.setattr("pipeline.matprat.asyncio.sleep", no_sleep)
+    monkeypatch.setattr("pipeline.pages.asyncio.sleep", no_sleep)
     with pytest.raises(SourceUnavailableError):
         await source(busy).fetch(URL)
     assert calls == 2
+
+
+async def test_a_missing_sitemap_is_an_error() -> None:
+    with pytest.raises(SourceUnavailableError):
+        await source(lambda request: httpx2.Response(404)).index()

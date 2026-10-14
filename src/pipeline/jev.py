@@ -1,7 +1,7 @@
 """TypeSafe Jev adapters, one per classifier port. https://docs.typesafe.ai
 
 Each question is one literal judgment about public data (an ingredient name and its
-matprat grocery department, an offer heading); nothing about the household is sent.
+grocery department, an offer heading); nothing about the household is sent.
 Criteria name Norwegian examples, which moved Jev from guessing to right on purre,
 risnudler, tamari and matfløte in a probe of 50 ingredients. The department fixed 28 of 36
 wrong answers on rarer words (reker, svinebog, multer). Turning probabilities into labels
@@ -229,8 +229,9 @@ def ingredient_labels() -> Labels:
     labels.contains(
         Item.FISH,
         "fish",
-        yes="all fish (laks, torsk, sei, makrell, tunfisk, sild), ansjos, kaviar, fiskesaus, worcestershiresaus, fiskeboller, "
-        "fiskekraft, bonito, dashi",
+        # godt.no probe 2026-10-14: uer and breiflabb were "no" until named here
+        yes="all fish (laks, torsk, sei, makrell, tunfisk, sild, uer, breiflabb, kveite, steinbit), ansjos, kaviar, fiskesaus, "
+        "worcestershiresaus, fiskeboller, fiskekraft, bonito, dashi",
         maybe="Products that sometimes hold fish: caesardressing, asiatiske krydderpastaer",
         no="skalldyr and bløtdyr (asked separately), tang, nori, sylteagurk and other pickles, everything else",
     )
@@ -316,7 +317,9 @@ def ingredient_labels() -> Labels:
     labels.contains(
         Item.MEAT,
         "meat or poultry, or anything made from them",
-        yes="all meat and poultry, bacon, pølser, skinke, kjøttkraft, kyllingbuljong, oksebuljong, kalvefond, smult, gelatin",
+        # godt.no probe 2026-10-14: and (duck), elg and bog were "no" until named here
+        yes="all meat and poultry (and is duck; gås, rype, elg, hjort; bog is a shoulder cut), bacon, pølser, skinke, "
+        "kjøttkraft, kyllingbuljong, oksebuljong, kalvefond, smult, gelatin",
         maybe="buljong or kraft of unnamed kind, ferdigsauser",
         no="fish and shellfish (asked separately), dairy, cheese, egg, sopp (every mushroom: aromasopp, portobello, "
         "steinsopp), everything else",
@@ -395,14 +398,37 @@ class JevIngredientClassifier:
     def labels(self) -> tuple[str, ...]:
         return self.registry.keys()
 
-    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str]:
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str], dish: str = "") -> dict[str, str]:
         keys = tuple(labels)
-        response = await self.jev.ask(
-            "ingredient",
-            {"ingredient": ingredient.name, "category": ingredient.category},
-            self.registry.questions(keys),
-        )
+        state: dict[str, JSONContent] = {"ingredient": ingredient.name, "category": ingredient.category}
+        if dish:
+            state["dish"] = dish
+        response = await self.jev.ask("ingredient", state, self.registry.questions(keys))
         return {**self.registry.read(response, keys), "model": response.model}
+
+
+@dataclass
+class JevDepartmentClassifier:
+    """Implements core.ports.DepartmentClassifier: one Choice over the departments, each described by the names filed
+    there, and the dish as context. Probed on 200 of matprat's names it was not shown (2026-10-14), without a dish: 158 in
+    matprat's own department, and 26 in one that changes a rule, mostly a near miss (frukt for bær, pølser for
+    svinekjøtt), some a protein gained or lost (bbq-saus as pølser, smult as melk). 30 names per department, or the kind
+    of meat asked apart, did no better; the dish put and, elg, bog and breiflabb right (METHOD.md §2)."""
+
+    jev: Jev
+
+    async def department(self, ingredient: str, departments: Mapping[str, Sequence[str]], dish: str = "") -> str:
+        question = Choice(
+            instructions="Which department of a Norwegian grocery store sells the recipe ingredient `ingredient`? Each "
+            "department lists ingredients a recipe site files there.",
+            criteria={department: list(names) for department, names in departments.items()},
+        )
+        state: dict[str, JSONContent] = {"ingredient": ingredient}
+        if dish:
+            state["dish"] = dish
+        response = await self.jev.ask("department", state, {"department": question})
+        probabilities = response.choices["department"].probabilities
+        return max(departments, key=lambda department: probabilities.get(department, 0.0))
 
 
 QUESTIONS_PER_CALL = 100

@@ -1,5 +1,5 @@
 {# One dinner as a card: the main discount, and what to swap for the diet rules picked. With a search, the searched words
-   are marked, and sorted by «Rabatt kr» the discount is in kroner. The rest is on matprat.no (the link). #}
+   are marked, and sorted by «Rabatt kr» the discount is in kroner. The rest is on matprat.no or godt.no (the link). #}
 {% macro card(d, search=none, via=(), order=none) %}
 <article class="card" data-protein="{{ d.protein }}">
   <h3><a href="{{ d.dish.url }}" rel="noopener">{% if search and search.words %}{% for piece, hit in marked(d.dish.name, search) %}{% if hit %}<mark>{{ piece }}</mark>{% else %}{{ piece }}{% endif %}{% endfor %}{% else %}{{ d.dish.name }}{% endif %}</a></h3>

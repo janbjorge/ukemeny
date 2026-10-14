@@ -97,17 +97,33 @@ def offer(
 
 @dataclass
 class FakeClassifier:
-    """Answers from `known`, PLAIN for anything else, and records what was asked: (name, labels)."""
+    """Answers from `known`, PLAIN for anything else, and records what was asked: (name, labels), and per name the
+    department and dish it came with."""
 
     known: Mapping[str, Traits] = field(default_factory=dict)
     asked: list[tuple[str, tuple[str, ...]]] = field(default_factory=list)
     labels: tuple[str, ...] = LABELS
+    context: dict[str, tuple[str, str]] = field(default_factory=dict)
 
-    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str]:
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str], dish: str = "") -> dict[str, str]:
         keys = tuple(labels)
         self.asked.append((ingredient.name, keys))
+        self.context[ingredient.name] = (ingredient.category, dish)
         levels = self.known.get(ingredient.name, PLAIN).levels()
         return {key: levels[key] for key in keys} | {"model": "fake"}
+
+
+@dataclass
+class FakeDepartments:
+    """Files a name under `known[name]`, or else the first department offered, and records what was asked: (name,
+    departments, dish)."""
+
+    known: Mapping[str, str] = field(default_factory=dict)
+    asked: list[tuple[str, tuple[str, ...], str]] = field(default_factory=list)
+
+    async def department(self, ingredient: str, departments: Mapping[str, Sequence[str]], dish: str = "") -> str:
+        self.asked.append((ingredient, tuple(departments), dish))
+        return self.known.get(ingredient, next(iter(departments)))
 
 
 @dataclass

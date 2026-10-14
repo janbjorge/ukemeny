@@ -1,5 +1,5 @@
-"""Build datasets/ from scratch: every recipe from matprat.no, this week's offers from mattilbud.no, and Jev's labels
-for every ingredient and offer. Nothing is kept between runs. Run on a laptop, then commit datasets/ and push
+"""Build datasets/ from scratch: every recipe from matprat.no and godt.no, this week's offers from mattilbud.no, and
+Jev's labels for every ingredient and offer. Nothing is kept between runs. Run on a laptop, then commit datasets/ and push
 (which deploys).
 
     uv run python -m pipeline.datasets       # a progress bar per step, and under it the URL being fetched
@@ -15,10 +15,12 @@ import asyncio
 import logging
 import os
 import sys
+from collections import Counter
 from collections.abc import Callable, Mapping
 from contextlib import closing
 from dataclasses import dataclass
 from typing import Never, TextIO
+from urllib.parse import urlsplit
 
 from tqdm import tqdm
 from typesafe_sdk import AsyncTypeSafeClient
@@ -26,7 +28,8 @@ from typesafe_sdk import AsyncTypeSafeClient
 from adapters import datasets
 from app import build
 from core.models import RefreshReport, Snapshot
-from pipeline.jev import Jev, JevIngredientClassifier, JevOfferMatcher
+from pipeline.godt import GodtRecipeSource
+from pipeline.jev import Jev, JevDepartmentClassifier, JevIngredientClassifier, JevOfferMatcher
 from pipeline.matprat import MatpratRecipeSource
 from pipeline.tjek import TjekOfferSource
 
@@ -50,8 +53,9 @@ class Result:
 
 
 STEPS = {
-    "recipes": "matprat.no pages",
+    "recipes": "matprat.no and godt.no pages",
     "ingredients": "Jev ingredient labels",
+    "departments": "Jev departments",
     "catalogs": "mattilbud.no catalogs",
     "offers": "Jev offer matches",
 }
@@ -109,12 +113,13 @@ def configure(verbose: int) -> None:
 
 
 async def run(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None) -> Result:
-    """`fetching` hears every URL matprat.no and mattilbud.no are asked for."""
+    """`fetching` hears every URL matprat.no, godt.no and mattilbud.no are asked for."""
     key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
         raise SetupError("TYPESAFE_API_KEY is not set. Get a TypeSafe API key at https://console.typesafe.ai")
     async with (
-        MatpratRecipeSource.open(CRAWL_WORKERS, fetching) as recipes,
+        MatpratRecipeSource.open(CRAWL_WORKERS, fetching) as matprat,
+        GodtRecipeSource.open(fetching=fetching) as godt,
         TjekOfferSource.open(fetching=fetching) as offers,
         AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
     ):
@@ -123,15 +128,17 @@ async def run(progress: build.Progress | None = None, fetching: Callable[[str], 
         def step(name: str, done: int, due: int) -> None:
             if progress:
                 progress(name, done, due)
-            if done == due and name in ("ingredients", "offers"):
+            if done == due and name in ("departments", "ingredients", "offers"):
                 logging.getLogger("matris.jev").info("so far: %s", jev.status())
 
-        snapshot, report = await build.snapshot(recipes, JevIngredientClassifier(jev), offers, JevOfferMatcher(jev), step)
+        snapshot, report = await build.snapshot(
+            (matprat, godt), JevDepartmentClassifier(jev), JevIngredientClassifier(jev), offers, JevOfferMatcher(jev), step
+        )
     return Result(snapshot, report, datasets.write(snapshot), jev.status())
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build datasets/ from scratch: matprat.no, mattilbud.no and Jev.")
+    parser = argparse.ArgumentParser(description="Build datasets/ from scratch: matprat.no, godt.no, mattilbud.no and Jev.")
     parser.add_argument("-v", "--verbose", action="count", default=0, help="more detail: -v, -vv or -vvv")
     verbose = parser.parse_args().verbose
     configure(verbose)
@@ -141,10 +148,11 @@ def main() -> None:
     except SetupError as e:
         sys.exit(f"error: {e}")
     s, r = result.snapshot, result.recipes
-    print(f"matprat.no: {r.listed:,} pages, {r.failed:,} failed")
+    sites = Counter((urlsplit(d.url).hostname or "").removeprefix("www.") for d in s.dishes)
+    print(f"recipes: {r.listed:,} pages, {r.failed:,} failed")
     print(
-        f"{len(s.dishes):,} dinners, {len(s.traits):,} ingredients, {len(s.offers):,} offers in {len(s.places)} places, "
-        f"{len(s.matches):,} ingredients on offer"
+        f"{len(s.dishes):,} dinners ({', '.join(f'{site} {n:,}' for site, n in sorted(sites.items()))}), "
+        f"{len(s.traits):,} ingredients, {len(s.offers):,} offers in {len(s.places)} places, {len(s.matches):,} ingredients on offer"
     )
     print(", ".join(f"{name} {size / 1e6:.1f} MB" for name, size in result.sizes.items()))
     print(result.jev)

@@ -6,7 +6,7 @@ from datetime import date, datetime
 from enum import StrEnum
 
 DINNER = "Middagsrett"
-"""matprat.no's dish type for a main course."""
+"""matprat.no's dish type for a main course; godt.no's «Middag» tag becomes it (src/pipeline/godt.py)."""
 
 
 class Gluten(StrEnum):
@@ -150,14 +150,15 @@ class Traits:
 @dataclass(frozen=True, slots=True)
 class Ingredient:
     name: str
-    """The product itself, as matprat names it: "laksefilet"."""
+    """The product itself, as the source names it: "laksefilet"."""
     text: str
     """The full line: "800 g skinn- og beinfri laksefilet"."""
     amount: float | None
     unit: str
-    """As written by matprat: "g", "dl", "stk.", "båt", or ""."""
+    """In matprat's words: "g", "dl", "stk.", "båt", or "" (godt.no's "fedd" is "båt")."""
     category: str
-    """matprat's grocery category: "/fisk og sjømat", "/kjøtt/kylling/høns"."""
+    """matprat's grocery category: "/fisk og sjømat", "/kjøtt/kylling/høns". godt.no names none, so it is "" until the
+    build files the ingredient (app.build.fill_departments)."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -165,12 +166,12 @@ class Recipe:
     url: str
     name: str
     dish_types: tuple[str, ...]
-    """matprat's dish types: "Middagsrett", "Dessert", "Tilbehør"."""
+    """matprat's dish types: "Middagsrett", "Dessert", "Tilbehør"; for godt.no "Middagsrett" or nothing."""
     main_categories: tuple[str, ...]
-    """What the dish is built on: "Fisk og sjømat", "Kylling og høns", "Storfe"."""
+    """What the dish is built on: "Fisk og sjømat", "Kylling og høns", "Storfe" (godt.no: its primary tag, "Suppe")."""
     portions: int
     prep_time: str
-    """matprat's bucket, such as "Under 20 min" or "Over 60 min"."""
+    """matprat's bucket, such as "Under 20 min" or "Over 60 min"; godt.no's minutes are put in one."""
     rating: float | None
     rating_count: int
     ingredients: tuple[Ingredient, ...]
@@ -200,8 +201,8 @@ class Part:
 
 @dataclass(frozen=True, slots=True)
 class Dish:
-    """A dinner as the site keeps it: facts from matprat, no rules (core.dishes.dish). The method and
-    wording stay on matprat.no; the site links to it."""
+    """A dinner as the site keeps it: facts from matprat.no or godt.no, no rules (core.dishes.dish). The method and
+    wording stay at the source; the site links to it."""
 
     url: str
     name: str
@@ -412,7 +413,7 @@ class Snapshot:
 
     built: datetime
     dishes: tuple[Dish, ...]
-    """Every dinner on matprat.no."""
+    """Every dinner on matprat.no and godt.no."""
     traits: Mapping[str, Traits]
     """Per ingredient name."""
     offers: tuple[Offer, ...]

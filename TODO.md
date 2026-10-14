@@ -6,7 +6,8 @@ Every request from jb, with status. Newest first. An item is ticked only when it
 
 - [ ] Offers per place, picked in «Sted» (jb 2026-10-13: "At the moment the pipeline assumes one location (stavanger), we need to extend this not assume location, and push that up to the search input in the 'finn en middag' part"). The code and the first build with places are committed (FACTS.md §1, §4); the place moved from the search to a select on 2026-10-14 (docs/done.md). Left: a push, then a look at the live site.
 - [ ] Logfire, every insight the app can see (jb 2026-10-13: "I wanto add logfire, go full tilt on all options. Make sure to understand the runtime in terms of being on fly.io and make sure we get every insight metric we can into logfire"). The code is in (FACTS.md §7) and checked in the Docker image. Left: a `matris` project in Logfire with a write token, `fly secrets set LOGFIRE_TOKEN=… -a matris`, a push, then check that the data arrives.
-- [ ] Tune Lavkarbo's 20 g per portion (METHOD.md §1): it leaves 378 of 1 943 dinners.
+- [ ] godt.no as a second recipe source (jb 2026-10-14: "I want to add https://www.godt.no/ as a source"). The code and a build with 1 455 dinners from godt.no are committed (FACTS.md §3, §4; METHOD.md §2, §7). Left: a push, then a look at the live site and its memory on the 256 MB machine (FACTS.md §7); a cached ranking is 2.3 MiB with godt.no, and 128 are kept.
+- [ ] Tune Lavkarbo's 20 g per portion (METHOD.md §1): it leaves 378 of 1 943 dinners (727 of 3 399 with godt.no, 2026-10-14).
 - [ ] Rebuild `datasets/` every week so the offers stay current: by hand (`uv run python -m pipeline.datasets`, commit, push), or a scheduled GitHub Action with a `TYPESAFE_API_KEY` secret (Jev would still run offline, not in the site).
 - [ ] Open question: a minimum rating or a maximum prep time in profile.yaml, since a discount can put a three-star, hour-long dish in the week (METHOD.md §5).
 

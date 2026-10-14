@@ -1,11 +1,11 @@
-"""From a full matprat recipe to the Dish the site keeps: facts only, per portion, without matprat's
-wording. Rules are applied at runtime (core.diet, core.ranking), so a new rule needs no new data."""
+"""From a full recipe to the Dish the site keeps: facts only, per portion, without the source's wording.
+Rules are applied at runtime (core.diet, core.ranking), so a new rule needs no new data."""
 
 from core.diet import grams
 from core.models import Dish, Part, Recipe
 
 ROUND_G = 5
-"""Grams per portion are rounded to this: enough for any rule, and no copy of matprat's amounts."""
+"""Grams per portion are rounded to this: enough for any rule, and no copy of the source's amounts."""
 
 
 def dish(recipe: Recipe) -> Dish:

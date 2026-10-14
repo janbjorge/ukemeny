@@ -23,7 +23,7 @@ from core.models import Dinner, Dish, Verdict
 from core.search import Order, Tag, fold, protein_word
 
 app = typer.Typer(
-    help="Middager fra matprat.no som passer profile.yaml, med ukens tilbud. `matris build` lager datasets/, "
+    help="Middager fra matprat.no og godt.no som passer profile.yaml, med ukens tilbud. `matris build` lager datasets/, "
     "`matris plan` gir ukens middager.",
     no_args_is_help=True,
     add_completion=False,
@@ -135,7 +135,7 @@ def candidates(
 
 
 @app.command()
-def check(url: Annotated[str, typer.Argument(help="En oppskrift på matprat.no.")], as_json: JsonOption = False) -> None:
+def check(url: Annotated[str, typer.Argument(help="En oppskrift på matprat.no eller godt.no.")], as_json: JsonOption = False) -> None:
     """Hvordan én oppskrift passer profile.yaml."""
     q = queries(as_json)
     found = q.check(url)
@@ -156,13 +156,14 @@ def check(url: Annotated[str, typer.Argument(help="En oppskrift på matprat.no."
 def build(
     verbose: Annotated[int, typer.Option("--verbose", "-v", count=True, help="Mer detaljer: -v, -vv eller -vvv.")] = 0,
 ) -> None:
-    """Lag datasets/ fra bunnen: matprat.no, mattilbud.no og Jev. Trenger TYPESAFE_API_KEY."""
+    """Lag datasets/ fra bunnen: matprat.no, godt.no, mattilbud.no og Jev. Trenger TYPESAFE_API_KEY."""
     from pipeline import datasets as pipeline
 
     pipeline.configure(verbose)
     steps = {
-        "recipes": "sider fra matprat.no",
+        "recipes": "sider fra matprat.no og godt.no",
         "ingredients": "ingredienser hos Jev",
+        "departments": "avdelinger hos Jev",
         "catalogs": "kundeaviser fra mattilbud.no",
         "offers": "tilbudsmatcher hos Jev",
     }

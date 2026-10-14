@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 import pytest
 from typesafe_sdk import (
+    Choice,
     ChoiceAnswer,
     JSONContent,
     NoulAnswer,
@@ -16,6 +17,7 @@ from core.models import LABELS, Carbs, Fodmap, Gluten, Kids, Lactose, Level, Oni
 from pipeline.jev import (
     QUESTIONS_PER_CALL,
     Jev,
+    JevDepartmentClassifier,
     JevIngredientClassifier,
     JevOfferMatcher,
     Question,
@@ -94,6 +96,12 @@ async def test_classifier_sends_only_the_ingredient_name() -> None:
     assert jev.tokens == 900 and jev.calls == 1
 
 
+async def test_a_dish_goes_with_an_ingredient_without_a_department() -> None:
+    client = FakeClient(PLAIN)
+    await JevIngredientClassifier(Jev(client)).classify(ingredient("and", 1, "stk", ""), FOUR, "And med rødkål")
+    assert client.calls[0][0] == {"ingredient": "and", "category": "", "dish": "And med rødkål"}
+
+
 async def test_the_registry_holds_every_label_and_asks_them_in_one_request() -> None:
     classifier = JevIngredientClassifier(Jev(client := FakeClient({key: {"no": 1.0} for key in LABELS})))
     assert classifier.labels == LABELS
@@ -170,6 +178,19 @@ async def test_kids_label() -> None:
 )
 async def test_new_labels(key: str, answer: dict[str, float], expected: str) -> None:
     assert await level(key, answer) == expected
+
+
+async def test_department_is_the_likeliest_of_those_offered_and_only_the_name_is_sent() -> None:
+    client = FakeClient({"department": {"/fisk og sjømat": 0.6, "/pasta/ris": 0.3, "/annet": 0.1}})
+    shelves = {"/fisk og sjømat": ("torskefilet", "laksefilet"), "/pasta/ris": ("jasminris",)}
+    assert await JevDepartmentClassifier(Jev(client)).department("kveite", shelves) == "/fisk og sjømat"
+    state, questions = client.calls[0]
+    assert state == {"ingredient": "kveite"}
+    await JevDepartmentClassifier(Jev(client)).department("kveite", shelves, "Kveite på røykeplanke")
+    assert client.calls[1][0] == {"ingredient": "kveite", "dish": "Kveite på røykeplanke"}
+    question = questions["department"]
+    assert isinstance(question, Choice)
+    assert dict(question.criteria) == {"/fisk og sjømat": ["torskefilet", "laksefilet"], "/pasta/ris": ["jasminris"]}
 
 
 async def test_matcher_asks_once_per_heading_and_scores_each_offer() -> None:

@@ -19,12 +19,12 @@ DIETS = ", ".join(f"`{d}`" for d in Diet)
 """Every diet rule and allergy a search can name."""
 
 DESCRIPTION = f"""\
-Dinner ideas from matprat.no, ranked by this week's grocery offers from mattilbud.no, searchable
+Dinner ideas from matprat.no and godt.no, ranked by this week's grocery offers from mattilbud.no, searchable
 in plain bokmål (`q`). No diet rule applies unless `q` names one: {DIETS}. A rule that leaves something out
 (vegetar, melkefri, uten egg, ...) also leaves out dinners with an ingredient that may hold it, such as a stock cube.
 The offers are from stores all over Norway until `sted` names a place (`sted=bergen`); then from the stores near it.
 `place` says which, and `links.places` gives the same answer in each place.
-Not an official source; recipes belong to matprat.no and offers to the stores.
+Not an official source; recipes belong to matprat.no and godt.no, and offers to the stores.
 
 Keys are English; advice is bokmål. Prices are kroner. `protein` is the main protein group,
 worked out from the heaviest meat or fish in the recipe. A dinner is `on_sale` when that protein
@@ -105,7 +105,7 @@ def build(queries: Queries) -> FastAPI:
 
     @api.get("/oppskrift", response_model=schema.CheckOut, summary="Whether one recipe fits, and what to swap")
     def recipe(
-        url: Annotated[str, Query(description="A matprat.no recipe URL from `dinners[].url`")],
+        url: Annotated[str, Query(description="A matprat.no or godt.no recipe URL from `dinners[].url`")],
         q: Annotated[str | None, Query(description=f"Diet rules and allergies to check against: {DIETS}")] = None,
     ) -> schema.CheckOut:
         found = queries.check(url, queries.household(q or ""))

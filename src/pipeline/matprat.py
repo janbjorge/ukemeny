@@ -6,30 +6,24 @@ and the dish type matprat reports to analytics ("Middagsrett"). robots.txt allow
 /oppskrifter/; the search API under /Services/ is disallowed, so pages are read one by one.
 """
 
-import asyncio
 import json
-import logging
 import re
 import xml.etree.ElementTree as ET
 from collections.abc import AsyncGenerator, Callable
 from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Self, TypedDict
-
-import httpx2
 
 from core.errors import SourceUnavailableError
 from core.models import Ingredient, Recipe, RecipeRef
+from pipeline.pages import Pages
 
 BASE = "https://www.matprat.no"
 SITEMAP = f"{BASE}/sitemap.xml"
-USER_AGENT = "matris/0.1 (+https://matris.app)"
-RETRY_STATUS = frozenset({429, 500, 502, 503, 504})
 
 _RECIPE_URL = re.compile(r"^https://www\.matprat\.no/oppskrifter/[^/]+/[^/]+/$")
 _NEXT_DATA = re.compile(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.DOTALL)
 _SITEMAP_NS = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
-log = logging.getLogger("matris.matprat")
 
 
 def parse_sitemap(xml: str) -> list[RecipeRef]:
@@ -99,68 +93,24 @@ def parse_recipe(html: str, url: str) -> Recipe | None:
 
 @dataclass
 class MatpratRecipeSource:
-    """Implements core.ports.RecipeSource. At most `workers` requests at a time. matprat.no's robots.txt asks for no
-    crawl delay and a page answers in about 0.2 s; a 429 or 5xx is retried with a growing pause."""
+    """Implements core.ports.RecipeSource, at most `workers` pages at a time (pipeline.pages). matprat.no's robots.txt
+    asks for no crawl delay and a page answers in about 0.2 s."""
 
-    client: httpx2.AsyncClient
-    workers: int = 16
-    tries: int = 4
-    _slots: asyncio.Semaphore = field(init=False)
-
-    def __post_init__(self) -> None:
-        self._slots = asyncio.Semaphore(self.workers)
+    pages: Pages
 
     @classmethod
     @asynccontextmanager
     async def open(cls, workers: int = 16, fetching: Callable[[str], None] | None = None) -> AsyncGenerator[Self]:
         """`fetching` hears the URL of every request as it goes out."""
-
-        async def tell(request: httpx2.Request) -> None:
-            if fetching:
-                fetching(str(request.url))
-
-        # One client for the run: its pool keeps a connection per worker alive, so 100 pages took 16 TLS handshakes
-        # (2026-10-13). matprat.no speaks only HTTP/1.1, so HTTP/2 would not share them further.
-        async with httpx2.AsyncClient(
-            timeout=30, follow_redirects=True, headers={"User-Agent": USER_AGENT}, event_hooks={"request": [tell]}
-        ) as client:
-            yield cls(client, workers)
+        async with Pages.open("matprat.no", workers, fetching) as pages:
+            yield cls(pages)
 
     async def index(self) -> list[RecipeRef]:
-        return parse_sitemap(await self._get(SITEMAP))
+        sitemap = await self.pages.get(SITEMAP)
+        if sitemap is None:
+            raise SourceUnavailableError("matprat.no", f"no sitemap at {SITEMAP}")
+        return parse_sitemap(sitemap)
 
     async def fetch(self, url: str) -> Recipe | None:
-        try:
-            html = await self._get(url)
-        except _GoneError:
-            return None
-        return parse_recipe(html, url)
-
-    async def _get(self, url: str) -> str:
-        async with self._slots:
-            return await self._get_with_retry(url)
-
-    async def _get_with_retry(self, url: str) -> str:
-        for attempt in range(self.tries):
-            try:
-                response = await self.client.get(url)
-            except httpx2.TransportError as e:
-                if attempt == self.tries - 1:
-                    raise SourceUnavailableError("matprat.no", str(e)) from e
-                log.info("retry %d: %s (%s)", attempt + 1, url, e)
-            else:
-                if response.status_code in (404, 410):
-                    raise _GoneError(url)
-                if response.status_code not in RETRY_STATUS:
-                    if response.is_error:
-                        raise SourceUnavailableError("matprat.no", f"{response.status_code} {url}")
-                    return response.text
-                if attempt == self.tries - 1:
-                    raise SourceUnavailableError("matprat.no", f"{response.status_code} {url}")
-                log.info("retry %d: %s (%d)", attempt + 1, url, response.status_code)
-            await asyncio.sleep(2**attempt)
-        raise AssertionError("unreachable")
-
-
-class _GoneError(Exception):
-    pass
+        html = await self.pages.get(url)
+        return None if html is None else parse_recipe(html, url)

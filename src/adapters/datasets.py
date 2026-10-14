@@ -1,8 +1,8 @@
 """The snapshot on disk: datasets/*.json, written by the offline build and read by the site at start-up.
 
-dishes.json holds the facts the rules need from each matprat dinner, per portion, without its wording (docs/plan-web.md);
-traits.json changes when new ingredients appear; offers.json every week. offers.json also says which catalogs reach each
-place (`places`).
+dishes.json holds the facts the rules need from each matprat.no and godt.no dinner, per portion, without its wording
+(docs/plan-web.md); traits.json changes when new ingredients appear; offers.json every week. offers.json also says which
+catalogs reach each place (`places`).
 """
 
 from collections.abc import Mapping

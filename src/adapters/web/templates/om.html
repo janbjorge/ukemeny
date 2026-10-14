@@ -3,7 +3,7 @@
 {% block main %}
 <section class="prose">
   <h1>Slik virker det</h1>
-  <p>Oppskriftene er fra matprat.no, og tilbudene fra butikkenes kundeaviser på mattilbud.no. matris kobler dem.</p>
+  <p>matris kobler oppskriftene fra matprat.no med tilbudene i butikkenes kundeaviser på mattilbud.no.</p>
 
   <h2>Oppskrifter og tilbud</h2>
   <p>Hver middag har en hovedråvare: den tyngste kjøtt-, fisk- eller skalldyrsingrediensen, målt i gram. Uten kjøtt og fisk er den vegetar.</p>
@@ -11,21 +11,23 @@
     avgjør om varen er den samme som ingrediensen. En vare er på tilbud når kundeavisen har en førpris som er høyere enn prisen nå.</p>
   <p>En middag er på tilbud når hovedråvaren er det, så bacon på tilbud gjør ikke lutefisk til et tilbud. Uten kjøtt og fisk teller en grønnsak
     fra 100 g per porsjon.</p>
-  <p>Middagene rangeres etter hvor mye som er på tilbud, der kjøtt og fisk teller mest, og så etter vurdering og tid. Ukens middager trekkes blant middagene med mest spart i kroner, én per hovedråvare, og jo mer spart, jo større sjanse. Du får en ny uke hver gang du åpner siden, eller når du trykker «Nye middager». Fisk kan komme to ganger, men ikke samme fisk.</p>
+  <p>Middagene rangeres etter hvor mye som er på tilbud, der kjøtt og fisk teller mest, og så etter vurdering og tid.</p>
+  <p>Ukens middager trekkes blant middagene med mest spart i kroner, og jo mer spart, jo større sjanse. Det blir én per hovedråvare,
+    men fisk kan komme to ganger, aldri samme fisk. Du får en ny uke hver gang du åpner siden eller trykker «Nye middager».</p>
   <p>Tilbudene er fra butikker over hele landet til du velger et sted under «Finn en middag». Da teller bare kundeavisene
     til butikkene rundt stedet{% if places %}: {{ places|join(", ") }}{% endif %}.</p>
 
   <h2>Søket</h2>
   <p>Et ord leter i middagens navn og ingredienser, også inne i sammensatte ord: «laks» finner røkelaks og laksefilet, og «pasta» finner
     spagetti og penne. Middager med ordet i navnet kommer først.</p>
-  <p>Hovedråvarene (kylling, fisk, svin, vegetar, …) velger hovedråvaren, så «kylling» gir ikke pannbiff med kyllingbuljong. «rask» er under 20 minutter,
+  <p>Ord for en hovedråvare, som «kylling», «fisk» og «svin», søker bare på hovedråvaren, så «kylling» gir ikke pannbiff med kyllingbuljong. «rask» er under 20 minutter,
     «godt likt» er minst 4,5 stjerner fra minst 20 vurderinger, og «barnevennlig» er uten chili og sterke ingredienser.</p>
   <p>«uten» tar bort («uten sopp og paprika»), «eller» gir det ene eller det andre («laks eller torsk»), og alle andre ord må passe.
     Ord som «jeg vil ha middag» hoppes over. Staver du feil, bytter søket til det nærmeste ordet og sier fra. Gir søket ingenting,
     foreslår det hva du kan ta bort.</p>
 
   <h2>Sjekk etiketten</h2>
-  <p>Hva en ingrediens inneholder er vurdert av en liten språkmodell, og den kan ta feil.</p>
+  <p>En liten språkmodell har vurdert hva hver ingrediens inneholder, og den kan ta feil.</p>
 
   <h2>La en KI-agent hjelpe deg</h2>
   <p>Bruker du ChatGPT, Claude eller en annen KI-agent, lim inn dette:</p>

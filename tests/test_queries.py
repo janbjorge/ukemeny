@@ -3,6 +3,7 @@ from datetime import date
 from app.queries import Queries
 from core.models import Gluten, Household, Item, Level, Onion, Rule
 from core.ranking import Week
+from core.search import Order
 from tests.fakes import FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
@@ -96,9 +97,10 @@ def test_sort_by_discount_in_percent_or_kroner() -> None:
         matches={"kyllingfilet": ["k"], "lammekotelett": ["l"]},
     )
     q = Queries(FakeDatasets(s))
-    assert [d.dish.name for d in q.search("rabatt i prosent").dinners] == ["Kylling", "Lam", "Laks"]  # 40 % before 33 %
-    assert [d.dish.name for d in q.search("rabatt i kroner").dinners] == ["Lam", "Kylling", "Laks"]  # 100 kr before 40 kr
-    assert q.search("rabatt i kroner").total == 3  # sorting leaves nothing out
+    assert [d.dish.name for d in q.search(order=Order.PERCENT).dinners] == ["Kylling", "Lam", "Laks"]  # 40 % before 33 %
+    assert [d.dish.name for d in q.search(order=Order.KRONER).dinners] == ["Lam", "Kylling", "Laks"]  # 100 kr before 40 kr
+    assert q.search(order=Order.KRONER).total == 3  # sorting leaves nothing out
+    assert not q.search("rabatt i kroner").dinners  # not a word for sorting (jb 2026-10-14)
 
 
 def test_allergies_and_vegetar_leave_dinners_out() -> None:
@@ -123,7 +125,7 @@ def test_allergies_and_vegetar_leave_dinners_out() -> None:
     assert checked is not None and checked.verdict.blocked == "inneholder egg (majones)"
 
 
-def test_offers_are_from_the_place_searched_for_or_from_every_store() -> None:
+def test_offers_are_from_the_place_picked_or_from_every_store() -> None:
     west = offer("KYLLINGBRYST", 99, pre_price=135, id="vest", catalog="kiwi-vest")
     north = offer("LAKSEFILET", 120, pre_price=160, id="nord", catalog="kiwi-nord")
     s = snapshot(
@@ -135,19 +137,20 @@ def test_offers_are_from_the_place_searched_for_or_from_every_store() -> None:
     )
     q = Queries(FakeDatasets(s), week=Week(days=2, fish=1))
 
-    def on_sale(text: str) -> list[str]:
-        return sorted(d.dish.name for d in q.search(text).dinners)
+    def on_sale(place: str | None = None) -> list[str]:
+        return sorted(d.dish.name for d in q.search("på tilbud", place).dinners)
 
-    assert on_sale("på tilbud") == ["Kylling", "Laks"] and q.search("på tilbud").place is None
-    assert on_sale("på tilbud i bergen") == ["Kylling"]
-    assert on_sale("på tilbud i tromsø") == ["Laks"]
-    assert q.search("i bergen").place == "Bergen"
+    assert on_sale() == ["Kylling", "Laks"] and q.search("på tilbud").place is None
+    assert on_sale("Bergen") == ["Kylling"]
+    assert on_sale("Tromsø") == ["Laks"]
+    assert q.search("", "Bergen").place == "Bergen"
+    assert (q.place("bergen"), q.place("TROMSO"), q.place("Gotham"), q.place("")) == ("Bergen", "Tromsø", None, None)
     week = q.plan(place="Bergen")
     assert (week.place, week.offers, week.on_sale) == ("Bergen", 1, 1)
     assert (q.plan().place, q.plan().offers, q.plan().on_sale) == (None, 2, 2)
     home = Queries(FakeDatasets(s), home="Tromsø")  # the CLI's place, from profile.yaml
     assert [d.dish.name for d in home.search("på tilbud").dinners] == ["Laks"]
-    assert [d.dish.name for d in home.search("på tilbud i bergen").dinners] == ["Kylling"]  # a searched place goes first
+    assert [d.dish.name for d in home.search("på tilbud", "Bergen").dinners] == ["Kylling"]  # a place picked goes first
 
 
 def test_rankings_past_the_limit_are_dropped_and_worked_out_again() -> None:

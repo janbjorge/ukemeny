@@ -28,7 +28,7 @@ from opentelemetry.metrics import CallbackOptions, Observation
 from starlette.types import Scope
 
 from app.queries import Found, Queries
-from core.search import Search
+from core.search import Order, Search
 
 ON_FLY = "FLY_APP_NAME" in os.environ
 # The commit, passed by the deploy job (Dockerfile): the service version, and links from a span to its code
@@ -57,7 +57,7 @@ HEAD = "matris.head"
 
 _searches = logfire.metric_counter("matris.searches", unit="{search}", description="Searches by route, and whether any dinner matched")
 _rules = logfire.metric_counter("matris.search.rules", unit="{search}", description="Searches naming each diet rule or allergy")
-_places = logfire.metric_counter("matris.search.places", unit="{search}", description="Searches naming each place")
+_places = logfire.metric_counter("matris.search.places", unit="{search}", description="Searches per place picked")
 _clauses = logfire.metric_counter("matris.search.clauses", unit="{clause}", description="What searches are made of, by kind")
 _results = logfire.metric_histogram("matris.search.results", unit="{dinner}", description="Dinners that match a search")
 _fragments = logfire.metric_counter("matris.fragments", unit="{fragment}", description="HTMX fragments, rendered or kept from before")
@@ -227,10 +227,19 @@ def _ready(queries: Queries) -> None:
     logfire.log("info", "ready", attributes)
 
 
-def search(queries: Queries, text: str, route: str, limit: int, skip_week: bool = False) -> Found:
+def search(
+    queries: Queries,
+    text: str,
+    place: str | None,
+    order: Order | None,
+    route: str,
+    limit: int,
+    skip_week: bool = False,
+    seed: int | None = None,
+) -> Found:
     """queries.search in a span that says what it understood and found, and counted."""
     with logfire.span("search {text}", text=text, route=route, limit=limit) as span:
-        found = queries.search(text, limit=limit, skip_week=skip_week)
+        found = queries.search(text, place, order, limit=limit, skip_week=skip_week, seed=seed)
         s = found.search
         span.set_attributes(
             {
@@ -238,23 +247,24 @@ def search(queries: Queries, text: str, route: str, limit: int, skip_week: bool 
                 "search.clauses": [c.label for c in s.clauses],
                 "search.rules": sorted(d.value for d in s.diets),
                 "search.place": found.place or "",
+                "search.order": found.order or "",
                 "search.corrected": [f"{typed} → {used}" for typed, used in s.corrected],
                 "search.total": found.total,
                 "search.shown": len(found.dinners),
                 "search.relax": [c.label for c, _ in found.relax],
             }
         )
-    counted(s, route, found.total)
+    counted(s, place, route, found.total)
     return found
 
 
-def counted(search: Search, route: str, total: int | None = None) -> None:
+def counted(search: Search, place: str | None, route: str, total: int | None = None) -> None:
     """Counts a search per route, diet rule and kind of clause. Not its words: each would be a series of its own."""
     _searches.add(1, {"route": route, "found": total != 0})
     for diet in search.diets:
         _rules.add(1, {"rule": diet.value, "route": route})
-    if search.place:
-        _places.add(1, {"place": search.place, "route": route})
+    if place:
+        _places.add(1, {"place": place, "route": route})
     for clause in search.clauses:
         _clauses.add(1, {"kind": clause.kind.value, "route": route})
     if total is not None:

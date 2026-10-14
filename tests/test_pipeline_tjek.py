@@ -7,7 +7,6 @@ from core.errors import SourceUnavailableError
 from pipeline.tjek import (
     API,
     GROCERS,
-    PLACES,
     Quantity,
     RawCatalog,
     RawOffer,
@@ -193,8 +192,3 @@ async def test_each_place_gets_the_catalogs_near_it_and_each_catalog_is_read_onc
     assert found.places == {"Stavanger": ("rema", "kiwi-sør"), "Tromsø": ("rema", "kiwi-nord")}
     assert sorted(fetched) == ["kiwi-nord", "kiwi-sør", "rema"]
     assert {o.id: o.catalog for o in found.offers} == {"r": "rema", "s": "kiwi-sør", "n": "kiwi-nord"}
-
-
-def test_places_are_one_word_each() -> None:
-    """A search reads a place as one word (core.search.parse)."""
-    assert all(len(place.split()) == 1 for place in PLACES)

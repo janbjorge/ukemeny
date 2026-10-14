@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict
 from app.queries import Check, Found, Queries
 from core.matching import main_protein
 from core.models import Dinner, Dish, Note, Plan
-from core.search import Clause, Diet, Kind, Search, diet_clause, place_clause
+from core.search import Clause, Diet, Kind, Order, Search, diet_clause
 
 
 class Out(BaseModel):
@@ -79,7 +79,7 @@ class CheckOut(Out):
 class ClauseOut(Out):
     kind: str
     """diet (a rule), tag (a category), protein (the main protein is one of these), not_protein, with (a word in the
-    name or an ingredient), without, order (a sort order) or place (where the offers are from)."""
+    name or an ingredient) or without."""
     text: str
     """How the search writes it."""
     label: str
@@ -110,33 +110,37 @@ class LinksOut(Out):
     add: dict[str, str]
     """Per diet rule not in this search: this answer (the week or the list) with it."""
     remove: dict[str, str]
-    """Per diet rule in this search, and its place («i bergen»): this answer without it."""
+    """Per diet rule in this search: this answer without it; and `sted`, when a place is picked: this answer with the
+    offers from every store."""
     places: dict[str, str]
-    """Per place other than this search's: this answer with the offers from the stores near it."""
+    """Per place other than this answer's: this answer with the offers from the stores near it."""
     plan: str
     """The week for this search's diet rules and place."""
     dinners: str
-    """Every dinner for this search."""
+    """Every dinner for this search, in the same order."""
 
 
 def _rules(search: Search) -> Search:
-    """What the week follows: the diet rules and the place."""
-    return Search(tuple(c for c in search.clauses if c.kind in (Kind.DIET, Kind.PLACE)))
+    """What the week follows, besides the place: the diet rules."""
+    return Search(tuple(c for c in search.clauses if c.kind is Kind.DIET))
 
 
-def links(base: str, search: Search, path: str, places: Iterable[str]) -> LinksOut:
+def links(base: str, search: Search, place: str | None, path: str, places: Iterable[str], order: Order | None = None) -> LinksOut:
     """`base` is the API's address, ending in "/" (https://matris.app/api/); `path` is this answer's ("plan", "middager")."""
     rules = _rules(search)
 
-    def url(path: str, s: Search) -> str:
-        return f"{base}{path}" + (f"?{urlencode({'q': s.text})}" if s.text else "")
+    def url(path: str, s: Search, at: str | None = place, by: Order | None = order) -> str:
+        query = urlencode({k: v for k, v in {"q": s.text, "sted": at and at.lower(), "sorter": by}.items() if v})
+        return f"{base}{path}" + (f"?{query}" if query else "")
 
-    here = [place_clause(search.place)] if search.place else []
+    remove = {d.value: url(path, search.drop(diet_clause(d))) for d in search.diets}
+    if place:
+        remove["sted"] = url(path, search, None)
     return LinksOut(
         add={d.value: url(path, search.toggle(diet_clause(d))) for d in Diet if d not in search.diets},
-        remove={d.value: url(path, search.drop(diet_clause(d))) for d in search.diets} | {c.text: url(path, search.drop(c)) for c in here},
-        places={p: url(path, search.toggle(place_clause(p))) for p in places if p != search.place},
-        plan=url("plan", rules),
+        remove=remove,
+        places={p: url(path, search, p) for p in places if p != place},
+        plan=url("plan", rules, by=None),
         dinners=url("middager", search),
     )
 
@@ -146,8 +150,8 @@ class SnapshotOut(Out):
     fitting: int
     on_sale: int
     place: str | None
-    """Where the offers are from: the stores near this place (`i bergen` in `q`), or, when null, every store in every
-    place (`links.places`)."""
+    """Where the offers are from: the stores near this place (`sted`), or, when null, every store in every place
+    (`links.places`)."""
     offers: int
     built: datetime
     """When the snapshot was built; offers are from that week."""
@@ -160,6 +164,8 @@ class SnapshotOut(Out):
 
 class DinnersOut(SnapshotOut):
     search: SearchOut
+    order: str | None = None
+    """How `dinners` are sorted: `prosent` or `kroner` (`sorter`), the biggest discount first; null: the ranking."""
 
 
 class PlanOut(SnapshotOut):
@@ -246,7 +252,8 @@ def dinners(queries: Queries, found: Found, base: str | None = None) -> DinnersO
         offers_until=queries.offers_until(),
         dinners=[dinner(d, n, found.via.get(d.dish.url, ())) for n, d in enumerate(found.dinners, 1)],
         search=_search(found.search, found.total, found.relax),
-        links=links(base, found.search, "middager", queries.snapshot.places) if base else None,
+        order=found.order,
+        links=links(base, found.search, found.place, "middager", queries.snapshot.places, found.order) if base else None,
     )
 
 
@@ -261,7 +268,7 @@ def plan(queries: Queries, week: Plan, search: Search | None = None, base: str |
         built=queries.snapshot.built,
         offers_until=queries.offers_until(),
         dinners=[dinner(d, n) for n, d in enumerate(week.dinners, 1)],
-        links=links(base, _rules(search or Search()), "plan", queries.snapshot.places) if base else None,
+        links=links(base, _rules(search or Search()), week.place, "plan", queries.snapshot.places) if base else None,
     )
 
 

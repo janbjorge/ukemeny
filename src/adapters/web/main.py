@@ -22,18 +22,17 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from adapters.datasets import JsonDatasets
 from adapters.web import api, fmt, telemetry
-from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
+from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, new_seed, offset, seed
 from app.queries import Found, Queries
 from core.matching import VEGETARIAN
 from core.search import (
+    ORDER_LABELS,
     Diet,
     Kind,
     Order,
     Tag,
     diet_clause,
     marked,
-    order_clause,
-    place_clause,
     protein_clause,
     protein_word,
     tag_clause,
@@ -80,8 +79,9 @@ ALLERGY_CHIPS = (
     Diet.LEGUME,
 )
 KIND_CHIPS = (Tag.QUICK, Tag.UNDER_40, Tag.ON_SALE, Tag.LIKED, Tag.MILD)
-# The elements that send a search as it is typed; their own answer must not replace the search box
-SEARCH_BOX = {"q", "sok"}
+# The elements whose own answer must not replace the search box: the box and its form send what was typed, and «Sted»
+# and «Nye middager» (#ny-uke) leave the text as it is
+KEEP_BOX = {"q", "sok", "sted", "ny-uke"}
 # Ideas per page and per "Vis flere": a phone screen holds one or two cards
 PAGE = 12
 # Rendered fragments kept, newest last: the snapshot does not change while the process runs, so a search someone
@@ -89,6 +89,8 @@ PAGE = 12
 FRAGMENTS = 512
 # Pages may be cached this long. Not stale-while-revalidate: a browser then showed the page from before a deploy
 PAGE_CACHE = "public, max-age=300"
+# Not the front page: its week is drawn anew on every visit (jb 2026-10-14)
+FRONT_CACHE = "no-cache"
 
 type Q = Annotated[str | None, Query()]
 
@@ -101,35 +103,36 @@ class Chip:
     on: bool
     count: int | None
     """Dinners after a click, for a chip that is off."""
+    order: Order | None
+    """The sort after a click: the one now, but for a sort chip, which toggles it."""
     protein: str = ""
 
 
 def chips(found: Found) -> dict[str, list[Chip]]:
-    s = found.search
+    s, order = found.search, found.order
 
     def tag(t: Tag) -> Chip:
         clause = tag_clause(t)
         on = s.has(clause)
-        return Chip(clause.label, s.toggle(clause).text, on, None if on else found.counts.tags[t])
+        return Chip(clause.label, s.toggle(clause).text, on, None if on else found.counts.tags[t], order)
 
     def diet(d: Diet) -> Chip:
         clause = diet_clause(d)
-        return Chip(clause.label, s.toggle(clause).text, s.has(clause), None)
+        return Chip(clause.label, s.toggle(clause).text, s.has(clause), None, order)
 
     chosen = next((c for c in s.clauses if c.kind is Kind.PROTEIN), None)
     every = sum(found.counts.proteins.values())
-    proteins = [Chip("Alle", s.drop(chosen).text if chosen else s.text, chosen is None, every if chosen else None)]
+    proteins = [Chip("Alle", s.drop(chosen).text if chosen else s.text, chosen is None, every if chosen else None, order)]
     for p in KNOWN_PROTEINS:
         if p == VEGETARIAN:
             continue  # «Vegetar» is a rule in Kosthold: no meat or fish in any ingredient, not just the main one
         if n := found.counts.proteins.get(p):
             clause = protein_clause(protein_word(p))
             on = chosen is not None and chosen.values == (p,)
-            proteins.append(Chip(protein_word(p).capitalize(), s.toggle(clause).text, on, None if on else n, p))
+            proteins.append(Chip(protein_word(p).capitalize(), s.toggle(clause).text, on, None if on else n, order, p))
 
-    sorted_by = next((c for c in s.clauses if c.kind is Kind.ORDER), None)
-    orders = [Chip("Anbefalt", s.drop(sorted_by).text if sorted_by else s.text, sorted_by is None, None)]
-    orders += [Chip(order_clause(o).label, s.toggle(order_clause(o)).text, s.has(order_clause(o)), None) for o in Order]
+    # On or off, neither on is the ranking (jb 2026-10-14: no «Anbefalt», "makes no sense")
+    orders = [Chip(ORDER_LABELS[o], s.text, order is o, None, None if order is o else o) for o in Order]
 
     def on_first(row: list[Chip]) -> list[Chip]:
         """Chosen chips lead their row, so a phone, which shows a row as one line to swipe, shows them."""
@@ -199,7 +202,7 @@ def create_app(queries: Queries) -> FastAPI:
             # One URL answers a full page or a redirect without HTMX and a fragment with it; a cache must keep them apart
             response.headers["Vary"] = ", ".join(filter(None, (response.headers.get("Vary"), "HX-Request")))
             if "hx-request" not in request.headers:
-                response.headers["Cache-Control"] = PAGE_CACHE
+                response.headers["Cache-Control"] = FRONT_CACHE if path == "/" else PAGE_CACHE
         return response
 
     app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
@@ -228,22 +231,38 @@ def create_app(queries: Queries) -> FastAPI:
     templates = Jinja2Templates(directory=HERE / "templates", context_processors=[context])
     templates.env.filters |= {name: getattr(fmt, name) for name in fmt.__all__}
 
-    def ideas(request: Request, choice: DinnerQuery, count: int) -> Found:
-        return telemetry.search(queries, choice.text(), request.url.path, limit=count, skip_week=True)
+    def ideas(request: Request, choice: DinnerQuery, count: int, week: int) -> Found:
+        """The list under the week the visit drew (`week`, its seed), which it leaves out when only rules are searched for."""
+        place = queries.place(choice.sted)
+        return telemetry.search(queries, choice.text(), place, choice.sorter, request.url.path, limit=count, skip_week=True, seed=week)
+
+    def drawn(found: Found) -> bool:
+        """Does the list depend on the visit's week? Only when it leaves it out: nothing but rules searched for."""
+        return all(c.kind is Kind.DIET for c in found.search.clauses)
+
+    def visit(uke: str | None) -> tuple[int, bool]:
+        """The visit's draw of the week (`uke`), and whether it is new: none came with the request (a first visit, or
+        «Nye middager», which leaves it out)."""
+        given = seed(uke)
+        return (new_seed(), True) if given is None else (given, False)
 
     rendered: OrderedDict[tuple[object, ...], bytes] = OrderedDict()
 
-    def fragment(request: Request, template: str, key: tuple[object, ...], context: Callable[[], dict[str, object]]) -> Response:
-        """An HTMX fragment, rendered once per key and kept (FRAGMENTS)."""
+    def fragment(
+        request: Request, template: str, key: tuple[object, ...], context: Callable[[], dict[str, object]], keep: bool = True
+    ) -> Response:
+        """An HTMX fragment, rendered once per key and kept (FRAGMENTS); with `keep` off, rendered every time: it holds
+        one visit's draw of the week."""
         key = (template, *key)
-        telemetry.fragment(template, kept=key in rendered)
-        if key in rendered:
+        telemetry.fragment(template, kept=keep and key in rendered)
+        if keep and key in rendered:
             rendered.move_to_end(key)
             return HTMLResponse(rendered[key])
         body = bytes(templates.TemplateResponse(request, template, context()).body)
-        rendered[key] = body
-        if len(rendered) > FRAGMENTS:
-            rendered.popitem(last=False)
+        if keep:
+            rendered[key] = body
+            if len(rendered) > FRAGMENTS:
+                rendered.popitem(last=False)
         return HTMLResponse(body)
 
     def rules_changed(found: Found, current_url: str | None) -> bool:
@@ -251,62 +270,107 @@ def create_app(queries: Queries) -> FastAPI:
         (HX-Current-URL)."""
         if not current_url:
             return True
-        before = {k: v[0] for k, v in parse_qs(urlsplit(current_url).query).items() if k in ("q", "protein", "tilbud")}
-        return queries.rules(queries.parse(DinnerQuery.of(**before).text())) != (found.household, found.place)
+        before = DinnerQuery.of(
+            **{k: v[0] for k, v in parse_qs(urlsplit(current_url).query).items() if k in ("q", "protein", "tilbud", "sted")}
+        )
+        return queries.rules(queries.parse(before.text()), queries.place(before.sted)) != (found.household, found.place)
 
     def dinner_context(
-        found: Found, fragment: bool = False, trigger: str | None = None, current_url: str | None = None
+        found: Found,
+        week: int,
+        fresh: bool = False,
+        fragment: bool = False,
+        trigger: str | None = None,
+        current_url: str | None = None,
     ) -> dict[str, object]:
         return {
             "found": found,
+            # The visit's draw of the week, sent back with every search from the page (#uke)
+            "seed": week,
             "chips": chips(found),
             "relax": [(c, n, found.search.drop(c).text) for c, n in found.relax],
             "shown": len(found.dinners),
-            "week": queries.plan(found.household, found.place),
-            # Until a search names a place the offers are from every store, which the list says (jb 2026-10-13: "We can
-            # assume all shops until the users narrows by selecting a location, we can show a warning")
-            "anywhere": found.place is None and bool(queries.snapshot.places),
-            # A fragment also sends the week when the diet rules changed (the week follows them), and, when a chip or a
-            # link changed the search rather than typing, the search box with its new text (both out of band)
-            "week_oob": fragment and rules_changed(found, current_url),
-            "box": fragment and trigger not in SEARCH_BOX,
+            "week": queries.plan(found.household, found.place, week),
+            # «Sted»: where the offers are from, every store until one is picked (jb 2026-10-14: "I dont want location to
+            # be in the seach, make it some kind of select")
+            "places": sorted(queries.snapshot.places),
+            # A fragment also sends the week when the diet rules changed (the week follows them) or it was drawn anew, with
+            # its #uke, and, when a chip or a link changed the search rather than typing, the search box with its new text
+            # (all out of band)
+            "week_oob": fragment and (fresh or rules_changed(found, current_url)),
+            "uke_oob": fragment and fresh,
+            "box": fragment and trigger not in KEEP_BOX,
         }
 
     @app.get("/", response_class=HTMLResponse)
-    def index(request: Request, q: Q = None, protein: Q = None, tilbud: Q = None, antall: Q = None) -> HTMLResponse:
-        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall)
-        found = ideas(request, choice, choice.antall if antall else PAGE)
-        return templates.TemplateResponse(request, "index.html", dinner_context(found))
+    def index(
+        request: Request,
+        q: Q = None,
+        protein: Q = None,
+        tilbud: Q = None,
+        antall: Q = None,
+        sted: Q = None,
+        sorter: Q = None,
+        uke: Q = None,
+    ) -> HTMLResponse:
+        choice, (week, _) = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted, sorter=sorter), visit(uke)
+        found = ideas(request, choice, choice.antall if antall else PAGE, week)
+        return templates.TemplateResponse(request, "index.html", dinner_context(found, week))
 
     @app.get("/middager", response_class=HTMLResponse)
-    def dinners_fragment(request: Request, q: Q = None, protein: Q = None, tilbud: Q = None, antall: Q = None) -> Response:
+    def dinners_fragment(
+        request: Request,
+        q: Q = None,
+        protein: Q = None,
+        tilbud: Q = None,
+        antall: Q = None,
+        sted: Q = None,
+        sorter: Q = None,
+        uke: Q = None,
+    ) -> Response:
         """The ideas under the week, for a search. Without HTMX it is the front page with the same search."""
-        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall)
+        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted, sorter=sorter)
         if "hx-request" not in request.headers:
-            query = link(choice.text(), choice.antall if antall else None)
+            query = link(choice.text(), choice.antall if antall else None, queries.place(choice.sted), choice.sorter)
             return RedirectResponse(f"/?{query}#forslag" if query else "/#forslag", status_code=303)
-        found = ideas(request, choice, choice.antall if antall else PAGE)
+        drew, fresh = visit(uke)
+        found = ideas(request, choice, choice.antall if antall else PAGE, drew)
         trigger, current_url = request.headers.get("hx-trigger"), request.headers.get("hx-current-url")
-        week, box = rules_changed(found, current_url), trigger not in SEARCH_BOX
+        week, box = fresh or rules_changed(found, current_url), trigger not in KEEP_BOX
         response = fragment(
             request,
             "_dinners.html",
-            (found.search.text, len(found.dinners), week, box),
-            lambda: dinner_context(found, fragment=True, trigger=trigger, current_url=current_url),
+            (found.search.text, found.place, found.order, len(found.dinners), box),
+            lambda: dinner_context(found, drew, fresh, fragment=True, trigger=trigger, current_url=current_url),
+            keep=not (week or drawn(found)),
         )
-        query = link(found.search.text)
+        query = link(found.search.text, place=found.place, order=found.order)
         response.headers["HX-Replace-Url"] = f"/?{query}#forslag" if query else "/#forslag"
         return response
 
     @app.get("/middager/flere", response_class=HTMLResponse)
-    def more_dinners(request: Request, q: Q = None, protein: Q = None, tilbud: Q = None, fra: Q = None) -> Response:
+    def more_dinners(
+        request: Request,
+        q: Q = None,
+        protein: Q = None,
+        tilbud: Q = None,
+        sted: Q = None,
+        sorter: Q = None,
+        uke: Q = None,
+        fra: Q = None,
+    ) -> Response:
         """The next ideas after the first `fra`, to append to the list. Without HTMX, the front page with them all."""
-        choice, start = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud), offset(fra)
+        choice, start = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, sted=sted, sorter=sorter), offset(fra)
         if "hx-request" not in request.headers:
-            return RedirectResponse(f"/?{link(choice.text(), start + PAGE)}#forslag", status_code=303)
-        found = ideas(request, choice, start + PAGE)
+            query = link(choice.text(), start + PAGE, queries.place(choice.sted), choice.sorter)
+            return RedirectResponse(f"/?{query}#forslag", status_code=303)
+        found = ideas(request, choice, start + PAGE, visit(uke)[0])
         return fragment(
-            request, "_more.html", (found.search.text, start), lambda: {"found": found, "start": start, "shown": len(found.dinners)}
+            request,
+            "_more.html",
+            (found.search.text, found.place, found.order, start),
+            lambda: {"found": found, "start": start, "shown": len(found.dinners)},
+            keep=not drawn(found),
         )
 
     @app.get("/om", response_class=HTMLResponse)
@@ -324,7 +388,7 @@ def create_app(queries: Queries) -> FastAPI:
                 "proteins": ", ".join(KNOWN_PROTEINS),
                 "diets": api.DIETS,
                 "rule_links": [(d.value, f"{request.base_url}api/plan?{link(d.value)}") for d in Diet],
-                "place_links": [(p, f"{request.base_url}api/plan?{link(place_clause(p).text)}") for p in queries.snapshot.places],
+                "place_links": [(p, f"{request.base_url}api/plan?{link('', place=p)}") for p in queries.snapshot.places],
             },
             media_type="text/plain",
         )

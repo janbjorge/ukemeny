@@ -1,7 +1,7 @@
 """Which dinners fit the household, and in what order. Pure: a snapshot in, ranked dinners out."""
 
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 
 from core.diet import carbs, fodmap_out, judge
@@ -18,7 +18,12 @@ class Week:
     fish: int = 2
     """Fish dinners per week, when enough fit."""
     on_sale_only: bool = True
-    """Picked from dinners whose main protein is on sale; others only fill in when there are too few."""
+    """Drawn from dinners whose main protein is on sale (`plan`); others only fill in when there are too few."""
+
+
+POOL = 5
+"""Per main protein, the dinners on sale with the most kroner off that the week is drawn from (fish: this many per fish
+dinner in the week, so two fish can differ)."""
 
 
 def swaps(verdict: Verdict) -> int:
@@ -167,11 +172,28 @@ def pick(ranked: Sequence[Dinner], days: int, fish: int) -> list[Dinner]:
     return chosen
 
 
-def plan(ranked: Sequence[Dinner], week: Week) -> list[Dinner]:
-    """The week: from dinners on sale when `on_sale_only`, topped up with others if too few."""
+def kroner(dinner: Dinner) -> float:
+    """Kroner off the card's discount (Dinner.deal); 0 without one."""
+    deal = dinner.deal
+    return (deal.sale.saving or 0.0) if deal and deal.sale else 0.0
+
+
+def plan(ranked: Sequence[Dinner], week: Week, chance: Callable[[], float]) -> list[Dinner]:
+    """The week, drawn from the dinners on sale, the more kroner off the likelier (jb 2026-10-14: "I want a Ukens
+    middager that consist of the lowest prices, in rabatt kr, if we can make this semi random"): by the square of the
+    kroner off, so a small saving rarely wins a day (METHOD.md §5). Per main protein the
+    POOL with the most kroner off, fewest swaps first, are in the draw, and `pick` keeps the week varied. Topped up from
+    the ranking when too few are on sale; without `on_sale_only`, the ranking alone. `chance` gives a random number
+    from 0 to 1 (random.Random.random), so the caller decides how often the week changes."""
     if not week.on_sale_only:
         return pick(ranked, week.days, week.fish)
-    chosen = pick([d for d in ranked if d.on_sale], week.days, week.fish)
+    pools: dict[str, list[Dinner]] = {}
+    for d in sorted((d for d in ranked if d.on_sale and kroner(d) > 0), key=lambda d: (swaps(d.verdict), -kroner(d))):
+        pools.setdefault(d.protein, []).append(d)
+    drawn = [d for protein, pool in pools.items() for d in pool[: POOL * max(week.fish, 1) if protein == FISH else POOL]]
+    # A weighted draw (Efraimidis and Spirakis): each dinner's place is a random number to the power 1 / weight
+    drawn.sort(key=lambda d: chance() ** (1 / kroner(d) ** 2), reverse=True)
+    chosen = pick(drawn, week.days, week.fish)
     have_fish = sum(d.protein == FISH for d in chosen)
     rest = [d for d in ranked if not d.on_sale]
     return chosen + pick(rest, week.days - len(chosen), max(week.fish - have_fish, 0))

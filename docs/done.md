@@ -2,6 +2,17 @@
 
 Finished requests from jb, newest first. Each quotes the request and says what was built.
 
+## 2026-10-14
+
+- [x] **The week no longer shifts the page** ("Button works, however, the page shifts up and down depend on the size of the ukes middags hero cards"): over 60 draws the week was 429–513 px tall at 1280 px, 532–609 px at 820 and 277–301 px at 390. Its cards now keep two lines for the name and for the deal and one for the swaps when a rule is picked, so every draw is one height (513, 683 and 301 px without rules); «Nye middager» stayed on the same pixel over 8 clicks at 1280 and 390 px.
+
+- [x] **Nye middager** ("Under Ukens middager, lets have a 'hit me' kind of button, ie. give a new set of dinners?"): a «↻ Nye middager» button under the week draws another; the search, «Sted» and the sort stay as they are, and the list under it still leaves out the week shown. Checked in WebKit, and on 11 phones and tablets and 5 desktop sizes in WebKit and Chromium.
+- [x] **The week by kroner off, semi-random** ("I want a Ukens middager that consist of the lowest prices, in rabatt kr, if we can make this semi random"; jb chose to replace the week, and a new one on every visit): drawn from the 5 dinners on sale with the most kroner off per main protein, weighted by the square of the kroner off, with the same variety rules; the week's cards show the kroner off. The front page is no longer cached for 5 minutes. METHOD.md §5 has the numbers behind the square.
+
+- [x] **Sorter without «Anbefalt», and not in the search** ("Sorter Anbefalt Rabatt % Rabatt kr - makes no sense, remove anbefalt, i also do not think this should be inc. in the serach box"): the row is «Rabatt %» and «Rabatt kr», each on or off; neither on is the ranking. The sort is `sorter=prosent|kroner` beside `q`, not words in the box; the API takes `sorter` and `matris candidates --sorter`. Checked in WebKit: typing, «Sted» and the other chips keep the sort.
+
+- [x] **The place is a select, and the filters line up** ("I dont want location to be in the seach, make it some kind of select, also, we need to make sure things are allined propperly, this looks like jr. level caues!"): «Sted» is a select under the search box («Hele landet» and the 20 places), `sted=bergen` in the address beside `q`; «i bergen» is no longer a search word, and the yellow note asking for it is gone. The API takes `sted` too, and `matris candidates --sted`. The filter labels share a column and sit on the first line of their chips (they wrapped above some rows and beside others), a chip's label and count share a baseline, and the select is shaped like a chip. Then, for "it need to reander epcicly well on all of them" (phones, tablets, …): tablets got the phones' 40 px chips and menu (any touch screen), «Sted» 16 px text by touch so Safari does not zoom, and the filters went through WebKit and Chromium on 11 phones and tablets and 5 desktop sizes (FACTS.md §1).
+
 ## 2026-10-13
 
 - [x] **Progress bars for the build** ("add tqdm and use that to track progress of the diffrent phases, also use to to how the current url getting fetched"): `uv run python -m pipeline.datasets` and `matris build` show a tqdm bar per step (matprat.no pages, Jev's labels, mattilbud.no catalogs, Jev's matches), and under it the URL being fetched. The `-v` lines print above the bars.

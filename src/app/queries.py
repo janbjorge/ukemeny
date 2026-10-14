@@ -2,13 +2,15 @@
 
 The rules come from the search: «uten løk», «glutenfri» and «lite laktose» are put on top of a base household.
 The site's base has no rules (core.search.ANYTHING); the CLI's is profile.yaml. The offers are from the stores near the
-place a search names («i bergen»), else near the base place (the CLI's, from profile.yaml), else from every store. What
-does not depend on the rules (core.ranking.prepare, the search Index) is worked out once, and the offers once per place;
-rankings, views and weeks once per set of rules and place, and kept: the snapshot only changes on deploy.
+place picked with the search (the site's «Sted»), else near the base place (the CLI's, from profile.yaml), else from every
+store. What does not depend on the rules (core.ranking.prepare, the search Index) is worked out once, and the offers once per place;
+rankings, views and the week's counts once per set of rules and place, and kept: the snapshot only changes on deploy.
+The week's dinners are drawn each time (core.ranking.plan).
 """
 
+import random
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 
 from core import ranking
@@ -16,7 +18,7 @@ from core.diet import judge
 from core.models import Dinner, Dish, Household, Offer, Plan, Snapshot, Verdict
 from core.ports import Datasets
 from core.ranking import Week
-from core.search import ANYTHING, Clause, Counts, Diet, Index, Kind, Search, View, household, via
+from core.search import ANYTHING, Clause, Counts, Diet, Index, Kind, Order, Search, View, fold, household, via
 
 type Rules = tuple[Household, str | None]
 """What a ranking depends on: the household, and the place whose offers count (None: every store)."""
@@ -35,7 +37,9 @@ class Found:
     household: Household
     """The rules the dinners were judged by: the base and the search's diet rules."""
     place: str | None
-    """Where the offers are from: the search's place, else the base place. None: every store."""
+    """Where the offers are from: the place picked, else the base place. None: every store."""
+    order: Order | None
+    """Sorted by this discount instead of the ranking."""
     dinners: tuple[Dinner, ...]
     """At most the limit asked for, best first."""
     total: int
@@ -57,13 +61,15 @@ class Queries:
         self.base = base
         self.week = week or Week()
         self.home = home
-        """The base place, when a search names none; None: every store."""
+        """The base place, when none is picked; None: every store."""
         self.prepared = ranking.prepare(self.snapshot)
-        self.index = Index(self.prepared, self.snapshot.traits, self.snapshot.places)
+        self.index = Index(self.prepared, self.snapshot.traits)
+        self._places = {fold(place): place for place in self.snapshot.places}
         self._nearby: dict[str | None, tuple[ranking.Prepared, ...]] = {None: self.prepared}
         self._ranked: dict[Rules, list[Dinner]] = {}
         self._view: dict[Rules, View] = {}
         self._plan: dict[Rules, Plan] = {}
+        """Without the dinners, which are drawn each time."""
 
     def nearby(self, place: str | None) -> tuple[ranking.Prepared, ...]:
         """Every dinner with the offers at the stores near `place` (core.ranking.nearby)."""
@@ -92,32 +98,49 @@ class Queries:
         """The search, with typos fixed against every dinner the base allows."""
         return self.index.parse(text)
 
-    def rules(self, search: Search) -> Rules:
-        """The base with the rules a search names («uten løk glutenfri»), and its place or the base place."""
-        return household(search.diets, self.base), search.place or self.home
+    def place(self, name: str | None) -> str | None:
+        """The place as Snapshot.places names it, from any case and with æøå as ae/o/a ("tromso" is Tromsø); None for
+        none or one the snapshot does not know."""
+        return self._places.get(fold(name)) if name else None
+
+    def rules(self, search: Search, place: str | None = None) -> Rules:
+        """The base with the rules a search names («uten løk glutenfri»), and the place (Snapshot.places names it) or
+        the base place."""
+        return household(search.diets, self.base), place or self.home
 
     def household(self, text: str = "") -> Household:
         """The base with the rules a search names: «uten løk glutenfri»."""
         return self.rules(self.parse(text))[0]
 
-    def search(self, text: str = "", limit: int = 30, per_protein: int = 3, skip_week: bool = False) -> Found:
-        """Dinners that fit the search's rules and match the rest of it, best first. Without a protein or a word
-        to find, the best `per_protein` of each main protein come first. With `skip_week` and nothing but rules
-        searched for, the week's dinners are left out (the page shows them above the list)."""
+    def search(
+        self,
+        text: str = "",
+        place: str | None = None,
+        order: Order | None = None,
+        limit: int = 30,
+        per_protein: int = 3,
+        skip_week: bool = False,
+        seed: int | None = None,
+    ) -> Found:
+        """Dinners that fit the search's rules and match the rest of it, best first or by `order`, with the offers near
+        `place` (Snapshot.places names it). Without a protein, a word to find or an order, the best `per_protein` of
+        each main protein come first. With `skip_week` and nothing but rules searched for, the week's dinners are left
+        out (the page shows them above the list): the week `seed` draws (plan)."""
         search = self.parse(text)
-        h, place = self.rules(search)
+        h, place = self.rules(search, place)
         view = self.view(h, place)
-        found = self.index.find(search, view)
-        if skip_week and all(c.kind in (Kind.DIET, Kind.ORDER, Kind.PLACE) for c in search.clauses):
-            week = {d.dish.url for d in self.plan(h, place).dinners}
+        found = self.index.find(search, view, order)
+        if skip_week and all(c.kind is Kind.DIET for c in search.clauses):
+            week = {d.dish.url for d in self.plan(h, place, seed).dinners}
             found = [d for d in found if d.dish.url not in week]
-        if not any(c.kind in (Kind.PROTEIN, Kind.WITH, Kind.ORDER) for c in search.clauses):
+        if order is None and not any(c.kind in (Kind.PROTEIN, Kind.WITH) for c in search.clauses):
             found = ranking.varied(found, per_protein)
         shown = tuple(found[:limit])
         return Found(
             search=search,
             household=h,
             place=place,
+            order=order,
             dinners=shown,
             total=len(found),
             counts=self.index.count(search, view),
@@ -143,13 +166,14 @@ class Queries:
         near = frozenset(self.snapshot.places[place])
         return [o for o in self.snapshot.offers if o.catalog in near]
 
-    def plan(self, h: Household | None = None, place: str | None = None) -> Plan:
-        """The week for these rules and this place."""
+    def plan(self, h: Household | None = None, place: str | None = None, seed: int | None = None) -> Plan:
+        """The week for these rules and this place, drawn with `seed`: the same seed, the same week; None, a new one."""
         key = (h or self.base, place)
-        if (week := self._plan.get(key)) is None:
-            ranked, offers = self.ranked(*key), self.offers(place)
-            week = self._plan[key] = Plan(
-                dinners=tuple(ranking.plan(ranked, self.week)),
+        ranked = self.ranked(*key)
+        if (counts := self._plan.get(key)) is None:
+            offers = self.offers(place)
+            counts = self._plan[key] = Plan(
+                dinners=(),
                 place=place,
                 offers=len(offers),
                 stores=tuple(sorted({o.store for o in offers})),
@@ -157,7 +181,7 @@ class Queries:
                 fitting=len(ranked),
                 on_sale=sum(d.on_sale for d in ranked),
             )
-        return week
+        return replace(counts, dinners=tuple(ranking.plan(ranked, self.week, random.Random(seed).random)))
 
     def check(self, url: str, h: Household | None = None) -> Check | None:
         dish = next((d for d in self.snapshot.dishes if d.url == url), None)

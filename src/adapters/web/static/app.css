@@ -88,6 +88,17 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .card .via, .card .swaps { color: var(--text-secondary); }
 .card .swaps b { color: var(--accent-strong); }
 .card .swaps b::before { content: "↺ "; }
+/* The week's cards are one height whatever is drawn, so «Nye middager» moves nothing below them (jb 2026-10-14: "the
+   page shifts up and down depend on the size of the ukes middags hero cards"): two lines for the name and for the deal,
+   and one for the swaps, cut with «…» past that. 300 drawn cards at 390, 820 and 1280 px never needed more. The name
+   keeps 4 px around it for the focus ring, which the cut would otherwise clip. */
+.cards.week .card h3, .cards.week .card .deal {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+}
+.cards.week .card h3 { padding: 4px; margin: -4px -4px 0; min-height: calc(2.4em + 8px); }
+.cards.week .card .deal { min-height: 3.1em; }
+.cards.week .card .meta, .cards.week .card .swaps { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cards.week .card .swaps { min-height: 1.55em; }
 
 /* Finn en middag: the search box and the chips */
 .finder { margin-top: 48px; background: var(--surface-2); border-radius: 24px; padding: 8px 24px 24px; }
@@ -104,21 +115,37 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .search button { font: inherit; font-weight: 650; padding: 0 24px; border: 0; border-radius: 999px; background: var(--accent); color: #fff; cursor: pointer; }
 .search button:active { background: var(--accent-strong); }
 
-.filters { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 8px; }
-.filters .row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; min-width: 0; }
-.filters .label { font-size: var(--t-small); color: var(--text-muted); min-width: 8.5em; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+/* Two columns: the labels, as wide as the widest, and the chips. A label sits on the first line of its chips, centred
+   on the line as the text in a chip is: --chip is the height of a chip, the select and a label's line. */
+.filters {
+  --chip: 36px; --chip-pad: calc((var(--chip) - 22px) / 2);
+  display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: 14px 24px; margin: 20px 0 8px;
+}
+.filters .row { display: contents; }
+.filters .label { font-size: var(--t-small); line-height: var(--chip); color: var(--text-muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+/* line-height 20px, padding and a 1px border make --chip; the label and the count share a baseline */
 .chips a, .chips .off {
-  display: inline-flex; align-items: center; gap: 4px; min-height: 36px; font-size: var(--t-small); text-decoration: none; white-space: nowrap;
-  color: var(--text-secondary); background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 999px; padding: 4px 13px;
+  display: inline-flex; align-items: baseline; gap: 5px; font-size: var(--t-small); line-height: 20px; text-decoration: none; white-space: nowrap;
+  color: var(--text-secondary); background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 999px; padding: var(--chip-pad) 14px;
 }
 .chips a:active { border-color: var(--accent); }
 .chips a[aria-current] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 650; }
 .chips .off { opacity: 0.45; }
-.chips .n { font-size: var(--t-chart); color: var(--text-muted); }
+/* line-height 1: on the label's baseline its own 20 px line would reach 1 px below the chip's */
+.chips .n { font-size: var(--t-chart); line-height: 1; color: var(--text-muted); }
 .chips a[aria-current] .n { color: inherit; }
 .chips.diet a[aria-current] { background: var(--good); border-color: var(--good); }
-.chips [data-protein]::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--p); margin-right: 2px; }
+.chips [data-protein]::before { content: ""; align-self: center; width: 9px; height: 9px; border-radius: 50%; background: var(--p); }
+/* «Sted»: a select shaped like a chip, filled like a chosen chip once a place is picked */
+.filters select {
+  justify-self: start; max-width: 100%; margin: 0; font: inherit; font-size: var(--t-small); line-height: 20px; color: var(--text-secondary);
+  padding: var(--chip-pad) 36px var(--chip-pad) 14px; border: 1px solid var(--hairline); border-radius: 999px; cursor: pointer;
+  background: var(--surface-1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%235d5448' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E") no-repeat right 14px center / 11px;
+  -webkit-appearance: none; appearance: none;
+}
+.filters select.on { background-color: var(--accent); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23ffffff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E"); border-color: var(--accent); color: #fff; font-weight: 650; }
+.filters option { color: var(--text-primary); background: var(--surface-1); font-weight: 400; }
 .chips a[data-protein][aria-current] { background: var(--p); border-color: var(--p); }
 .chips a[data-protein][aria-current]::before { background: #fff; }
 
@@ -129,12 +156,14 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .more { grid-column: 1 / -1; text-align: center; margin: 4px 0 0; position: relative; }
 /* The mark that loads the next cards: about two screens before the end of the list */
 .more .ahead { position: absolute; top: -1200px; left: 0; width: 1px; height: 1px; pointer-events: none; }
-.more a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; font-weight: 650; text-decoration: none; color: var(--accent-strong); background: var(--surface-1); border: 2px solid var(--accent-soft); border-radius: 999px; padding: 8px 28px; }
-.more a:active { border-color: var(--accent); }
+/* «Nye middager» under the week, shaped like «Vis flere» */
+.again { margin: 0; text-align: center; }
+.more a, .again a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; font-weight: 650; text-decoration: none; color: var(--accent-strong); background: var(--surface-1); border: 2px solid var(--accent-soft); border-radius: 999px; padding: 8px 28px; }
+.more a:active, .again a:active { border-color: var(--accent); }
 .more .n { font-weight: 400; color: var(--text-muted); font-size: var(--t-small); }
 .more.htmx-request a { opacity: 0.6; }
 /* While a search is on its way */
-#forslag-liste.htmx-request .cards { opacity: 0.55; transition: opacity 0.2s; }
+#forslag-liste.htmx-request .cards, #uka.htmx-request .cards { opacity: 0.55; transition: opacity 0.2s; }
 
 .prose { max-width: 70ch; }
 .prose h2 { font-size: var(--t-heading); margin-top: 32px; }
@@ -152,10 +181,19 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   .card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
   .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
   .card h3 a:hover { color: var(--accent); text-decoration: underline; }
-  .chips a:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .chips a:hover, .filters select:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .filters select.on:hover { border-color: var(--accent-strong); background-color: var(--accent-strong); color: #fff; }
   .chips a[aria-current]:hover { color: #fff; }
   .search button:hover { background: var(--accent-strong); }
-  .more a:hover { border-color: var(--accent); }
+  .more a:hover, .again a:hover { border-color: var(--accent); }
+}
+
+/* Touch screens of any width (tablets too): chips and the select as big as a finger */
+@media (pointer: coarse) {
+  .filters { --chip: 40px; }
+  nav.top a { padding-block: 10px; }
+  /* Safari on iPhone and iPad zooms the page into a select whose text is under 16px */
+  .filters select { font-size: 16px; }
 }
 
 /* Phones: one column, rows of chips to swipe, the week as cards to swipe, and a search box that stays on top */
@@ -178,14 +216,15 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   .search button { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
   .search input { padding: 11px 16px 11px 46px; background-position: 15px center; }
 
+  .filters { --chip: 40px; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
   .filters .row { display: block; }
-  .filters .label { display: block; margin: 0 0 4px; }
+  .filters .label { display: block; line-height: 1.4; margin: 0 0 6px; }
   .filters .chips {
     flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
     margin-inline: calc(-1 * var(--gutter)); padding: 2px var(--gutter) 4px; scroll-padding-inline: var(--gutter);
   }
   .filters .chips::-webkit-scrollbar { display: none; }
-  .chips a, .chips .off { min-height: 40px; padding: 6px 14px; flex: none; }
+  .chips a, .chips .off { flex: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

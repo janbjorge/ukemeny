@@ -14,16 +14,13 @@ from core.search import (
     Diet,
     Index,
     Kind,
-    Order,
     Search,
     Tag,
     View,
     diet_clause,
     household,
     marked,
-    order_clause,
     parse,
-    place_clause,
     protein_clause,
     same,
     tag_clause,
@@ -76,8 +73,6 @@ def tags_of(text: str) -> list[str]:
         ("lav fodmap gravid lavkarbo", ["lav fodmap", "gravid", "lavkarbo"]),
         ("melkefri uten svin", ["melkefri", "uten svin"]),
         ("annet kjøtt", ["annet kjøtt"]),
-        ("kylling størst rabatt", ["kylling", "rabatt i prosent"]),
-        ("mest spart rabatt i prosent", ["rabatt i prosent"]),  # a later order replaces an earlier one
         ("laks laks", ["laks"]),
         ("", []),
         ("og og eller ,", []),
@@ -117,17 +112,9 @@ def test_the_written_search_parses_back_to_the_same_clauses() -> None:
         "annet kjøtt",
         *Tag,
         *Diet,
-        *Order,
     ):
         once = parse(text)
         assert parse(once.text).clauses == once.clauses
-
-
-def test_an_order_toggles_and_replaces_the_other() -> None:
-    s = parse("kylling rabatt i kroner")
-    assert s.order is Order.KRONER and order_clause(Order.KRONER).label == "Rabatt kr"
-    assert s.toggle(order_clause(Order.PERCENT)).text == "kylling rabatt i prosent"
-    assert s.toggle(order_clause(Order.KRONER)).text == "kylling"
 
 
 def test_toggle_adds_removes_and_replaces() -> None:
@@ -303,27 +290,11 @@ def test_without_clause_text() -> None:
     assert without_clause("sopp").text == "uten sopp"
 
 
-PLACES = ("Bergen", "Tromsø", "Ålesund")
-
-
-def test_a_place_says_where_the_offers_are_from() -> None:
-    s = parse("kylling i bergen", places=PLACES)
-    assert s.place == "Bergen" and [c.kind for c in s.clauses] == [Kind.PROTEIN, Kind.PLACE]
-    assert s.text == "kylling i bergen" and parse(s.text, places=PLACES).clauses == s.clauses
-    assert parse("nær tromso", places=PLACES).place == "Tromsø"  # æøå as o, and «nær»
-    assert parse("i bergen i ålesund", places=PLACES).place == "Ålesund"  # one place: the last
-    assert parse("bergen").place is None  # a place the snapshot does not know is a word
-    assert s.toggle(place_clause("Tromsø")).text == "kylling i tromsø"
-    assert s.drop(place_clause("Bergen")).text == "kylling"
-    assert place_clause("Ålesund").label == "I Ålesund"
-
-
-def test_a_place_takes_typos_and_leaves_out_no_dinner() -> None:
+def test_a_place_is_a_word_like_any_other() -> None:
+    """The place is picked beside the search, not in it (jb 2026-10-14: "I dont want location to be in the seach")."""
     s = snapshot(recipe("Kyllinggryte", CHICKEN), recipe("Bergensk fiskesuppe", COD))
     every = prepare(s)
-    index = Index(every, s.traits, PLACES)
+    index = Index(every, s.traits)
     view = index.view(dinners(s, ANYTHING, every))
-    search = index.parse("bregen")
-    assert search.place == "Bergen" and search.corrected == (("bregen", "Bergen"),)
-    assert len(index.find(index.parse("i bergen"), view)) == 2  # a place picks the offers, not the dinners
-    assert [d.dish.name for d in index.find(index.parse("bergensk"), view)] == ["Bergensk fiskesuppe"]
+    assert [c.kind for c in parse("kylling i bergen").clauses] == [Kind.PROTEIN, Kind.WITH]
+    assert [d.dish.name for d in index.find(index.parse("bergen"), view)] == ["Bergensk fiskesuppe"]

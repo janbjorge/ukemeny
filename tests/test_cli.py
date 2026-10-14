@@ -87,8 +87,13 @@ def test_the_profile_place_is_where_the_cli_shops(monkeypatch: pytest.MonkeyPatc
     profile.PROFILE.write_text("place: tromso\n")
     body = json.loads(runner.invoke(cli.app, ["plan", "--json"]).stdout)
     assert (body["place"], body["on_sale"]) == ("Tromsø", 0)
-    body = json.loads(runner.invoke(cli.app, ["candidates", "i", "bergen", "--json"]).stdout)
+    body = json.loads(runner.invoke(cli.app, ["candidates", "--sted", "bergen", "--json"]).stdout)
     assert (body["place"], body["on_sale"]) == ("Bergen", 1)
+    r = runner.invoke(cli.app, ["candidates", "--sted", "Gotham", "--json"])
+    assert r.exit_code == 1 and json.loads(r.stdout)["error"] == {
+        "kind": "usage",
+        "message": "--sted: kjenner ikke Gotham; kjente steder er Bergen, Tromsø",
+    }
     profile.PROFILE.write_text("place: Gotham\n")
     r = runner.invoke(cli.app, ["plan", "--json"])
     assert r.exit_code == 1 and "kjenner ikke Gotham; kjente steder er Bergen, Tromsø" in json.loads(r.stdout)["error"]["message"]

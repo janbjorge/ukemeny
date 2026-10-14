@@ -7,7 +7,7 @@
 
 ## The household
 
-- The site has no profile (jb 2026-10-13: "why would i have a profile for the webpage? that makes no sense"): it starts with no diet rules, and a visitor picks «uten løk», «glutenfri» or «lite laktose» in the search. `profile.yaml` is for the CLI only: its base household, which the same words add to, and its place, which a place in the search replaces.
+- The site has no profile (jb 2026-10-13: "why would i have a profile for the webpage? that makes no sense"): it starts with no diet rules, and a visitor picks «uten løk», «glutenfri» or «lite laktose» in the search. `profile.yaml` is for the CLI only: its base household, which the same words add to, and its place, which `candidates --sted` replaces.
 - Build only what jb asked for. Every element on the page needs a request behind it (jb 2026-10-13: "half of the fucking feature ive not asked for. This clutter hell").
 - The site and the repo say what the rules are ("Uten løk", "Glutenfritt"), never why. No health conditions, ages or names in user-facing text, data, docs or commits.
 - User-facing text is plain bokmål. JSON keys for agents are English.

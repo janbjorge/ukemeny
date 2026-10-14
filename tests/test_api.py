@@ -116,14 +116,20 @@ def test_a_place_in_answers_and_links() -> None:
     body = api.get("/api/plan").json()
     assert (body["place"], body["offers"], body["on_sale"]) == (None, 1, 1)
     assert body["links"]["places"] == {
-        "Bergen": "http://testserver/api/plan?q=i+bergen",
-        "Tromsø": "http://testserver/api/plan?q=i+troms%C3%B8",
+        "Bergen": "http://testserver/api/plan?sted=bergen",
+        "Tromsø": "http://testserver/api/plan?sted=troms%C3%B8",
     }
     body = api.get(body["links"]["places"]["Tromsø"]).json()
     assert (body["place"], body["offers"], body["on_sale"]) == ("Tromsø", 0, 0)
-    assert body["links"]["remove"] == {"i tromsø": "http://testserver/api/plan"}
+    assert body["links"]["remove"] == {"sted": "http://testserver/api/plan"}
     assert list(body["links"]["places"]) == ["Bergen"]
-    body = api.get("/api/middager?q=kylling+i+bergen").json()
-    assert body["place"] == "Bergen" and body["search"]["understood"][-1] == {"kind": "place", "text": "i bergen", "label": "I Bergen"}
-    assert body["links"]["plan"] == "http://testserver/api/plan?q=i+bergen"
-    assert "- [Bergen](http://testserver/api/plan?q=i+bergen)" in api.get("/llms.txt").text
+    body = api.get("/api/middager?q=kylling+melkefri&sted=Bergen").json()
+    assert body["place"] == "Bergen" and [c["kind"] for c in body["search"]["understood"]] == ["protein", "diet"]
+    assert body["links"]["plan"] == "http://testserver/api/plan?q=melkefri&sted=bergen"
+    assert body["links"]["remove"]["sted"] == "http://testserver/api/middager?q=kylling+melkefri"
+    assert api.get("/api/middager?sted=gotham").json()["place"] is None  # an unknown place is every store
+    body = api.get("/api/middager?q=melkefri&sted=bergen&sorter=kroner").json()
+    assert body["order"] == "kroner" and api.get("/api/middager?sorter=billigst").json()["order"] is None
+    assert body["links"]["add"]["vegansk"] == "http://testserver/api/middager?q=melkefri+vegansk&sted=bergen&sorter=kroner"
+    assert body["links"]["plan"] == "http://testserver/api/plan?q=melkefri&sted=bergen"  # the week is not sorted
+    assert "- [Bergen](http://testserver/api/plan?sted=bergen)" in api.get("/llms.txt").text

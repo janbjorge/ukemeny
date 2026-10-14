@@ -22,8 +22,8 @@ DESCRIPTION = f"""\
 Dinner ideas from matprat.no, ranked by this week's grocery offers from mattilbud.no, searchable
 in plain bokmål (`q`). No diet rule applies unless `q` names one: {DIETS}. A rule that leaves something out
 (vegetar, melkefri, uten egg, ...) also leaves out dinners with an ingredient that may hold it, such as a stock cube.
-The offers are from stores all over Norway until `q` names a place (`i bergen`); then from the stores near it. `place`
-says which, and `links.places` gives the same answer in each place.
+The offers are from stores all over Norway until `sted` names a place (`sted=bergen`); then from the stores near it.
+`place` says which, and `links.places` gives the same answer in each place.
 Not an official source; recipes belong to matprat.no and offers to the stores.
 
 Keys are English; advice is bokmål. Prices are kroner. `protein` is the main protein group,
@@ -35,10 +35,8 @@ worked out from the heaviest meat or fish in the recipe. A dinner is `on_sale` w
 SEARCH = f"""A search in plain bokmål, such as `rask kylling uten sopp`, `laks eller torsk på tilbud` or `glutenfri pasta`.
 Understood: diet rules and allergies ({DIETS}: which dinners fit and what to swap), categories
 (`under 20 min`, `under 40 min`, `under en time`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins (`kylling`,
-`fisk`, `kjøtt`, `sjømat`, ...), `uten`/`ikke` before a word to leave it out, `eller` between words for either, a place
-whose stores' offers count (`i bergen`; the places are the keys of `links.places`), and a sort order instead of the
-ranking: `rabatt i prosent` or `rabatt i kroner` (the biggest discount first, as a share or in kroner off; dinners without
-one last).
+`fisk`, `kjøtt`, `sjømat`, ...), `uten`/`ikke` before a word to leave it out, and `eller` between words for either.
+The place and the sort order are not words in `q`: they are `sted` and `sorter`.
 Any other word must be in the dish name or an ingredient; a word that matches nothing is swapped for the closest known
 one (see `search.corrected`). æøå may be written as ae/o/a."""
 
@@ -47,6 +45,10 @@ def build(queries: Queries) -> FastAPI:
     api = FastAPI(title="matris.app", description=DESCRIPTION, version="1", docs_url=None, redoc_url=None, openapi_url=None)
     # Public, read-only data: any site or agent may call it
     api.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"])
+    near = Query(
+        description=f"Where the offers are from: the stores near one of {', '.join(sorted(queries.snapshot.places))} (any case). "
+        "Left out: every store."
+    )
 
     @api.get("/", include_in_schema=False)
     def root() -> RedirectResponse:
@@ -64,13 +66,16 @@ def build(queries: Queries) -> FastAPI:
 
     @api.get("/plan", response_model=schema.PlanOut, summary="This week's dinners")
     def plan(
-        request: Request, q: Annotated[str | None, Query(description=f"Diet rules and allergies ({DIETS}) and a place (`i bergen`)")] = None
+        request: Request,
+        q: Annotated[str | None, Query(description=f"Diet rules and allergies: {DIETS}")] = None,
+        sted: Annotated[str | None, near] = None,
     ) -> schema.PlanOut:
-        """A varied week: one dinner per main protein (fish up to twice, never the same fish twice),
-        picked from dinners whose main protein is on sale. `links` adds or takes away a diet rule, or picks a place."""
-        search = queries.parse(q or "")
-        telemetry.counted(search, request.url.path)
-        return schema.plan(queries, queries.plan(*queries.rules(search)), search, base(request))
+        """A varied week: one dinner per main protein (fish up to twice, never the same fish twice), drawn anew on
+        each call from the dinners on sale with the most kroner off, the more off the likelier. `links` adds or takes
+        away a diet rule, or picks a place."""
+        search, place = queries.parse(q or ""), queries.place(sted)
+        telemetry.counted(search, place, request.url.path)
+        return schema.plan(queries, queries.plan(*queries.rules(search, place)), search, base(request))
 
     @api.get("/middager", response_model=schema.DinnersOut, summary="Search the dinners that fit, best first")
     def dinners(
@@ -81,12 +86,21 @@ def build(queries: Queries) -> FastAPI:
             str | None, Query(description="1: only dinners whose main protein is on sale. Same as `på tilbud` in `q`.")
         ] = None,
         antall: Annotated[str | None, Query(description="How many, 1-100 (default 30)")] = None,
+        sted: Annotated[str | None, near] = None,
+        sorter: Annotated[
+            str | None,
+            Query(
+                description="`prosent` or `kroner`: the biggest discount first, as a share or in kroner off (dinners "
+                "without one last), instead of the ranking."
+            ),
+        ] = None,
     ) -> schema.DinnersOut:
         """Dinners whose name has a searched word first, then fewest swaps, the biggest discount, rating and
         prep time. Without a protein or a word to find, the best 3 of each main protein come first.
         `search` says how `q` was understood, and `links` adds or takes away a diet rule, or picks a place."""
-        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall)
-        found = telemetry.search(queries, choice.text(), request.url.path, limit=choice.antall)
+        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted, sorter=sorter)
+        place = queries.place(choice.sted)
+        found = telemetry.search(queries, choice.text(), place, choice.sorter, request.url.path, limit=choice.antall)
         return schema.dinners(queries, found, base(request))
 
     @api.get("/oppskrift", response_model=schema.CheckOut, summary="Whether one recipe fits, and what to swap")

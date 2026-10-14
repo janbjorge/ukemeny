@@ -74,7 +74,8 @@ def test_a_search_says_what_it_understood_and_is_counted(capfire: CaptureLogfire
 
 def test_a_fragment_says_whether_it_was_kept(capfire: CaptureLogfire) -> None:
     for _ in range(2):
-        client.get("/middager?q=laks+rask", headers={"HX-Request": "true", "HX-Trigger": "q"})
+        page = {"HX-Request": "true", "HX-Trigger": "q", "HX-Current-URL": "http://testserver/?q=laks"}
+        client.get("/middager?q=laks+rask&uke=1", headers=page)
     assert [attrs["fragment.kept"] for _, attrs in _spans(capfire) if "fragment.kept" in attrs] == [False, True]
 
 

@@ -35,7 +35,7 @@ def client() -> TestClient:
 def test_front_page_shows_the_week_with_no_rules_until_picked(client: TestClient) -> None:
     html = client.get("/").text
     assert "<h1>Ukens middager</h1>" in html
-    assert "Kyllinggryte" in html and "\u221227\u00a0%" in html and "kyllingfilet hos KIWI" in html
+    assert "Kyllinggryte" in html and "\u221236\u00a0kr" in html and "kyllingfilet hos KIWI" in html  # the week shows kroner off
     assert "Bytt:" not in html and "Glutenfritt" not in html  # no rules on the page until a visitor picks them
     for gone in ("ting å sjekke", "Også på tilbud", "Prøv for eksempel", "Søker etter", "Uten bytter"):
         assert gone not in html
@@ -54,17 +54,33 @@ def test_cards_are_calm(client: TestClient) -> None:
 
 
 def test_sorted_by_kroner_the_cards_show_kroner_off(client: TestClient) -> None:
-    ideas, week = client.get("/middager?q=kylling+rabatt+i+kroner", headers=HX).text.split('<section id="uka"')
+    ideas, week = client.get("/middager?q=kylling&sorter=kroner", headers=HX).text.split('<section id="uka"')
     assert '<span class="pct">\u221236\u00a0kr</span>' in ideas  # 135 kr before, 99 kr now
-    assert "\u221227\u00a0%" not in ideas and "\u221227\u00a0%" in week  # the week is not sorted
+    assert "\u221227\u00a0%" not in ideas and "\u221236\u00a0kr" in week  # the week shows kroner off as well
 
 
 def test_ideas_leave_out_the_week(client: TestClient) -> None:
     html = client.get("/").text
-    ideas = html[html.index('id="forslag"') :]
-    week = client.get("/api/plan").json()["dinners"]
-    for d in week:
-        assert d["name"] not in ideas
+    week, ideas = html[: html.index('id="forslag"')], html[html.index('id="forslag"') :]
+    shown = [n for n in ("Kyllinggryte", "Laks i ovn", "Torsk med bacon") if n in week]
+    assert shown and not any(n in ideas for n in shown)
+    # The visit's draw goes with every search from the page (#uke), so a fragment leaves out the same week
+    drew = html.split('id="uke" name="uke" value="')[1].split('"')[0]
+    assert 'hx-include="#uke"' in html and client.get("/").headers["Cache-Control"] == "no-cache"  # a new week each visit
+    fragment = client.get(f"/middager?uke={drew}", headers=HX | {"HX-Current-URL": "http://testserver/"}).text
+    assert not any(n in fragment for n in shown)
+
+
+def test_new_dinners_draws_another_week(client: TestClient) -> None:
+    """«Nye middager» (jb 2026-10-14: "lets have a 'hit me' kind of button, ie. give a new set of dinners")."""
+    html = client.get("/?q=glutenfri").text
+    assert '<a id="ny-uke" href="/?q=glutenfri#uka" hx-get="/middager" hx-include="#q, #sted, [name=sorter]"' in html
+    here = HX | {"HX-Current-URL": "http://testserver/?q=glutenfri"}
+    again = client.get("/middager?q=glutenfri", headers=here | {"HX-Trigger": "ny-uke"}).text  # no #uke: a new draw
+    assert '<section id="uka" hx-swap-oob="true">' in again and 'id="uke" name="uke" value="' in again
+    assert 'id="q"' not in again  # the box stays as typed
+    same = client.get("/middager?q=glutenfri&uke=5", headers=here).text  # a search from the page keeps its draw
+    assert 'id="uka"' not in same and 'id="uke"' not in same
 
 
 def test_fragment_filters_and_falls_back_to_the_page(client: TestClient) -> None:
@@ -98,8 +114,13 @@ def test_chips_toggle_and_count(client: TestClient) -> None:
     assert 'hx-get="/middager?q=kylling+uten+l%C3%B8k" hx-trigger="mousedown, click" hx-sync="this:drop">Uten løk</a>' in html
     assert 'aria-label="Allergier">' in html and f'hx-get="/middager?q=kylling+uten+egg"{GO}>Uten egg</a>' in html
     assert ">Lav FODMAP</a>" in html and ">Vegetar</a>" in html
-    assert 'aria-label="Sorter">' in html and f'hx-get="/middager?q=kylling+rabatt+i+prosent"{GO}>Rabatt %</a>' in html
-    assert 'hx-get="/middager?q=kylling" hx-trigger="mousedown, click" hx-sync="this:drop" aria-current="true">Anbefalt</a>' in html
+    assert 'aria-label="Sorter">' in html and f'hx-get="/middager?q=kylling&amp;sorter=prosent"{GO}>Rabatt %</a>' in html
+    assert "Anbefalt" not in html and 'name="sorter"' not in html  # neither on is the ranking (jb 2026-10-14)
+    by_kroner = client.get("/?q=kylling&sorter=kroner").text
+    assert f'hx-get="/middager?q=kylling"{GO} aria-current="true">Rabatt kr</a>' in by_kroner  # off again
+    assert f'hx-get="/middager?q=kylling&amp;sorter=prosent"{GO}>Rabatt %</a>' in by_kroner  # the other one replaces it
+    assert f'hx-get="/middager?q=kylling+uten+egg&amp;sorter=kroner"{GO}>Uten egg</a>' in by_kroner  # a chip keeps the sort
+    assert '<input type="hidden" name="sorter" form="sok" value="kroner">' in by_kroner  # and so does typing
     proteins_row = html[html.index('class="chips proteins"') :]
     assert "Vegetar" not in proteins_row[: proteins_row.index("</nav>")]  # a rule in Kosthold, not a main protein
     proteins = html[html.index('class="chips proteins"') :]
@@ -112,9 +133,9 @@ def test_the_box_follows_chips_but_not_typing(client: TestClient) -> None:
     assert '<section id="uka" hx-swap-oob="true">' in clicked  # the week follows the rules
     typed = client.get("/middager?q=fisk", headers=HX | {"HX-Trigger": "q"}).text
     assert 'id="q"' not in typed
-    same_rules = client.get("/middager?q=fisk+rask", headers=HX | {"HX-Current-URL": "http://testserver/?q=fisk#forslag"}).text
+    same_rules = client.get("/middager?q=fisk+rask&uke=1", headers=HX | {"HX-Current-URL": "http://testserver/?q=fisk#forslag"}).text
     assert 'id="uka"' not in same_rules  # the week only comes along when the diet rules change
-    new_rules = client.get("/middager?q=fisk+glutenfri", headers=HX | {"HX-Current-URL": "http://testserver/?q=fisk#forslag"}).text
+    new_rules = client.get("/middager?q=fisk+glutenfri&uke=1", headers=HX | {"HX-Current-URL": "http://testserver/?q=fisk#forslag"}).text
     assert '<section id="uka" hx-swap-oob="true">' in new_rules
 
 
@@ -144,7 +165,8 @@ def test_headers(client: TestClient) -> None:
     r = client.get("/")
     assert r.headers["X-Content-Type-Options"] == "nosniff"
     assert 'rel="service-desc"' in r.headers["Link"]
-    assert r.headers["Cache-Control"] == "public, max-age=300"
+    assert r.headers["Cache-Control"] == "no-cache"  # the week is drawn anew on every visit
+    assert client.get("/om").headers["Cache-Control"] == "public, max-age=300"
     assert "HX-Request" in r.headers["Vary"]
     css = client.get(main.static_url("app.css"))
     assert css.headers["Cache-Control"].endswith("immutable")
@@ -202,7 +224,7 @@ def test_the_real_site_renders() -> None:
     assert html.count('<article class="card"') >= 5
 
 
-def test_offers_are_from_every_store_until_a_place_is_searched_for() -> None:
+def test_offers_are_from_every_store_until_a_place_is_picked() -> None:
     s = snapshot(
         recipe("Kyllinggryte", CHICKEN),
         recipe("Laks i ovn", SALMON),
@@ -212,12 +234,18 @@ def test_offers_are_from_every_store_until_a_place_is_searched_for() -> None:
     )
     client = TestClient(main.create_app(Queries(FakeDatasets(s), week=Week(days=2, fish=1))))
     anywhere = client.get("/").text
-    assert "Tilbudene er fra butikker over hele landet" in anywhere and "\u221227\u00a0%" in anywhere
-    north = client.get("/?q=i+troms%C3%B8").text
-    assert "over hele landet" not in north and "\u221227\u00a0%" not in north  # nothing on sale near Tromsø
+    assert '<option value="">Hele landet</option>' in anywhere and "\u221236\u00a0kr" in anywhere
+    assert '<select id="sted" name="sted" form="sok" hx-get="/middager" hx-include="#sok">' in anywhere
+    north = client.get("/?sted=troms%C3%B8").text
+    assert '<option value="tromsø" selected>Tromsø</option>' in north and 'class="on"' in north
+    assert "\u221236\u00a0kr" not in north  # nothing on sale near Tromsø
+    assert 'href="/?q=glutenfri&amp;sted=troms%C3%B8#forslag"' in north  # a chip keeps the place
     week = '<section id="uka" hx-swap-oob="true">'
-    moved = client.get("/middager?q=i+bergen", headers=HX | {"HX-Current-URL": "http://testserver/?q=i+troms%C3%B8"}).text
-    assert week in moved and "\u221227\u00a0%" in moved  # another place, another week
-    stayed = client.get("/middager?q=kylling+i+bergen", headers=HX | {"HX-Current-URL": "http://testserver/?q=i+bergen"}).text
+    tromso = HX | {"HX-Current-URL": "http://testserver/?sted=troms%C3%B8"}
+    moved = client.get("/middager?q=&sted=bergen", headers=tromso | {"HX-Trigger": "sted"})
+    assert week in moved.text and "\u221236\u00a0kr" in moved.text  # another place, another week
+    assert moved.headers["HX-Replace-Url"] == "/?sted=bergen#forslag" and 'id="q"' not in moved.text  # the box stays
+    stayed = client.get("/middager?q=kylling&sted=Bergen&uke=1", headers=HX | {"HX-Current-URL": "http://testserver/?sted=bergen"}).text
     assert week not in stayed
+    assert client.get("/middager?sted=bergen", follow_redirects=False).headers["location"] == "/?sted=bergen#forslag"
     assert "Bergen, Tromsø" in client.get("/om").text

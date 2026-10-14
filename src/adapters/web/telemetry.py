@@ -234,12 +234,10 @@ def search(
     order: Order | None,
     route: str,
     limit: int,
-    skip_week: bool = False,
-    seed: int | None = None,
 ) -> Found:
     """queries.search in a span that says what it understood and found, and counted."""
     with logfire.span("search {text}", text=text, route=route, limit=limit) as span:
-        found = queries.search(text, place, order, limit=limit, skip_week=skip_week, seed=seed)
+        found = queries.search(text, place, order, limit=limit)
         s = found.search
         span.set_attributes(
             {

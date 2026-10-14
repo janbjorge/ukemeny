@@ -33,13 +33,7 @@ def test_search() -> None:
     assert q.search("laksefilet").via == {recipe("Laks", SALMON).url: ("laksefilet",)}
 
 
-def test_search_skips_the_week_only_when_browsing_and_relaxes_when_empty() -> None:
-    s = snapshot(recipe("Kylling", CHICKEN), recipe("Laks", SALMON), offers=[SALE], matches={"kyllingfilet": ["sale"]})
-    q = Queries(FakeDatasets(s), week=Week(days=1, fish=0))
-    assert [d.dish.name for d in q.plan().dinners] == ["Kylling"]
-    assert [d.dish.name for d in q.search("", skip_week=True).dinners] == ["Laks"]
-    assert [d.dish.name for d in q.search("glutenfri", skip_week=True).dinners] == ["Laks"]  # rules alone are browsing
-    assert [d.dish.name for d in q.search("kylling", skip_week=True).dinners] == ["Kylling"]
+def test_search_relaxes_when_empty() -> None:
     q = queries()
     found = q.search("fisk på tilbud")
     assert found.dinners == () and found.total == 0

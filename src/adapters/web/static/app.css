@@ -67,7 +67,6 @@ nav.top a { flex: none; color: var(--text-secondary); text-decoration: none; fon
 nav.top a[aria-current] { color: var(--accent-strong); font-weight: 650; background: var(--accent-soft); }
 nav.top .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 650; font-size: var(--t-body); color: var(--accent); margin-right: auto; padding-left: 0; }
 
-#uka h1 { font-size: var(--t-title); margin: 8px 0 0; }
 main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px + env(safe-area-inset-bottom)); }
 .banner { background: var(--mark); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 10px; }
 
@@ -88,21 +87,10 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .card .via, .card .swaps { color: var(--text-secondary); }
 .card .swaps b { color: var(--accent-strong); }
 .card .swaps b::before { content: "↺ "; }
-/* The week's cards are one height whatever is drawn, so «Nye middager» moves nothing below them (jb 2026-10-14: "the
-   page shifts up and down depend on the size of the ukes middags hero cards"): two lines for the name and for the deal,
-   and one for the swaps, cut with «…» past that. 300 drawn cards at 390, 820 and 1280 px never needed more. The name
-   keeps 4 px around it for the focus ring, which the cut would otherwise clip. */
-.cards.week .card h3, .cards.week .card .deal {
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
-}
-.cards.week .card h3 { padding: 4px; margin: -4px -4px 0; min-height: calc(2.4em + 8px); }
-.cards.week .card .deal { min-height: 3.1em; }
-.cards.week .card .meta, .cards.week .card .swaps { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cards.week .card .swaps { min-height: 1.55em; }
 
 /* Finn en middag: the search box and the chips */
-.finder { margin-top: 48px; background: var(--surface-2); border-radius: 24px; padding: 8px 24px 24px; }
-.finder h2 { margin-top: 20px; }
+.finder { background: var(--surface-2); border-radius: 24px; padding: 8px 24px 24px; }
+.finder h1 { font-size: var(--t-title); margin: 20px 0 8px; }
 .search { display: flex; gap: 8px; margin: 12px 0 8px; }
 .search input {
   flex: 1; min-width: 0; font: inherit; font-size: var(--t-heading); color: var(--text-primary);
@@ -156,14 +144,12 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .more { grid-column: 1 / -1; text-align: center; margin: 4px 0 0; position: relative; }
 /* The mark that loads the next cards: about two screens before the end of the list */
 .more .ahead { position: absolute; top: -1200px; left: 0; width: 1px; height: 1px; pointer-events: none; }
-/* «Nye middager» under the week, shaped like «Vis flere» */
-.again { margin: 0; text-align: center; }
-.more a, .again a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; font-weight: 650; text-decoration: none; color: var(--accent-strong); background: var(--surface-1); border: 2px solid var(--accent-soft); border-radius: 999px; padding: 8px 28px; }
-.more a:active, .again a:active { border-color: var(--accent); }
+.more a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; font-weight: 650; text-decoration: none; color: var(--accent-strong); background: var(--surface-1); border: 2px solid var(--accent-soft); border-radius: 999px; padding: 8px 28px; }
+.more a:active { border-color: var(--accent); }
 .more .n { font-weight: 400; color: var(--text-muted); font-size: var(--t-small); }
 .more.htmx-request a { opacity: 0.6; }
 /* While a search is on its way */
-#forslag-liste.htmx-request .cards, #uka.htmx-request .cards { opacity: 0.55; transition: opacity 0.2s; }
+#forslag-liste.htmx-request .cards { opacity: 0.55; transition: opacity 0.2s; }
 
 .prose { max-width: 70ch; }
 .prose h2 { font-size: var(--t-heading); margin-top: 32px; }
@@ -185,7 +171,7 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   .filters select.on:hover { border-color: var(--accent-strong); background-color: var(--accent-strong); color: #fff; }
   .chips a[aria-current]:hover { color: #fff; }
   .search button:hover { background: var(--accent-strong); }
-  .more a:hover, .again a:hover { border-color: var(--accent); }
+  .more a:hover { border-color: var(--accent); }
 }
 
 /* Touch screens of any width (tablets too): chips and the select as big as a finger */
@@ -196,22 +182,17 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   .filters select { font-size: 16px; }
 }
 
-/* Phones: one column, rows of chips to swipe, the week as cards to swipe, and a search box that stays on top */
+/* Phones: one column, rows of chips to swipe, and a search box that stays on top */
 @media (max-width: 640px) {
   main { padding-top: 16px; }
   h2 { margin-top: 32px; }
 
   .cards { gap: 12px; }
   .card { padding: 12px 16px 14px; border-radius: 14px; }
-  .cards.week {
-    grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 86%; align-items: stretch;
-    overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
-    margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter) 12px; scroll-padding-inline: var(--gutter);
-  }
-  .cards.week::-webkit-scrollbar { display: none; }
-  .cards.week .card { scroll-snap-align: start; }
 
-  .finder { margin: 32px calc(-1 * var(--gutter)) 0; border-radius: 0; padding: 4px var(--gutter) 24px; }
+  .finder { margin: 0 calc(-1 * var(--gutter)); border-radius: 0; padding: 4px var(--gutter) 24px; }
+  /* Flush under the menu, unless the note about old offers is above it */
+  .finder:first-child { margin-top: -16px; }
   .search { position: sticky; top: 0; z-index: 2; margin: 8px calc(-1 * var(--gutter)); padding: 8px var(--gutter); background: var(--surface-2); }
   .search button { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
   .search input { padding: 11px 16px 11px 46px; background-position: 15px center; }

@@ -119,20 +119,14 @@ class Queries:
         order: Order | None = None,
         limit: int = 30,
         per_protein: int = 3,
-        skip_week: bool = False,
-        seed: int | None = None,
     ) -> Found:
         """Dinners that fit the search's rules and match the rest of it, best first or by `order`, with the offers near
         `place` (Snapshot.places names it). Without a protein, a word to find or an order, the best `per_protein` of
-        each main protein come first. With `skip_week` and nothing but rules searched for, the week's dinners are left
-        out (the page shows them above the list): the week `seed` draws (plan)."""
+        each main protein come first."""
         search = self.parse(text)
         h, place = self.rules(search, place)
         view = self.view(h, place)
         found = self.index.find(search, view, order)
-        if skip_week and all(c.kind is Kind.DIET for c in search.clauses):
-            week = {d.dish.url for d in self.plan(h, place, seed).dinners}
-            found = [d for d in found if d.dish.url not in week]
         if order is None and not any(c.kind in (Kind.PROTEIN, Kind.WITH) for c in search.clauses):
             found = ranking.varied(found, per_protein)
         shown = tuple(found[:limit])
@@ -149,15 +143,12 @@ class Queries:
         )
 
     def warm(self) -> None:
-        """Work out the view and the week for each diet rule on its own, and for each place without rules, ahead of the
-        first search that needs it."""
+        """Work out the view for each diet rule on its own, and for each place without rules, ahead of the first search
+        that needs it."""
         for diet in Diet:
-            h = household([diet], self.base)
-            self.view(h, self.home)
-            self.plan(h, self.home)
+            self.view(household([diet], self.base), self.home)
         for place in self.snapshot.places:
             self.view(self.base, place)
-            self.plan(self.base, place)
 
     def offers(self, place: str | None = None) -> list[Offer]:
         """This week's offers at the stores near `place`, or at every store."""
@@ -166,8 +157,8 @@ class Queries:
         near = frozenset(self.snapshot.places[place])
         return [o for o in self.snapshot.offers if o.catalog in near]
 
-    def plan(self, h: Household | None = None, place: str | None = None, seed: int | None = None) -> Plan:
-        """The week for these rules and this place, drawn with `seed`: the same seed, the same week; None, a new one."""
+    def plan(self, h: Household | None = None, place: str | None = None) -> Plan:
+        """The week for these rules and this place, drawn anew each time."""
         key = (h or self.base, place)
         ranked = self.ranked(*key)
         if (counts := self._plan.get(key)) is None:
@@ -181,7 +172,7 @@ class Queries:
                 fitting=len(ranked),
                 on_sale=sum(d.on_sale for d in ranked),
             )
-        return replace(counts, dinners=tuple(ranking.plan(ranked, self.week, random.Random(seed).random)))
+        return replace(counts, dinners=tuple(ranking.plan(ranked, self.week, random.random)))
 
     def check(self, url: str, h: Household | None = None) -> Check | None:
         dish = next((d for d in self.snapshot.dishes if d.url == url), None)

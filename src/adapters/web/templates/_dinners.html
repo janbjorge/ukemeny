@@ -1,10 +1,10 @@
 {# The ideas: chips, and the dinners for the search. An HTMX fragment of index.html (/middager); then it also sends the
-   search box and the week out of band. Every search from it carries the visit's draw of the week (#uke). #}
+   search box out of band. #}
 {% from "_dinner.html" import card with context %}
 {% from "_search.html" import search_box %}
 {% from "_ui.html" import go, chip, more_button with context %}
 {% set s = found.search %}
-<div id="forslag-liste" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste" hx-include="#uke">
+<div id="forslag-liste" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste">
   <div class="filters">
     {% if places %}
     {# Where the offers are from. Part of the search form (form="sok"), so it goes with a search and, without JavaScript, with Søk #}
@@ -40,6 +40,4 @@
   </div>
   {% endif %}
   {% if box %}{{ search_box(s.text, oob=true) }}{% endif %}
-  {% if uke_oob %}<input type="hidden" id="uke" name="uke" value="{{ seed }}" hx-swap-oob="true">{% endif %}
-  {% if week_oob %}{% include "_week.html" %}{% endif %}
 </div>

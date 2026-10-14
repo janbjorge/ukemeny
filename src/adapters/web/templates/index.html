@@ -1,14 +1,12 @@
 {% extends "base.html" %}
 {% from "_search.html" import search_box %}
 {% block main %}
-{% include "_week.html" %}
 <section id="forslag" class="finder">
-  <h2>Finn en middag</h2>
+  <h1>Finn en middag</h1>
   <form class="search" id="sok" action="/#forslag" method="get" role="search"
     hx-get="/middager" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste"
     onsubmit="document.getElementById('q').blur()">
     {{ search_box(found.search.text) }}
-    <input type="hidden" id="uke" name="uke" value="{{ seed }}">
     <button type="submit">Søk</button>
   </form>
   {% include "_dinners.html" %}

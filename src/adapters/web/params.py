@@ -4,7 +4,6 @@ Validation never fails: an unknown protein is ignored, numbers are capped, a lon
 old or hand-edited link still shows a page.
 """
 
-import secrets
 from typing import Annotated
 from urllib.parse import urlencode
 
@@ -69,17 +68,6 @@ def link(text: str, antall: int | None = None, place: str | None = None, order: 
     """The query string for a search: "q=rask+kylling", with "sted" (lower case), "sorter" and "antall" only when given."""
     given = {"q": text, "sted": place and place.lower(), "sorter": order, "antall": antall}
     return urlencode({k: v for k, v in given.items() if v})
-
-
-def seed(value: str | None) -> int | None:
-    """The visit's draw of the week (`uke`, core.ranking.plan): the number given; None when missing or nonsense."""
-    digits = "".join(c for c in str(value or "") if c.isdigit())[:9]
-    return int(digits) if digits else None
-
-
-def new_seed() -> int:
-    """A new draw of the week: on a first visit, and for «Nye middager»."""
-    return secrets.randbits(30)
 
 
 def offset(value: str | None) -> int:

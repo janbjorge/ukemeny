@@ -4,6 +4,10 @@ Finished requests from jb, newest first. Each quotes the request and says what w
 
 ## 2026-10-14
 
+- [x] **The page fast again after godt.no** ("The last commit, adding off godt.no has made the page super slow. you need to ivestigate"; "We are not moving to a larger instance for this"; "lets 1 and 2"): each machine ran out of memory while warming every rule and place and was killed, over and over (FACTS.md §7). Nothing is warmed now, 8 rankings are kept with their places' offers, and datasets/ is read one file at a time with one copy of each name (b758bdd). On Fly: start-up 0.87 s (13–16 s before), the process 124–132 MiB with 38–50 MiB to spare, a new rule or place 145–199 ms and a search already made 19 ms.
+
+- [x] **godt.no as a second recipe source** ("I want to add https://www.godt.no/ as a source"): 1 455 dinners from godt.no beside matprat.no's 1 944 (cb59d31; FACTS.md §3, §4; METHOD.md §2, §7). Live: the first 60 ideas on the front page link 29 to godt.no and 31 to matprat.no.
+
 - [x] **Several main proteins at once** ("We need to allow multi select on ; Hovedråvare"): a chip in «Hovedråvare» joins the ones chosen instead of replacing them, and a chosen one leaves: «Kylling» then «Fisk» is `q=kylling+eller+fisk`, both lit, 485 dinners (306 + 179). «Alle» still clears them.
 
 - [x] **No Ukens middager on the site** ("lets kill the 'Ukens middager' banner hero cards"): the week's cards, its heading and «Nye middager» are gone from the front page, and with them the visit's draw (`uke`): the list under the search leaves nothing out, fragments are always kept, and the front page is cached for 5 minutes again. «Finn en middag» is the page's h1, and the title says «matris: middager med ukens tilbud». /api/plan and `matris plan` still give the week.

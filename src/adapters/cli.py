@@ -67,8 +67,8 @@ def _verdict_lines(verdict: Verdict) -> list[str]:
 
 
 def _dish_line(dish: Dish, protein: str) -> str:
-    rating = f" · ★{dish.rating:.1f} ({dish.rating_count})" if dish.rating else ""
-    return f"{dish.name} · {protein} · {dish.prep_time}{rating}"
+    rating = f" | *{dish.rating:.1f} ({dish.rating_count})" if dish.rating else ""
+    return f"{dish.name} | {protein} | {dish.prep_time.replace('\N{EN DASH}', '-')}{rating}"  # matprat's "20-40 min" has an en dash
 
 
 def _dinner(n: int, d: Dinner) -> str:
@@ -122,13 +122,13 @@ def candidates(
         return emit(schema.dinners(q, found))
     s = found.search
     if s.clauses:
-        typer.echo(f"Søker etter: {' · '.join(c.label for c in s.clauses)}")
+        typer.echo(f"Søker etter: {' | '.join(c.label for c in s.clauses)}")
     for typed, used in s.corrected:
-        typer.echo(f"Fant ikke «{typed}», så søker etter «{used}».")
+        typer.echo(f'Fant ikke "{typed}", så søker etter "{used}".')
     if s.clauses:
         typer.echo(f"{found.total:,} {'middag passer' if found.total == 1 else 'middager passer'}.\n")
     if not found.dinners and found.relax:
-        tips = ", ".join(f"«{c.label}» ({n:,} middager)" for c, n in found.relax[:3])
+        tips = ", ".join(f'"{c.label}" ({n:,} middager)' for c, n in found.relax[:3])
         typer.echo(f"Ingen middager passer alt dette. Prøv å fjerne {tips}.")
     for n, d in enumerate(found.dinners, 1):
         typer.echo(_dinner(n, d) + "\n")

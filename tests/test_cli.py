@@ -51,7 +51,7 @@ def test_candidates_and_check_json() -> None:
 
 def test_candidates_search_without_quotes() -> None:
     out = runner.invoke(cli.app, ["candidates", "kyllign", "på", "tilbud"]).stdout
-    assert "Søker etter: Kylling · På tilbud" in out and "Fant ikke «kyllign», så søker etter «kylling»." in out
+    assert "Søker etter: Kylling | På tilbud" in out and 'Fant ikke "kyllign", så søker etter "kylling".' in out
     assert "1 middag passer" in out and "1. Kyllinggryte" in out
     body = json.loads(runner.invoke(cli.app, ["candidates", "fisk", "--json"]).stdout)
     assert body["dinners"] == [] and body["search"]["without"][0]["text"] == "fisk"

@@ -64,7 +64,8 @@ STEPS = {
 
 class Bars:
     """A tqdm bar per step of the build (app.build.Progress), and under it the URL being fetched (jb 2026-10-13: "add
-    tqdm and use that to track progress of the diffrent phases, also use to to how the current url getting fetched")."""
+    tqdm and use that to track progress of the diffrent phases, also use to to how the current url getting fetched").
+    ASCII bars (jb 2026-10-19: "Make sure we are ascii first in all our tools")."""
 
     def __init__(self, steps: Mapping[str, str], file: TextIO | None = None) -> None:
         self.steps = steps
@@ -75,7 +76,7 @@ class Bars:
     def __call__(self, step: str, done: int, due: int) -> None:
         if done == 0:
             self.close()
-            self._bar = tqdm(desc=self.steps[step], total=due, file=self.file, dynamic_ncols=True)
+            self._bar = tqdm(desc=self.steps[step], total=due, file=self.file, dynamic_ncols=True, ascii=True)
         elif self._bar is not None:
             self._bar.update(done - self._bar.n)
         if done == due:
@@ -86,7 +87,7 @@ class Bars:
         if self._bar is None:
             return
         if self._url is None:
-            self._url = tqdm(bar_format="{desc}", file=self.file, dynamic_ncols=True, leave=False)
+            self._url = tqdm(bar_format="{desc}", file=self.file, dynamic_ncols=True, leave=False, ascii=True)
         self._url.set_description_str(url)
 
     def close(self) -> None:

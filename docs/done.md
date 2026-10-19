@@ -2,6 +2,10 @@
 
 Finished requests from jb, newest first. Each quotes the request and says what was built.
 
+## 2026-10-19
+
+- [x] **ASCII in the tools** ("Make sure we are ascii first in all our tools, like in tqdm in @src/pipeline/"): the build's tqdm bars are `ascii=True` (`#` not blocks, even on a UTF-8 terminal), the Jev line reads `Jev: 1,234 calls, 5,678 tokens, ~$0.012`, and `matris` separates with `|`, marks the rating `*4.5`, quotes with `"` and writes `20-40 min` instead of `·`, `★`, «» and the en dash. Æ, ø and å stay: the CLI's text is bokmål.
+
 ## 2026-10-14
 
 - [x] **The page fast again after godt.no** ("The last commit, adding off godt.no has made the page super slow. you need to ivestigate"; "We are not moving to a larger instance for this"; "lets 1 and 2"): each machine ran out of memory while warming every rule and place and was killed, over and over (FACTS.md §7). Nothing is warmed now, 8 rankings are kept with their places' offers, and datasets/ is read one file at a time with one copy of each name (b758bdd). On Fly: start-up 0.87 s (13–16 s before), the process 124–132 MiB with 38–50 MiB to spare, a new rule or place 145–199 ms and a search already made 19 ms.

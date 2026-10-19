@@ -37,3 +37,14 @@ def test_an_empty_step_closes_at_once() -> None:
     bars("offers", 0, 0)
     bars.fetching("https://squid-api.tjek.com/v2/offers")
     assert "Jev offer matches" in out.getvalue() and "squid-api" not in out.getvalue()
+
+
+def test_the_bars_are_ascii_on_a_utf8_terminal() -> None:
+    raw = io.BytesIO()
+    out = io.TextIOWrapper(raw, encoding="utf-8", write_through=True)  # A StringIO has no encoding, so tqdm picks ASCII there anyway
+    bars = Bars(STEPS, out)
+    bars("recipes", 0, 4)
+    bars.fetching("https://www.matprat.no/oppskrifter/middag/a/")
+    bars("recipes", 2, 4)
+    bars("recipes", 4, 4)
+    assert raw.getvalue().isascii()

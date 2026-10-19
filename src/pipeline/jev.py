@@ -49,7 +49,7 @@ class Jev:
 
     def status(self) -> str:
         cost = self.tokens / 1e6 * PRICE_PER_MTOK
-        return f"Jev: {self.calls:,} calls · {self.tokens:,} tokens ≈ ${cost:.3f}"
+        return f"Jev: {self.calls:,} calls, {self.tokens:,} tokens, ~${cost:.3f}"
 
     async def ask(self, name: str, state: JSONContent, questions: Mapping[str, Question]) -> SystemOneResponse:
         async with self._slots:

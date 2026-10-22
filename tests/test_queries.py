@@ -4,7 +4,7 @@ from app.queries import Queries
 from core.models import Gluten, Household, Item, Level, Onion, Rule
 from core.ranking import Week
 from core.search import Order
-from tests.fakes import FakeDatasets, ingredient, offer, recipe, snapshot, traits
+from tests.fakes import SIDE, SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
 SALMON = ingredient("laksefilet", 600, "g", "/fisk og sjømat")
@@ -12,14 +12,19 @@ SALE = offer("KYLLINGBRYST", 99, pre_price=135, id="sale")
 
 
 def queries(household: Household | None = None) -> Queries:
-    s = snapshot(recipe("Kylling", CHICKEN), recipe("Laks", SALMON), offers=[SALE], matches={"kyllingfilet": ["sale"]})
+    s = snapshot(
+        recipe("Kylling", CHICKEN),
+        recipe("Laks", SALMON, SIDE),
+        offers=[SALE, SIDE_OFFER],
+        matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
+    )
     return Queries(FakeDatasets(s), household or Household(), Week(days=2, fish=1))
 
 
 def test_plan_and_dinners() -> None:
     q = queries()
     week = q.plan()
-    assert (week.considered, week.fitting, week.on_sale, week.offers, week.stores) == (2, 2, 1, 1, ("KIWI",))
+    assert (week.considered, week.fitting, week.on_sale, week.offers, week.stores) == (2, 2, 1, 2, ("KIWI",))
     assert {d.dish.name for d in week.dinners} == {"Kylling", "Laks"}
 
 
@@ -63,9 +68,11 @@ def test_the_site_starts_with_no_rules_and_the_search_adds_them() -> None:
     onion = ingredient("løk", 400, "g", "/grønnsaker")
     pasta = ingredient("spagetti", 400, "g", "/pasta/ris")
     s = snapshot(
-        recipe("Biff med løk", onion),
-        recipe("Pasta", pasta),
-        recipe("Laks", SALMON),
+        recipe("Biff med løk", onion, SIDE),
+        recipe("Pasta", pasta, SIDE),
+        recipe("Laks", SALMON, SIDE),
+        offers=[SIDE_OFFER],
+        matches=SIDE_MATCH,
         known={"løk": traits(onion=Onion.ONION), "spagetti": traits(gluten=Gluten.YES)},
     )
     q = Queries(FakeDatasets(s))
@@ -85,15 +92,16 @@ def test_sort_by_discount_in_percent_or_kroner() -> None:
     lamb = ingredient("lammekotelett", 600, "g", "/kjøtt/lamme-/fåre-/sauekjøtt")
     s = snapshot(
         recipe("Kylling", CHICKEN),
-        recipe("Laks", SALMON),
+        recipe("Laks", SALMON, SIDE),
         recipe("Lam", lamb),
-        offers=[offer("KYLLINGFILET", 60, pre_price=100, id="k"), offer("LAMMEKOTELETT", 200, pre_price=300, id="l")],
-        matches={"kyllingfilet": ["k"], "lammekotelett": ["l"]},
+        recipe("Torsk", ingredient("torskefilet", 600, "g", "/fisk og sjømat")),
+        offers=[offer("KYLLINGFILET", 60, pre_price=100, id="k"), offer("LAMMEKOTELETT", 200, pre_price=300, id="l"), SIDE_OFFER],
+        matches={"kyllingfilet": ["k"], "lammekotelett": ["l"], **SIDE_MATCH},
     )
     q = Queries(FakeDatasets(s))
-    assert [d.dish.name for d in q.search(order=Order.PERCENT).dinners] == ["Kylling", "Lam", "Laks"]  # 40 % before 33 %
-    assert [d.dish.name for d in q.search(order=Order.KRONER).dinners] == ["Lam", "Kylling", "Laks"]  # 100 kr before 40 kr
-    assert q.search(order=Order.KRONER).total == 3  # sorting leaves nothing out
+    assert [d.dish.name for d in q.search(order=Order.PERCENT).dinners] == ["Kylling", "Lam", "Laks"]  # 40 %, 33 %, 20 %
+    assert [d.dish.name for d in q.search(order=Order.KRONER).dinners] == ["Lam", "Kylling", "Laks"]  # 100 kr, 40 kr, 5 kr
+    assert q.search().total == 3  # Torsk has nothing on sale (jb 2026-10-22: "ignore dinners with 0 Discounted ingredients")
     assert not q.search("rabatt i kroner").dinners  # not a word for sorting (jb 2026-10-14)
 
 
@@ -101,9 +109,11 @@ def test_allergies_and_vegetar_leave_dinners_out() -> None:
     mayo = ingredient("majones", 1, "dl", "/margarin/olje/majones")
     stock = ingredient("kyllingbuljong", 5, "dl", "/diverse")
     s = snapshot(
-        recipe("Potetsalat", mayo),
-        recipe("Grønnsakssuppe", stock),
-        recipe("Laks", SALMON),
+        recipe("Potetsalat", mayo, SIDE),
+        recipe("Grønnsakssuppe", stock, SIDE),
+        recipe("Laks", SALMON, SIDE),
+        offers=[SIDE_OFFER],
+        matches=SIDE_MATCH,
         known={
             "majones": traits(contains={Item.EGG: Level.YES, Item.ANIMAL: Level.YES}),
             "kyllingbuljong": traits(contains={Item.MEAT: Level.YES, Item.ANIMAL: Level.YES}),
@@ -156,7 +166,8 @@ def test_rankings_past_the_limit_are_dropped_and_worked_out_again() -> None:
 
 
 def test_a_places_offers_are_dropped_with_the_rankings() -> None:
-    q = Queries(FakeDatasets(snapshot(recipe("Kylling", CHICKEN), places={"Bergen": ["kiwi-vest"]})))
+    s = snapshot(recipe("Kylling", CHICKEN), offers=[SALE], matches={"kyllingfilet": ["sale"]}, places={"Bergen": ["KIWI"]})
+    q = Queries(FakeDatasets(s))
     q.KEPT = 1
     bergen = q.nearby("Bergen")
     assert q.ranked(place="Bergen") and q.nearby("Bergen") is bergen

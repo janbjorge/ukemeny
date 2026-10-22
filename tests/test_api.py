@@ -4,14 +4,17 @@ from adapters.web import main
 from app.queries import Queries
 from core.models import Household
 from core.ranking import Week
-from tests.fakes import FakeDatasets, ingredient, offer, recipe, snapshot
+from tests.fakes import SIDE, SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
 SALMON = ingredient("laksefilet", 600, "g", "/fisk og sjømat")
 KYLLING = recipe("Kyllinggryte", CHICKEN)
 
 s = snapshot(
-    KYLLING, recipe("Laks i ovn", SALMON), offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale")], matches={"kyllingfilet": ["sale"]}
+    KYLLING,
+    recipe("Laks i ovn", SALMON, SIDE),
+    offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale"), SIDE_OFFER],
+    matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
 )
 client = TestClient(main.create_app(Queries(FakeDatasets(s), Household(), Week(days=2, fish=1))))
 

@@ -95,6 +95,13 @@ def offer(
     )
 
 
+SIDE = ingredient("potet", 200, "g", "/poteter")
+"""A side on sale (SIDE_OFFER, SIDE_MATCH): the site only shows dinners with an ingredient on sale (app.queries), and
+50 g per portion is too little to make a dinner without meat or fish «på tilbud»."""
+SIDE_OFFER = offer("POTETER", 20, pre_price=25, id="potet")
+SIDE_MATCH = {"potet": ["potet"]}
+
+
 @dataclass
 class FakeClassifier:
     """Answers from `known`, PLAIN for anything else, and records what was asked: (name, labels), and per name the

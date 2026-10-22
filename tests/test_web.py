@@ -7,7 +7,7 @@ from adapters.web import main
 from app.queries import Queries
 from core.models import Household, Onion
 from core.ranking import Week
-from tests.fakes import FakeDatasets, ingredient, offer, recipe, snapshot, traits
+from tests.fakes import SIDE, SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
 SALMON = ingredient("laksefilet", 600, "g", "/fisk og sjømat")
@@ -22,11 +22,11 @@ GO = ' hx-trigger="mousedown, click" hx-sync="this:drop"'
 def client() -> TestClient:
     s = snapshot(
         recipe("Kyllinggryte", CHICKEN, ONION, rating=4.6, rating_count=12),
-        recipe("Laks i ovn", SALMON),
-        recipe("Torsk med bacon", COD),
+        recipe("Laks i ovn", SALMON, SIDE),
+        recipe("Torsk med bacon", COD, SIDE),
         known={"løk": traits(onion=Onion.ONION)},
-        offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale")],
-        matches={"kyllingfilet": ["sale"]},
+        offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale"), SIDE_OFFER],
+        matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
     )
     queries = Queries(FakeDatasets(s), week=Week(days=2, fish=1))  # as on the site: no rules until searched for
     return TestClient(main.create_app(queries))
@@ -49,7 +49,7 @@ def test_front_page_is_the_search_with_no_rules_until_picked(client: TestClient)
 
 
 def test_cards_are_calm(client: TestClient) -> None:
-    s = snapshot(recipe("Laks i ovn", SALMON, rating=4.6, rating_count=3))
+    s = snapshot(recipe("Laks i ovn", SALMON, SIDE, rating=4.6, rating_count=3), offers=[SIDE_OFFER], matches=SIDE_MATCH)
     page = TestClient(main.create_app(Queries(FakeDatasets(s), week=Week(days=1, fish=1)))).get("/").text
     assert "★" not in page  # 3 ratings are too few to show
     assert "Sterk" not in page
@@ -156,7 +156,7 @@ def test_canonical_host_redirects_everything_but_health(client: TestClient, monk
 
 def test_more_appends_the_next_page(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(main, "PAGE", 1)
-    s = snapshot(*(recipe(f"Laks {n}", SALMON) for n in range(4)))
+    s = snapshot(*(recipe(f"Laks {n}", SALMON, SIDE) for n in range(4)), offers=[SIDE_OFFER], matches=SIDE_MATCH)
     small = TestClient(main.create_app(Queries(FakeDatasets(s), Household(), Week(days=1, fish=1))))
     html = small.get("/?q=laks").text
     assert html.count('<article class="card"') == 1

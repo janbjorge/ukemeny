@@ -370,6 +370,17 @@ class Dinner:
         return next((b for b in self.buys if b.sale), None)
 
     @property
+    def deals(self) -> tuple[Buy, ...]:
+        """Every ingredient with a discount, most important first; two ingredients with the same offer count once."""
+        seen: set[str] = set()
+        found = []
+        for b in self.buys:
+            if b.sale and b.sale.id not in seen:
+                seen.add(b.sale.id)
+                found.append(b)
+        return tuple(found)
+
+    @property
     def sale(self) -> float:
         """How much of the dinner is discounted: weight times discount, summed."""
         return sum(b.weight * (b.sale.discount or 0.0) for b in self.buys if b.sale)

@@ -79,7 +79,8 @@ class Queries:
         return nearby
 
     def ranked(self, h: Household | None = None, place: str | None = None) -> list[Dinner]:
-        """Every dinner that fits, best first (core.ranking.dinners)."""
+        """Every dinner that fits and has an ingredient on sale near `place`, best first (core.ranking.dinners; jb
+        2026-10-22: "We should ignore dinners with 0 Discounted ingredients")."""
         key = (h or self.base, place)
         if (ranked := self._ranked.get(key)) is None:
             if len(self._ranked) >= self.KEPT:
@@ -87,7 +88,7 @@ class Queries:
                 self._view.clear()
                 self._plan.clear()
                 self._nearby = {None: self.prepared}
-            ranked = self._ranked[key] = ranking.dinners(self.snapshot, key[0], self.nearby(place))
+            ranked = self._ranked[key] = [d for d in ranking.dinners(self.snapshot, key[0], self.nearby(place)) if d.deals]
         return ranked  # Not self._ranked[key]: another request's thread may have dropped it already
 
     def view(self, h: Household | None = None, place: str | None = None) -> View:

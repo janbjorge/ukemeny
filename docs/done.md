@@ -2,6 +2,11 @@
 
 Finished requests from jb, newest first. Each quotes the request and says what was built.
 
+## 2026-10-22
+
+- [x] **Only dinners with something on sale** ("We should ignore dinners with 0 Discounted ingredients"; everywhere on the site): `Queries.ranked` leaves out dinners without an ingredient on sale near the place, so the list, the counts, the API and the CLI do too (1 978 of 3 399 left in Stavanger; METHOD.md §3).
+- [x] **Stock is not the main protein** (jb, on a «Svinekoteletter med hjemmelaget surkål» card labelled Storfe): liquids only count without solid meat or fish (c185409, METHOD.md §3).
+
 ## 2026-10-19
 
 - [x] **ASCII in the tools** ("Make sure we are ascii first in all our tools, like in tqdm in @src/pipeline/"): the build's tqdm bars are `ascii=True` (`#` not blocks, even on a UTF-8 terminal), the Jev line reads `Jev: 1,234 calls, 5,678 tokens, ~$0.012`, and `matris` separates with `|`, marks the rating `*4.5`, quotes with `"` and writes `20-40 min` instead of `·`, `★`, «» and the en dash. Æ, ø and å stay: the CLI's text is bokmål.

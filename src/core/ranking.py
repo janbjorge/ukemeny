@@ -173,9 +173,8 @@ def pick(ranked: Sequence[Dinner], days: int, fish: int) -> list[Dinner]:
 
 
 def kroner(dinner: Dinner) -> float:
-    """Kroner off the card's discount (Dinner.deal); 0 without one."""
-    deal = dinner.deal
-    return (deal.sale.saving or 0.0) if deal and deal.sale else 0.0
+    """Kroner off every discounted ingredient (Dinner.saving); 0 without one."""
+    return dinner.saving
 
 
 def plan(ranked: Sequence[Dinner], week: Week, chance: Callable[[], float]) -> list[Dinner]:

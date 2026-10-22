@@ -21,7 +21,7 @@ GO = ' hx-trigger="mousedown, click" hx-sync="this:drop"'
 @pytest.fixture
 def client() -> TestClient:
     s = snapshot(
-        recipe("Kyllinggryte", CHICKEN, ONION, rating=4.6, rating_count=12),
+        recipe("Kyllinggryte", CHICKEN, ONION, SIDE, rating=4.6, rating_count=12),
         recipe("Laks i ovn", SALMON, SIDE),
         recipe("Torsk med bacon", COD, SIDE),
         known={"løk": traits(onion=Onion.ONION)},
@@ -37,7 +37,9 @@ def test_front_page_is_the_search_with_no_rules_until_picked(client: TestClient)
     assert "<h1>Finn en middag</h1>" in html
     assert 'id="uka"' not in html and "Nye middager" not in html  # no week on the page (jb 2026-10-14)
     assert all(n in html for n in ("Kyllinggryte", "Laks i ovn", "Torsk med bacon"))  # the list leaves nothing out
-    assert "\u221227\u00a0%" in html and "kyllingfilet hos KIWI" in html
+    assert '<span class="pct">\u221241\u00a0kr</span> <span class="n">på 2 varer</span>' in html  # 135 to 99 kr, 25 to 20 kr
+    assert 'kyllingfilet<span class="store"> · KIWI</span></span><span class="off">\u221236\u00a0kr</span>' in html
+    assert "%" not in html[html.index('class="cards"') :]  # no percent (jb 2026-10-22)
     assert "Bytt:" not in html and "Glutenfritt" not in html  # no rules on the page until a visitor picks them
     for gone in ("ting å sjekke", "Også på tilbud", "Prøv for eksempel", "Søker etter", "Uten bytter"):
         assert gone not in html
@@ -57,8 +59,8 @@ def test_cards_are_calm(client: TestClient) -> None:
 
 def test_sorted_by_kroner_the_cards_show_kroner_off(client: TestClient) -> None:
     ideas = client.get("/middager?q=kylling&sorter=kroner", headers=HX).text
-    assert '<span class="pct">\u221236\u00a0kr</span>' in ideas  # 135 kr before, 99 kr now
-    assert "\u221227\u00a0%" not in ideas
+    assert '<span class="pct">\u221241\u00a0kr</span>' in ideas
+    assert '<span class="off">\u221236\u00a0kr</span>' in ideas and '<span class="off">\u22125\u00a0kr</span>' in ideas
 
 
 def test_fragment_filters_and_falls_back_to_the_page(client: TestClient) -> None:
@@ -209,14 +211,14 @@ def test_offers_are_from_every_store_until_a_place_is_picked() -> None:
     )
     client = TestClient(main.create_app(Queries(FakeDatasets(s), week=Week(days=2, fish=1))))
     anywhere = client.get("/").text
-    assert '<option value="">Hele landet</option>' in anywhere and "\u221227\u00a0%" in anywhere
+    assert '<option value="">Hele landet</option>' in anywhere and "\u221236\u00a0kr" in anywhere
     assert '<select id="sted" name="sted" form="sok" hx-get="/middager" hx-include="#sok">' in anywhere
     north = client.get("/?sted=troms%C3%B8").text
     assert '<option value="tromsø" selected>Tromsø</option>' in north and 'class="on"' in north
-    assert "\u221227\u00a0%" not in north  # nothing on sale near Tromsø
+    assert "\u221236\u00a0kr" not in north  # nothing on sale near Tromsø
     assert 'href="/?q=glutenfri&amp;sted=troms%C3%B8#forslag"' in north  # a chip keeps the place
     moved = client.get("/middager?q=&sted=bergen", headers=HX | {"HX-Trigger": "sted"})
-    assert "\u221227\u00a0%" in moved.text  # another place, other offers
+    assert "\u221236\u00a0kr" in moved.text  # another place, other offers
     assert moved.headers["HX-Replace-Url"] == "/?sted=bergen#forslag" and 'id="q"' not in moved.text  # the box stays
     assert client.get("/middager?sted=bergen", follow_redirects=False).headers["location"] == "/?sted=bergen#forslag"
     assert "Bergen, Tromsø" in client.get("/om").text

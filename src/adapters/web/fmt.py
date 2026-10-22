@@ -10,6 +10,7 @@ MINUS = "\u2212"
 
 def kr(value: float) -> str:
     """99.9 -> "99,90 kr"; whole kroner without decimals. A no-break space before kr."""
+    value = round(value, 2)  # 25.9 + 0.1 is 26.000000000000004, not 26
     text = f"{value:,.0f}" if value == int(value) else f"{value:,.2f}"
     return text.replace(",", NBSP).replace(".", ",") + f"{NBSP}kr"
 

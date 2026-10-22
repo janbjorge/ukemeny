@@ -1,13 +1,19 @@
-{# One dinner as a card: the main discount, and what to swap for the diet rules picked. With a search, the searched words
-   are marked, and sorted by «Rabatt kr» the discount is in kroner. The rest is on matprat.no or godt.no (the link). #}
+{# One dinner as a card: the kroner off every ingredient on sale, then each of them with its store and discount, and what
+   to swap for the diet rules picked. With a search, the searched words are marked. The rest is on matprat.no or godt.no
+   (the link). #}
 {% macro card(d, search=none, via=(), order=none) %}
 <article class="card" data-protein="{{ d.protein }}">
   <h3><a href="{{ d.dish.url }}" rel="noopener">{% if search and search.words %}{% for piece, hit in marked(d.dish.name, search) %}{% if hit %}<mark>{{ piece }}</mark>{% else %}{{ piece }}{% endif %}{% endfor %}{% else %}{{ d.dish.name }}{% endif %}</a></h3>
   <p class="meta"><span class="protein">{{ d.protein }}</span> {{ d.dish.prep_time }}
     {%- if d.dish.rating and d.dish.rating_count >= 5 %} · <span class="star">★</span>&nbsp;{{ "%.1f"|format(d.dish.rating)|replace(".", ",") }}{% endif %}</p>
   {% if via %}<p class="via">Med {% for name in via %}<mark>{{ name }}</mark>{{ ", " if not loop.last }}{% endfor %}</p>{% endif %}
-  {% set b = d.deal %}{% if b %}
-  <p class="deal" title="{{ b.sale.price|kr }}, før {{ b.sale.pre_price|kr }}, til {{ b.sale.valid_until|dato }}"><span class="pct">{{ b.sale.saving|spart if order == "kroner" else b.sale.discount|prosent }}</span> {{ b.part.name }} hos {{ b.sale.store }}</p>
+  {% set deals = d.deals %}{% if deals %}
+  <div class="save">
+    <p class="total"><span class="pct">{{ d.saving|spart }}</span>{% if deals|length > 1 %} <span class="n">på {{ deals|length }} varer</span>{% endif %}</p>
+    <ul>{% for x in deals %}
+      <li title="{{ x.sale.price|kr }}, før {{ x.sale.pre_price|kr }}, til {{ x.sale.valid_until|dato }}"><span class="what">{{ x.part.name }}<span class="store"> · {{ x.sale.store }}</span></span><span class="off">{{ x.sale.saving|spart }}</span></li>
+    {%- endfor %}</ul>
+  </div>
   {% endif %}
   {% if d.verdict.swaps %}<p class="swaps"><b>Bytt:</b> {{ d.verdict.swaps|map(attribute="swap")|join(" · ") }}</p>{% endif %}
 </article>

@@ -82,7 +82,15 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .card .star { color: var(--star); }
 .card .hot { color: var(--accent-strong); font-weight: 650; }
 .card p { margin: 0; font-size: var(--t-small); }
-.card .deal { font-size: var(--t-body); }
+.card .save { margin-top: 6px; }
+.card .total { display: flex; align-items: baseline; gap: 8px; margin: 0 0 6px; }
+.card .total .pct { font-size: var(--t-heading); padding: 2px 10px; border-radius: 8px; margin: 0; }
+.card .total .n { color: var(--text-muted); font-size: var(--t-small); }
+.card .save ul { list-style: none; margin: 0; padding: 0; font-size: var(--t-small); }
+.card .save li { display: flex; align-items: baseline; gap: 12px; padding: 1px 0; }
+.card .save .what { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card .save .store { color: var(--text-muted); }
+.card .save .off { color: var(--text-secondary); white-space: nowrap; }
 .card .pct { display: inline-block; font-weight: 650; color: var(--sale-ink); background: var(--sale); border-radius: 6px; padding: 0 7px; margin-right: 4px; }
 .card .via, .card .swaps { color: var(--text-secondary); }
 .card .swaps b { color: var(--accent-strong); }

@@ -381,6 +381,12 @@ class Dinner:
         return tuple(found)
 
     @property
+    def saving(self) -> float:
+        """Kroner off every discounted ingredient, as the catalogs have it (per pack, not per portion: jb 2026-10-22,
+        "its a rabbit hole")."""
+        return sum((b.sale.saving or 0.0) for b in self.deals if b.sale)
+
+    @property
     def sale(self) -> float:
         """How much of the dinner is discounted: weight times discount, summed."""
         return sum(b.weight * (b.sale.discount or 0.0) for b in self.buys if b.sale)

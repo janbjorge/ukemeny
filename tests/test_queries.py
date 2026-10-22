@@ -93,14 +93,16 @@ def test_sort_by_discount_in_percent_or_kroner() -> None:
     s = snapshot(
         recipe("Kylling", CHICKEN),
         recipe("Laks", SALMON, SIDE),
-        recipe("Lam", lamb),
+        recipe("Lam", lamb, SIDE),
         recipe("Torsk", ingredient("torskefilet", 600, "g", "/fisk og sjømat")),
         offers=[offer("KYLLINGFILET", 60, pre_price=100, id="k"), offer("LAMMEKOTELETT", 200, pre_price=300, id="l"), SIDE_OFFER],
         matches={"kyllingfilet": ["k"], "lammekotelett": ["l"], **SIDE_MATCH},
     )
     q = Queries(FakeDatasets(s))
     assert [d.dish.name for d in q.search(order=Order.PERCENT).dinners] == ["Kylling", "Lam", "Laks"]  # 40 %, 33 %, 20 %
-    assert [d.dish.name for d in q.search(order=Order.KRONER).dinners] == ["Lam", "Kylling", "Laks"]  # 100 kr, 40 kr, 5 kr
+    # Every discounted ingredient counts: 100 + 5 kr, 40 kr, 5 kr (jb 2026-10-22: "total saving per dinner")
+    assert [d.dish.name for d in q.search(order=Order.KRONER).dinners] == ["Lam", "Kylling", "Laks"]
+    assert q.search(order=Order.KRONER).dinners[0].saving == 105
     assert q.search().total == 3  # Torsk has nothing on sale (jb 2026-10-22: "ignore dinners with 0 Discounted ingredients")
     assert not q.search("rabatt i kroner").dinners  # not a word for sorting (jb 2026-10-14)
 

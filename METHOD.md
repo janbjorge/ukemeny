@@ -68,7 +68,7 @@ jb 2026-10-13: "more categories like; uten løk, glutenfree etc… an epic searc
 - A word that matches nothing is swapped for the closest known word (difflib, at least 75 % alike) and the page says so: «kyllign» becomes kylling.
 - Dinners with a searched word in the name come before those with it only among the ingredients, then the ranking (§5) decides.
 - When nothing matches, the page offers to drop each part of the search, with how many dinners that would give, most first.
-- «Rabatt %» and «Rabatt kr» (`sorter=prosent`, `sorter=kroner`; not search words since 2026-10-14) sort instead of ranking, by the discount the card shows (core.models.Dinner.deal: the most important ingredient on sale, its biggest discount): as a share, or in kroner off as the catalog has it (before-price minus price, per pack, not per recipe). Dinners without a discount come last in ranking order; nothing is left out.
+- «Rabatt %» and «Rabatt kr» (`sorter=prosent`, `sorter=kroner`; not search words since 2026-10-14) sort instead of ranking, by the discount the card shows (core.models.Dinner.deal: the most important ingredient on sale, its biggest discount): «Rabatt %» as a share, «Rabatt kr» by the kroner off every discounted ingredient summed (core.models.Dinner.saving; jb 2026-10-22: "we should look at total saving per dinner due to the Discounted ingredients"), as the catalogs have it: before-price minus price, per pack, not per portion (jb 2026-10-22: "I dont think we should get into per portion, its a rabbit hole"). Two ingredients matched to the same offer count it once. The week (§5) draws by the same sum.
 
 ## 7. godt.no (src/pipeline/godt.py)
 

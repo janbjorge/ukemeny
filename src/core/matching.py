@@ -128,16 +128,17 @@ def doubted(category: str, traits: Traits) -> Traits:
 def main_protein(dish: Dish) -> tuple[str, str]:
     """(group, ingredient name) of the heaviest meat, fish or shellfish in the dish, such as
     ("kylling", "kyllingfilet"). matprat's own main-ingredient label is not used: it files
-    "Kyllingfilet med spekeskinke" under pork."""
+    "Kyllingfilet med spekeskinke" under pork. Stock and other liquids only count when nothing solid is there:
+    matprat files kjøttkraft under /kjøtt, so the stock for a surkål outweighed the pork chops."""
     found = [
-        (p.grams or 0.0, group, p.name)
+        (p.unit not in LIQUID_UNITS, p.grams or 0.0, group, p.name)
         for p in dish.parts
         if p.category.startswith(("/kjøtt", "/fisk og sjømat", "/skalldyr"))
         for group in [next((g for prefix, g in PROTEINS.items() if p.category.startswith(prefix)), "kjøtt")]
     ]
     if not found:
         return VEGETARIAN, ""
-    _, group, name = max(found)
+    *_, group, name = max(found)
     return group, name
 
 

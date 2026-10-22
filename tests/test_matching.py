@@ -66,6 +66,13 @@ def test_main_protein_is_the_heaviest_meat_or_fish() -> None:
     )
 
 
+def test_stock_is_the_main_protein_only_without_solid_meat_or_fish() -> None:
+    stock = ingredient("kjøttkraft", 5, "dl", "/kjøtt/storfekjøtt")
+    chops = ingredient("kotelett av svin", 4, "stk", "/kjøtt/svinekjøtt")
+    assert main_protein(dish(recipe("A", stock, chops))) == ("svin", "kotelett av svin")
+    assert main_protein(dish(recipe("B", stock))) == ("storfe", "kjøttkraft")
+
+
 def test_a_picked_department_of_meat_fish_shellfish_or_dairy_needs_a_yes() -> None:
     fish, maybe_meat = traits(contains={Item.FISH: Level.YES}), traits(contains={Item.MEAT: Level.MAYBE})
     assert agrees("/fisk og sjømat", fish) and not agrees("/kjøtt/storfekjøtt", fish)

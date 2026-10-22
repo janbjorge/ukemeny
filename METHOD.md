@@ -31,7 +31,7 @@ Every simplification and judgement call behind what the site suggests. Add to it
 
 ## 3. Main protein and variety
 
-- A dinner's main protein is its heaviest meat, fish or shellfish ingredient by grams, grouped by matprat department (fisk, skalldyr, kylling, kalkun, and, kjøttdeig, svin, pølser, storfe, lam, vilt; other meat is "kjøtt"; none is "vegetar"). matprat's own main-ingredient label is not used, since it files "Kyllingfilet med spekeskinke" under pork.
+- A dinner's main protein is its heaviest meat, fish or shellfish ingredient by grams, grouped by matprat department (fisk, skalldyr, kylling, kalkun, and, kjøttdeig, svin, pølser, storfe, lam, vilt; other meat is "kjøtt"; none is "vegetar"). matprat's own main-ingredient label is not used, since it files "Kyllingfilet med spekeskinke" under pork. Stock and other liquids (dl, l, ss, …) only count when nothing solid is there: matprat files kjøttkraft under /kjøtt, and its stock made «Svinekoteletter med hjemmelaget surkål» a beef dinner. This changed the main ingredient of 122 of 3 399 dinners and the protein of 58 (2026-10-22).
 - The week has one dinner per protein, except fish, which may come `week.fish` times but never the same fish ingredient twice (jb 2026-10-13: "load of chicken options"). If too few proteins fit, the rest is filled with repeats.
 - The list puts the best 3 of each protein first and the rest after, unless a protein or a word is searched for. It used to stop at 3 per protein, which showed 39 of the 1 908 dinners at most. While the page showed a week above it (until 2026-10-14), the list left out the week's dinners when nothing was searched; now it leaves out nothing.
 

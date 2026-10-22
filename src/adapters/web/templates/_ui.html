@@ -1,11 +1,11 @@
 {# Small pieces the list and "Vis flere" share. Import "with context": they use link(). #}
 {# A link that loads the list for a search. It starts on mouse-down, the 80-120 ms before the click a mouse gives; touch
    (where swiping a chip row must not search) and keys start on the click. #}
-{% macro go(text, order, antall=none) %}{% set qs = link(text, antall, found.place, order) %}href="/{{ '?' ~ qs if qs }}#forslag" hx-get="/middager{{ '?' ~ qs if qs }}" hx-trigger="mousedown, click" hx-sync="this:drop"{% endmacro %}
+{% macro go(text, antall=none) %}{% set qs = link(text, antall, found.place) %}href="/{{ '?' ~ qs if qs }}#forslag" hx-get="/middager{{ '?' ~ qs if qs }}" hx-trigger="mousedown, click" hx-sync="this:drop"{% endmacro %}
 
 {% macro chip(c) -%}
 {# A chip without a count (a diet rule) is always a link; one with a count of 0 would give nothing, so it is not. #}
-{% if c.on or c.count is none or c.count %}<a {{ go(c.text, c.order) }}{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}{% if c.on %} aria-current="true"{% endif %}>{{ c.label }}{% if c.count %} <span class="n">{{ c.count|tall }}</span>{% endif %}</a>
+{% if c.on or c.count is none or c.count %}<a {{ go(c.text) }}{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}{% if c.on %} aria-current="true"{% endif %}>{{ c.label }}{% if c.count %} <span class="n">{{ c.count|tall }}</span>{% endif %}</a>
 {%- else %}<span class="off"{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}>{{ c.label }}</span>{% endif %}
 {%- endmacro %}
 
@@ -13,8 +13,8 @@
    scroll (jb 2026-10-13: "we still lack the inf scroll"). A mark well above it starts loading before the end of the list is
    in view; the button loads when it comes into view or is clicked. Without JavaScript it is a link. #}
 {% macro more_button(found, shown) -%}
-{% set qs = link(found.search.text, place=found.place, order=found.order) %}{% set next = "/middager/flere?" ~ (qs ~ "&" if qs) ~ "fra=" ~ shown %}
+{% set qs = link(found.search.text, place=found.place) %}{% set next = "/middager/flere?" ~ (qs ~ "&" if qs) ~ "fra=" ~ shown %}
 <p class="more"><span class="ahead" hx-get="{{ next }}" hx-trigger="intersect once" hx-target="closest .more" hx-swap="outerHTML"
-  hx-sync="closest .more:drop" aria-hidden="true"></span><a href="/?{{ link(found.search.text, shown + page, found.place, found.order) }}#forslag" hx-get="{{ next }}"
+  hx-sync="closest .more:drop" aria-hidden="true"></span><a href="/?{{ link(found.search.text, shown + page, found.place) }}#forslag" hx-get="{{ next }}"
   hx-trigger="intersect once, click" hx-target="closest .more" hx-swap="outerHTML" hx-sync="closest .more:drop" hx-indicator="closest .more">Vis flere <span class="n">{{ (found.total - shown)|tall }} til</span></a></p>
 {%- endmacro %}

@@ -24,10 +24,8 @@ from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
 from app.queries import Found, Queries
 from core.matching import VEGETARIAN
 from core.search import (
-    ORDER_LABELS,
     Diet,
     Kind,
-    Order,
     Tag,
     diet_clause,
     marked,
@@ -99,36 +97,31 @@ class Chip:
     on: bool
     count: int | None
     """Dinners after a click, for a chip that is off; for a main protein, the dinners it adds."""
-    order: Order | None
-    """The sort after a click: the one now, but for a sort chip, which toggles it."""
     protein: str = ""
 
 
 def chips(found: Found) -> dict[str, list[Chip]]:
-    s, order = found.search, found.order
+    s = found.search
 
     def tag(t: Tag) -> Chip:
         clause = tag_clause(t)
         on = s.has(clause)
-        return Chip(clause.label, s.toggle(clause).text, on, None if on else found.counts.tags[t], order)
+        return Chip(clause.label, s.toggle(clause).text, on, None if on else found.counts.tags[t])
 
     def diet(d: Diet) -> Chip:
         clause = diet_clause(d)
-        return Chip(clause.label, s.toggle(clause).text, s.has(clause), None, order)
+        return Chip(clause.label, s.toggle(clause).text, s.has(clause), None)
 
     chosen = next((c for c in s.clauses if c.kind is Kind.PROTEIN), None)
     every = sum(found.counts.proteins.values())
-    proteins = [Chip("Alle", s.drop(chosen).text if chosen else s.text, chosen is None, every if chosen else None, order)]
+    proteins = [Chip("Alle", s.drop(chosen).text if chosen else s.text, chosen is None, every if chosen else None)]
     for p in KNOWN_PROTEINS:
         if p == VEGETARIAN:
             continue  # «Vegetar» is a rule in Kosthold: no meat or fish in any ingredient, not just the main one
         if n := found.counts.proteins.get(p):
             clause = protein_clause(protein_word(p))
             on = chosen is not None and p in chosen.values
-            proteins.append(Chip(protein_word(p).capitalize(), s.toggle(clause).text, on, None if on else n, order, p))
-
-    # On or off, neither on is the ranking (jb 2026-10-14: no «Anbefalt», "makes no sense")
-    orders = [Chip(ORDER_LABELS[o], s.text, order is o, None, None if order is o else o) for o in Order]
+            proteins.append(Chip(protein_word(p).capitalize(), s.toggle(clause).text, on, None if on else n, p))
 
     def on_first(row: list[Chip]) -> list[Chip]:
         """Chosen chips lead their row, so a phone, which shows a row as one line to swipe, shows them."""
@@ -139,7 +132,6 @@ def chips(found: Found) -> dict[str, list[Chip]]:
         "allergies": on_first([diet(d) for d in ALLERGY_CHIPS]),
         "kinds": on_first([tag(t) for t in KIND_CHIPS]),
         "proteins": on_first(proteins),
-        "orders": orders,
     }
 
 
@@ -229,7 +221,7 @@ def create_app(queries: Queries) -> FastAPI:
 
     def ideas(request: Request, choice: DinnerQuery, count: int) -> Found:
         place = queries.place(choice.sted)
-        return telemetry.search(queries, choice.text(), place, choice.sorter, request.url.path, limit=count)
+        return telemetry.search(queries, choice.text(), place, request.url.path, limit=count)
 
     rendered: OrderedDict[tuple[object, ...], bytes] = OrderedDict()
 
@@ -267,9 +259,8 @@ def create_app(queries: Queries) -> FastAPI:
         tilbud: Q = None,
         antall: Q = None,
         sted: Q = None,
-        sorter: Q = None,
     ) -> HTMLResponse:
-        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted, sorter=sorter)
+        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted)
         found = ideas(request, choice, choice.antall if antall else PAGE)
         return templates.TemplateResponse(request, "index.html", dinner_context(found))
 
@@ -281,22 +272,21 @@ def create_app(queries: Queries) -> FastAPI:
         tilbud: Q = None,
         antall: Q = None,
         sted: Q = None,
-        sorter: Q = None,
     ) -> Response:
         """The ideas for a search. Without HTMX it is the front page with the same search."""
-        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted, sorter=sorter)
+        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted)
         if "hx-request" not in request.headers:
-            query = link(choice.text(), choice.antall if antall else None, queries.place(choice.sted), choice.sorter)
+            query = link(choice.text(), choice.antall if antall else None, queries.place(choice.sted))
             return RedirectResponse(f"/?{query}#forslag" if query else "/#forslag", status_code=303)
         found = ideas(request, choice, choice.antall if antall else PAGE)
         trigger = request.headers.get("hx-trigger")
         response = fragment(
             request,
             "_dinners.html",
-            (found.search.text, found.place, found.order, len(found.dinners), trigger not in KEEP_BOX),
+            (found.search.text, found.place, len(found.dinners), trigger not in KEEP_BOX),
             lambda: dinner_context(found, fragment=True, trigger=trigger),
         )
-        query = link(found.search.text, place=found.place, order=found.order)
+        query = link(found.search.text, place=found.place)
         response.headers["HX-Replace-Url"] = f"/?{query}#forslag" if query else "/#forslag"
         return response
 
@@ -307,19 +297,18 @@ def create_app(queries: Queries) -> FastAPI:
         protein: Q = None,
         tilbud: Q = None,
         sted: Q = None,
-        sorter: Q = None,
         fra: Q = None,
     ) -> Response:
         """The next ideas after the first `fra`, to append to the list. Without HTMX, the front page with them all."""
-        choice, start = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, sted=sted, sorter=sorter), offset(fra)
+        choice, start = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, sted=sted), offset(fra)
         if "hx-request" not in request.headers:
-            query = link(choice.text(), start + PAGE, queries.place(choice.sted), choice.sorter)
+            query = link(choice.text(), start + PAGE, queries.place(choice.sted))
             return RedirectResponse(f"/?{query}#forslag", status_code=303)
         found = ideas(request, choice, start + PAGE)
         return fragment(
             request,
             "_more.html",
-            (found.search.text, found.place, found.order, start),
+            (found.search.text, found.place, start),
             lambda: {"found": found, "start": start, "shown": len(found.dinners)},
         )
 

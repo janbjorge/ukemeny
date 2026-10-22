@@ -20,7 +20,7 @@ from adapters import profile, schema
 from adapters.datasets import DATASETS, JsonDatasets
 from app.queries import Queries
 from core.models import Dinner, Dish, Verdict
-from core.search import Order, Tag, fold, protein_word
+from core.search import Tag, fold, protein_word
 
 app = typer.Typer(
     help="Middager fra matprat.no og godt.no som passer profile.yaml, med ukens tilbud. `matris build` lager datasets/, "
@@ -108,16 +108,15 @@ def candidates(
     per_protein: Annotated[int, typer.Option(help="De beste så mange per protein først, for variasjon. 0: bare rangering.")] = 3,
     on_sale: Annotated[bool, typer.Option("--on-sale", help="Bare middager med hovedråvaren på tilbud.")] = False,
     sted: Annotated[str | None, typer.Option(help="Tilbud fra butikkene nær dette stedet, ikke stedet i profile.yaml.")] = None,
-    sorter: Annotated[Order | None, typer.Option(help="Størst rabatt først, i prosent eller kroner, ikke rangeringen.")] = None,
     as_json: JsonOption = False,
 ) -> None:
-    """Middager som passer, færrest bytter først, så mest rabatt. Med et søk: de som passer søket."""
+    """Middager som passer, færrest bytter først, så mest spart i kroner. Med et søk: de som passer søket."""
     q = queries(as_json)
     place = q.place(sted)
     if sted and place is None:
         fail("usage", f"--sted: kjenner ikke {sted}; kjente steder er {', '.join(q.snapshot.places)}", as_json)
     words = [*(query or []), protein_word(protein) if protein else "", Tag.ON_SALE.value if on_sale else ""]
-    found = q.search(" ".join(w for w in words if w), place, sorter, limit=top, per_protein=per_protein)
+    found = q.search(" ".join(w for w in words if w), place, limit=top, per_protein=per_protein)
     if as_json:
         return emit(schema.dinners(q, found))
     s = found.search

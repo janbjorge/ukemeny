@@ -18,7 +18,7 @@ from core.diet import judge
 from core.models import Dinner, Dish, Household, Offer, Plan, Snapshot, Verdict
 from core.ports import Datasets
 from core.ranking import Week
-from core.search import ANYTHING, Clause, Counts, Index, Kind, Order, Search, View, fold, household, via
+from core.search import ANYTHING, Clause, Counts, Index, Kind, Search, View, fold, household, via
 
 type Rules = tuple[Household, str | None]
 """What a ranking depends on: the household, and the place whose offers count (None: every store)."""
@@ -38,8 +38,6 @@ class Found:
     """The rules the dinners were judged by: the base and the search's diet rules."""
     place: str | None
     """Where the offers are from: the place picked, else the base place. None: every store."""
-    order: Order | None
-    """Sorted by this discount instead of the ranking."""
     dinners: tuple[Dinner, ...]
     """At most the limit asked for, best first."""
     total: int
@@ -119,25 +117,23 @@ class Queries:
         self,
         text: str = "",
         place: str | None = None,
-        order: Order | None = None,
         limit: int = 30,
         per_protein: int = 3,
     ) -> Found:
-        """Dinners that fit the search's rules and match the rest of it, best first or by `order`, with the offers near
-        `place` (Snapshot.places names it). Without a protein, a word to find or an order, the best `per_protein` of
+        """Dinners that fit the search's rules and match the rest of it, best first, with the offers near
+        `place` (Snapshot.places names it). Without a protein or a word to find, the best `per_protein` of
         each main protein come first."""
         search = self.parse(text)
         h, place = self.rules(search, place)
         view = self.view(h, place)
-        found = self.index.find(search, view, order)
-        if order is None and not any(c.kind in (Kind.PROTEIN, Kind.WITH) for c in search.clauses):
+        found = self.index.find(search, view)
+        if not any(c.kind in (Kind.PROTEIN, Kind.WITH) for c in search.clauses):
             found = ranking.varied(found, per_protein)
         shown = tuple(found[:limit])
         return Found(
             search=search,
             household=h,
             place=place,
-            order=order,
             dinners=shown,
             total=len(found),
             counts=self.index.count(search, view),

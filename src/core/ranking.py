@@ -39,8 +39,9 @@ def score(dish: Dish) -> float:
 
 
 def rank(dinner: Dinner) -> tuple[int, float, float]:
-    """Fewest swaps first, then the most discounted, then rating and prep time."""
-    return (swaps(dinner.verdict), -dinner.sale, -dinner.score)
+    """Fewest swaps first, then the most kroner off (Dinner.saving; jb 2026-10-22: the sort «Rabatt kr» became the
+    order), then rating and prep time."""
+    return (swaps(dinner.verdict), -dinner.saving, -dinner.score)
 
 
 def buys(dish: Dish, verdict: Verdict, matched: Mapping[str, tuple[Offer, ...]]) -> tuple[Buy, ...]:

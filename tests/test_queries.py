@@ -3,7 +3,6 @@ from datetime import date
 from app.queries import Queries
 from core.models import Gluten, Household, Item, Level, Onion, Rule
 from core.ranking import Week
-from core.search import Order
 from tests.fakes import SIDE, SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
@@ -88,7 +87,7 @@ def test_the_site_starts_with_no_rules_and_the_search_adds_them() -> None:
     assert checked is not None and checked.verdict.swaps
 
 
-def test_sort_by_discount_in_percent_or_kroner() -> None:
+def test_ranked_by_the_kroner_off_every_discounted_ingredient() -> None:
     lamb = ingredient("lammekotelett", 600, "g", "/kjøtt/lamme-/fåre-/sauekjøtt")
     s = snapshot(
         recipe("Kylling", CHICKEN),
@@ -99,12 +98,10 @@ def test_sort_by_discount_in_percent_or_kroner() -> None:
         matches={"kyllingfilet": ["k"], "lammekotelett": ["l"], **SIDE_MATCH},
     )
     q = Queries(FakeDatasets(s))
-    assert [d.dish.name for d in q.search(order=Order.PERCENT).dinners] == ["Kylling", "Lam", "Laks"]  # 40 %, 33 %, 20 %
     # Every discounted ingredient counts: 100 + 5 kr, 40 kr, 5 kr (jb 2026-10-22: "total saving per dinner")
-    assert [d.dish.name for d in q.search(order=Order.KRONER).dinners] == ["Lam", "Kylling", "Laks"]
-    assert q.search(order=Order.KRONER).dinners[0].saving == 105
+    assert [d.dish.name for d in q.search(per_protein=0).dinners] == ["Lam", "Kylling", "Laks"]
+    assert q.search().dinners[0].saving == 105
     assert q.search().total == 3  # Torsk has nothing on sale (jb 2026-10-22: "ignore dinners with 0 Discounted ingredients")
-    assert not q.search("rabatt i kroner").dinners  # not a word for sorting (jb 2026-10-14)
 
 
 def test_allergies_and_vegetar_leave_dinners_out() -> None:

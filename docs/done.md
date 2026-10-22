@@ -4,6 +4,7 @@ Finished requests from jb, newest first. Each quotes the request and says what w
 
 ## 2026-10-22
 
+- [x] **One order, by kroner saved** ("I also think we can drop the percent, i dont think anyone really cares about percent"; "ie. we can remove the entire; Sorter - kr"): the «Sorter» row and `sorter` are gone from the site, the API and the CLI (old links still open), the ranking goes by the kroner off every discounted ingredient after fewest swaps (METHOD.md §5, §6).
 - [x] **A card that shows the savings** ("i want bullet points of the ingridentes, and the discount"; "it looks like aids"; "We must be able to make this look really awsome"): the total kroner off large, with «på N varer», then each ingredient on sale with its store and kroner off. Checked in WebKit at 1280 and 390 px.
 - [x] **«Rabatt kr» by the total** ("next, we should look at total saving per dinner due to the Discounted ingredients"): the kroner off every discounted ingredient summed, per pack (`Dinner.saving`), shown large on the card with each ingredient under it.
 - [x] **Only dinners with something on sale** ("We should ignore dinners with 0 Discounted ingredients"; everywhere on the site): `Queries.ranked` leaves out dinners without an ingredient on sale near the place, so the list, the counts, the API and the CLI do too (1 978 of 3 399 left in Stavanger; METHOD.md §3).

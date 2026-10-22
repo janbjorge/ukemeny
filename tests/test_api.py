@@ -131,8 +131,7 @@ def test_a_place_in_answers_and_links() -> None:
     assert body["links"]["plan"] == "http://testserver/api/plan?q=melkefri&sted=bergen"
     assert body["links"]["remove"]["sted"] == "http://testserver/api/middager?q=kylling+melkefri"
     assert api.get("/api/middager?sted=gotham").json()["place"] is None  # an unknown place is every store
-    body = api.get("/api/middager?q=melkefri&sted=bergen&sorter=kroner").json()
-    assert body["order"] == "kroner" and api.get("/api/middager?sorter=billigst").json()["order"] is None
-    assert body["links"]["add"]["vegansk"] == "http://testserver/api/middager?q=melkefri+vegansk&sted=bergen&sorter=kroner"
-    assert body["links"]["plan"] == "http://testserver/api/plan?q=melkefri&sted=bergen"  # the week is not sorted
+    body = api.get("/api/middager?q=melkefri&sted=bergen&sorter=kroner").json()  # an old link: `sorter` is ignored
+    assert "order" not in body
+    assert body["links"]["add"]["vegansk"] == "http://testserver/api/middager?q=melkefri+vegansk&sted=bergen"
     assert "- [Bergen](http://testserver/api/plan?sted=bergen)" in api.get("/llms.txt").text

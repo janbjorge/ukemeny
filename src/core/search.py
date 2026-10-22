@@ -3,8 +3,8 @@
 `parse` turns the words into clauses: diet rules (`Diet`), categories (`Tag`), main proteins, and words to find or
 leave out. A diet rule changes which dinners fit and what to swap (`household`); the rest narrow down the dinners that
 fit, which an `Index` holds in ranking order. æ, ø and å may be typed as ae, o and a, and a word that matches nothing is
-swapped for the closest known word (METHOD.md §6). The place whose offers count and the sort order are not words: they
-come with the search (app.queries.Queries.search).
+swapped for the closest known word (METHOD.md §6). The place whose offers count is not a word: it comes with the search
+(app.queries.Queries.search).
 """
 
 import difflib
@@ -16,7 +16,7 @@ from enum import StrEnum
 
 from core.matching import PROTEINS
 from core.models import Dinner, Dish, Household, Item, Kids, Part, Rule, Traits
-from core.ranking import Prepared, kroner
+from core.ranking import Prepared
 
 
 class Tag(StrEnum):
@@ -28,18 +28,6 @@ class Tag(StrEnum):
     ON_SALE = "på tilbud"
     LIKED = "godt likt"
     MILD = "barnevennlig"
-
-
-class Order(StrEnum):
-    """How to sort instead of the ranking: by the card's discount (core.models.Dinner.deal; jb 2026-10-13: "We lack two
-    sorting options, by releive (percent) and absolute, acctual discount"). Not a word in the search (jb 2026-10-14: "i
-    also do not think this should be inc. in the serach box"); the value is how the address writes it (`sorter=kroner`)."""
-
-    PERCENT = "prosent"
-    KRONER = "kroner"
-
-
-ORDER_LABELS: Mapping[Order, str] = {Order.PERCENT: "Rabatt %", Order.KRONER: "Rabatt kr"}
 
 
 class Diet(StrEnum):
@@ -569,13 +557,6 @@ class Counts:
     """Matches per main protein, whatever protein is chosen now."""
 
 
-DISCOUNT: Mapping[Order, Callable[[Dinner], float]] = {
-    Order.PERCENT: lambda d: (d.deal.sale.discount or 0.0) if d.deal and d.deal.sale else 0.0,
-    Order.KRONER: kroner,
-}
-"""The card's discount, as a share or in kroner; 0 without one."""
-
-
 @dataclass(frozen=True, slots=True)
 class View:
     """One set of rules over the Index: the dinners that fit, by index id (the dish's place in the snapshot)."""
@@ -673,12 +654,10 @@ class Index:
                     keep -= self.hits(c.values[0])[1]
         return keep, named
 
-    def find(self, search: Search, view: View, order: Order | None = None) -> list[Dinner]:
-        """Every dinner that meets all clauses: with an order, the biggest discount first (none last); then those
-        with a searched word in the name; then in ranking order."""
+    def find(self, search: Search, view: View) -> list[Dinner]:
+        """Every dinner that meets all clauses: those with a searched word in the name first, then in ranking order."""
         keep, named = self._keep(search.clauses, view)
-        discount = DISCOUNT[order] if order else (lambda d: 0.0)
-        return [view.dinners[i] for i in sorted(keep, key=lambda i: (-discount(view.dinners[i]), -named[i], view.rank[i]))]
+        return [view.dinners[i] for i in sorted(keep, key=lambda i: (-named[i], view.rank[i]))]
 
     def count(self, search: Search, view: View) -> Counts:
         keep, _ = self._keep(search.clauses, view)

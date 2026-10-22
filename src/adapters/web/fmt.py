@@ -2,7 +2,7 @@
 
 from datetime import date, datetime
 
-__all__ = ["dato", "kr", "prosent", "spart", "tall"]
+__all__ = ["dato", "kr", "spart", "tall"]
 
 NBSP = "\u00a0"
 MINUS = "\u2212"
@@ -18,11 +18,6 @@ def kr(value: float) -> str:
 def tall(value: int) -> str:
     """1908 -> "1 908", with a no-break space between thousands."""
     return f"{value:,}".replace(",", NBSP)
-
-
-def prosent(fraction: float) -> str:
-    """0.27 -> "-27 %" with a real minus sign, for a discount."""
-    return f"{MINUS}{round(fraction * 100)}{NBSP}%"
 
 
 def spart(value: float) -> str:

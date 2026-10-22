@@ -57,8 +57,10 @@ def test_cards_are_calm(client: TestClient) -> None:
     assert "Sterk" not in page
 
 
-def test_sorted_by_kroner_the_cards_show_kroner_off(client: TestClient) -> None:
-    ideas = client.get("/middager?q=kylling&sorter=kroner", headers=HX).text
+def test_an_old_sort_link_still_opens(client: TestClient) -> None:
+    r = client.get("/middager?q=kylling&sorter=kroner", headers=HX)
+    assert r.headers["HX-Replace-Url"] == "/?q=kylling#forslag"  # «Sorter» is gone (jb 2026-10-22)
+    ideas = r.text
     assert '<span class="pct">\u221241\u00a0kr</span>' in ideas
     assert '<span class="off">\u221236\u00a0kr</span>' in ideas and '<span class="off">\u22125\u00a0kr</span>' in ideas
 
@@ -94,13 +96,7 @@ def test_chips_toggle_and_count(client: TestClient) -> None:
     assert 'hx-get="/middager?q=kylling+uten+l%C3%B8k" hx-trigger="mousedown, click" hx-sync="this:drop">Uten løk</a>' in html
     assert 'aria-label="Allergier">' in html and f'hx-get="/middager?q=kylling+uten+egg"{GO}>Uten egg</a>' in html
     assert ">Lav FODMAP</a>" in html and ">Vegetar</a>" in html
-    assert 'aria-label="Sorter">' in html and f'hx-get="/middager?q=kylling&amp;sorter=prosent"{GO}>Rabatt %</a>' in html
-    assert "Anbefalt" not in html and 'name="sorter"' not in html  # neither on is the ranking (jb 2026-10-14)
-    by_kroner = client.get("/?q=kylling&sorter=kroner").text
-    assert f'hx-get="/middager?q=kylling"{GO} aria-current="true">Rabatt kr</a>' in by_kroner  # off again
-    assert f'hx-get="/middager?q=kylling&amp;sorter=prosent"{GO}>Rabatt %</a>' in by_kroner  # the other one replaces it
-    assert f'hx-get="/middager?q=kylling+uten+egg&amp;sorter=kroner"{GO}>Uten egg</a>' in by_kroner  # a chip keeps the sort
-    assert '<input type="hidden" name="sorter" form="sok" value="kroner">' in by_kroner  # and so does typing
+    assert "Sorter" not in html and "Rabatt" not in html and "sorter" not in html  # one order (jb 2026-10-22: "remove the entire; Sorter")
     proteins_row = html[html.index('class="chips proteins"') :]
     assert "Vegetar" not in proteins_row[: proteins_row.index("</nav>")]  # a rule in Kosthold, not a main protein
     proteins = html[html.index('class="chips proteins"') :]

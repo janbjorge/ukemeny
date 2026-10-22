@@ -10,7 +10,7 @@ from urllib.parse import urlencode
 from pydantic import BaseModel, BeforeValidator, ConfigDict
 
 from core.matching import PROTEINS, VEGETARIAN
-from core.search import Order, Tag, protein_word
+from core.search import Tag, protein_word
 
 KNOWN_PROTEINS = (*dict.fromkeys(PROTEINS.values()), "kjøtt", VEGETARIAN)
 MAX_DINNERS = 100
@@ -32,10 +32,6 @@ def _count(value: object) -> int:
     return min(max(int(digits), 1), MAX_DINNERS) if digits else DEFAULT_DINNERS
 
 
-def _order(value: object) -> Order | None:
-    return next((o for o in Order if o.value == value), None)
-
-
 def _text(value: object) -> str:
     return " ".join(str(value).split())[:MAX_SEARCH]
 
@@ -50,8 +46,6 @@ class DinnerQuery(BaseModel):
     antall: Annotated[int, BeforeValidator(_count)] = DEFAULT_DINNERS
     sted: Annotated[str, BeforeValidator(_text)] = ""
     """Where the offers are from: a place as Snapshot.places names it, in any case (Queries.place); empty for every store."""
-    sorter: Annotated[Order | None, BeforeValidator(_order)] = None
-    """The biggest discount first, as a share or in kroner, instead of the ranking."""
 
     @classmethod
     def of(cls, **given: str | None) -> DinnerQuery:
@@ -64,9 +58,9 @@ class DinnerQuery(BaseModel):
         return " ".join(w for w in words if w)
 
 
-def link(text: str, antall: int | None = None, place: str | None = None, order: Order | None = None) -> str:
-    """The query string for a search: "q=rask+kylling", with "sted" (lower case), "sorter" and "antall" only when given."""
-    given = {"q": text, "sted": place and place.lower(), "sorter": order, "antall": antall}
+def link(text: str, antall: int | None = None, place: str | None = None) -> str:
+    """The query string for a search: "q=rask+kylling", with "sted" (lower case) and "antall" only when given."""
+    given = {"q": text, "sted": place and place.lower(), "antall": antall}
     return urlencode({k: v for k, v in given.items() if v})
 
 

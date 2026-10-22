@@ -28,7 +28,7 @@ from opentelemetry.metrics import CallbackOptions, Observation
 from starlette.types import Scope
 
 from app.queries import Found, Queries
-from core.search import Order, Search
+from core.search import Search
 
 ON_FLY = "FLY_APP_NAME" in os.environ
 # The commit, passed by the deploy job (Dockerfile): the service version, and links from a span to its code
@@ -231,13 +231,12 @@ def search(
     queries: Queries,
     text: str,
     place: str | None,
-    order: Order | None,
     route: str,
     limit: int,
 ) -> Found:
     """queries.search in a span that says what it understood and found, and counted."""
     with logfire.span("search {text}", text=text, route=route, limit=limit) as span:
-        found = queries.search(text, place, order, limit=limit)
+        found = queries.search(text, place, limit=limit)
         s = found.search
         span.set_attributes(
             {
@@ -245,7 +244,6 @@ def search(
                 "search.clauses": [c.label for c in s.clauses],
                 "search.rules": sorted(d.value for d in s.diets),
                 "search.place": found.place or "",
-                "search.order": found.order or "",
                 "search.corrected": [f"{typed} → {used}" for typed, used in s.corrected],
                 "search.total": found.total,
                 "search.shown": len(found.dinners),

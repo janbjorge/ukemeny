@@ -36,7 +36,7 @@ SEARCH = f"""A search in plain bokmål, such as `rask kylling uten sopp`, `laks 
 Understood: diet rules and allergies ({DIETS}: which dinners fit and what to swap), categories
 (`under 20 min`, `under 40 min`, `under en time`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins (`kylling`,
 `fisk`, `kjøtt`, `sjømat`, ...), `uten`/`ikke` before a word to leave it out, and `eller` between words for either.
-The place and the sort order are not words in `q`: they are `sted` and `sorter`.
+The place is not a word in `q`: it is `sted`.
 Any other word must be in the dish name or an ingredient; a word that matches nothing is swapped for the closest known
 one (see `search.corrected`). æøå may be written as ae/o/a."""
 
@@ -87,20 +87,13 @@ def build(queries: Queries) -> FastAPI:
         ] = None,
         antall: Annotated[str | None, Query(description="How many, 1-100 (default 30)")] = None,
         sted: Annotated[str | None, near] = None,
-        sorter: Annotated[
-            str | None,
-            Query(
-                description="`prosent` or `kroner`: the biggest discount first, as a share or in kroner off (dinners "
-                "without one last), instead of the ranking."
-            ),
-        ] = None,
     ) -> schema.DinnersOut:
-        """Dinners whose name has a searched word first, then fewest swaps, the biggest discount, rating and
-        prep time. Without a protein or a word to find, the best 3 of each main protein come first.
-        `search` says how `q` was understood, and `links` adds or takes away a diet rule, or picks a place."""
-        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted, sorter=sorter)
+        """Dinners whose name has a searched word first, then fewest swaps, the most kroner off (every discounted
+        ingredient summed, `discounts`), rating and prep time. Without a protein or a word to find, the best 3 of each
+        main protein come first. `search` says how `q` was understood, and `links` adds or takes away a diet rule, or picks a place."""
+        choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted)
         place = queries.place(choice.sted)
-        found = telemetry.search(queries, choice.text(), place, choice.sorter, request.url.path, limit=choice.antall)
+        found = telemetry.search(queries, choice.text(), place, request.url.path, limit=choice.antall)
         return schema.dinners(queries, found, base(request))
 
     @api.get("/oppskrift", response_model=schema.CheckOut, summary="Whether one recipe fits, and what to swap")

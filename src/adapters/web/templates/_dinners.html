@@ -22,21 +22,17 @@
       <nav class="chips" aria-label="Hva slags middag">{% for c in chips.kinds %}{{ chip(c) }} {% endfor %}</nav></div>
     <div class="row"><span class="label">Hovedråvare</span>
       <nav class="chips proteins" aria-label="Hovedråvare">{% for c in chips.proteins %}{{ chip(c) }} {% endfor %}</nav></div>
-    <div class="row"><span class="label">Sorter</span>
-      <nav class="chips" aria-label="Sorter">{% for c in chips.orders %}{{ chip(c) }} {% endfor %}</nav>
-      {# The sort goes with typing and «Sted», which send the search form #}
-      {% if found.order %}<input type="hidden" name="sorter" form="sok" value="{{ found.order }}">{% endif %}</div>
   </div>
   {% for typed, used in s.corrected %}<p class="note">Fant ikke «{{ typed }}», så viser treff for «{{ used }}».</p>{% endfor %}
   <p class="count" role="status">{{ found.total|tall }} {{ "middag" if found.total == 1 else "middager" }}</p>
   <div class="cards">
-    {% for d in found.dinners %}{{ card(d, s, found.via.get(d.dish.url, ()), found.order) }}{% endfor %}
+    {% for d in found.dinners %}{{ card(d, s, found.via.get(d.dish.url, ())) }}{% endfor %}
     {% if found.total > shown %}{{ more_button(found, shown) }}{% endif %}
   </div>
   {% if not found.dinners %}
   <div class="empty">
     <p><b>Ingen middager passer alt dette.</b></p>
-    {% if relax %}<p>Prøv å fjerne {% for c, n, rest in relax[:3] %}<a {{ go(rest, found.order) }}>«{{ c.label }}»</a> ({{ n|tall }} middager){{ ", " if not loop.last }}{% endfor %}.</p>{% endif %}
+    {% if relax %}<p>Prøv å fjerne {% for c, n, rest in relax[:3] %}<a {{ go(rest) }}>«{{ c.label }}»</a> ({{ n|tall }} middager){{ ", " if not loop.last }}{% endfor %}.</p>{% endif %}
   </div>
   {% endif %}
   {% if box %}{{ search_box(s.text, oob=true) }}{% endif %}

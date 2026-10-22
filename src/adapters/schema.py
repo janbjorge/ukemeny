@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict
 from app.queries import Check, Found, Queries
 from core.matching import main_protein
 from core.models import Dinner, Dish, Note, Plan
-from core.search import Clause, Diet, Kind, Order, Search, diet_clause
+from core.search import Clause, Diet, Kind, Search, diet_clause
 
 
 class Out(BaseModel):
@@ -125,12 +125,12 @@ def _rules(search: Search) -> Search:
     return Search(tuple(c for c in search.clauses if c.kind is Kind.DIET))
 
 
-def links(base: str, search: Search, place: str | None, path: str, places: Iterable[str], order: Order | None = None) -> LinksOut:
+def links(base: str, search: Search, place: str | None, path: str, places: Iterable[str]) -> LinksOut:
     """`base` is the API's address, ending in "/" (https://matris.app/api/); `path` is this answer's ("plan", "middager")."""
     rules = _rules(search)
 
-    def url(path: str, s: Search, at: str | None = place, by: Order | None = order) -> str:
-        query = urlencode({k: v for k, v in {"q": s.text, "sted": at and at.lower(), "sorter": by}.items() if v})
+    def url(path: str, s: Search, at: str | None = place) -> str:
+        query = urlencode({k: v for k, v in {"q": s.text, "sted": at and at.lower()}.items() if v})
         return f"{base}{path}" + (f"?{query}" if query else "")
 
     remove = {d.value: url(path, search.drop(diet_clause(d))) for d in search.diets}
@@ -140,7 +140,7 @@ def links(base: str, search: Search, place: str | None, path: str, places: Itera
         add={d.value: url(path, search.toggle(diet_clause(d))) for d in Diet if d not in search.diets},
         remove=remove,
         places={p: url(path, search, p) for p in places if p != place},
-        plan=url("plan", rules, by=None),
+        plan=url("plan", rules),
         dinners=url("middager", search),
     )
 
@@ -164,8 +164,6 @@ class SnapshotOut(Out):
 
 class DinnersOut(SnapshotOut):
     search: SearchOut
-    order: str | None = None
-    """How `dinners` are sorted: `prosent` or `kroner` (`sorter`), the biggest discount first; null: the ranking."""
 
 
 class PlanOut(SnapshotOut):
@@ -252,8 +250,7 @@ def dinners(queries: Queries, found: Found, base: str | None = None) -> DinnersO
         offers_until=queries.offers_until(),
         dinners=[dinner(d, n, found.via.get(d.dish.url, ())) for n, d in enumerate(found.dinners, 1)],
         search=_search(found.search, found.total, found.relax),
-        order=found.order,
-        links=links(base, found.search, found.place, "middager", queries.snapshot.places, found.order) if base else None,
+        links=links(base, found.search, found.place, "middager", queries.snapshot.places) if base else None,
     )
 
 

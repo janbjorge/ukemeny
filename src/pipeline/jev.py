@@ -404,7 +404,7 @@ class JevIngredientClassifier:
         if dish:
             state["dish"] = dish
         response = await self.jev.ask("ingredient", state, self.registry.questions(keys))
-        return {**self.registry.read(response, keys), "model": response.model}
+        return {**self.registry.read(response, keys), "source": response.model}
 
 
 @dataclass

@@ -151,7 +151,7 @@ async def classify(
     async def one(name: str) -> Traits:
         nonlocal done
         levels = await classifier.classify(wanted[name], classifier.labels, used_in.get(name, ""))
-        flagged = " ".join(f"{k}={v}" for k, v in levels.items() if k != "model" and v not in ("no", "none", "ok", "low"))
+        flagged = " ".join(f"{k}={v}" for k, v in levels.items() if k != "source" and v not in ("no", "none", "ok", "low"))
         log.debug("%s (%s): %s", name, wanted[name].category, flagged or "nothing to note")
         done += 1
         if progress:

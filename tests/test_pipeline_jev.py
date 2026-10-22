@@ -89,7 +89,7 @@ async def test_classifier_sends_only_the_ingredient_name() -> None:
         Lactose.NONE,
         Kids.OK,
     )
-    assert traits.model == "jev-1.13.0"
+    assert traits.source == "jev-1.13.0"
     state, questions = client.calls[0]
     assert state == {"ingredient": "kyllingfilet", "category": "/kjøtt/kylling/høns"}
     assert set(questions) == set(FOUR)
@@ -106,7 +106,7 @@ async def test_the_registry_holds_every_label_and_asks_them_in_one_request() -> 
     classifier = JevIngredientClassifier(Jev(client := FakeClient({key: {"no": 1.0} for key in LABELS})))
     assert classifier.labels == LABELS
     levels = await classifier.classify(X, LABELS)
-    assert len(client.calls) == 1 and set(levels) == {*LABELS, "model"}
+    assert len(client.calls) == 1 and set(levels) == {*LABELS, "source"}
     with pytest.raises(ValueError, match="twice"):
         ingredient_labels().contains("egg", "egg", yes="", maybe="", no="")
 
@@ -115,7 +115,7 @@ async def test_only_the_labels_asked_for_are_sent() -> None:
     client = FakeClient({"egg": {"yes": 0.9, "no": 0.1}, "fodmap": {"low": 0.8, "high": 0.2}})
     levels = await JevIngredientClassifier(Jev(client)).classify(X, ["egg", "fodmap"])
     assert set(client.calls[0][1]) == {"egg", "fodmap"}
-    assert levels == {"egg": "yes", "fodmap": "low", "model": "jev-1.13.0"}
+    assert levels == {"egg": "yes", "fodmap": "low", "source": "jev-1.13.0"}
 
 
 async def level(key: str, answer: dict[str, float]) -> str:

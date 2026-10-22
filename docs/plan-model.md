@@ -58,16 +58,18 @@ name, so the site's lookup stays as it is.
 
 ## 1. The vocabulary (pipeline, data)
 
-- [ ] Row shape: `category`, `product`, `source` join the facts; `model` goes. src/core/models.py `Traits.of` and
-      `levels`, src/adapters/datasets.py (read and write). The site ignores the new keys.
-- [ ] tests/test_traits.py reviews the file: every name in dishes.json has a row; a row is consistent (`animal` no
-      means no meat, fish, shellfish, milk or egg; pork yes means meat yes; a plant category holds no meat, fish, egg
-      or milk; /kjøtt holds meat; /fisk og sjømat holds fish, shellfish or molluscs; /ost and /melk hold milk; named
-      exceptions such as hvalkjøtt).
-- [ ] Seed it once from the live traits.json (2026-10-14, jev-1.13.0) with a throwaway script outside the repo:
-      category from the matprat line, else the near-name, else the 2026-10-14 pick; `product` = name; `source`; then
-      fix by hand what the test flags (26 rows) and the known wrong answers (gulost milk, riseddik, hjertesalat).
-      Logged in METHOD.md §2.
+- [x] Row shape: `category`, `product`, `source` join the facts; `model` goes. src/core/models.py `Traits.of` and
+      `levels`, src/adapters/datasets.py (read and write). The site ignores the new keys. `CATEGORIES`, our list of
+      kinds, in src/core/matching.py.
+- [x] tests/test_traits.py reviews the file: every name in dishes.json has a row; every part's category is its row's;
+      a row is consistent (`animal` no means no meat, fish, shellfish, milk or egg «yes»; pork yes means meat yes;
+      /grønnsaker, /frukt, /bær, /poteter, /sopp and /nøtter hold nothing from an animal; /kjøtt holds meat and
+      /svinekjøtt pork; /fisk og sjømat holds fish, shellfish or molluscs and no meat; /ost and /melk hold milk; /egg
+      holds egg; named exceptions: hvalkjøtt, ferdig potetmos).
+- [x] Seeded once from the live traits.json (2026-10-14, jev-1.13.0) with a throwaway script outside the repo:
+      category from the matprat line (1 148), else the near-name (54), else the 2026-10-14 pick (542); `product` =
+      name; `source`; then 61 rows fixed by hand (the test's flags and the known wrong answers). dishes.json's parts
+      took their row's category (347 parts, 20 names). Logged in METHOD.md §2.
 
 ## 2. The build (pipeline, code)
 

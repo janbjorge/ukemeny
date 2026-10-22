@@ -38,9 +38,12 @@ def traits(
     fodmap: Fodmap | None = Fodmap.LOW,
     carbs: Carbs | None = Carbs.NONE,
     pregnancy: Pregnancy | None = Pregnancy.OK,
+    category: str = "",
 ) -> Traits:
     """An ingredient with every label asked: it holds nothing, unless told otherwise."""
-    return Traits(gluten, onion, lactose, kids, "", {item: Level.NO for item in Item} | dict(contains or {}), fodmap, carbs, pregnancy)
+    return Traits(
+        gluten, onion, lactose, kids, "", {item: Level.NO for item in Item} | dict(contains or {}), fodmap, carbs, pregnancy, category
+    )
 
 
 PLAIN = traits()
@@ -119,7 +122,7 @@ class FakeClassifier:
         self.asked.append((ingredient.name, keys))
         self.context[ingredient.name] = (ingredient.category, dish)
         levels = self.known.get(ingredient.name, PLAIN).levels()
-        return {key: levels[key] for key in keys} | {"model": "fake"}
+        return {key: levels[key] for key in keys} | {"source": "fake"}
 
 
 @dataclass

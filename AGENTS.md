@@ -26,5 +26,5 @@
 ## Git and hosting
 
 - Commit to `main`. No force-push.
-- `datasets/` is committed; rebuild it weekly with `uv run python -m pipeline.datasets` (FACTS.md §4).
+- `datasets/` is committed. traits.json is the vocabulary: kept between builds, fixed by hand (`source` «hand») and reviewed by tests/test_traits.py, never rebuilt. dishes.json and offers.json are built from the sources, the offers weekly (FACTS.md §4).
 - Every push to `main` is checked and deployed to Fly by .github/workflows/deploy.yml, which makes it public. Ask jb before every push.

@@ -48,8 +48,8 @@ class IngredientClassifier(Protocol):
         ...
 
     async def classify(self, ingredient: Ingredient, labels: Iterable[str], dish: str = "") -> Levels:
-        """These labels of the ingredient's name, and "model"; its grocery category is context, and so is `dish`, a dinner
-        it is in, for an ingredient without one."""
+        """These labels of the ingredient's name, and "source", the model that answered; its grocery category is
+        context, and so is `dish`, a dinner it is in, for an ingredient without one."""
         ...
 
 

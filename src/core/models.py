@@ -98,27 +98,36 @@ class Pregnancy(StrEnum):
 
 
 type Levels = Mapping[str, str]
-"""An ingredient's labels as stored and written: level per label key ("gluten": "no", "egg": "maybe"),
-and "model": the model that answered."""
+"""A row of the vocabulary as stored and written: a level per label key ("gluten": "no", "egg": "maybe"), and
+"category", "product" and "source" (Traits)."""
 LABELS = ("gluten", "onion", "lactose", "kids", *Item, "fodmap", "carbs", "pregnancy")
 """Every label key an ingredient is asked about."""
+HAND = "hand"
+"""Traits.source of a row written or fixed by hand."""
 
 
 @dataclass(frozen=True, slots=True)
 class Traits:
-    """What an ingredient is, regardless of recipe. Each label is asked once per ingredient name."""
+    """A row of the vocabulary, datasets/traits.json: what an ingredient name is, whatever the recipe. The rows are kept
+    between builds and fixed by hand (docs/plan-model.md); a name without one gets a row drafted once."""
 
     gluten: Gluten
     onion: Onion
     lactose: Lactose
     kids: Kids
-    model: str = ""
+    source: str = ""
+    """Who answered: HAND, or the Jev model that drafted the row."""
     contains: Mapping[Item, Level] = field(default_factory=dict, hash=False)
     """Per item, whether the ingredient holds it. An item not here was never asked about."""
     fodmap: Fodmap | None = None
     carbs: Carbs | None = None
     pregnancy: Pregnancy | None = None
     """None: never asked about."""
+    category: str = ""
+    """Our kind of ingredient (core.matching.CATEGORIES), which every Part with the name takes: "/kjøtt/kylling/høns"."""
+    product: str = ""
+    """What the name is in the shop, which the offers are matched to: "kyllingfilet" for "kyllingfilet i strimler".
+    "" is the name itself."""
 
     @classmethod
     def of(cls, levels: Levels) -> Traits:
@@ -127,11 +136,13 @@ class Traits:
             onion=Onion(levels["onion"]),
             lactose=Lactose(levels["lactose"]),
             kids=Kids(levels["kids"]),
-            model=levels.get("model", ""),
+            source=levels.get("source", ""),
             contains={item: Level(levels[item]) for item in Item if item in levels},
             fodmap=Fodmap(levels["fodmap"]) if "fodmap" in levels else None,
             carbs=Carbs(levels["carbs"]) if "carbs" in levels else None,
             pregnancy=Pregnancy(levels["pregnancy"]) if "pregnancy" in levels else None,
+            category=levels.get("category", ""),
+            product=levels.get("product", ""),
         )
 
     def levels(self) -> dict[str, str]:
@@ -143,7 +154,9 @@ class Traits:
             "kids": self.kids.value,
             **{item.value: level.value for item, level in self.contains.items()},
             **{key: value.value for key, value in optional.items() if value is not None},
-            "model": self.model,
+            "category": self.category,
+            "product": self.product,
+            "source": self.source,
         }
 
 

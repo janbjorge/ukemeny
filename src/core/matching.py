@@ -7,6 +7,47 @@ from dataclasses import replace
 from core.diet import DAIRY
 from core.models import Dish, Item, Level, Offer, Part, Traits
 
+CATEGORIES = (
+    "/bær",
+    "/diverse",
+    "/drikke",
+    "/egg",
+    "/fisk og sjømat",
+    "/frukt",
+    "/glutenfritt",
+    "/grønnsaker",
+    "/hermetikk",
+    "/kjøtt/and/gås",
+    "/kjøtt/elg/annet vilt",
+    "/kjøtt/innmat",
+    "/kjøtt/kalkun",
+    "/kjøtt/kalvekjøtt",
+    "/kjøtt/kjøttdeig/karbonadedeig",
+    "/kjøtt/kylling/høns",
+    "/kjøtt/lamme-/fåre-/sauekjøtt",
+    "/kjøtt/pålegg",
+    "/kjøtt/pølser",
+    "/kjøtt/reinsdyr",
+    "/kjøtt/spekemat",
+    "/kjøtt/storfekjøtt",
+    "/kjøtt/svinekjøtt",
+    "/korn/mel/bakervarer",
+    "/krydder",
+    "/margarin/olje/majones",
+    "/melk/melkeprodukter",
+    "/melkefritt",
+    "/nøtter",
+    "/ost",
+    "/pasta/ris",
+    "/poteter",
+    "/skalldyr",
+    "/sopp",
+    "/tørrvarer",
+)
+"""Our kinds of ingredient: what Part.category and Traits.category hold, and what the rules below go by. They are
+matprat's 35 grocery departments until we rename or merge them (jb 2026-10-22: "model our internals according to OUR
+needs"); a recipe source's own labels are put in these, or a name is filed by the vocabulary (app.build)."""
+
 WEIGHTS: Mapping[str, float] = {
     "/kjøtt": 3.0,
     "/fisk og sjømat": 3.0,

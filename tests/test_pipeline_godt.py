@@ -6,18 +6,18 @@ import pytest
 
 from core.errors import SourceUnavailableError
 from core.models import RecipeRef
-from pipeline.godt import GodtRecipeSource, parse_recipe, parse_sitemap, prep_time
+from pipeline.godt import GodtRecipeSource, parse_listing, parse_recipe, prep_time
 from pipeline.pages import Pages
 
 URL = "https://www.godt.no/oppskrifter/suppe/9662/tomatsuppe"
 
-SITEMAP = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>{URL}</loc><lastmod>2026-10-13T13:29:42.000Z</lastmod><image:image><image:loc>https://img.godt.no/x</image:loc></image:image></url>
-  <url><loc>https://www.godt.no/oppskrifter/4731/fondue</loc><lastmod>2026-10-01T10:00:00.000Z</lastmod></url>
-  <url><loc>https://www.godt.no/oppskrifter/suppe</loc></url>
-  <url><loc>https://www.godt.no/artikler/noe/123/noe</loc></url>
-</urlset>"""
+def card(path: str, updated: str = "2026-10-13T13:29:42.000Z") -> dict[str, object]:
+    return {"links": {"relativeUrl": path}, "changes": {"updated": updated}}
+
+
+def listing(items: list[dict[str, object]], total: int, size: int = 2) -> str:
+    props = {"props": {"pageProps": {"recipes": {"items": items, "pagination": {"total": total, "page": 1, "size": size}}}}}
+    return f'<html><script id="__NEXT_DATA__" type="application/json">{json.dumps(props)}</script>'
 
 INGREDIENTS: list[dict[str, object]] = [
     {"amount": 1, "description": None, "id": "1319", "maxAmount": None, "name": "løk", "unit": "stk"},
@@ -62,11 +62,25 @@ def with_props(**changes: object) -> dict[str, object]:
     return RECIPE | {"clientProperties": props | changes}
 
 
-def test_parse_sitemap_keeps_recipe_pages() -> None:
-    assert parse_sitemap(SITEMAP) == [
-        RecipeRef(URL, "2026-10-13T13:29:42.000Z"),
-        RecipeRef("https://www.godt.no/oppskrifter/4731/fondue", "2026-10-01T10:00:00.000Z"),
-    ]
+def test_parse_listing_keeps_recipe_pages() -> None:
+    html = listing(
+        [
+            card("/oppskrifter/suppe/9662/tomatsuppe"),
+            card("/oppskrifter/4731/fondue", "2026-10-01T10:00:00.000Z"),
+            card("/oppskrifter/suppe"),
+            card("https://www.godt.no/artikler/noe/123/noe"),
+            {"links": "nope"},
+        ],
+        total=2,
+    )
+    assert parse_listing(html) == (
+        [
+            RecipeRef(URL, "2026-10-13T13:29:42.000Z"),
+            RecipeRef("https://www.godt.no/oppskrifter/4731/fondue", "2026-10-01T10:00:00.000Z"),
+        ],
+        2,
+        2,
+    )
 
 
 def test_parse_recipe() -> None:
@@ -121,25 +135,63 @@ def source(handle: Callable[[httpx2.Request], httpx2.Response]) -> GodtRecipeSou
 
 
 async def test_fetch_and_index() -> None:
+    pages = {
+        "1": listing([card("/oppskrifter/suppe/9662/tomatsuppe"), card("/oppskrifter/4731/fondue", "2026-10-01T10:00:00.000Z")], 3),
+        "2": listing([card("/oppskrifter/pasta/8529/kremet-kyllingpasta", "2024-07-26T08:44:03Z")], 3),
+    }
+
     def handle(request: httpx2.Request) -> httpx2.Response:
-        if request.url.path == "/sitemap-recipes.xml":
-            return httpx2.Response(200, text=SITEMAP)
+        if request.url.path == "/oppskrifter/middag":
+            return httpx2.Response(200, text=pages[request.url.params["page"]])
         return httpx2.Response(200, text=page(RECIPE))
 
     godt = source(handle)
-    assert len(await godt.index()) == 2
+    assert await godt.index() == [
+        RecipeRef(URL, "2026-10-13T13:29:42.000Z"),
+        RecipeRef("https://www.godt.no/oppskrifter/4731/fondue", "2026-10-01T10:00:00.000Z"),
+        RecipeRef("https://www.godt.no/oppskrifter/pasta/8529/kremet-kyllingpasta", "2024-07-26T08:44:03Z"),
+    ]
     recipe = await godt.fetch(URL)
     assert recipe is not None and recipe.name == "Hjemmelaget tomatsuppe"
 
 
-async def test_gone_page_is_none_and_a_missing_sitemap_an_error() -> None:
-    gone = source(lambda request: httpx2.Response(404))
+async def test_a_later_page_cannot_shrink_the_list() -> None:
+    """Page 2 and page 61 reported 1 447 on 2026-10-22 while page 1 and the last page's 16 items made 1 456."""
+    pages = {
+        "1": listing([card("/oppskrifter/suppe/9662/tomatsuppe"), card("/oppskrifter/4731/fondue")], 5),
+        "2": listing(
+            [card("/oppskrifter/pasta/8529/kremet-kyllingpasta"), card("/oppskrifter/fisk/7306/fiskeboller-i-hvit-saus")],
+            2,
+        ),
+        "3": listing([card("/oppskrifter/gryte/2169/indisk-lammegryte")], 2),
+    }
+
+    def handle(request: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(200, text=pages[request.url.params["page"]])
+
+    assert len(await source(handle).index()) == 5
+
+
+async def test_a_short_list_is_an_error_and_a_gone_page_is_none() -> None:
+    def handle(request: httpx2.Request) -> httpx2.Response:
+        if request.url.params.get("page") == "2":
+            return httpx2.Response(200, text=listing([], 3))
+        if request.url.path == "/oppskrifter/middag":
+            return httpx2.Response(200, text=listing([card("/oppskrifter/suppe/9662/tomatsuppe")], 3))
+        return httpx2.Response(404)
+
+    gone = source(handle)
     assert await gone.fetch(URL) is None
-    with pytest.raises(SourceUnavailableError):
+    with pytest.raises(SourceUnavailableError, match="1 of 3"):
         await gone.index()
 
 
-async def test_known_pages_stand_in_for_the_sitemap() -> None:
+async def test_a_missing_list_is_an_error() -> None:
+    with pytest.raises(SourceUnavailableError, match="no recipe list"):
+        await source(lambda request: httpx2.Response(404)).index()
+
+
+async def test_known_pages_stand_in_for_the_list() -> None:
     asked: list[str] = []
 
     def handle(request: httpx2.Request) -> httpx2.Response:
@@ -149,7 +201,7 @@ async def test_known_pages_stand_in_for_the_sitemap() -> None:
     client = httpx2.AsyncClient(transport=httpx2.MockTransport(handle))
     godt = GodtRecipeSource(Pages(client, "godt.no", tries=1), known=(URL,))
     assert await godt.index() == [RecipeRef(URL, "")]
-    assert asked == []  # The sitemap is never asked for
+    assert asked == []  # The list is never asked for
 
 
 async def test_a_firewall_challenge_is_a_failed_page_and_not_retried() -> None:

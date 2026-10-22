@@ -6,7 +6,7 @@ Jev's labels for every ingredient and offer. Nothing is kept between runs. Run o
     uv run python -m pipeline.datasets -v    # also Jev's cost after each Jev step, failures, retries, catalogs
     uv run python -m pipeline.datasets -vv   # also a line per page, ingredient, offer match and Jev call
     uv run python -m pipeline.datasets -vvv  # also every HTTP request
-    uv run python -m pipeline.datasets --known  # godt.no's pages from the dinners in datasets/, not its sitemap
+    uv run python -m pipeline.datasets --known  # godt.no's pages from the dinners in datasets/, not its list
     uv run python -m pipeline.datasets --offers  # only this week's offers and their matches, for the dinners in datasets/
 
 Needs TYPESAFE_API_KEY. The site reads only datasets/.
@@ -119,8 +119,8 @@ def configure(verbose: int) -> None:
 
 
 def known_godt(root: Path = datasets.DATASETS) -> tuple[str, ...]:
-    """The godt.no dinners in datasets/, whose pages a build with --known reads again: godt.no's sitemap is 404 since
-    2026-10-22 (jb: "we need some kind of refresh option that uses the dishes we know allready")."""
+    """The godt.no dinners in datasets/, whose pages a build with --known reads again, instead of the dinner list
+    (jb: "we need some kind of refresh option that uses the dishes we know allready")."""
     try:
         dishes = datasets.JsonDatasets(root).snapshot().dishes
     except FileNotFoundError as e:
@@ -169,7 +169,7 @@ async def offers(progress: build.Progress | None = None, fetching: Callable[[str
 
 async def run(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None, known: bool = False) -> Result:
     """`fetching` hears every URL matprat.no, godt.no and mattilbud.no are asked for. `known`: godt.no's pages are the
-    dinners already in datasets/ (known_godt), not its sitemap's."""
+    dinners already in datasets/ (known_godt), not its dinner list's."""
     key = _key()
     godt_pages = known_godt() if known else ()
     async with (
@@ -194,7 +194,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build datasets/ from scratch: matprat.no, godt.no, mattilbud.no and Jev.")
     parser.add_argument("-v", "--verbose", action="count", default=0, help="more detail: -v, -vv or -vvv")
     only = parser.add_mutually_exclusive_group()
-    only.add_argument("--known", action="store_true", help="godt.no: read the dinners in datasets/, not the sitemap")
+    only.add_argument("--known", action="store_true", help="godt.no: read the dinners in datasets/, not the dinner list")
     only.add_argument("--offers", action="store_true", help="only this week's offers and matches, for the dinners in datasets/")
     args = parser.parse_args()
     configure(args.verbose)

@@ -1,9 +1,11 @@
 """Recipes from godt.no.
 
-The recipe sitemap lists every recipe page with its last change. Each page embeds its data as Next.js page props
-(`__NEXT_DATA__`): ingredients with amount and unit, portions, minutes, rating, and tags, where «Middag» marks a dinner.
-godt.no names no grocery department, so the build gives each ingredient one (app.build.fill_departments). robots.txt asks
-for no crawl delay and shuts out only a list of AI crawlers (GPTBot, ClaudeBot, CCBot, ...), which matris is not.
+The dinner list at /oppskrifter/middag pages every dinner (24 a page; 1 456 on 2026-10-22). The recipe sitemap
+(`/sitemap-recipes.xml`, and `/sitemap-index.xml`, which robots.txt still names) is 404 since 2026-10-22. Each recipe
+page embeds its data as Next.js page props (`__NEXT_DATA__`): ingredients with amount and unit, portions, minutes,
+rating, and tags, where «Middag» marks a dinner. godt.no names no grocery department, so the build gives each
+ingredient one (app.build.fill_departments). robots.txt asks for no crawl delay and shuts out only a list of AI
+crawlers (GPTBot, ClaudeBot, CCBot, ...), which matris is not.
 
 godt.no is behind AWS WAF. Read 8 at a time on 2026-10-14, it served 2 681 pages in about 70 s and answered the other
 1 215 with a challenge (202, no body, `x-amzn-waf-action: challenge`), and still did minutes later. So the pages are
@@ -12,7 +14,6 @@ read at most PER_SECOND a second, and a challenge counts as a failed page.
 
 import json
 import re
-import xml.etree.ElementTree as ET
 from collections.abc import AsyncGenerator, Callable, Mapping, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -23,10 +24,11 @@ from core.models import DINNER, Ingredient, Recipe, RecipeRef
 from pipeline.pages import Pages
 
 BASE = "https://www.godt.no"
-SITEMAP = f"{BASE}/sitemap-recipes.xml"
+LISTING = f"{BASE}/oppskrifter/middag"
+"""Every dinner, 24 a page. The build keeps only dinners (app.build.recipes), and the whole catalog is 3 902 pages."""
 DINNER_TAG = "middag"
 PER_SECOND = 4
-"""Pages a second: 3 896 pages in about 16 minutes, about as long as matprat.no's crawl."""
+"""Pages a second. 1 456 dinner pages at this rate is about 6 minutes; the old full catalog (3 896) was about 16."""
 
 UNITS: Mapping[str, str] = {
     "stykker": "stk",
@@ -45,16 +47,36 @@ UNITS: Mapping[str, str] = {
 
 _RECIPE_URL = re.compile(r"^https://www\.godt\.no/oppskrifter/(?:[^/]+/)*\d+/[^/]+$")
 _NEXT_DATA = re.compile(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.DOTALL)
-_SITEMAP_NS = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
 
 
-def parse_sitemap(xml: str) -> list[RecipeRef]:
-    refs = []
-    for url in ET.fromstring(xml).iter(f"{_SITEMAP_NS}url"):
-        loc = (url.findtext(f"{_SITEMAP_NS}loc") or "").strip()
-        if _RECIPE_URL.match(loc):
-            refs.append(RecipeRef(loc, (url.findtext(f"{_SITEMAP_NS}lastmod") or "").strip()))
-    return refs
+def parse_listing(html: str) -> tuple[list[RecipeRef], int, int]:
+    """Recipe pages on one list page, how many the list has, and how many a page holds.
+
+    `changes.updated` is the old sitemap `lastmod`. A link that is not a recipe page is left out. Raises ValueError
+    when the page has no list.
+    """
+    match = _NEXT_DATA.search(html)
+    if match is None:
+        raise ValueError("no page data")
+    recipes = json.loads(match.group(1)).get("props", {}).get("pageProps", {}).get("recipes") or {}
+    pagination = recipes.get("pagination") or {}
+    try:
+        total, size = int(pagination["total"]), int(pagination["size"])
+    except (KeyError, TypeError, ValueError) as e:
+        raise ValueError("no pagination") from e
+    refs: list[RecipeRef] = []
+    for item in recipes.get("items") or []:
+        links = item.get("links") if isinstance(item, dict) else None
+        if not isinstance(links, dict):
+            continue
+        path = str(links.get("relativeUrl") or "")
+        loc = path if path.startswith("https://") else f"{BASE}{path}" if path.startswith("/") else ""
+        if not _RECIPE_URL.match(loc):
+            continue
+        changes = item.get("changes")
+        updated = str(changes.get("updated") or "") if isinstance(changes, dict) else ""
+        refs.append(RecipeRef(loc, updated))
+    return refs, total, size
 
 
 def prep_time(minutes: int) -> str:
@@ -135,8 +157,8 @@ class GodtRecipeSource:
 
     pages: Pages
     known: tuple[str, ...] = ()
-    """The pages to read instead of the sitemap's: the godt.no dinners already in datasets/ (pipeline.datasets
-    --known), since the sitemap is gone (404 since 2026-10-22)."""
+    """The pages to read instead of the dinner list's: the godt.no dinners already in datasets/ (pipeline.datasets
+    --known). Dinners added on godt.no since that file was written are missed."""
 
     @classmethod
     @asynccontextmanager
@@ -148,10 +170,30 @@ class GodtRecipeSource:
     async def index(self) -> list[RecipeRef]:
         if self.known:
             return [RecipeRef(url, "") for url in self.known]
-        sitemap = await self.pages.get(SITEMAP)
-        if sitemap is None:
-            raise SourceUnavailableError("godt.no", f"no sitemap at {SITEMAP}")
-        return parse_sitemap(sitemap)
+        found: dict[str, RecipeRef] = {}
+        page = 1
+        expected = 0
+        while True:
+            url = f"{LISTING}?page={page}"
+            html = await self.pages.get(url)
+            if html is None:
+                raise SourceUnavailableError("godt.no", f"no recipe list at {url}")
+            try:
+                refs, total, size = parse_listing(html)
+            except ValueError as e:
+                raise SourceUnavailableError("godt.no", f"recipe list at {url}: {e}") from e
+            if page == 1:
+                expected = total  # Later pages under-counted on 2026-10-22 (METHOD.md §7).
+            for ref in refs:
+                found.setdefault(ref.url, ref)
+            if page == 1 and not found:
+                raise SourceUnavailableError("godt.no", f"empty recipe list at {url}")
+            if not refs or size < 1 or page * size >= expected:
+                break
+            page += 1
+        if len(found) < expected:
+            raise SourceUnavailableError("godt.no", f"recipe list has {len(found)} of {expected}")
+        return list(found.values())
 
     async def fetch(self, url: str) -> Recipe | None:
         html = await self.pages.get(url)

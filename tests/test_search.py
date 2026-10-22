@@ -40,7 +40,7 @@ ONION = ingredient("løk", 1, "stk.", "/grønnsaker")
 SPRING_ONION = ingredient("vårløk", 1, "bunt", "/grønnsaker")
 CHILI = ingredient("rød chili", 1, "stk.", "/grønnsaker")
 LETTUCE = ingredient("isbergsalat", 100, "g", "/grønnsaker")
-HOUSEHOLD = Household(onion_substitute="vårløk")
+HOUSEHOLD = ANYTHING
 
 
 def tags_of(text: str) -> list[str]:
@@ -224,9 +224,9 @@ def test_diet_words_are_rules_on_top_of_a_base() -> None:
     assert parse("uten løk, glutenfri og laktosefri kylling").diets == {Diet.ONION, Diet.GLUTEN, Diet.LACTOSE}
     assert household([]) == ANYTHING
     h = household([Diet.ONION, Diet.GLUTEN, Diet.LACTOSE])
-    assert (h.onion, h.onion_substitute, h.gluten, h.lactose_g_per_portion) == (Rule.AVOID, "vårløk", Rule.AVOID, 3.0)
+    assert (h.onion, h.onion_ok, h.gluten, h.lactose_g_per_portion) == (Rule.AVOID, "vårløk", Rule.AVOID, 3.0)
     assert h.garlic is Rule.OK and not h.kid_notes
-    assert household([Diet.ONION], Household(onion_substitute="purre")).onion_substitute == "purre"  # a profile's own
+    assert household([Diet.ONION], Household(onion_ok="purre")).onion_ok == "purre"  # a profile's own
 
 
 def test_rules_that_leave_things_out() -> None:
@@ -235,7 +235,7 @@ def test_rules_that_leave_things_out() -> None:
     assert {Item.ANIMAL, Item.MILK, Item.EGG} <= household([Diet.VEGAN]).avoid
     fodmap = household([Diet.FODMAP])
     assert fodmap.fodmap and fodmap.onion is Rule.AVOID and fodmap.garlic is Rule.AVOID and fodmap.gluten is Rule.AVOID
-    assert fodmap.lactose_g_per_portion == 3.0 and fodmap.onion_substitute == "vårløk"
+    assert fodmap.lactose_g_per_portion == 3.0 and fodmap.onion_ok == "vårløk"
     assert household([Diet.LOW_CARB]).carbs_g_per_portion == 20.0 and household([Diet.PREGNANT]).pregnant
     assert household([Diet.GARLIC]).garlic is Rule.AVOID
 
@@ -252,7 +252,7 @@ def test_barnevennlig(index: Bound) -> None:
 def test_time_rating_and_protein(index: Bound) -> None:
     assert set(names(index, "rask")) == {"Kyllinggryte med sopp", "Pasta med røkelaks"}
     assert names(index, "godt likt") == ["Kyllinggryte med sopp"]
-    assert names(index, "fisk") == ["Torsk med bacon", "Pasta med røkelaks"]  # no swap first
+    assert names(index, "fisk") == ["Pasta med røkelaks", "Torsk med bacon"]  # nothing on sale: the quicker first
 
 
 def test_words_find_names_ingredients_departments_and_synonyms(index: Bound) -> None:

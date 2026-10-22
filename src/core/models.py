@@ -264,7 +264,7 @@ class Offers:
 
 class Rule(StrEnum):
     AVOID = "avoid"
-    """Swap it out; skip the dish when it is built on it."""
+    """Leave out any dish with it."""
     NOTE = "note"
     """Mention it, nothing more."""
     OK = "ok"
@@ -275,22 +275,18 @@ class Household:
     """What the household cannot eat. Read from profile.yaml; the defaults are ours."""
 
     onion: Rule = Rule.AVOID
-    onion_substitute: str | None = None
-    """An onion that is fine and stands in for onion in most dishes (ours: vårløk). With one,
-    only dishes with onion in the name are skipped; without, also dishes with lots of onion."""
+    onion_ok: str | None = None
+    """An onion that is fine (ours: vårløk): dishes with it are not left out for onion."""
     gluten: Rule = Rule.AVOID
     garlic: Rule = Rule.NOTE
     lactose_g_per_portion: float | None = 3.0
-    """Lactose per adult portion that is still fine. Above it, dairy gets a lactose-free
-    swap. None: no limit."""
-    swaps: bool = True
-    """False: skip any recipe that needs a swap other than lactose-free dairy."""
+    """Lactose per adult portion that is still fine. Above it, the dish is left out. None: no limit."""
     kid_notes: bool = True
     """Notes on chili heat and choking risks."""
     avoid: frozenset[Item] = frozenset()
     """Leave out any dinner with an ingredient that holds one of these, or may (Level.MAYBE)."""
     fodmap: bool = False
-    """Leave out dinners with a high-FODMAP ingredient that no swap above takes care of."""
+    """Leave out dinners with a high-FODMAP ingredient that no rule above judges."""
     carbs_g_per_portion: float | None = None
     """Leave out dinners with more carbohydrate per portion than this. None: no limit."""
     pregnant: bool = False
@@ -311,20 +307,16 @@ class Note:
     problem: Problem
     ingredient: str
     advice: str
-    swap: str = ""
-    """A swap in a few words, for a card: "glutenfri pasta", "vårløk for løk". Empty for a note."""
 
 
 @dataclass(frozen=True, slots=True)
 class Verdict:
     blocked: str | None
     """Why the recipe does not work for the household, or None."""
-    swaps: tuple[Note, ...]
-    """Changes needed to make the recipe fit."""
     warnings: tuple[Note, ...]
     """Things to check or keep in mind; the recipe fits as is."""
     lactose_g: float
-    """Lactose per portion before swaps."""
+    """Lactose per portion."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -358,7 +350,7 @@ class Dinner:
     verdict: Verdict
     buys: tuple[Buy, ...]
     score: float
-    """Rating and prep time; breaks ties after swaps and discounts."""
+    """Rating and prep time; breaks ties after the kroner off."""
     protein: str = "vegetar"
     """The main protein's group: fisk, kylling, svin, ... (core.matching.main_protein)."""
     main: str = ""
@@ -410,7 +402,7 @@ class Plan:
     considered: int
     """Dinner recipes looked at."""
     fitting: int
-    """Of those, recipes that fit the household (possibly with swaps)."""
+    """Of those, recipes that fit the household."""
     on_sale: int
     """Of those, dinners with a main ingredient on sale."""
 

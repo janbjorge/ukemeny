@@ -17,11 +17,10 @@ def test_template_is_our_household() -> None:
     p = profile.load(profile.TEMPLATE)
     assert p.household == Household(
         onion=Rule.AVOID,
-        onion_substitute="vårløk",
+        onion_ok="vårløk",
         gluten=Rule.AVOID,
         garlic=Rule.NOTE,
         lactose_g_per_portion=3.0,
-        swaps=True,
         kid_notes=True,
     )
     assert p.week == Week(days=5, fish=2, on_sale_only=True)
@@ -46,7 +45,7 @@ week: {dinners: 7, on_sale_only: false}
         )
     )
     h = p.household
-    assert (h.onion, h.onion_substitute, h.garlic, h.lactose_g_per_portion, h.kid_notes) == (Rule.AVOID, None, Rule.AVOID, None, False)
+    assert (h.onion, h.onion_ok, h.garlic, h.lactose_g_per_portion, h.kid_notes) == (Rule.AVOID, None, Rule.AVOID, None, False)
     assert p.week == Week(days=7, fish=2, on_sale_only=False)
     assert p.place is None  # every store
 

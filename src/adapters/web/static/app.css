@@ -67,16 +67,15 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .banner { background: var(--mark); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 10px; }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 16px; margin: 16px 0; }
-/* Cards in a row are as tall as the tallest, and share its five rows (meta, name, «Med», what you save, «Bytt»), so the
+/* Cards in a row are as tall as the tallest, and share its four rows (meta, name, «Med», what you save), so the
    names and the sums line up across the row (jb 2026-10-22: cards in different sizes "fuckes with my brain") */
 .card {
   background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 14px; padding: 16px 20px 18px;
-  display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; align-content: start; min-width: 0;
+  display: grid; grid-row: span 4; grid-template-rows: subgrid; row-gap: 0; align-content: start; min-width: 0;
 }
 .card .meta { grid-row: 1; }
 .card .via { grid-row: 3; margin-top: 6px; }
 .card .save { grid-row: 4; }
-.card .swaps { grid-row: 5; margin-top: 8px; }
 .card h3 { grid-row: 2; margin: 6px 0 0; font-size: 22px; letter-spacing: -0.005em; }
 .card h3 a { color: var(--text-primary); text-decoration: none; overflow-wrap: anywhere; }
 /* Above the name: the main protein with its dot, time and rating, in small capitals */
@@ -97,9 +96,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .card .save .store { flex: none; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
 .card .save .lead { flex: 1; min-width: 12px; border-bottom: 1px dotted var(--hairline); }
 .card .save .off { flex: none; color: var(--text-primary); white-space: nowrap; }
-.card .via, .card .swaps { color: var(--text-secondary); }
-.card .swaps b { color: var(--accent-strong); }
-.card .swaps b::before { content: "↺ "; }
+.card .via { color: var(--text-secondary); }
 
 /* Finn en middag: the title and search box on the paper, then the chips */
 .hero h1 { font-size: var(--t-title); margin: 8px 0 8px; }

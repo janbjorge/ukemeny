@@ -33,7 +33,7 @@ worked out from the heaviest meat or fish in the recipe. A dinner is `on_sale` w
 
 
 SEARCH = f"""A search in plain bokmål, such as `rask kylling uten sopp`, `laks eller torsk på tilbud` or `glutenfri pasta`.
-Understood: diet rules and allergies ({DIETS}: which dinners fit and what to swap), categories
+Understood: diet rules and allergies ({DIETS}: which dinners fit; nothing is swapped), categories
 (`under 20 min`, `under 40 min`, `under en time`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins (`kylling`,
 `fisk`, `kjøtt`, `sjømat`, ...), `uten`/`ikke` before a word to leave it out, and `eller` between words for either.
 The place is not a word in `q`: it is `sted`.
@@ -88,7 +88,7 @@ def build(queries: Queries) -> FastAPI:
         antall: Annotated[str | None, Query(description="How many, 1-100 (default 30)")] = None,
         sted: Annotated[str | None, near] = None,
     ) -> schema.DinnersOut:
-        """Dinners whose name has a searched word first, then fewest swaps, the most kroner off (every discounted
+        """Dinners whose name has a searched word first, then the most kroner off (every discounted
         ingredient summed, `discounts`), rating and prep time. Without a protein or a word to find, the best 3 of each
         main protein come first. `search` says how `q` was understood, and `links` adds or takes away a diet rule, or picks a place."""
         choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted)
@@ -96,7 +96,7 @@ def build(queries: Queries) -> FastAPI:
         found = telemetry.search(queries, choice.text(), place, request.url.path, limit=choice.antall)
         return schema.dinners(queries, found, base(request))
 
-    @api.get("/oppskrift", response_model=schema.CheckOut, summary="Whether one recipe fits, and what to swap")
+    @api.get("/oppskrift", response_model=schema.CheckOut, summary="Whether one recipe fits, and why not")
     def recipe(
         url: Annotated[str, Query(description="A matprat.no or godt.no recipe URL from `dinners[].url`")],
         q: Annotated[str | None, Query(description=f"Diet rules and allergies to check against: {DIETS}")] = None,

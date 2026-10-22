@@ -24,11 +24,10 @@ class _Diet(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     onion: Rule = Rule.AVOID
-    onion_substitute: str | None = None
+    onion_ok: str | None = None
     gluten: Rule = Rule.AVOID
     garlic: Rule = Rule.NOTE
     lactose: float | None = Field(default=3.0, ge=0)
-    swaps: bool = True
 
 
 class _Week(BaseModel):
@@ -72,11 +71,10 @@ def load(path: Path = PROFILE) -> Profile:
     return Profile(
         household=Household(
             onion=diet.onion,
-            onion_substitute=diet.onion_substitute or None,
+            onion_ok=diet.onion_ok or None,
             gluten=diet.gluten,
             garlic=diet.garlic,
             lactose_g_per_portion=diet.lactose,
-            swaps=diet.swaps,
             kid_notes=p.small_kids,
         ),
         week=Week(days=p.week.dinners, fish=p.week.fish, on_sale_only=p.week.on_sale_only),

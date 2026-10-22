@@ -1,5 +1,5 @@
 {# One dinner as a card: the main protein, time and rating over the name, the kroner off every ingredient on sale, then
-   each of them with its store and discount, and what to swap for the diet rules picked. With a search, the searched words are marked. The rest is on matprat.no or godt.no
+   each of them with its store and discount. With a search, the searched words are marked. The rest is on matprat.no or godt.no
    (the link). #}
 {% macro card(d, search=none, via=()) %}
 <article class="card" data-protein="{{ d.protein }}">
@@ -15,6 +15,5 @@
     {%- endfor %}</ul>
   </div>
   {% endif %}
-  {% if d.verdict.swaps %}<p class="swaps"><b>Bytt:</b> {{ d.verdict.swaps|map(attribute="swap")|join(" · ") }}</p>{% endif %}
 </article>
 {% endmacro %}

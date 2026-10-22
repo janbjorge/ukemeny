@@ -76,15 +76,12 @@ def test_the_site_starts_with_no_rules_and_the_search_adds_them() -> None:
     )
     q = Queries(FakeDatasets(s))
     assert {d.dish.name for d in q.search("").dinners} == {"Biff med løk", "Pasta", "Laks"}
-    assert all(not d.verdict.swaps for d in q.search("").dinners)
     found = q.search("uten løk glutenfri")
-    assert {d.dish.name for d in found.dinners} == {"Pasta", "Laks"}  # onion is the point of the biff
+    assert {d.dish.name for d in found.dinners} == {"Laks"}  # nothing is swapped: no glutenfri spagetti
     assert found.household.onion is Rule.AVOID and found.household.gluten is Rule.AVOID
-    pasta_card = next(d for d in found.dinners if d.dish.name == "Pasta")
-    assert [n.swap for n in pasta_card.verdict.swaps] == ["glutenfri spagetti"]
-    assert q.plan(found.household).fitting == 2 and q.plan().fitting == 3
+    assert q.plan(found.household).fitting == 1 and q.plan().fitting == 3
     checked = q.check(recipe("Pasta", pasta).url, q.household("glutenfri"))
-    assert checked is not None and checked.verdict.swaps
+    assert checked is not None and checked.verdict.blocked == "inneholder gluten (spagetti)"
 
 
 def test_ranked_by_the_kroner_off_every_discounted_ingredient() -> None:

@@ -44,7 +44,7 @@ def test_front_page_is_the_search_with_no_rules_until_picked(client: TestClient)
     for gone in ("ting å sjekke", "Også på tilbud", "Prøv for eksempel", "Søker etter", "Uten bytter"):
         assert gone not in html
     picked = client.get("/?q=uten+l%C3%B8k").text
-    assert "<b>Bytt:</b> vårløk for løk" in picked
+    assert "Bytt" not in picked  # nothing is swapped (jb 2026-10-22)
     assert 'hx-get="/middager" hx-trigger="mousedown, click" hx-sync="this:drop" aria-current="true">Uten løk</a>' in picked
     for private in ("IBS", "intoleran", "år gammel"):
         assert private not in html

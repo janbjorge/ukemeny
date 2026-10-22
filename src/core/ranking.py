@@ -6,7 +6,7 @@ from dataclasses import dataclass, replace
 
 from core.diet import carbs, fodmap_out, judge
 from core.matching import FISH, cheapest_first, main_protein, weight
-from core.models import Buy, Dinner, Dish, Household, Item, Level, Offer, Pregnancy, Snapshot, Verdict
+from core.models import Buy, Dinner, Dish, Household, Item, Level, Offer, Pregnancy, Snapshot
 
 TIME_BONUS: Mapping[str, float] = {"Under": 1.0, "20": 0.5, "40": 0.0, "Over": -1.0}
 """By the start of matprat's prep time bucket: small kids do not wait for a slow dinner."""
@@ -26,11 +26,6 @@ POOL = 5
 dinner in the week, so two fish can differ)."""
 
 
-def swaps(verdict: Verdict) -> int:
-    """How far a dinner is from fitting as is. Ranks before anything else."""
-    return len(verdict.swaps)
-
-
 def score(dish: Dish) -> float:
     """Rating and prep time, for dinners that fit and are discounted equally well."""
     rating = dish.rating - 4 if dish.rating and dish.rating_count >= 5 else 0.0
@@ -38,19 +33,18 @@ def score(dish: Dish) -> float:
     return rating + quick
 
 
-def rank(dinner: Dinner) -> tuple[int, float, float]:
-    """Fewest swaps first, then the most kroner off (Dinner.saving; jb 2026-10-22: the sort «Rabatt kr» became the
-    order), then rating and prep time."""
-    return (swaps(dinner.verdict), -dinner.saving, -dinner.score)
+def rank(dinner: Dinner) -> tuple[float, float]:
+    """The most kroner off first (Dinner.saving; jb 2026-10-22: the sort «Rabatt kr» became the order), then rating and
+    prep time."""
+    return (-dinner.saving, -dinner.score)
 
 
-def buys(dish: Dish, verdict: Verdict, matched: Mapping[str, tuple[Offer, ...]]) -> tuple[Buy, ...]:
-    """The dish's ingredients that are on offer, used as is (not swapped), most important first."""
-    swapped = {s.ingredient for s in verdict.swaps}
+def buys(dish: Dish, matched: Mapping[str, tuple[Offer, ...]]) -> tuple[Buy, ...]:
+    """The dish's ingredients that are on offer, most important first."""
     seen: set[str] = set()
     found = []
     for part in dish.parts:
-        if matched.get(part.name) and part.name not in swapped and part.name not in seen and weight(part):
+        if matched.get(part.name) and part.name not in seen and weight(part):
             seen.add(part.name)
             found.append(Buy(part, matched[part.name], weight(part)))
     return tuple(sorted(found, key=lambda b: b.weight, reverse=True))
@@ -65,13 +59,13 @@ class Prepared:
     main: str
     score: float
     buys: tuple[Buy, ...]
-    """Every ingredient on offer, as if nothing were swapped."""
+    """Every ingredient on offer."""
     holds: frozenset[Item]
     """What some judged ingredient holds or may hold, or was never asked about: a rule that leaves one of these out
     leaves the dinner out (core.diet.judge says why)."""
     not_for_pregnant: bool
     high_fodmap: bool
-    """An ingredient no swap takes care of (core.diet.fodmap_out)."""
+    """An ingredient no other rule judges (core.diet.fodmap_out)."""
     carbs_g: float
     """Per portion, as core.diet.judge counts it."""
 
@@ -107,7 +101,7 @@ def prepare(snapshot: Snapshot) -> tuple[Prepared, ...]:
                 protein,
                 main,
                 score(dish),
-                buys(dish, NO_SWAPS, matched),
+                buys(dish, matched),
                 holds=frozenset(item for item in Item if any(t.contains.get(item, Level.YES) is not Level.NO for _, t in known)),
                 not_for_pregnant=any(t.pregnancy is not Pregnancy.OK for _, t in known),
                 high_fodmap=any(fodmap_out(t, p.category) for p, t in known),
@@ -117,15 +111,12 @@ def prepare(snapshot: Snapshot) -> tuple[Prepared, ...]:
     return tuple(prepared)
 
 
-NO_SWAPS = Verdict(blocked=None, swaps=(), warnings=(), lactose_g=0.0)
-
-
 def nearby(prepared: Sequence[Prepared], snapshot: Snapshot, place: str | None) -> tuple[Prepared, ...]:
     """The same dinners with the offers at the stores near `place`; None: every store, as `prepare` has them."""
     if place is None:
         return tuple(prepared)
     matched = offered(snapshot, place)
-    return tuple(replace(p, buys=buys(p.dish, NO_SWAPS, matched)) for p in prepared)
+    return tuple(replace(p, buys=buys(p.dish, matched)) for p in prepared)
 
 
 def dinners(snapshot: Snapshot, household: Household, prepared: Sequence[Prepared] | None = None) -> list[Dinner]:
@@ -137,9 +128,7 @@ def dinners(snapshot: Snapshot, household: Household, prepared: Sequence[Prepare
             continue
         verdict = judge(p.dish, snapshot.traits, household)
         if verdict.blocked is None:
-            swapped = {s.ingredient for s in verdict.swaps}
-            kept = tuple(b for b in p.buys if b.part.name not in swapped) if swapped else p.buys
-            found.append(Dinner(p.dish, verdict, kept, p.score, p.protein, p.main))
+            found.append(Dinner(p.dish, verdict, p.buys, p.score, p.protein, p.main))
     found.sort(key=rank)
     return found
 
@@ -182,13 +171,13 @@ def plan(ranked: Sequence[Dinner], week: Week, chance: Callable[[], float]) -> l
     """The week, drawn from the dinners on sale, the more kroner off the likelier (jb 2026-10-14: "I want a Ukens
     middager that consist of the lowest prices, in rabatt kr, if we can make this semi random"): by the square of the
     kroner off, so a small saving rarely wins a day (METHOD.md §5). Per main protein the
-    POOL with the most kroner off, fewest swaps first, are in the draw, and `pick` keeps the week varied. Topped up from
+    POOL with the most kroner off are in the draw, and `pick` keeps the week varied. Topped up from
     the ranking when too few are on sale; without `on_sale_only`, the ranking alone. `chance` gives a random number
     from 0 to 1 (random.Random.random), so the caller decides how often the week changes."""
     if not week.on_sale_only:
         return pick(ranked, week.days, week.fish)
     pools: dict[str, list[Dinner]] = {}
-    for d in sorted((d for d in ranked if d.on_sale and kroner(d) > 0), key=lambda d: (swaps(d.verdict), -kroner(d))):
+    for d in sorted((d for d in ranked if d.on_sale and kroner(d) > 0), key=lambda d: -kroner(d)):
         pools.setdefault(d.protein, []).append(d)
     drawn = [d for protein, pool in pools.items() for d in pool[: POOL * max(week.fish, 1) if protein == FISH else POOL]]
     # A weighted draw (Efraimidis and Spirakis): each dinner's place is a random number to the power 1 / weight

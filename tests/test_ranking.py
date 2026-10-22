@@ -25,7 +25,7 @@ def test_blocked_recipes_are_left_out() -> None:
     assert [d.dish.name for d in dinners(s, HOUSEHOLD)] == ["Kyllinggryte"]
 
 
-def test_discounted_dinner_ranks_first_within_the_same_swaps() -> None:
+def test_discounted_dinner_ranks_first() -> None:
     s = snapshot(
         recipe("Laks", SALMON, rating=5.0, rating_count=50),
         recipe("Kylling", CHICKEN),
@@ -38,26 +38,15 @@ def test_discounted_dinner_ranks_first_within_the_same_swaps() -> None:
     assert not found[1].on_sale  # On offer, but no before-price
 
 
-def test_swaps_rank_before_discounts() -> None:
-    s = snapshot(
-        recipe("Kyllinggryte", CHICKEN, ONION),
-        recipe("Laks", SALMON),
-        known={"løk": traits(onion=Onion.ONION)},
-        offers=[SALE],
-        matches={"kyllingfilet": ["sale"]},
-    )
-    assert [d.dish.name for d in dinners(s, HOUSEHOLD)] == ["Laks", "Kyllinggryte"]
-
-
-def test_swapped_ingredients_are_not_bought_on_offer() -> None:
+def test_a_dinner_that_would_need_a_swap_is_left_out() -> None:
     s = snapshot(
         recipe("Pasta", PASTA, CHICKEN),
+        recipe("Laks", SALMON),
         known={"spaghetti": traits(gluten=Gluten.YES)},
         offers=[offer("SPAGHETTI", 20, pre_price=30, id="pasta"), SALE],
         matches={"spaghetti": ["pasta"], "kyllingfilet": ["sale"]},
     )
-    (dinner,) = dinners(s, HOUSEHOLD)
-    assert [b.part.name for b in dinner.buys] == ["kyllingfilet"]
+    assert [d.dish.name for d in dinners(s, HOUSEHOLD)] == ["Laks"]  # no «glutenfri spaghetti» (jb 2026-10-22)
 
 
 def test_a_discount_on_the_side_does_not_put_a_dinner_on_sale() -> None:

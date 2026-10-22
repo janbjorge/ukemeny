@@ -1,7 +1,7 @@
 """Search dinners in plain bokmål: «rask kylling uten sopp», «laks eller torsk på tilbud», «glutenfri pasta».
 
 `parse` turns the words into clauses: diet rules (`Diet`), categories (`Tag`), main proteins, and words to find or
-leave out. A diet rule changes which dinners fit and what to swap (`household`); the rest narrow down the dinners that
+leave out. A diet rule changes which dinners fit (`household`); the rest narrow down the dinners that
 fit, which an `Index` holds in ranking order. æ, ø and å may be typed as ae, o and a, and a word that matches nothing is
 swapped for the closest known word (METHOD.md §6). The place whose offers count is not a word: it comes with the search
 (app.queries.Queries.search).
@@ -90,8 +90,8 @@ AVOID: Mapping[Diet, frozenset[Item]] = {
 
 ANYTHING = Household(onion=Rule.OK, gluten=Rule.OK, garlic=Rule.OK, lactose_g_per_portion=None, kid_notes=False)
 """No rules: what the site starts with."""
-ONION_SUBSTITUTE = "vårløk"
-"""«Uten løk» still allows vårløk, and suggests it instead of onion."""
+ONION_OK = "vårløk"
+"""«Uten løk» still allows vårløk."""
 
 
 TIME_TAGS = (Tag.QUICK, Tag.UNDER_40, Tag.UNDER_60)
@@ -110,7 +110,7 @@ NOT_MILD = ("chili", "spicy", "sterk")
 
 class Kind(StrEnum):
     DIET = "diet"
-    """A rule: which dinners fit and what to swap (`household`)."""
+    """A rule: which dinners fit (`household`)."""
     TAG = "tag"
     PROTEIN = "protein"
     """The main protein is one of `values`."""
@@ -197,7 +197,7 @@ def household(diets: Iterable[Diet], base: Household = ANYTHING) -> Household:
     diets = set(diets)
     h = base
     if diets & {Diet.ONION, Diet.FODMAP}:
-        h = replace(h, onion=Rule.AVOID, onion_substitute=h.onion_substitute or ONION_SUBSTITUTE)
+        h = replace(h, onion=Rule.AVOID, onion_ok=h.onion_ok or ONION_OK)
     if diets & {Diet.GLUTEN, Diet.FODMAP}:
         h = replace(h, gluten=Rule.AVOID)
     if diets & {Diet.GARLIC, Diet.FODMAP}:

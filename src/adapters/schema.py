@@ -16,19 +16,12 @@ from pydantic import BaseModel, ConfigDict
 
 from app.queries import Check, Found, Queries
 from core.matching import main_protein
-from core.models import Dinner, Dish, Note, Plan
+from core.models import Dinner, Dish, Plan
 from core.search import Clause, Diet, Kind, Search, diet_clause
 
 
 class Out(BaseModel):
     model_config = ConfigDict(frozen=True)
-
-
-class NoteOut(Out):
-    ingredient: str
-    problem: str
-    """gluten, onion, garlic or lactose."""
-    advice: str
 
 
 class DiscountOut(Out):
@@ -60,8 +53,6 @@ class DinnerOut(RecipeOut):
     rank: int
     on_sale: bool
     """The main protein (or, without meat or fish, a main vegetable) is discounted this week."""
-    fits_as_is: bool
-    swaps: list[NoteOut]
     discounts: list[DiscountOut]
     matched: list[str] = []
     """Ingredients that hold a searched word the dish name does not."""
@@ -72,7 +63,7 @@ class CheckOut(Out):
     """The recipe itself is on matprat.no or godt.no (`recipe.url`); its ingredients are not repeated here."""
     fits: bool
     blocked: str | None
-    swaps: list[NoteOut]
+    """Why it does not fit: the first ingredient a rule leaves out. Nothing is swapped."""
     lactose_g_per_portion: float
 
 
@@ -170,10 +161,6 @@ class PlanOut(SnapshotOut):
     stores: list[str]
 
 
-def _note(note: Note) -> NoteOut:
-    return NoteOut(ingredient=note.ingredient, problem=note.problem.value, advice=note.advice)
-
-
 class _DishFields(TypedDict):
     name: str
     url: str
@@ -217,8 +204,6 @@ def dinner(d: Dinner, rank: int, matched: tuple[str, ...] = ()) -> DinnerOut:
         **_dish(d.dish),
         rank=rank,
         on_sale=d.on_sale,
-        fits_as_is=not d.verdict.swaps,
-        swaps=[_note(s) for s in d.verdict.swaps],
         discounts=discounts,
         matched=list(matched),
     )
@@ -275,6 +260,5 @@ def check(found: Check) -> CheckOut:
         recipe=RecipeOut(**_dish(found.dish)),
         fits=verdict.blocked is None,
         blocked=verdict.blocked,
-        swaps=[_note(s) for s in verdict.swaps],
         lactose_g_per_portion=round(verdict.lactose_g, 1),
     )

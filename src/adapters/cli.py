@@ -59,11 +59,10 @@ def queries(as_json: bool) -> Queries:
 
 
 def _verdict_lines(verdict: Verdict) -> list[str]:
-    lines = [f"   bytt: {s.ingredient}: {s.advice}" for s in verdict.swaps]
     notes: dict[str, list[str]] = {}
     for w in verdict.warnings:
         notes.setdefault(w.ingredient, []).append(w.advice)
-    return lines + [f"   merk: {name}: {'; '.join(advice)}" for name, advice in notes.items()]
+    return [f"   merk: {name}: {'; '.join(advice)}" for name, advice in notes.items()]
 
 
 def _dish_line(dish: Dish, protein: str) -> str:
@@ -144,11 +143,9 @@ def check(url: Annotated[str, typer.Argument(help="En oppskrift på matprat.no e
         return emit(schema.check(found))
     verdict = found.verdict
     typer.echo(found.dish.name)
-    typer.echo(
-        f"   passer ikke: {verdict.blocked}" if verdict.blocked else "   passer med bytter" if verdict.swaps else "   passer som den er"
-    )
+    typer.echo(f"   passer ikke: {verdict.blocked}" if verdict.blocked else "   passer som den er")
     typer.echo("\n".join(_verdict_lines(verdict)))
-    typer.echo(f"   laktose: rundt {verdict.lactose_g:.1f} g per porsjon før bytter")
+    typer.echo(f"   laktose: rundt {verdict.lactose_g:.1f} g per porsjon")
 
 
 @app.command()

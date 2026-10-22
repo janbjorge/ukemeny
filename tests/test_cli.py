@@ -6,7 +6,7 @@ from typer.testing import CliRunner
 
 from adapters import cli, profile
 from app.queries import Queries
-from core.models import Household, Onion
+from core.models import Household, Onion, Rule
 from core.ranking import Week
 from tests.fakes import FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
@@ -24,7 +24,7 @@ def fixture_queries(monkeypatch: pytest.MonkeyPatch) -> None:
         offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale")],
         matches={"kyllingfilet": ["sale"]},
     )
-    q = Queries(FakeDatasets(s), Household(onion_substitute="vårløk"), Week(days=1, fish=0))
+    q = Queries(FakeDatasets(s), Household(onion=Rule.NOTE), Week(days=1, fish=0))
     monkeypatch.setattr(cli, "queries", lambda as_json: q)
 
 
@@ -32,13 +32,14 @@ def test_plan_json_is_one_document() -> None:
     r = runner.invoke(cli.app, ["plan", "--json"])
     assert r.exit_code == 0
     body = json.loads(r.stdout)
-    assert body["dinners"][0]["swaps"] == [{"ingredient": "løk", "problem": "onion", "advice": "bruk vårløk i stedet"}]
+    assert "swaps" not in body["dinners"][0]
     assert body["dinners"][0]["discounts"][0]["discount_percent"] == 27
 
 
 def test_plan_text_is_bokmal() -> None:
     out = runner.invoke(cli.app, ["plan"]).stdout
-    assert "1 av 1 middager passer" in out and "bytt: løk: bruk vårløk i stedet" in out and "på tilbud: kyllingfilet -27%" in out
+    assert "1 av 1 middager passer" in out and "merk: løk: inneholder løk" in out and "bytt" not in out
+    assert "på tilbud: kyllingfilet -27%" in out
 
 
 def test_candidates_and_check_json() -> None:

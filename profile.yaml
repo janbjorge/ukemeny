@@ -3,23 +3,18 @@
 # Edit with `matris profile`. Nothing here is sent to Jev; it only sees ingredient names and offer headings.
 
 diet:
-  # avoid: swap it out, and skip dishes built on it
+  # avoid: leave out any dish with it
   # note:  mention it, nothing more
   # ok:    ignore it
   onion: avoid
-  # Spring onion is fine for us and stands in for onion in most dishes: recipes with it
-  # fit as is, and onion swaps say "use vårløk instead". Dishes with onion in the name are
-  # still skipped. Leave out to also skip dishes with about three onions for four.
-  onion_substitute: vårløk  # spring onion
+  # Spring onion is fine for us: dishes with it are not left out for onion.
+  onion_ok: vårløk  # spring onion
   gluten: avoid
-  garlic: note   # avoid swaps it for garlic oil
+  garlic: note
 
-  # Grams of lactose per adult portion that are still fine. Above it, cream, milk and
-  # the like get a lactose-free swap. Leave empty for no limit.
+  # Grams of lactose per adult portion that are still fine. Above it, the dish is left
+  # out. Leave empty for no limit.
   lactose: 3
-
-  # false: only dinners that need no swaps at all (lactose-free dairy still allowed)
-  swaps: true
 
 # Small kids at the table: notes for chili heat and choking risks
 # (whole nuts, sausages, cherry tomatoes, grapes).

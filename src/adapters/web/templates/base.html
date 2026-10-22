@@ -17,6 +17,14 @@
 {# htmx never evaluates code from attributes: the CSP allows no eval, and an hx-on:… handler threw EvalError (jb 2026-10-13) #}
 <meta name="htmx-config" content='{"allowEval":false}'>
 <script src="{{ static_url('htmx.min.js') }}" defer></script>
+<script>
+// A filter panel (_ui.html pick) stays open while its chips are picked: each pick swaps in the list, panel and all
+let openPick = null;
+addEventListener("htmx:beforeSwap", () => { openPick = document.querySelector("details.pick[open]")?.id ?? null; });
+addEventListener("htmx:afterSwap", () => { if (openPick) document.getElementById(openPick)?.setAttribute("open", ""); openPick = null; });
+addEventListener("click", (e) => { const done = e.target.closest?.(".pick .done"); if (done) done.closest("details").open = false; });
+addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll("details.pick[open]").forEach((d) => { d.open = false; }); });
+</script>
 <style>{{ style }}</style>
 </head>
 <body>

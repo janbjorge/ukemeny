@@ -100,7 +100,8 @@ def test_chips_toggle_and_count(client: TestClient) -> None:
     proteins_row = html[html.index('class="chips proteins"') :]
     assert "Vegetar" not in proteins_row[: proteins_row.index("</nav>")]  # a rule in Kosthold, not a main protein
     proteins = html[html.index('class="chips proteins"') :]
-    assert proteins.index(">Kylling<") < proteins.index(">Alle ")  # a chosen chip leads its row
+    assert proteins.index(">Alle ") < proteins.index(">Kylling<")  # in the order written: a panel shows every chip
+    assert 'class="picked"><a href="/#forslag" hx-get="/middager"' in html and 'aria-label="Fjern Kylling">Kylling' in html
     both = client.get("/middager?q=kylling+eller+fisk", headers=HX).text
     assert f'hx-get="/middager?q=fisk"{GO} data-protein="kylling" aria-current="true">Kylling</a>' in both
     assert f'hx-get="/middager?q=kylling"{GO} data-protein="fisk" aria-current="true">Fisk</a>' in both

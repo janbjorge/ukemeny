@@ -21,7 +21,7 @@
   /* Headings in a book serif, the rest in the system's sans */
   --serif: "Iowan Old Style", Charter, "Palatino Linotype", Georgia, ui-serif, serif;
 }
-/* One colour per main protein, for its dot and a chosen chip (white text on it). Hues spread so neighbours differ:
+/* One colour per main protein, for its dot on a card and in «Hovedråvare». Hues spread so neighbours differ:
    fjord blue fish, amber chicken. */
 [data-protein="fisk"] { --p: #0568a4; }
 [data-protein="and"] { --p: #067272; }
@@ -98,7 +98,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .card .save .off { flex: none; color: var(--text-primary); white-space: nowrap; }
 .card .via { color: var(--text-secondary); }
 
-/* Finn en middag: the title and search box on the paper, then the chips */
+/* Finn en middag: the title and search box on the paper, then the filter bar */
 .hero h1 { font-size: var(--t-title); margin: 8px 0 8px; }
 .search { display: flex; gap: 8px; margin: 12px 0 8px; }
 .search input {
@@ -112,38 +112,57 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .search button { font: inherit; font-weight: 650; padding: 0 24px; border: 0; border-radius: 999px; background: var(--accent); color: #fff; cursor: pointer; }
 .search button:active { background: var(--accent-strong); }
 
-/* Two columns: the labels, as wide as the widest, and the chips. A label sits on the first line of its chips, centred
-   on the line as the text in a chip is: --chip is the height of a chip, the select and a label's line. */
-.filters {
-  --chip: 36px; --chip-pad: calc((var(--chip) - 22px) / 2);
-  display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: 14px 24px; margin: 20px 0 8px;
+/* The filter bar: «Sted» and a button per panel, chip-shaped, filled once something in it is picked. --chip is their height */
+.filters { --chip: 40px; --chip-pad: calc((var(--chip) - 22px) / 2); margin: 16px 0 8px; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.bar select, .pick summary {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%; margin: 0; font: inherit; font-size: var(--t-small); line-height: 20px;
+  color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 999px; cursor: pointer;
+  padding: var(--chip-pad) 34px var(--chip-pad) 16px; -webkit-appearance: none; appearance: none; list-style: none; user-select: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%231c1b18' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 11px;
 }
-.filters .row { display: contents; }
-.filters .label { font-size: var(--t-small); line-height: var(--chip); color: var(--text-muted); }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
-/* line-height 20px, padding and a 1px border make --chip; the label and the count share a baseline */
+.pick summary::-webkit-details-marker { display: none; }
+.bar select.on, .pick summary.on {
+  background-color: var(--accent); border-color: var(--accent); color: #fff; font-weight: 650;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23ffffff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+}
+.bar option { color: var(--text-primary); background: var(--surface-1); font-weight: 400; }
+/* How many are picked in a panel */
+.pick summary .k { min-width: 20px; padding: 0 6px; border-radius: 999px; background: #fff; color: var(--accent-strong); font-size: var(--t-chart); text-align: center; }
+
+/* A panel under its button; a click beside it lands on the backdrop, its summary's, and closes it */
+.pick { position: relative; }
+.pick[open] { z-index: 20; }
+.pick[open] summary::before { content: ""; position: fixed; inset: 0; cursor: default; }
+/* Over the backdrop, so another button opens its panel at once (one is open at a time: name="filtre") */
+@media (min-width: 641px) { .pick:not([open]) summary { position: relative; z-index: 21; } }
+.panel {
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 1; width: min(400px, calc(100vw - 2 * var(--gutter)));
+  background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 14px; box-shadow: var(--shadow-lift); padding: 8px;
+}
+.panel .head { display: none; }
+.panel .sub { margin: 12px 8px 4px; font-size: var(--t-chart); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+/* In a panel the chips are rows: the name, its count or a tick when picked */
+.chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; margin: 0; }
 .chips a, .chips .off {
-  display: inline-flex; align-items: baseline; gap: 5px; font-size: var(--t-small); line-height: 20px; text-decoration: none; white-space: nowrap;
-  color: var(--text-secondary); background: var(--surface-2); border: 1px solid transparent; border-radius: 999px; padding: var(--chip-pad) 14px;
+  display: flex; align-items: baseline; gap: 8px; min-height: var(--chip); padding: var(--chip-pad) 10px; border-radius: 10px;
+  font-size: var(--t-small); line-height: 20px; color: var(--text-primary); text-decoration: none; white-space: nowrap; min-width: 0;
 }
-.chips a:active { border-color: var(--accent); }
-.chips a[aria-current] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 650; }
 .chips .off { opacity: 0.45; }
-/* line-height 1: on the label's baseline its own 20 px line would reach 1 px below the chip's */
-.chips .n { font-size: var(--t-chart); line-height: 1; color: var(--text-muted); }
-.chips a[aria-current] .n { color: inherit; }
-.chips [data-protein]::before { content: ""; align-self: center; width: 9px; height: 9px; border-radius: 50%; background: var(--p); }
-/* «Sted»: a select shaped like a chip, filled like a chosen chip once a place is picked */
-.filters select {
-  justify-self: start; max-width: 100%; margin: 0; font: inherit; font-size: var(--t-small); line-height: 20px; color: var(--text-secondary);
-  padding: var(--chip-pad) 36px var(--chip-pad) 14px; border: 1px solid transparent; border-radius: 999px; cursor: pointer;
-  background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%235d5448' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E") no-repeat right 14px center / 11px;
-  -webkit-appearance: none; appearance: none;
+.chips .n { margin-left: auto; font-size: var(--t-chart); line-height: 1; color: var(--text-muted); }
+.chips a[aria-current] { background: var(--accent-soft); color: var(--accent-strong); font-weight: 650; }
+.chips a[aria-current]::after { content: "✓"; margin-left: auto; }
+.chips [data-protein]::before { content: ""; align-self: center; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--p); }
+
+/* What is picked, each a chip that takes it out, and «Nullstill» */
+.picked { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 0; }
+.picked a {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px 4px 12px; border-radius: 999px; font-size: var(--t-small);
+  line-height: 20px; text-decoration: none; color: var(--accent-strong); background: var(--accent-soft); font-weight: 650;
 }
-.filters select.on { background-color: var(--accent); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23ffffff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E"); border-color: var(--accent); color: #fff; font-weight: 650; }
-.filters option { color: var(--text-primary); background: var(--surface-1); font-weight: 400; }
-.chips a[data-protein][aria-current] { background: var(--p); border-color: var(--p); }
-.chips a[data-protein][aria-current]::before { background: #fff; }
+.picked a span { font-size: 16px; line-height: 1; font-weight: 400; }
+.picked a.clear { background: none; color: var(--accent); font-weight: 400; text-decoration: underline; padding-left: 4px; }
 
 .note { background: var(--mark); border-radius: 10px; padding: 8px 12px; font-size: var(--t-small); margin: 8px 0; }
 /* Over the cards, in the headings' serif: it ends the filters and starts the list */
@@ -176,19 +195,20 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   .card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
   .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
   .card h3 a:hover { color: var(--accent); text-decoration: underline; }
-  .chips a:hover, .filters select:hover { border-color: var(--accent); color: var(--accent-strong); }
-  .filters select.on:hover { border-color: var(--accent-strong); background-color: var(--accent-strong); color: #fff; }
-  .chips a[aria-current]:hover { color: #fff; }
+  .bar select:hover, .pick summary:hover { border-color: var(--accent); }
+  .bar select.on:hover, .pick summary.on:hover { border-color: var(--accent-strong); background-color: var(--accent-strong); }
+  .chips a:hover { background: var(--surface-2); }
+  .chips a[aria-current]:hover { background: var(--accent-soft); text-decoration: line-through; }
+  .picked a:hover { background: var(--hairline); }
   .search button:hover { background: var(--accent-strong); }
   .more a:hover { border-color: var(--accent); }
 }
 
 /* Touch screens of any width (tablets too): chips and the select as big as a finger */
 @media (pointer: coarse) {
-  .filters { --chip: 40px; }
   nav.top a { padding-block: 10px; }
   /* Safari on iPhone and iPad zooms the page into a select whose text is under 16px */
-  .filters select { font-size: 16px; }
+  .bar select { font-size: 16px; }
 }
 
 /* Phones: one column, rows of chips to swipe, and a search box that stays on top */
@@ -211,15 +231,30 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   .search button { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
   .search input { padding: 11px 16px 11px 46px; background-position: 15px center; }
 
-  .filters { --chip: 40px; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
-  .filters .row { display: block; }
-  .filters .label { display: block; line-height: 1.4; margin: 0 0 6px; }
-  .filters .chips {
+  /* The bar is one line to swipe; a panel's sheet is fixed, so the bar's scrolling does not clip it */
+  .bar {
     flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
-    margin-inline: calc(-1 * var(--gutter)); padding: 2px var(--gutter) 4px; scroll-padding-inline: var(--gutter);
+    margin-inline: calc(-1 * var(--gutter)); padding: 2px var(--gutter); scroll-padding-inline: var(--gutter);
   }
-  .filters .chips::-webkit-scrollbar { display: none; }
-  .chips a, .chips .off { flex: none; }
+  .bar::-webkit-scrollbar { display: none; }
+  .bar > * { flex: none; }
+  /* A panel is a sheet from the bottom over a dimmed page, with its name and «Ferdig» on top */
+  .pick { position: static; }
+  .pick[open] summary::before { z-index: 29; background: rgb(20 20 15 / 40%); }
+  .panel {
+    position: fixed; z-index: 30; top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 80dvh; overflow-y: auto; overscroll-behavior: contain;
+    border: 0; border-radius: 20px 20px 0 0; padding: 0 12px calc(16px + env(safe-area-inset-bottom));
+  }
+  .panel .head {
+    display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1;
+    margin: 0 -12px 4px; padding: 12px 12px 12px 20px; background: var(--surface-1); border-bottom: 1px solid var(--hairline);
+    font-family: var(--serif); font-size: var(--t-heading);
+  }
+  .panel .done {
+    font: inherit; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; font-size: var(--t-body); font-weight: 650;
+    color: #fff; background: var(--accent); border: 0; border-radius: 999px; padding: 8px 18px; cursor: pointer;
+  }
+  .chips a, .chips .off { font-size: var(--t-body); min-height: 48px; padding-block: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

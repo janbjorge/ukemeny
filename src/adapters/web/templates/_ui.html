@@ -3,6 +3,22 @@
    (where swiping a chip row must not search) and keys start on the click. #}
 {% macro go(text, antall=none) %}{% set qs = link(text, antall, found.place) %}href="/{{ '?' ~ qs if qs }}#forslag" hx-get="/middager{{ '?' ~ qs if qs }}" hx-trigger="mousedown, click" hx-sync="this:drop"{% endmacro %}
 
+{# A button in the filter bar and its panel of chips: on a phone a sheet from the bottom. A panel closes on «Ferdig», Escape,
+   a click outside it (on its summary's backdrop) or another panel opening (name="filtre"); it stays open while its
+   chips are picked (base.html). #}
+{% macro pick(id, title, row, kind="", more=none, more_title="") -%}
+{% set on = (row + (more or []))|selectattr("on")|rejectattr("label", "equalto", "Alle")|list %}
+<details class="pick" id="{{ id }}" name="filtre">
+  <summary{% if on %} class="on"{% endif %}>{{ title }}{% if on %} <span class="k">{{ on|length }}</span>{% endif %}</summary>
+  <div class="panel">
+    <p class="head"><b>{{ title }}</b><button type="button" class="done">Ferdig</button></p>
+    <nav class="chips {{ kind }}" aria-label="{{ title }}">{% for c in row %}{{ chip(c) }} {% endfor %}</nav>
+    {% if more %}<p class="sub">{{ more_title }}</p>
+    <nav class="chips {{ kind }}" aria-label="{{ more_title }}">{% for c in more %}{{ chip(c) }} {% endfor %}</nav>{% endif %}
+  </div>
+</details>
+{%- endmacro %}
+
 {% macro chip(c) -%}
 {# A chip without a count (a diet rule) is always a link; one with a count of 0 would give nothing, so it is not. #}
 {% if c.on or c.count is none or c.count %}<a {{ go(c.text) }}{% if c.protein %} data-protein="{{ c.protein }}"{% endif %}{% if c.on %} aria-current="true"{% endif %}>{{ c.label }}{% if c.count %} <span class="n">{{ c.count|tall }}</span>{% endif %}</a>

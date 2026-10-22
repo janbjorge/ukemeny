@@ -4,7 +4,7 @@ import hashlib
 import os
 from collections import OrderedDict
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
 from typing import Annotated
@@ -26,6 +26,7 @@ from core.matching import VEGETARIAN
 from core.search import (
     Diet,
     Kind,
+    Search,
     Tag,
     diet_clause,
     marked,
@@ -43,23 +44,22 @@ LINK = '</llms.txt>; rel="alternate"; type="text/markdown", </api/openapi.json>;
 # The pages a crawler should index; the query-string variants and fragments stay out (see robots_txt)
 PAGES = ("", "om")
 
-# The chips above the ideas: the diet rules and allergies a visitor picks (none to start with), then what a dinner is like
+# The chips in the filter bar's panels: the diet rules and allergies a visitor picks (none to start with), then what a
+# dinner is like. «Kosthold» is how you choose to eat, «Allergier» the 14 allergens food must be labelled with (EU
+# 1169/2011), and under them what a sensitive stomach does not take (jb 2026-10-22: "why is uten hvitlook in Kosthold,
+# but uten sennep is in Allergier?")
 DIET_CHIPS = (
     Diet.VEGETARIAN,
     Diet.VEGAN,
     Diet.PESCETARIAN,
-    Diet.GLUTEN,
-    Diet.MILK,
-    Diet.LACTOSE,
-    Diet.ONION,
-    Diet.GARLIC,
-    Diet.FODMAP,
     Diet.LOW_CARB,
     Diet.PORK,
     Diet.ALCOHOL,
     Diet.PREGNANT,
 )
 ALLERGY_CHIPS = (
+    Diet.GLUTEN,
+    Diet.MILK,
     Diet.EGG,
     Diet.FISH,
     Diet.CRUSTACEAN,
@@ -72,8 +72,8 @@ ALLERGY_CHIPS = (
     Diet.MUSTARD,
     Diet.SULPHITE,
     Diet.LUPIN,
-    Diet.LEGUME,
 )
+STOMACH_CHIPS = (Diet.LACTOSE, Diet.ONION, Diet.GARLIC, Diet.FODMAP, Diet.LEGUME)
 # «På tilbud» is no chip: every dinner shown has something on sale (jb 2026-10-22: "the filter; Hva slags - paa tilbud can
 # also be removed"); the words still work in the search
 KIND_CHIPS = (Tag.QUICK, Tag.UNDER_40, Tag.LIKED, Tag.MILD)
@@ -102,6 +102,15 @@ class Chip:
     protein: str = ""
 
 
+# What «Nullstill» takes out of a search: what the filter bar picks, not the words typed
+PICKED = {Kind.DIET, Kind.TAG, Kind.PROTEIN}
+
+
+def cleared(s: Search) -> str:
+    """The search without anything picked in the filter bar."""
+    return replace(s, clauses=tuple(c for c in s.clauses if c.kind not in PICKED)).text
+
+
 def chips(found: Found) -> dict[str, list[Chip]]:
     s = found.search
 
@@ -125,15 +134,13 @@ def chips(found: Found) -> dict[str, list[Chip]]:
             on = chosen is not None and p in chosen.values
             proteins.append(Chip(protein_word(p).capitalize(), s.toggle(clause).text, on, None if on else n, p))
 
-    def on_first(row: list[Chip]) -> list[Chip]:
-        """Chosen chips lead their row, so a phone, which shows a row as one line to swipe, shows them."""
-        return sorted(row, key=lambda c: not c.on)
-
+    # In the order written: a panel shows them all, and the row under the bar the chosen ones
     return {
-        "diets": on_first([diet(d) for d in DIET_CHIPS]),
-        "allergies": on_first([diet(d) for d in ALLERGY_CHIPS]),
-        "kinds": on_first([tag(t) for t in KIND_CHIPS]),
-        "proteins": on_first(proteins),
+        "diets": [diet(d) for d in DIET_CHIPS],
+        "allergies": [diet(d) for d in ALLERGY_CHIPS],
+        "stomach": [diet(d) for d in STOMACH_CHIPS],
+        "kinds": [tag(t) for t in KIND_CHIPS],
+        "proteins": proteins,
     }
 
 
@@ -243,6 +250,7 @@ def create_app(queries: Queries) -> FastAPI:
         return {
             "found": found,
             "chips": chips(found),
+            "cleared": cleared(found.search),
             "relax": [(c, n, found.search.drop(c).text) for c, n in found.relax],
             "shown": len(found.dinners),
             # «Sted»: where the offers are from, every store until one is picked (jb 2026-10-14: "I dont want location to

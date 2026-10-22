@@ -13,7 +13,7 @@ read at most PER_SECOND a second, and a challenge counts as a failed page.
 import json
 import re
 import xml.etree.ElementTree as ET
-from collections.abc import AsyncGenerator, Callable, Mapping
+from collections.abc import AsyncGenerator, Callable, Mapping, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Self, TypedDict
@@ -134,15 +134,20 @@ class GodtRecipeSource:
     0.25 s (2026-10-14)."""
 
     pages: Pages
+    known: tuple[str, ...] = ()
+    """The pages to read instead of the sitemap's: the godt.no dinners already in datasets/ (pipeline.datasets
+    --known), since the sitemap is gone (404 since 2026-10-22)."""
 
     @classmethod
     @asynccontextmanager
-    async def open(cls, workers: int = 4, fetching: Callable[[str], None] | None = None) -> AsyncGenerator[Self]:
+    async def open(cls, workers: int = 4, fetching: Callable[[str], None] | None = None, known: Sequence[str] = ()) -> AsyncGenerator[Self]:
         """`fetching` hears the URL of every request as it goes out."""
         async with Pages.open("godt.no", workers, fetching, per_second=PER_SECOND) as pages:
-            yield cls(pages)
+            yield cls(pages, tuple(known))
 
     async def index(self) -> list[RecipeRef]:
+        if self.known:
+            return [RecipeRef(url, "") for url in self.known]
         sitemap = await self.pages.get(SITEMAP)
         if sitemap is None:
             raise SourceUnavailableError("godt.no", f"no sitemap at {SITEMAP}")

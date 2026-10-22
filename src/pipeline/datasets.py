@@ -6,6 +6,7 @@ Jev's labels for every ingredient and offer. Nothing is kept between runs. Run o
     uv run python -m pipeline.datasets -v    # also Jev's cost after each Jev step, failures, retries, catalogs
     uv run python -m pipeline.datasets -vv   # also a line per page, ingredient, offer match and Jev call
     uv run python -m pipeline.datasets -vvv  # also every HTTP request
+    uv run python -m pipeline.datasets --known  # godt.no's pages from the dinners in datasets/, not its sitemap
 
 Needs TYPESAFE_API_KEY. The site reads only datasets/.
 """
@@ -19,6 +20,7 @@ from collections import Counter
 from collections.abc import Callable, Mapping
 from contextlib import closing
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Never, TextIO
 from urllib.parse import urlsplit
 
@@ -28,6 +30,7 @@ from typesafe_sdk import AsyncTypeSafeClient
 from adapters import datasets
 from app import build
 from core.models import RefreshReport, Snapshot
+from pipeline.godt import BASE as GODT
 from pipeline.godt import GodtRecipeSource
 from pipeline.jev import Jev, JevDepartmentClassifier, JevIngredientClassifier, JevOfferMatcher
 from pipeline.matprat import MatpratRecipeSource
@@ -113,14 +116,29 @@ def configure(verbose: int) -> None:
     logging.getLogger("matris").setLevel(logging.WARNING if verbose == 0 else logging.INFO if verbose == 1 else logging.DEBUG)
 
 
-async def run(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None) -> Result:
-    """`fetching` hears every URL matprat.no, godt.no and mattilbud.no are asked for."""
+def known_godt(root: Path = datasets.DATASETS) -> tuple[str, ...]:
+    """The godt.no dinners in datasets/, whose pages a build with --known reads again: godt.no's sitemap is 404 since
+    2026-10-22 (jb: "we need some kind of refresh option that uses the dishes we know allready")."""
+    try:
+        dishes = datasets.JsonDatasets(root).snapshot().dishes
+    except FileNotFoundError as e:
+        raise SetupError(f"--known reads {root}, which is missing: {e}") from e
+    urls = tuple(d.url for d in dishes if d.url.startswith(GODT))
+    if not urls:
+        raise SetupError(f"--known found no godt.no dinners in {root}")
+    return urls
+
+
+async def run(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None, known: bool = False) -> Result:
+    """`fetching` hears every URL matprat.no, godt.no and mattilbud.no are asked for. `known`: godt.no's pages are the
+    dinners already in datasets/ (known_godt), not its sitemap's."""
     key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
         raise SetupError("TYPESAFE_API_KEY is not set. Get a TypeSafe API key at https://console.typesafe.ai")
+    godt_pages = known_godt() if known else ()
     async with (
         MatpratRecipeSource.open(CRAWL_WORKERS, fetching) as matprat,
-        GodtRecipeSource.open(fetching=fetching) as godt,
+        GodtRecipeSource.open(fetching=fetching, known=godt_pages) as godt,
         TjekOfferSource.open(fetching=fetching) as offers,
         AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
     ):
@@ -141,11 +159,12 @@ async def run(progress: build.Progress | None = None, fetching: Callable[[str], 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build datasets/ from scratch: matprat.no, godt.no, mattilbud.no and Jev.")
     parser.add_argument("-v", "--verbose", action="count", default=0, help="more detail: -v, -vv or -vvv")
-    verbose = parser.parse_args().verbose
-    configure(verbose)
+    parser.add_argument("--known", action="store_true", help="godt.no: read the dinners in datasets/, not the sitemap")
+    args = parser.parse_args()
+    configure(args.verbose)
     try:
         with closing(Bars(STEPS)) as bars:
-            result = asyncio.run(run(bars, bars.fetching))
+            result = asyncio.run(run(bars, bars.fetching, args.known))
     except SetupError as e:
         sys.exit(f"error: {e}")
     s, r = result.snapshot, result.recipes

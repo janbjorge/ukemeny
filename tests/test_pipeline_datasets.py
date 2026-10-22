@@ -1,6 +1,12 @@
 import io
+from dataclasses import replace
+from pathlib import Path
 
-from pipeline.datasets import STEPS, Bars
+import pytest
+
+from adapters.datasets import write
+from pipeline.datasets import STEPS, Bars, SetupError, known_godt
+from tests.fakes import recipe, snapshot
 
 
 def test_each_step_leaves_its_bar_behind() -> None:
@@ -48,3 +54,12 @@ def test_the_bars_are_ascii_on_a_utf8_terminal() -> None:
     bars("recipes", 2, 4)
     bars("recipes", 4, 4)
     assert raw.getvalue().isascii()
+
+
+def test_known_lists_the_godt_dinners_in_datasets(tmp_path: Path) -> None:
+    matprat = recipe("Kyllinggryte")
+    godt = replace(recipe("Tomatsuppe"), url="https://www.godt.no/oppskrifter/suppe/9662/tomatsuppe")
+    write(snapshot(matprat, godt), tmp_path)
+    assert known_godt(tmp_path) == (godt.url,)
+    with pytest.raises(SetupError, match="missing"):
+        known_godt(tmp_path / "nowhere")

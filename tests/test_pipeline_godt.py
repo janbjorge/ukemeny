@@ -139,6 +139,19 @@ async def test_gone_page_is_none_and_a_missing_sitemap_an_error() -> None:
         await gone.index()
 
 
+async def test_known_pages_stand_in_for_the_sitemap() -> None:
+    asked: list[str] = []
+
+    def handle(request: httpx2.Request) -> httpx2.Response:
+        asked.append(request.url.path)
+        return httpx2.Response(404)
+
+    client = httpx2.AsyncClient(transport=httpx2.MockTransport(handle))
+    godt = GodtRecipeSource(Pages(client, "godt.no", tries=1), known=(URL,))
+    assert await godt.index() == [RecipeRef(URL, "")]
+    assert asked == []  # The sitemap is never asked for
+
+
 async def test_a_firewall_challenge_is_a_failed_page_and_not_retried() -> None:
     calls = 0
 

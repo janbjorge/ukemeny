@@ -73,20 +73,22 @@ name, so the site's lookup stays as it is.
 
 ## 2. The build (pipeline, code)
 
-- [ ] src/app/build.py: `classify` asks Jev only for names without a row, with the category as context, and appends
-      rows; `fill_departments` becomes the three-way lookup above (line, near-name, Jev pick) for missing rows only;
-      every part's category comes from the vocabulary. `dishes_of` and the hint dinner go.
-- [ ] src/core/matching.py `agrees` and `doubted` go, and with them the «maybe» the doubt check wrote.
-- [ ] src/pipeline/jev.py: the `dish` context goes from both classifiers and the label texts; `JEV_MODEL` stays.
+- [x] src/app/build.py: `draft` asks Jev only for names without a row (the three-way lookup above for the category,
+      then the facts with it as context) and appends rows; `filed` gives every part its row's category. `classify`,
+      `fill_departments`, `dishes_of` and the hint dinner are gone. The build prints the new names.
+- [x] src/core/matching.py `agrees` and `doubted` are gone, and with them the «maybe» the doubt check wrote; `words`
+      is the near-name key.
+- [x] src/pipeline/jev.py: the `dish` context is gone from both classifiers; `JevDepartmentClassifier` is
+      `JevCategoryClassifier`; `JEV_MODEL` stays.
 - [ ] Form: a function in core that both parsers call on the line; `Part.form` with a default of "" so the site's
       reader does not care; written to dishes.json. src/pipeline/matprat.py, godt.py, src/adapters/datasets.py.
 - [ ] `match` asks per product with the form and the dinner's name, and writes per name; the `lines` plumbing through
       `snapshot`, `reprice` and `match` goes. src/pipeline/jev.py `_offer_question` says what the dinner wants it as.
 - [ ] The vanished lines: «Svinespyd med østerssaus og kokosmelk» (godt.no 17056) and «Ribbesandwich» have no pork
       part. Read the page (jb's OK first); if the main ingredient is a nameless line, src/pipeline/godt.py keeps it.
-- [ ] Tests: tests/test_build.py's classify and department tests follow the new shape; tests/test_pipeline_jev.py loses
+- [x] Tests: tests/test_build.py's classify and department tests follow the new shape; tests/test_pipeline_jev.py loses
       the hint-dinner tests; tests/fakes.py loses `dish` arguments.
-- [ ] FACTS.md §4 and §6, METHOD.md §2, AGENTS.md's `datasets/` line and README.md say what the build does now.
+- [x] FACTS.md §4 and §6, METHOD.md §2, AGENTS.md's `datasets/` line and README.md say what the build does now.
 
 ## 3. The ten percent that is not pipeline
 

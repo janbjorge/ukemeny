@@ -3,8 +3,8 @@
 The dinner list at /oppskrifter/middag pages every dinner (24 a page; 1 456 on 2026-10-22). The recipe sitemap
 (`/sitemap-recipes.xml`, and `/sitemap-index.xml`, which robots.txt still names) is 404 since 2026-10-22. Each recipe
 page embeds its data as Next.js page props (`__NEXT_DATA__`): ingredients with amount and unit, portions, minutes,
-rating, and tags, where «Middag» marks a dinner. godt.no names no grocery department, so the build gives each
-ingredient one (app.build.fill_departments). robots.txt asks for no crawl delay and shuts out only a list of AI
+rating, and tags, where «Middag» marks a dinner. godt.no names no grocery department: every ingredient's category comes
+from the vocabulary (app.build.filed). robots.txt asks for no crawl delay and shuts out only a list of AI
 crawlers (GPTBot, ClaudeBot, CCBot, ...), which matris is not.
 
 godt.no is behind AWS WAF. Read 8 at a time on 2026-10-14, it served 2 681 pages in about 70 s and answered the other

@@ -1,6 +1,8 @@
-"""The offline build: read every recipe from matprat.no and godt.no and this week's offers, ask Jev about every
-ingredient and offer, and make the snapshot. From scratch every time, with nothing kept between runs (jb 2026-10-13: "one thing,
-and one thing only, refresh from the sources, and build up or dataset, from scratch every time").
+"""The offline build: read every recipe from matprat.no and godt.no and this week's offers, look every ingredient name up
+in the vocabulary (datasets/traits.json) and draft a row for each name it has not seen, ask Jev which discounted offers
+are which ingredient, and make the snapshot. The dinners and the offers are built from the sources every time (jb
+2026-10-13: "one thing, and one thing only, refresh from the sources, and build up or dataset, from scratch every time");
+the vocabulary is kept and fixed by hand (jb 2026-10-22, docs/plan-model.md).
 
 Runs on a laptop with Jev (wired in src/pipeline/datasets.py). The site only reads the result, so
 the server needs no Jev key and makes no calls to matprat.no, godt.no or mattilbud.no.
@@ -8,16 +10,16 @@ the server needs no Jev key and makes no calls to matprat.no, godt.no or mattilb
 
 import asyncio
 import logging
-from collections import Counter, defaultdict
+from collections import Counter
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 
 from core.dishes import dish
 from core.errors import SourceUnavailableError
-from core.matching import ELSEWHERE, agrees, candidates, doubted, not_an_ingredient, per_dinner, weight
+from core.matching import CATEGORIES, candidates, not_an_ingredient, per_dinner, weight, words
 from core.models import Dish, Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
-from core.ports import DepartmentClassifier, IngredientClassifier, OfferMatcher, OfferSource, RecipeSource
+from core.ports import CategoryClassifier, IngredientClassifier, OfferMatcher, OfferSource, RecipeSource
 
 log = logging.getLogger("matris.build")
 """-v (info): failures and totals. -vv (debug): what each page, ingredient and offer became."""
@@ -26,12 +28,12 @@ MATCH_THRESHOLD = 0.5
 """An offer counts as the ingredient from this probability on."""
 
 EXAMPLES = 12
-"""Names per department the department classifier is shown: those filed there most often. 30 did no better (METHOD.md §2)."""
+"""Names per category the category classifier is shown: those the dinners use most. 30 did no better (METHOD.md §2)."""
 
 type Progress = Callable[[str, int, int], None]
 """(step, done, due) for a person watching the build: called with done 0 as a step starts, then as each item is done.
-The steps: "recipes" (matprat.no and godt.no pages), "ingredients" (Jev's labels), "departments" (Jev's departments
-for godt.no's ingredients), "catalogs" (mattilbud.no), "offers" (Jev's matches)."""
+The steps: "recipes" (matprat.no and godt.no pages), "categories" (Jev's category for a new name neither its line nor a
+near-name files), "ingredients" (Jev's facts for every new name), "catalogs" (mattilbud.no), "offers" (Jev's matches)."""
 
 
 async def recipes(
@@ -68,99 +70,80 @@ async def recipes(
     return dinners, RefreshReport(listed=len(listed), fetched=done - failed, failed=failed, dinners=len(dinners))
 
 
-def dishes_of(dinners: Iterable[Recipe]) -> dict[str, str]:
-    """Per ingredient name no recipe files under a department (godt.no's), the first dinner by URL that uses it."""
-    filed = {i.name for r in dinners for i in r.ingredients if i.category}
-    found: dict[str, str] = {}
-    for r in sorted(dinners, key=lambda r: r.url):
-        for i in r.ingredients:
-            if i.name not in filed:
-                found.setdefault(i.name, r.name)
-    return found
+def examples(dinners: Iterable[Recipe], vocabulary: Mapping[str, Traits]) -> dict[str, tuple[str, ...]]:
+    """Per category of ours, the names the vocabulary files there that the dinners use most, EXAMPLES at most: what the
+    category classifier is shown."""
+    used = Counter(i.name for r in dinners for i in r.ingredients)
+    filed: dict[str, list[str]] = {category: [] for category in CATEGORIES}
+    for name, t in vocabulary.items():
+        if t.category in filed:
+            filed[t.category].append(name)
+    return {category: tuple(sorted(names, key=lambda n: (-used[n], n))[:EXAMPLES]) for category, names in filed.items()}
 
 
-async def fill_departments(
+async def draft(
     dinners: Sequence[Recipe],
-    classifier: DepartmentClassifier,
-    traits: Mapping[str, Traits],
-    progress: Callable[[int, int], None] | None = None,
-) -> tuple[list[Recipe], dict[str, Traits]]:
-    """Every ingredient with a grocery department, and the traits. One without (godt.no names none) gets the department
-    its name is filed under in other recipes (matprat.no's; the most used), or else the classifier picks one of those
-    departments, each shown with the names filed there most often, and a dinner it is in. A pick of meat, fish, shellfish
-    or dairy the traits do not agree with is /diverse, and the traits get «maybe» for it (core.matching.doubted;
-    METHOD.md §2)."""
-    filed: defaultdict[str, Counter[str]] = defaultdict(Counter)
-    shelves: defaultdict[str, Counter[str]] = defaultdict(Counter)
-    for r in sorted(dinners, key=lambda r: r.url):
-        for i in r.ingredients:
-            if i.category:
-                filed[i.name][i.category] += 1
-                shelves[i.category][i.name] += 1
-    known = {name: counts.most_common(1)[0][0] for name, counts in filed.items()}
-    examples = {department: tuple(n for n, _ in names.most_common(EXAMPLES)) for department, names in sorted(shelves.items())}
-    missing = {i.name for r in dinners for i in r.ingredients if not i.category}
-    ask = sorted(missing - known.keys()) if examples else []
-    used_in = dishes_of(dinners)
-    settled = dict(traits)
-    log.info("departments: %d names filed as in other recipes, %d to ask", len(missing & known.keys()), len(ask))
-    done = 0
-    if progress:
-        progress(done, len(ask))
-
-    async def one(name: str) -> str:
-        nonlocal done
-        picked = await classifier.department(name, examples, used_in.get(name, ""))
-        department = picked
-        if name in traits and not agrees(picked, traits[name]):
-            department, settled[name] = ELSEWHERE, doubted(picked, traits[name])
-            log.debug("%s: %s, not %s: the traits disagree, so they say maybe", name, department, picked)
-        else:
-            log.debug("%s: %s", name, department)
-        done += 1
-        if progress:
-            progress(done, len(ask))
-        return department
-
-    async with asyncio.TaskGroup() as tg:
-        tasks = {name: tg.create_task(one(name)) for name in ask}
-    known |= {name: task.result() for name, task in tasks.items()}
-    filled = [
-        replace(r, ingredients=tuple(i if i.category else replace(i, category=known.get(i.name, "")) for i in r.ingredients))
-        for r in dinners
-    ]
-    return filled, settled
-
-
-async def classify(
-    dinners: Sequence[Recipe],
+    vocabulary: Mapping[str, Traits],
+    categories: CategoryClassifier,
     classifier: IngredientClassifier,
-    progress: Callable[[int, int], None] | None = None,
+    progress: Progress | None = None,
 ) -> dict[str, Traits]:
-    """Traits per ingredient name: every label, one request per name. The department, when a recipe has one for the
-    name, goes with it; a name only godt.no uses goes with a dinner it is in instead (METHOD.md §2)."""
+    """The vocabulary with a row for every ingredient name the dinners use, sorted by name. A name without a row gets
+    one drafted, once (METHOD.md §2): its category from the recipe line when the source has one (matprat.no), else from
+    a name in the vocabulary with the same words (core.matching.words: «frosne erter» files «erter»), else the category
+    classifier's pick of ours, each shown with `examples`; then its facts from the ingredient classifier, with that
+    category as context. A name with a row is not asked about again: a wrong row is fixed by hand."""
     wanted: dict[str, Ingredient] = {}
     for ingredient in (i for r in dinners for i in r.ingredients):
         if ingredient.name not in wanted or (ingredient.category and not wanted[ingredient.name].category):
             wanted[ingredient.name] = ingredient
-    used_in = dishes_of(dinners)
+    new = sorted(name for name in wanted if name not in vocabulary)
+    near: dict[frozenset[str], str] = {}
+    for name, t in sorted(vocabulary.items()):
+        near.setdefault(words(name), t.category)
+    known = {name: wanted[name].category or near.get(words(name), "") for name in new}
+    ask = [name for name in new if not known[name]]
+    shown = examples(dinners, vocabulary)
+    log.info("vocabulary: %d names without a row, %d of them with no line or near-name to file them", len(new), len(ask))
     done = 0
     if progress:
-        progress(done, len(wanted))
+        progress("categories", done, len(ask))
 
-    async def one(name: str) -> Traits:
+    async def pick(name: str) -> str:
         nonlocal done
-        levels = await classifier.classify(wanted[name], classifier.labels, used_in.get(name, ""))
-        flagged = " ".join(f"{k}={v}" for k, v in levels.items() if k != "source" and v not in ("no", "none", "ok", "low"))
-        log.debug("%s (%s): %s", name, wanted[name].category, flagged or "nothing to note")
+        category = await categories.category(name, shown)
+        log.debug("%s: %s", name, category)
         done += 1
         if progress:
-            progress(done, len(wanted))
-        return Traits.of(levels)
+            progress("categories", done, len(ask))
+        return category
 
     async with asyncio.TaskGroup() as tg:
-        tasks = {name: tg.create_task(one(name)) for name in sorted(wanted)}
-    return {name: task.result() for name, task in tasks.items()}
+        picks = {name: tg.create_task(pick(name)) for name in ask}
+    known |= {name: task.result() for name, task in picks.items()}
+    done = 0
+    if progress:
+        progress("ingredients", done, len(new))
+
+    async def facts(name: str) -> Traits:
+        nonlocal done
+        levels = await classifier.classify(replace(wanted[name], category=known[name]), classifier.labels)
+        flagged = " ".join(f"{k}={v}" for k, v in levels.items() if k != "source" and v not in ("no", "none", "ok", "low"))
+        log.debug("%s (%s): %s", name, known[name], flagged or "nothing to note")
+        done += 1
+        if progress:
+            progress("ingredients", done, len(new))
+        return Traits.of({**levels, "category": known[name], "product": name})
+
+    async with asyncio.TaskGroup() as tg:
+        rows = {name: tg.create_task(facts(name)) for name in new}
+    return dict(sorted({**vocabulary, **{name: task.result() for name, task in rows.items()}}.items()))
+
+
+def filed(dinners: Iterable[Recipe], vocabulary: Mapping[str, Traits]) -> list[Recipe]:
+    """The dinners with every ingredient's category from the vocabulary, whatever the source said: the vocabulary is the
+    truth, so a row fixed by hand holds in every dinner."""
+    return [replace(r, ingredients=tuple(replace(i, category=vocabulary[i.name].category) for i in r.ingredients)) for r in dinners]
 
 
 @dataclass(frozen=True, slots=True)
@@ -249,27 +232,28 @@ async def match(
 
 async def snapshot(
     sources: Sequence[RecipeSource],
-    departments: DepartmentClassifier,
+    vocabulary: Mapping[str, Traits],
+    categories: CategoryClassifier,
     classifier: IngredientClassifier,
     offers: OfferSource,
     matcher: OfferMatcher,
     progress: Progress | None = None,
 ) -> tuple[Snapshot, RefreshReport]:
-    """Everything the site needs, for every household: no diet rule is applied here. Recipes become
-    Dishes: facts per portion, without the sources' wording (docs/plan-web.md)."""
+    """Everything the site needs, for every household: no diet rule is applied here. Recipes become Dishes: facts per
+    portion, without the sources' wording (docs/plan-web.md), each part filed as the vocabulary has it (`filed`). The
+    snapshot's traits are the vocabulary with the rows drafted for new names (`draft`), to be written back."""
 
     def step(name: str) -> Callable[[int, int], None] | None:
         return (lambda done, due: progress(name, done, due)) if progress else None
 
     dinners, report = await recipes(sources, step("recipes"))
-    known = await classify(dinners, classifier, step("ingredients"))
-    dinners, known = await fill_departments(dinners, departments, known, step("departments"))
-    dinners = sorted(dinners, key=lambda r: r.url)
+    known = await draft(dinners, vocabulary, categories, classifier, progress)
+    dinners = sorted(filed(dinners, known), key=lambda r: r.url)
     lines = {r.url: [i.text for i in r.ingredients] for r in dinners}
     base = Snapshot(
         built=datetime.now(UTC),
         dishes=tuple(dish(r) for r in dinners),
-        traits=dict(sorted(known.items())),
+        traits=known,
         offers=(),
         matches={},
         places={},

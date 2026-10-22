@@ -160,8 +160,8 @@ def build(
     pipeline.configure(verbose)
     steps = {
         "recipes": "sider fra matprat.no og godt.no",
-        "ingredients": "ingredienser hos Jev",
-        "departments": "avdelinger hos Jev",
+        "categories": "kategorier hos Jev for nye navn",
+        "ingredients": "fakta hos Jev for nye navn",
         "catalogs": "kundeaviser fra mattilbud.no",
         "offers": "tilbudsmatcher hos Jev",
     }
@@ -172,6 +172,9 @@ def build(
         fail("setup", str(e), False)
     s = result.snapshot
     typer.echo(f"{len(s.dishes):,} middager, {len(s.traits):,} ingredienser, {len(s.offers):,} tilbud på {len(s.places)} steder.")
+    if result.recipes:
+        drafted = ", ".join(result.drafted) or "ingen"
+        typer.echo(f"{len(result.drafted):,} nye navn i ordlisten (se git diff datasets/traits.json): {drafted}")
     typer.echo(result.jev, err=True)
 
 

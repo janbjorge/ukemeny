@@ -170,8 +170,9 @@ class Ingredient:
     unit: str
     """In matprat's words: "g", "dl", "stk.", "båt", or "" (godt.no's "fedd" is "båt")."""
     category: str
-    """matprat's grocery category: "/fisk og sjømat", "/kjøtt/kylling/høns". godt.no names none, so it is "" until the
-    build files the ingredient (app.build.fill_departments)."""
+    """What the source files the line under, in our words (core.matching.CATEGORIES): matprat.no's shelf, "" from
+    godt.no, which names none. The build files every ingredient by the vocabulary before a Dish is made
+    (app.build.filed); the line's category only counts when a name is new (app.build.draft)."""
 
 
 @dataclass(frozen=True, slots=True)

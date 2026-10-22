@@ -2,10 +2,9 @@
 
 import re
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import replace
 
 from core.diet import DAIRY
-from core.models import Dish, Item, Level, Offer, Part, Traits
+from core.models import Dish, Item, Offer, Part
 
 CATEGORIES = (
     "/bær",
@@ -88,10 +87,8 @@ HOLDS: Mapping[str | tuple[str, ...], tuple[Item, ...]] = {
     "/skalldyr": (Item.CRUSTACEAN, Item.MOLLUSC),
     DAIRY: (Item.MILK,),
 }
-"""Departments that say what a dinner is built on (the main protein) or where lactose counts, and what an ingredient
-filed there holds."""
-ELSEWHERE = "/diverse"
-"""matprat's department for what has none of its own."""
+"""Categories that say what a dinner is built on (the main protein) or where lactose counts, and what a row of the
+vocabulary filed there must hold (tests/test_traits.py)."""
 
 FULL_WEIGHT_G = 100
 """Per portion, from this amount an ingredient counts fully: 150 g kyllingfilet does, 25 g bacon a quarter."""
@@ -150,20 +147,16 @@ def weight(part: Part) -> float:
     return base / 2 if part.grams is None else base * min(1.0, part.grams / FULL_WEIGHT_G)
 
 
-def agrees(category: str, traits: Traits) -> bool:
-    """Whether the traits allow a department a classifier picked: one of meat, fish, shellfish or dairy needs Jev's yes
-    that the ingredient holds it, asked without the department (METHOD.md §2)."""
-    items = next((items for prefix, items in HOLDS.items() if category.startswith(prefix)), ())
-    return not items or any(traits.contains.get(item) is Level.YES for item in items)
+_NEAR = _FILLER - {"tørket"}
+"""The fillers a near-name drops: all of the offer filter's but «tørket», since a dried herb is its own product and
+shelf («tørket chili» is not «chili»)."""
 
 
-def doubted(category: str, traits: Traits) -> Traits:
-    """The traits with «maybe» for what a picked department holds, when they disagree with it (`agrees`): one of Jev's
-    answers says it may be there, so a rule that leaves it out leaves the ingredient out (METHOD.md §1, §2)."""
-    if agrees(category, traits):
-        return traits
-    items = next(items for prefix, items in HOLDS.items() if category.startswith(prefix))
-    return replace(traits, contains={**traits.contains, **{item: Level.MAYBE for item in items}})
+def words(name: str) -> frozenset[str]:
+    """The words of an ingredient name that say what it is, so «frosne erter» has «erter»'s and «friske urter»
+    «urter»'s: a name without a row in the vocabulary takes the category of a name with the same words
+    (app.build.draft, METHOD.md §2)."""
+    return frozenset(word for word in _WORD.findall(name.lower()) if word not in _NEAR)
 
 
 def main_protein(dish: Dish) -> tuple[str, str]:

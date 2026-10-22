@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 
 from adapters.datasets import write
-from pipeline.datasets import STEPS, Bars, SetupError, known_godt
-from tests.fakes import recipe, snapshot
+from pipeline.datasets import STEPS, Bars, SetupError, known_godt, vocabulary
+from tests.fakes import ingredient, recipe, snapshot
 
 
 def test_each_step_leaves_its_bar_behind() -> None:
@@ -18,7 +18,7 @@ def test_each_step_leaves_its_bar_behind() -> None:
     bars("catalogs", 0, 1)
     bars("catalogs", 1, 1)
     lines = out.getvalue().split("\n")
-    assert lines[0].rsplit("\r", 1)[-1].startswith("Jev ingredient labels: 100%")
+    assert lines[0].rsplit("\r", 1)[-1].startswith("Jev facts for new names: 100%")
     assert "1148/1148" in lines[0]
     assert lines[1].rsplit("\r", 1)[-1].startswith("mattilbud.no catalogs: 100%")
 
@@ -63,3 +63,10 @@ def test_known_lists_the_godt_dinners_in_datasets(tmp_path: Path) -> None:
     assert known_godt(tmp_path) == (godt.url,)
     with pytest.raises(SetupError, match="missing"):
         known_godt(tmp_path / "nowhere")
+
+
+def test_the_vocabulary_is_read_from_datasets(tmp_path: Path) -> None:
+    write(snapshot(recipe("Kyllinggryte", ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns"))), tmp_path)
+    assert set(vocabulary(tmp_path)) == {"kyllingfilet"}
+    with pytest.raises(SetupError, match="vocabulary"):
+        vocabulary(tmp_path / "nowhere")

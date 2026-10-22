@@ -19,11 +19,12 @@ Each read command takes `--json` for agents: one JSON document on stdout, errors
 ## Rebuild the data (weekly)
 
 ```sh
-export TYPESAFE_API_KEY=...             # https://console.typesafe.ai
-uv run python -m pipeline.datasets      # datasets/ from scratch: matprat, godt, offers, Jev
+export TYPESAFE_API_KEY=...                   # https://console.typesafe.ai
+uv run python -m pipeline.datasets --offers   # this week's offers and their matches (Jev)
+uv run python -m pipeline.datasets            # also every recipe again, and a row for each new ingredient name
 ```
 
-Then commit `datasets/` and push; a push to main deploys (.github/workflows/deploy.yml).
+`datasets/traits.json` is the vocabulary: a row per ingredient name with its category and facts, kept between builds and fixed by hand. A build drafts a row for a name it has not seen; review them in `git diff datasets/traits.json`. Then commit `datasets/` and push; a push to main deploys (.github/workflows/deploy.yml).
 
 ## Check
 

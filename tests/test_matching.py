@@ -1,18 +1,17 @@
 from core.dishes import dish
 from core.matching import (
-    agrees,
     candidates,
     cheapest_first,
-    doubted,
     heading_key,
     main_protein,
     not_an_ingredient,
     per_dinner,
     stems,
     weight,
+    words,
 )
-from core.models import Item, Level, Part
-from tests.fakes import ingredient, offer, recipe, traits
+from core.models import Part
+from tests.fakes import ingredient, offer, recipe
 
 
 def test_weight_by_category_and_amount_per_portion() -> None:
@@ -80,17 +79,8 @@ def test_stock_is_the_main_protein_only_without_solid_meat_or_fish() -> None:
     assert main_protein(dish(recipe("B", stock))) == ("storfe", "kjøttkraft")
 
 
-def test_a_picked_department_of_meat_fish_shellfish_or_dairy_needs_a_yes() -> None:
-    fish, maybe_meat = traits(contains={Item.FISH: Level.YES}), traits(contains={Item.MEAT: Level.MAYBE})
-    assert agrees("/fisk og sjømat", fish) and not agrees("/kjøtt/storfekjøtt", fish)
-    assert not agrees("/kjøtt/pølser", maybe_meat)  # «maybe» is a sauce, not the dinner's meat
-    assert agrees("/skalldyr", traits(contains={Item.MOLLUSC: Level.YES}))
-    assert not agrees("/ost", traits()) and not agrees("/melk/melkeprodukter", traits())
-    assert agrees("/grønnsaker", traits())  # Nothing to check
-
-
-def test_traits_that_disagree_with_a_picked_department_say_maybe() -> None:
-    duck = traits()  # Jev called «and» no meat
-    assert doubted("/kjøtt/and/gås", duck).contains[Item.MEAT] is Level.MAYBE
-    assert doubted("/fisk og sjømat", traits(contains={Item.MOLLUSC: Level.YES})).contains[Item.FISH] is Level.NO  # blekksprut
-    assert doubted("/grønnsaker", duck) == duck
+def test_a_near_name_has_the_same_words_once_fillers_are_dropped() -> None:
+    assert words("frosne erter") == words("erter") == {"erter"}
+    assert words("friske urter") == words("urter")
+    assert words("rød chili") == words("chili") != words("tørket chili")  # A dried spice is its own product
+    assert words("kjøttdeig av svin") != words("kjøttdeig")

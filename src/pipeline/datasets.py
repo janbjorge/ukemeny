@@ -1,6 +1,7 @@
-"""Build datasets/ from scratch: every recipe from matprat.no and godt.no, this week's offers from mattilbud.no, and
-Jev's labels for every ingredient and offer. Nothing is kept between runs. Run on a laptop, then commit datasets/ and push
-(which deploys).
+"""Build datasets/: every recipe from matprat.no and godt.no, this week's offers from mattilbud.no, and Jev's offer
+matches, from scratch; and a row in the vocabulary (traits.json) for each ingredient name it has not seen, drafted by Jev
+once. The vocabulary is the one thing kept between runs; it is fixed by hand, never rebuilt. Run on a laptop, review
+`git diff datasets/traits.json`, then commit datasets/ and push (which deploys).
 
     uv run python -m pipeline.datasets       # a progress bar per step, and under it the URL being fetched
     uv run python -m pipeline.datasets -v    # also Jev's cost after each Jev step, failures, retries, catalogs
@@ -30,10 +31,10 @@ from typesafe_sdk import AsyncTypeSafeClient
 
 from adapters import datasets
 from app import build
-from core.models import RefreshReport, Snapshot
+from core.models import RefreshReport, Snapshot, Traits
 from pipeline.godt import BASE as GODT
 from pipeline.godt import GodtRecipeSource
-from pipeline.jev import Jev, JevDepartmentClassifier, JevIngredientClassifier, JevOfferMatcher
+from pipeline.jev import Jev, JevCategoryClassifier, JevIngredientClassifier, JevOfferMatcher
 from pipeline.matprat import MatpratRecipeSource
 from pipeline.tjek import TjekOfferSource
 
@@ -57,12 +58,14 @@ class Result:
     """None when only the offers were refreshed."""
     sizes: dict[str, int]
     jev: str
+    drafted: tuple[str, ...] = ()
+    """The names the vocabulary got a row for in this build: review them in `git diff datasets/traits.json`."""
 
 
 STEPS = {
     "recipes": "matprat.no and godt.no pages",
-    "ingredients": "Jev ingredient labels",
-    "departments": "Jev departments",
+    "categories": "Jev categories for new names",
+    "ingredients": "Jev facts for new names",
     "catalogs": "mattilbud.no catalogs",
     "offers": "Jev offer matches",
 }
@@ -133,6 +136,14 @@ def known_godt(root: Path = datasets.DATASETS) -> tuple[str, ...]:
     return urls
 
 
+def vocabulary(root: Path = datasets.DATASETS) -> Mapping[str, Traits]:
+    """The vocabulary in datasets/, which a build reads and adds to, never rebuilds (FACTS.md §4)."""
+    try:
+        return datasets.JsonDatasets(root).snapshot().traits
+    except FileNotFoundError as e:
+        raise SetupError(f"the vocabulary in {root} is missing: {e}") from e
+
+
 def _key() -> str:
     key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
@@ -146,7 +157,7 @@ def _reporting(jev: Jev, progress: build.Progress | None) -> build.Progress:
     def step(name: str, done: int, due: int) -> None:
         if progress:
             progress(name, done, due)
-        if done == due and name in ("departments", "ingredients", "offers"):
+        if done == due and name in ("categories", "ingredients", "offers"):
             logging.getLogger("matris.jev").info("so far: %s", jev.status())
 
     return step
@@ -171,8 +182,10 @@ async def offers(progress: build.Progress | None = None, fetching: Callable[[str
 
 async def run(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None, known: bool = False) -> Result:
     """`fetching` hears every URL matprat.no, godt.no and mattilbud.no are asked for. `known`: godt.no's pages are the
-    dinners already in datasets/ (known_godt), not its dinner list's."""
+    dinners already in datasets/ (known_godt), not its dinner list's. The vocabulary in datasets/ is read first and
+    written back with a row per new name (Result.drafted)."""
     key = _key()
+    kept = vocabulary()
     godt_pages = known_godt() if known else ()
     async with (
         MatpratRecipeSource.open(CRAWL_WORKERS, fetching) as matprat,
@@ -183,13 +196,15 @@ async def run(progress: build.Progress | None = None, fetching: Callable[[str], 
         jev = Jev(client, max_in_flight=JEV_IN_FLIGHT)
         snapshot, report = await build.snapshot(
             (matprat, godt),
-            JevDepartmentClassifier(jev),
+            kept,
+            JevCategoryClassifier(jev),
             JevIngredientClassifier(jev),
             tjek,
             JevOfferMatcher(jev),
             _reporting(jev, progress),
         )
-    return Result(snapshot, report, datasets.write(snapshot), jev.status())
+    drafted = tuple(name for name in snapshot.traits if name not in kept)
+    return Result(snapshot, report, datasets.write(snapshot), jev.status(), drafted)
 
 
 def main() -> None:
@@ -209,6 +224,7 @@ def main() -> None:
     sites = Counter((urlsplit(d.url).hostname or "").removeprefix("www.") for d in s.dishes)
     if r:
         print(f"recipes: {r.listed:,} pages, {r.failed:,} failed")
+        print(f"vocabulary: {len(result.drafted):,} new names drafted by Jev: {', '.join(result.drafted) or 'none'}")
     print(
         f"{len(s.dishes):,} dinners ({', '.join(f'{site} {n:,}' for site, n in sorted(sites.items()))}), "
         f"{len(s.traits):,} ingredients, {len(s.offers):,} offers in {len(s.places)} places, "

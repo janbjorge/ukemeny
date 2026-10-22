@@ -47,17 +47,17 @@ class IngredientClassifier(Protocol):
         """Every label it can answer."""
         ...
 
-    async def classify(self, ingredient: Ingredient, labels: Iterable[str], dish: str = "") -> Levels:
-        """These labels of the ingredient's name, and "source", the model that answered; its grocery category is
-        context, and so is `dish`, a dinner it is in, for an ingredient without one."""
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> Levels:
+        """These labels of the ingredient's name, and "source", the model that answered; its category is context."""
         ...
 
 
-class DepartmentClassifier(Protocol):
-    """Which grocery department an ingredient is filed under, for a source that names none (godt.no)."""
+class CategoryClassifier(Protocol):
+    """Which of our categories (core.matching.CATEGORIES) a new ingredient name belongs to, when neither its recipe line
+    nor a name with the same words says (app.build.draft)."""
 
-    async def department(self, ingredient: str, departments: Mapping[str, Sequence[str]], dish: str = "") -> str:
-        """One of `departments`, each given with ingredient names filed there; `dish`, a dinner it is in, is context."""
+    async def category(self, ingredient: str, categories: Mapping[str, Sequence[str]]) -> str:
+        """One of `categories`, each given with ingredient names filed there."""
         ...
 
 

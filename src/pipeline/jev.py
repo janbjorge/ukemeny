@@ -398,37 +398,33 @@ class JevIngredientClassifier:
     def labels(self) -> tuple[str, ...]:
         return self.registry.keys()
 
-    async def classify(self, ingredient: Ingredient, labels: Iterable[str], dish: str = "") -> dict[str, str]:
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str]:
         keys = tuple(labels)
         state: dict[str, JSONContent] = {"ingredient": ingredient.name, "category": ingredient.category}
-        if dish:
-            state["dish"] = dish
         response = await self.jev.ask("ingredient", state, self.registry.questions(keys))
         return {**self.registry.read(response, keys), "source": response.model}
 
 
 @dataclass
-class JevDepartmentClassifier:
-    """Implements core.ports.DepartmentClassifier: one Choice over the departments, each described by the names filed
-    there, and the dish as context. Probed on 200 of matprat's names it was not shown (2026-10-14), without a dish: 158 in
-    matprat's own department, and 26 in one that changes a rule, mostly a near miss (frukt for bær, pølser for
-    svinekjøtt), some a protein gained or lost (bbq-saus as pølser, smult as melk). 30 names per department, or the kind
-    of meat asked apart, did no better; the dish put and, elg, bog and breiflabb right (METHOD.md §2)."""
+class JevCategoryClassifier:
+    """Implements core.ports.CategoryClassifier: one Choice over our categories, each described by the names filed there.
+    Probed on 200 of matprat's names it was not shown (2026-10-14): 158 in matprat's own department, and 26 in one that
+    changes a rule, mostly a near miss (frukt for bær, pølser for svinekjøtt), some a protein gained or lost (bbq-saus as
+    pølser, smult as melk). 30 names per department, or the kind of meat asked apart, did no better. A dinner the name is
+    in was context until 2026-10-22: the first by URL can be the wrong one, and an omelette put erter in /egg
+    (METHOD.md §2)."""
 
     jev: Jev
 
-    async def department(self, ingredient: str, departments: Mapping[str, Sequence[str]], dish: str = "") -> str:
+    async def category(self, ingredient: str, categories: Mapping[str, Sequence[str]]) -> str:
         question = Choice(
             instructions="Which department of a Norwegian grocery store sells the recipe ingredient `ingredient`? Each "
             "department lists ingredients a recipe site files there.",
-            criteria={department: list(names) for department, names in departments.items()},
+            criteria={category: list(names) for category, names in categories.items()},
         )
-        state: dict[str, JSONContent] = {"ingredient": ingredient}
-        if dish:
-            state["dish"] = dish
-        response = await self.jev.ask("department", state, {"department": question})
-        probabilities = response.choices["department"].probabilities
-        return max(departments, key=lambda department: probabilities.get(department, 0.0))
+        response = await self.jev.ask("category", {"ingredient": ingredient}, {"category": question})
+        probabilities = response.choices["category"].probabilities
+        return max(categories, key=lambda category: probabilities.get(category, 0.0))
 
 
 QUESTIONS_PER_CALL = 100

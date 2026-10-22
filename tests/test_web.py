@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from adapters.web import main
 from app.queries import Queries
 from core.models import Household, Onion
-from core.ranking import Week
 from tests.fakes import SIDE, SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
@@ -28,7 +27,7 @@ def client() -> TestClient:
         offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale"), SIDE_OFFER],
         matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
     )
-    queries = Queries(FakeDatasets(s), week=Week(days=2, fish=1))  # as on the site: no rules until searched for
+    queries = Queries(FakeDatasets(s))  # as on the site: no rules until searched for
     return TestClient(main.create_app(queries))
 
 
@@ -37,7 +36,7 @@ def test_front_page_is_the_search_with_no_rules_until_picked(client: TestClient)
     assert "<h1>Finn en middag</h1>" in html
     assert 'id="uka"' not in html and "Nye middager" not in html  # no week on the page (jb 2026-10-14)
     assert all(n in html for n in ("Kyllinggryte", "Laks i ovn", "Torsk med bacon"))  # the list leaves nothing out
-    assert '<span class="sum">\u221241\u00a0kr</span> <span class="n">på 2 varer</span>' in html  # 135 to 99 kr, 25 to 20 kr
+    assert '<span class="sum">\u221261\u00a0kr</span> <span class="n">på 2 varer</span>' in html  # 135 to 99 kr, 45 to 20 kr
     assert 'kyllingfilet</span><span class="store">KIWI</span><span class="lead"></span><span class="off">\u221236\u00a0kr</span>' in html
     assert "%" not in html[html.index('class="cards"') :]  # no percent (jb 2026-10-22)
     assert "Bytt:" not in html and "Glutenfritt" not in html  # no rules on the page until a visitor picks them
@@ -52,7 +51,7 @@ def test_front_page_is_the_search_with_no_rules_until_picked(client: TestClient)
 
 def test_cards_are_calm(client: TestClient) -> None:
     s = snapshot(recipe("Laks i ovn", SALMON, SIDE, rating=4.6, rating_count=3), offers=[SIDE_OFFER], matches=SIDE_MATCH)
-    page = TestClient(main.create_app(Queries(FakeDatasets(s), week=Week(days=1, fish=1)))).get("/").text
+    page = TestClient(main.create_app(Queries(FakeDatasets(s)))).get("/").text
     assert "★" not in page  # 3 ratings are too few to show
     assert "Sterk" not in page
 
@@ -61,8 +60,8 @@ def test_an_old_sort_link_still_opens(client: TestClient) -> None:
     r = client.get("/middager?q=kylling&sorter=kroner", headers=HX)
     assert r.headers["HX-Replace-Url"] == "/?q=kylling#forslag"  # «Sorter» is gone (jb 2026-10-22)
     ideas = r.text
-    assert '<span class="sum">\u221241\u00a0kr</span>' in ideas
-    assert '<span class="off">\u221236\u00a0kr</span>' in ideas and '<span class="off">\u22125\u00a0kr</span>' in ideas
+    assert '<span class="sum">\u221261\u00a0kr</span>' in ideas
+    assert '<span class="off">\u221236\u00a0kr</span>' in ideas and '<span class="off">\u221225\u00a0kr</span>' in ideas
 
 
 def test_fragment_filters_and_falls_back_to_the_page(client: TestClient) -> None:
@@ -127,10 +126,11 @@ def test_about_llms_robots_sitemap_health(client: TestClient) -> None:
     assert nav.count("<a ") == 2 and 'href="/om" aria-current="page"' in nav  # one page for the search (jb 2026-10-13)
     assert "Slik virker det" in about
     assert "mattilbud" not in about  # no pricing sources on the page (jb 2026-10-22)
+    assert "sparer deg minst 20 kroner" in about  # the floor (jb 2026-10-22)
     assert "Les http://testserver/llms.txt først" in about  # a prompt to paste into an agent (jb 2026-10-13)
     llms = client.get("/llms.txt").text
-    assert "http://testserver/api/plan" in llms and "kjøttdeig" in llms
-    assert "- [melkefri](http://testserver/api/plan?q=melkefri)" in llms  # a link per rule: agents need not write URLs
+    assert "api/plan" not in llms and "kjøttdeig" in llms  # no week (jb 2026-10-22)
+    assert "- [melkefri](http://testserver/api/middager?q=melkefri)" in llms  # a link per rule: agents need not write URLs
     robots = client.get("/robots.txt").text
     assert "Allow: /api/" in robots and "Sitemap: http://testserver/sitemap.xml" in robots
     assert robots.startswith("User-agent: ChatGPT-User\nUser-agent: Claude-User\nUser-agent: Perplexity-User\nAllow: /\n")
@@ -159,7 +159,7 @@ def test_canonical_host_redirects_everything_but_health(client: TestClient, monk
 def test_more_appends_the_next_page(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(main, "PAGE", 1)
     s = snapshot(*(recipe(f"Laks {n}", SALMON, SIDE) for n in range(4)), offers=[SIDE_OFFER], matches=SIDE_MATCH)
-    small = TestClient(main.create_app(Queries(FakeDatasets(s), Household(), Week(days=1, fish=1))))
+    small = TestClient(main.create_app(Queries(FakeDatasets(s), Household())))
     html = small.get("/?q=laks").text
     assert html.count('<article class="card"') == 1
     assert 'hx-get="/middager/flere?q=laks&amp;fra=1"' in html and 'Vis flere <span class="n">3 til</span>' in html
@@ -209,7 +209,7 @@ def test_offers_are_from_every_store_until_a_place_is_picked() -> None:
         matches={"kyllingfilet": ["sale"]},
         places={"Bergen": ["kiwi-vest"], "Tromsø": ["kiwi-nord"]},
     )
-    client = TestClient(main.create_app(Queries(FakeDatasets(s), week=Week(days=2, fish=1))))
+    client = TestClient(main.create_app(Queries(FakeDatasets(s))))
     anywhere = client.get("/").text
     assert '<option value="">Hele landet</option>' in anywhere and "\u221236\u00a0kr" in anywhere
     assert '<select id="sted" name="sted" form="sok" hx-get="/middager" hx-include="#sok">' in anywhere

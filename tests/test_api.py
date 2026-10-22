@@ -3,7 +3,6 @@ from fastapi.testclient import TestClient
 from adapters.web import main
 from app.queries import Queries
 from core.models import Household
-from core.ranking import Week
 from tests.fakes import SIDE, SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
@@ -16,14 +15,15 @@ s = snapshot(
     offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale"), SIDE_OFFER],
     matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
 )
-client = TestClient(main.create_app(Queries(FakeDatasets(s), Household(), Week(days=2, fish=1))))
+client = TestClient(main.create_app(Queries(FakeDatasets(s), Household())))
 
 
-def test_plan() -> None:
-    body = client.get("/api/plan").json()
-    assert (body["considered"], body["fitting"], body["on_sale"], body["stores"]) == (2, 2, 1, ["KIWI"])
+def test_dinners() -> None:
+    body = client.get("/api/middager").json()
+    assert (body["considered"], body["fitting"], body["on_sale"], body["offers"]) == (2, 2, 1, 2)
     first = body["dinners"][0]
-    assert first["rank"] == 1 and first["protein"] in {"kylling", "fisk"}
+    assert first["rank"] == 1 and first["protein"] == "kylling"  # the most kroner off first
+    assert "plan" not in body and "plan" not in body["links"]
     sale = next(d for d in body["dinners"] if d["name"] == "Kyllinggryte")["discounts"][0]
     assert sale == {
         "ingredient": "kyllingfilet",
@@ -37,7 +37,7 @@ def test_plan() -> None:
 
 
 def test_cors_is_open() -> None:
-    r = client.get("/api/plan", headers={"Origin": "https://chat.openai.com"})
+    r = client.get("/api/middager", headers={"Origin": "https://chat.openai.com"})
     assert r.headers["access-control-allow-origin"] == "*"
 
 
@@ -63,8 +63,8 @@ def test_dinners_search() -> None:
 
 
 def test_rules_come_from_q() -> None:
-    plain = client.get("/api/plan").json()
-    ruled = client.get("/api/plan", params={"q": "uten løk glutenfri"}).json()
+    plain = client.get("/api/middager").json()
+    ruled = client.get("/api/middager", params={"q": "uten løk glutenfri"}).json()
     assert plain["fitting"] == ruled["fitting"] == 2  # nothing here has onion or gluten
     body = client.get("/api/oppskrift", params={"url": KYLLING.url, "q": "glutenfri"}).json()
     assert body["fits"] is True
@@ -77,7 +77,7 @@ def test_api_root_points_at_the_schema() -> None:
 
 
 def test_no_notes_name_ingredients() -> None:
-    for path in ("/api/plan", "/api/middager", f"/api/oppskrift?url={KYLLING.url}"):
+    for path in ("/api/middager", f"/api/oppskrift?url={KYLLING.url}"):
         body = client.get(path).json()
         for d in body.get("dinners", [body]):
             assert "notes" not in d
@@ -94,17 +94,16 @@ def test_recipe_and_not_found() -> None:
 def test_openapi_names_this_server() -> None:
     schema = client.get("/api/openapi.json").json()
     assert schema["servers"] == [{"url": "http://testserver/api"}]
-    assert {"/plan", "/middager", "/oppskrift"} <= set(schema["paths"])
+    assert set(schema["paths"]) == {"/middager", "/oppskrift"}  # no week (jb 2026-10-22)
 
 
 def test_answers_link_to_each_rule_so_agents_need_not_write_urls() -> None:
-    week = client.get("/api/plan", params={"q": "melkefri"}).json()["links"]
-    assert week["add"]["glutenfri"] == "http://testserver/api/plan?q=melkefri+glutenfri"
-    assert week["remove"] == {"melkefri": "http://testserver/api/plan"}
-    assert week["dinners"] == "http://testserver/api/middager?q=melkefri"
+    ruled = client.get("/api/middager", params={"q": "melkefri"}).json()["links"]
+    assert ruled["add"]["glutenfri"] == "http://testserver/api/middager?q=melkefri+glutenfri"
+    assert ruled["remove"] == {"melkefri": "http://testserver/api/middager"}
+    assert ruled["dinners"] == "http://testserver/api/middager?q=melkefri"
     found = client.get("/api/middager", params={"q": "kylling melkefri"}).json()["links"]
     assert found["add"]["uten løk"] == "http://testserver/api/middager?q=kylling+melkefri+uten+l%C3%B8k"
-    assert found["plan"] == "http://testserver/api/plan?q=melkefri"  # the week follows the rules only
     assert "melkefri" not in found["add"]
 
 
@@ -115,23 +114,22 @@ def test_a_place_in_answers_and_links() -> None:
         matches={"kyllingfilet": ["sale"]},
         places={"Bergen": ["kiwi-vest"], "Tromsø": ["kiwi-nord"]},
     )
-    api = TestClient(main.create_app(Queries(FakeDatasets(s), Household(), Week(days=1, fish=0))))
-    body = api.get("/api/plan").json()
+    api = TestClient(main.create_app(Queries(FakeDatasets(s), Household())))
+    body = api.get("/api/middager").json()
     assert (body["place"], body["offers"], body["on_sale"]) == (None, 1, 1)
     assert body["links"]["places"] == {
-        "Bergen": "http://testserver/api/plan?sted=bergen",
-        "Tromsø": "http://testserver/api/plan?sted=troms%C3%B8",
+        "Bergen": "http://testserver/api/middager?sted=bergen",
+        "Tromsø": "http://testserver/api/middager?sted=troms%C3%B8",
     }
     body = api.get(body["links"]["places"]["Tromsø"]).json()
     assert (body["place"], body["offers"], body["on_sale"]) == ("Tromsø", 0, 0)
-    assert body["links"]["remove"] == {"sted": "http://testserver/api/plan"}
+    assert body["links"]["remove"] == {"sted": "http://testserver/api/middager"}
     assert list(body["links"]["places"]) == ["Bergen"]
     body = api.get("/api/middager?q=kylling+melkefri&sted=Bergen").json()
     assert body["place"] == "Bergen" and [c["kind"] for c in body["search"]["understood"]] == ["protein", "diet"]
-    assert body["links"]["plan"] == "http://testserver/api/plan?q=melkefri&sted=bergen"
     assert body["links"]["remove"]["sted"] == "http://testserver/api/middager?q=kylling+melkefri"
     assert api.get("/api/middager?sted=gotham").json()["place"] is None  # an unknown place is every store
     body = api.get("/api/middager?q=melkefri&sted=bergen&sorter=kroner").json()  # an old link: `sorter` is ignored
     assert "order" not in body
     assert body["links"]["add"]["vegansk"] == "http://testserver/api/middager?q=melkefri+vegansk&sted=bergen"
-    assert "- [Bergen](http://testserver/api/plan?sted=bergen)" in api.get("/llms.txt").text
+    assert "- [Bergen](http://testserver/api/middager?sted=bergen)" in api.get("/llms.txt").text

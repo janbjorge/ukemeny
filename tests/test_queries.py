@@ -2,7 +2,6 @@ from datetime import date
 
 from app.queries import Queries
 from core.models import Gluten, Household, Item, Level, Onion, Rule
-from core.ranking import Week
 from tests.fakes import SIDE, SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
@@ -17,14 +16,14 @@ def queries(household: Household | None = None) -> Queries:
         offers=[SALE, SIDE_OFFER],
         matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
     )
-    return Queries(FakeDatasets(s), household or Household(), Week(days=2, fish=1))
+    return Queries(FakeDatasets(s), household or Household())
 
 
-def test_plan_and_dinners() -> None:
+def test_tally_and_dinners() -> None:
     q = queries()
-    week = q.plan()
-    assert (week.considered, week.fitting, week.on_sale, week.offers, week.stores) == (2, 2, 1, 2, ("KIWI",))
-    assert {d.dish.name for d in week.dinners} == {"Kylling", "Laks"}
+    t = q.tally()
+    assert (t.considered, t.fitting, t.on_sale, t.offers, t.stores) == (2, 2, 1, 2, ("KIWI",))
+    assert {d.dish.name for d in q.search().dinners} == {"Kylling", "Laks"}
 
 
 def test_search() -> None:
@@ -79,7 +78,7 @@ def test_the_site_starts_with_no_rules_and_the_search_adds_them() -> None:
     found = q.search("uten løk glutenfri")
     assert {d.dish.name for d in found.dinners} == {"Laks"}  # nothing is swapped: no glutenfri spagetti
     assert found.household.onion is Rule.AVOID and found.household.gluten is Rule.AVOID
-    assert q.plan(found.household).fitting == 1 and q.plan().fitting == 3
+    assert q.tally(found.household).fitting == 1 and q.tally().fitting == 3
     checked = q.check(recipe("Pasta", pasta).url, q.household("glutenfri"))
     assert checked is not None and checked.verdict.blocked == "inneholder gluten (spagetti)"
 
@@ -91,14 +90,22 @@ def test_ranked_by_the_kroner_off_every_discounted_ingredient() -> None:
         recipe("Laks", SALMON, SIDE),
         recipe("Lam", lamb, SIDE),
         recipe("Torsk", ingredient("torskefilet", 600, "g", "/fisk og sjømat")),
-        offers=[offer("KYLLINGFILET", 60, pre_price=100, id="k"), offer("LAMMEKOTELETT", 200, pre_price=300, id="l"), SIDE_OFFER],
-        matches={"kyllingfilet": ["k"], "lammekotelett": ["l"], **SIDE_MATCH},
+        recipe("Sei", ingredient("seifilet", 600, "g", "/fisk og sjømat")),
+        offers=[
+            offer("KYLLINGFILET", 60, pre_price=100, id="k"),
+            offer("LAMMEKOTELETT", 200, pre_price=300, id="l"),
+            offer("SEIFILET", 92, pre_price=100, id="s"),
+            SIDE_OFFER,
+        ],
+        matches={"kyllingfilet": ["k"], "lammekotelett": ["l"], "seifilet": ["s"], **SIDE_MATCH},
     )
     q = Queries(FakeDatasets(s))
-    # Every discounted ingredient counts: 100 + 5 kr, 40 kr, 5 kr (jb 2026-10-22: "total saving per dinner")
+    # Every discounted ingredient counts: 100 + 25 kr, 40 kr, 25 kr (jb 2026-10-22: "total saving per dinner")
     assert [d.dish.name for d in q.search(per_protein=0).dinners] == ["Lam", "Kylling", "Laks"]
-    assert q.search().dinners[0].saving == 105
-    assert q.search().total == 3  # Torsk has nothing on sale (jb 2026-10-22: "ignore dinners with 0 Discounted ingredients")
+    assert q.search().dinners[0].saving == 125
+    # Torsk has nothing on sale (jb 2026-10-22: "ignore dinners with 0 Discounted ingredients"), and Sei only 8 kr off
+    # (core.ranking.FLOOR_KR; jb: "no point in showing 100 menues with tuna on sale for 8kr")
+    assert q.search().total == 3 and q.tally().fitting == 3
 
 
 def test_allergies_and_vegetar_leave_dinners_out() -> None:
@@ -135,7 +142,7 @@ def test_offers_are_from_the_place_picked_or_from_every_store() -> None:
         matches={"kyllingfilet": ["vest"], "laksefilet": ["nord"]},
         places={"Bergen": ["kiwi-vest", "rema"], "Tromsø": ["kiwi-nord", "rema"]},
     )
-    q = Queries(FakeDatasets(s), week=Week(days=2, fish=1))
+    q = Queries(FakeDatasets(s))
 
     def on_sale(place: str | None = None) -> list[str]:
         return sorted(d.dish.name for d in q.search("på tilbud", place).dinners)
@@ -145,9 +152,9 @@ def test_offers_are_from_the_place_picked_or_from_every_store() -> None:
     assert on_sale("Tromsø") == ["Laks"]
     assert q.search("", "Bergen").place == "Bergen"
     assert (q.place("bergen"), q.place("TROMSO"), q.place("Gotham"), q.place("")) == ("Bergen", "Tromsø", None, None)
-    week = q.plan(place="Bergen")
-    assert (week.place, week.offers, week.on_sale) == ("Bergen", 1, 1)
-    assert (q.plan().place, q.plan().offers, q.plan().on_sale) == (None, 2, 2)
+    bergen = q.tally(place="Bergen")
+    assert (bergen.place, bergen.offers, bergen.on_sale) == ("Bergen", 1, 1)
+    assert (q.tally().place, q.tally().offers, q.tally().on_sale) == (None, 2, 2)
     home = Queries(FakeDatasets(s), home="Tromsø")  # the CLI's place, from profile.yaml
     assert [d.dish.name for d in home.search("på tilbud").dinners] == ["Laks"]
     assert [d.dish.name for d in home.search("på tilbud", "Bergen").dinners] == ["Kylling"]  # a place picked goes first

@@ -93,13 +93,13 @@ name, so the site's lookup stays as it is.
 
 ## 3. The ten percent that is not pipeline
 
-- [ ] The floor: `Queries.ranked` keeps a dinner only from this many kroner off, one constant in core, 20 kr to start.
-      With this week's offers: 2 262 of 3 392 dinners have any kroner off, 1 467 have 20 or more, 1 180 have 30 or
-      more, 582 have 50 or more; the median among those on sale is 31 kr. Tuned on the cards.
-- [ ] The week's draw deleted: src/core/ranking.py `Week`, `pick`, `plan`, `POOL`; src/app/queries.py `plan`;
-      `/api/plan` in src/adapters/web/api.py; `matris plan` in src/adapters/cli.py; `schema.plan`, `PlanOut` and the
-      `plan` links; `week:` in profile.example.yaml and src/adapters/profile.py; the links in llms.txt; the tests.
-      `Dinner.sale` in src/core/models.py, which nothing reads, goes with it.
+- [x] The floor: `Queries.ranked` keeps a dinner only from `core.ranking.FLOOR_KR` off, 20 kr to start. With this
+      week's offers: 2 262 of 3 392 dinners have any kroner off, 1 467 have 20 or more, 1 180 have 30 or more, 582
+      have 50 or more; the median among those on sale is 31 kr. To tune on the cards. /om and llms.txt say it.
+- [x] The week's draw deleted: `Week`, `pick`, `plan`, `POOL` and `kroner` in src/core/ranking.py; `Queries.plan` (the
+      counts live on as `Queries.tally`, core.models `Tally`); `/api/plan`; `matris plan`; `schema.plan`, `PlanOut` and
+      the `plan` links; `week:` in profile.yaml, the template and src/adapters/profile.py; the links in llms.txt; the
+      tests. `Dinner.sale`, which nothing read, went with it.
 - [x] The docs put right where they disagree with the code (an audit on 2026-10-22): FACTS.md §1 says 300 ms where
       the page uses 100; FACTS.md §1 and README.md lead with a week the site does not show; FACTS.md §2 names a
       `build.refresh` that does not exist; FACTS.md §6's wrong-answer list is stale; METHOD.md §3 and §6 mention

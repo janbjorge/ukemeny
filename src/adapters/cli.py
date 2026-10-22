@@ -1,6 +1,6 @@
 """Command-line adapter: `matris --help` lists everything.
 
-The read commands (`plan`, `candidates`, `check`) read datasets/ like the site. With `--json` they print
+The read commands (`candidates`, `check`) read datasets/ like the site. With `--json` they print
 one JSON document on stdout (src/adapters/schema.py) and nothing else; errors are
 `{"error": {"kind", "message"}}` with exit code 1. `build` makes datasets/ with Jev (src/pipeline/datasets.py).
 """
@@ -24,7 +24,7 @@ from core.search import Tag, fold, protein_word
 
 app = typer.Typer(
     help="Middager fra matprat.no og godt.no som passer profile.yaml, med ukens tilbud. `matris build` lager datasets/, "
-    "`matris plan` gir ukens middager.",
+    "`matris candidates` gir middagene som sparer mest.",
     no_args_is_help=True,
     add_completion=False,
 )
@@ -55,7 +55,7 @@ def queries(as_json: bool) -> Queries:
     places = {fold(place): place for place in datasets.snapshot().places}
     if p.place and fold(p.place) not in places:
         fail("setup", f"{profile.PROFILE}: place: kjenner ikke {p.place}; kjente steder er {', '.join(places.values())}", as_json)
-    return Queries(datasets, p.household, p.week, places[fold(p.place)] if p.place else None)
+    return Queries(datasets, p.household, places[fold(p.place)] if p.place else None)
 
 
 def _verdict_lines(verdict: Verdict) -> list[str]:
@@ -79,21 +79,6 @@ def _dinner(n: int, d: Dinner) -> str:
                 f"{sale.price:.2f} kr, før {sale.pre_price:.2f}, til {sale.valid_until:%d.%m})"
             )
     return "\n".join(lines + _verdict_lines(d.verdict))
-
-
-@app.command()
-def plan(as_json: JsonOption = False) -> None:
-    """Ukens middager: trukket blant dem med mest spart i kroner, én per hovedråvare. Ny hver gang."""
-    q = queries(as_json)
-    week = q.plan(place=q.home)
-    if as_json:
-        return emit(schema.plan(q, week))
-    typer.echo(
-        f"{week.fitting:,} av {week.considered:,} middager passer, {week.on_sale:,} med hovedråvaren på tilbud. "
-        f"{week.offers:,} tilbud fra {', '.join(week.stores)}.\n"
-    )
-    for n, d in enumerate(week.dinners, 1):
-        typer.echo(_dinner(n, d) + "\n")
 
 
 @app.command()

@@ -1,11 +1,9 @@
-import random
-from collections import Counter
 from dataclasses import replace
 
 from adapters.datasets import JsonDatasets
 from core.diet import judge
 from core.models import Gluten, Household, Onion
-from core.ranking import POOL, Week, dinners, pick, plan, prepare, varied
+from core.ranking import dinners, prepare, varied
 from core.search import Diet, household
 from tests.fakes import ingredient, offer, recipe, snapshot, traits
 
@@ -55,7 +53,7 @@ def test_a_discount_on_the_side_does_not_put_a_dinner_on_sale() -> None:
     bacon = ingredient("bacon", 150, "g", "/kjøtt/svinekjøtt")
     s = snapshot(recipe("Lutefisk", lutefisk, bacon), offers=[offer("Stjernebacon", 20, pre_price=39.9, id="b")], matches={"bacon": ["b"]})
     (dinner,) = dinners(s, HOUSEHOLD)
-    assert dinner.main == "lutefisk" and dinner.sale > 0 and not dinner.on_sale
+    assert dinner.main == "lutefisk" and dinner.saving > 0 and not dinner.on_sale
 
 
 def test_offers_missing_from_the_snapshot_are_ignored() -> None:
@@ -76,60 +74,20 @@ def test_meat_and_fish_offers_count_per_dinner() -> None:
     assert found == {"Nigiri": [], "Tunfisksalat": ["tin"]}
 
 
-def test_week_is_varied_and_never_the_same_fish_twice() -> None:
-    s = snapshot(
-        recipe("Kylling 1", CHICKEN, rating=5.0, rating_count=10),
-        recipe("Kylling 2", CHICKEN, rating=5.0, rating_count=10),
-        recipe("Laks 1", SALMON),
-        recipe("Laks 2", SALMON),
-        recipe("Torsk", COD),
-        recipe("Grønnsaksgryte", BROCCOLI),
-    )
-    names = [d.dish.name for d in plan(dinners(s, HOUSEHOLD), Week(days=4, fish=2, on_sale_only=False), random.Random(0).random)]
-    assert len(names) == 4
-    assert sum(n.startswith("Laks") for n in names) == 1
-    assert "Torsk" in names
-    assert sum(n.startswith("Kylling") for n in names) == 1
+def test_the_main_protein_is_the_meat_in_the_recipe_not_matprats_label() -> None:
+    s = snapshot(recipe("Kylling med spekeskinke", CHICKEN, HAM, main="Svin"), recipe("Svinestek", PORK))
+    assert [d.protein for d in dinners(s, HOUSEHOLD)] == ["kylling", "svin"]
 
 
-def test_week_goes_by_the_meat_in_the_recipe_not_matprats_label() -> None:
-    s = snapshot(recipe("Kylling med spekeskinke", CHICKEN, HAM, main="Svin"), recipe("Kyllinggryte", CHICKEN), recipe("Svinestek", PORK))
-    names = {d.dish.name for d in pick(dinners(s, HOUSEHOLD), days=2, fish=0)}
-    assert "Svinestek" in names and len(names) == 2
-
-
-def test_week_picks_dinners_on_sale_and_fills_in() -> None:
-    s = snapshot(
-        recipe("Kylling", CHICKEN, rating=3.0, rating_count=10),
-        recipe("Biff", PORK, rating=5.0, rating_count=10),
-        recipe("Lam", BROCCOLI, rating=5.0, rating_count=10),
-        offers=[SALE],
-        matches={"kyllingfilet": ["sale"]},
-    )
-    week = plan(dinners(s, HOUSEHOLD), Week(days=2, fish=0), random.Random(0).random)
-    assert week[0].dish.name == "Kylling" and len(week) == 2
-
-
-def test_week_is_drawn_from_the_most_kroner_off_the_more_the_likelier() -> None:
-    """jb 2026-10-14: "I want a Ukens middager that consist of the lowest prices, in rabatt kr, if we can make this semi
-    random"."""
-    off = [10, 20, 30, 40, 50, 60, 70]  # kroner off, one chicken dinner each
+def test_the_most_kroner_off_comes_first() -> None:
+    off = [10, 70, 40]  # kroner off, one chicken dinner each
     parts = [ingredient(f"kylling {kr}", 600, "g", "/kjøtt/kylling/høns") for kr in off]
     s = snapshot(
         *(recipe(f"Kylling {kr}", part) for kr, part in zip(off, parts, strict=True)),
         offers=[offer(f"KYLLING {kr}", 100, pre_price=100 + kr, id=str(kr)) for kr in off],
         matches={f"kylling {kr}": [str(kr)] for kr in off},
     )
-    ranked, week = dinners(s, HOUSEHOLD), Week(days=1, fish=0)
-    drawn = Counter(plan(ranked, week, random.Random(n).random)[0].dish.name for n in range(400))
-    assert set(drawn) == {f"Kylling {kr}" for kr in off[-POOL:]}  # the 10 and 20 kr off are not in the draw
-    assert drawn["Kylling 70"] > drawn["Kylling 50"] > drawn["Kylling 30"]  # the more off, the likelier
-    assert plan(ranked, week, random.Random(7).random) == plan(ranked, week, random.Random(7).random)  # the same seed, the same week
-
-
-def test_pick_repeats_proteins_only_when_it_must() -> None:
-    s = snapshot(recipe("Kylling 1", CHICKEN), recipe("Kylling 2", CHICKEN))
-    assert len(pick(dinners(s, HOUSEHOLD), days=2, fish=2)) == 2
+    assert [d.dish.name for d in dinners(s, HOUSEHOLD)] == ["Kylling 70", "Kylling 40", "Kylling 10"]
 
 
 def test_varied_puts_a_few_of_each_protein_first() -> None:

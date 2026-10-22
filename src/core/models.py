@@ -396,11 +396,6 @@ class Dinner:
         return sum((b.sale.saving or 0.0) for b in self.deals if b.sale)
 
     @property
-    def sale(self) -> float:
-        """How much of the dinner is discounted: weight times discount, summed."""
-        return sum(b.weight * (b.sale.discount or 0.0) for b in self.buys if b.sale)
-
-    @property
     def on_sale(self) -> bool:
         """The main protein is discounted this week; without meat or fish, a main vegetable.
         Discounted bacon on the side does not make lutefisk a dinner on sale."""
@@ -410,8 +405,9 @@ class Dinner:
 
 
 @dataclass(frozen=True, slots=True)
-class Plan:
-    dinners: tuple[Dinner, ...]
+class Tally:
+    """The counts behind an answer: where the offers are from and how many, and how many dinners fit the rules."""
+
     place: str | None
     """Where the offers are from: the stores near this place, or (None) every store."""
     offers: int
@@ -419,9 +415,9 @@ class Plan:
     considered: int
     """Dinner recipes looked at."""
     fitting: int
-    """Of those, recipes that fit the household."""
+    """Of those, dinners that fit the household and save enough to be shown (core.ranking.FLOOR_KR)."""
     on_sale: int
-    """Of those, dinners with a main ingredient on sale."""
+    """Of those, dinners with the main ingredient on sale (Dinner.on_sale)."""
 
 
 @dataclass(frozen=True, slots=True)

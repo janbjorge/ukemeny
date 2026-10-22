@@ -4,7 +4,6 @@ import pytest
 
 from adapters import profile
 from core.models import Household, Rule
-from core.ranking import Week
 
 
 def write(tmp_path: Path, text: str) -> Path:
@@ -23,7 +22,6 @@ def test_template_is_our_household() -> None:
         lactose_g_per_portion=3.0,
         kid_notes=True,
     )
-    assert p.week == Week(days=5, fish=2, on_sale_only=True)
     assert p.place == "Stavanger"
 
 
@@ -40,13 +38,11 @@ diet:
   garlic: avoid
   lactose:
 small_kids: false
-week: {dinners: 7, on_sale_only: false}
 """,
         )
     )
     h = p.household
     assert (h.onion, h.onion_ok, h.garlic, h.lactose_g_per_portion, h.kid_notes) == (Rule.AVOID, None, Rule.AVOID, None, False)
-    assert p.week == Week(days=7, fish=2, on_sale_only=False)
     assert p.place is None  # every store
 
 
@@ -61,6 +57,7 @@ def test_missing_profile_says_how_to_make_one(tmp_path: Path) -> None:
         ("diet: {onions: avoid}", "diet.onions"),
         ("diet: {onion: never}", "diet.onion"),
         ("shopping: {lat: 1, lng: 1}", "shopping"),
+        ("week: {dinners: 5}", "week"),  # the week's draw is gone (jb 2026-10-22)
         ("place: [", "not valid YAML"),
     ],
 )

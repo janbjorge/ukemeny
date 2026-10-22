@@ -1,4 +1,4 @@
-# What the household can't eat, where it shops, and what a week looks like, for the `matris` CLI.
+# What the household can't eat and where it shops, for the `matris` CLI.
 # The site and the offline build do not read this file: a visitor picks the diet in the search, and the place beside it.
 # Edit with `matris profile`. Nothing here is sent to Jev; it only sees ingredient names and offer headings.
 
@@ -23,10 +23,3 @@ small_kids: true
 # Offers are from the grocery stores near here: one of the places in datasets/offers.json
 # (`places`). Leave out for every store.
 place: Stavanger
-
-week:
-  dinners: 5
-  fish: 2   # of those, fish dinners when enough fit
-  # Pick dinners whose main meat, fish or vegetable is discounted this week (has a
-  # before-price). Others only fill in when there are too few.
-  on_sale_only: true

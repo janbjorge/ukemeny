@@ -4,20 +4,18 @@ The rules come from the search: «uten løk», «glutenfri» and «lite laktose�
 The site's base has no rules (core.search.ANYTHING); the CLI's is profile.yaml. The offers are from the stores near the
 place picked with the search (the site's «Sted»), else near the base place (the CLI's, from profile.yaml), else from every
 store. What does not depend on the rules (core.ranking.prepare, the search Index) is worked out once. The offers per place,
-and rankings, views and the week's counts per set of rules and place, are worked out when first asked for and kept, a few
-at a time (Queries.KEPT): the snapshot only changes on deploy. The week's dinners are drawn each time (core.ranking.plan).
+and rankings, views and tallies per set of rules and place, are worked out when first asked for and kept, a few at a
+time (Queries.KEPT): the snapshot only changes on deploy.
 """
 
-import random
 from collections.abc import Mapping
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import date
 
 from core import ranking
 from core.diet import judge
-from core.models import Dinner, Dish, Household, Offer, Plan, Snapshot, Verdict
+from core.models import Dinner, Dish, Household, Offer, Snapshot, Tally, Verdict
 from core.ports import Datasets
-from core.ranking import Week
 from core.search import ANYTHING, Clause, Counts, Index, Kind, Search, View, fold, household, via
 
 type Rules = tuple[Household, str | None]
@@ -55,10 +53,9 @@ class Queries:
     for a few (2026-10-14, FACTS.md §7): past this many they are all dropped, the places' offers too, and worked out
     again as asked, in about 40 ms locally."""
 
-    def __init__(self, datasets: Datasets, base: Household = ANYTHING, week: Week | None = None, home: str | None = None) -> None:
+    def __init__(self, datasets: Datasets, base: Household = ANYTHING, home: str | None = None) -> None:
         self.snapshot: Snapshot = datasets.snapshot()
         self.base = base
-        self.week = week or Week()
         self.home = home
         """The base place, when none is picked; None: every store."""
         self.prepared = ranking.prepare(self.snapshot)
@@ -67,8 +64,7 @@ class Queries:
         self._nearby: dict[str | None, tuple[ranking.Prepared, ...]] = {None: self.prepared}
         self._ranked: dict[Rules, list[Dinner]] = {}
         self._view: dict[Rules, View] = {}
-        self._plan: dict[Rules, Plan] = {}
-        """Without the dinners, which are drawn each time."""
+        self._tally: dict[Rules, Tally] = {}
 
     def nearby(self, place: str | None) -> tuple[ranking.Prepared, ...]:
         """Every dinner with the offers at the stores near `place` (core.ranking.nearby)."""
@@ -77,16 +73,18 @@ class Queries:
         return nearby
 
     def ranked(self, h: Household | None = None, place: str | None = None) -> list[Dinner]:
-        """Every dinner that fits and has an ingredient on sale near `place`, best first (core.ranking.dinners; jb
-        2026-10-22: "We should ignore dinners with 0 Discounted ingredients")."""
+        """Every dinner that fits and saves at least core.ranking.FLOOR_KR near `place`, best first (core.ranking.dinners;
+        jb 2026-10-22: "We should ignore dinners with 0 Discounted ingredients", "no point in showing 100 menues with
+        tuna on sale for 8kr")."""
         key = (h or self.base, place)
         if (ranked := self._ranked.get(key)) is None:
             if len(self._ranked) >= self.KEPT:
                 self._ranked.clear()
                 self._view.clear()
-                self._plan.clear()
+                self._tally.clear()
                 self._nearby = {None: self.prepared}
-            ranked = self._ranked[key] = [d for d in ranking.dinners(self.snapshot, key[0], self.nearby(place)) if d.deals]
+            found = ranking.dinners(self.snapshot, key[0], self.nearby(place))
+            ranked = self._ranked[key] = [d for d in found if d.saving >= ranking.FLOOR_KR]
         return ranked  # Not self._ranked[key]: another request's thread may have dropped it already
 
     def view(self, h: Household | None = None, place: str | None = None) -> View:
@@ -148,14 +146,13 @@ class Queries:
         near = frozenset(self.snapshot.places[place])
         return [o for o in self.snapshot.offers if o.catalog in near]
 
-    def plan(self, h: Household | None = None, place: str | None = None) -> Plan:
-        """The week for these rules and this place, drawn anew each time."""
+    def tally(self, h: Household | None = None, place: str | None = None) -> Tally:
+        """The counts behind an answer for these rules and this place."""
         key = (h or self.base, place)
-        ranked = self.ranked(*key)
-        if (counts := self._plan.get(key)) is None:
+        if (tally := self._tally.get(key)) is None:
+            ranked = self.ranked(*key)
             offers = self.offers(place)
-            counts = self._plan[key] = Plan(
-                dinners=(),
+            tally = self._tally[key] = Tally(
                 place=place,
                 offers=len(offers),
                 stores=tuple(sorted({o.store for o in offers})),
@@ -163,7 +160,7 @@ class Queries:
                 fitting=len(ranked),
                 on_sale=sum(d.on_sale for d in ranked),
             )
-        return replace(counts, dinners=tuple(ranking.plan(ranked, self.week, random.random)))
+        return tally
 
     def check(self, url: str, h: Household | None = None) -> Check | None:
         dish = next((d for d in self.snapshot.dishes if d.url == url), None)

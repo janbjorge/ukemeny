@@ -23,6 +23,7 @@ from adapters.web import api, fmt, telemetry
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
 from app.queries import Found, Queries
 from core.matching import VEGETARIAN
+from core.ranking import FLOOR_KR
 from core.search import (
     Diet,
     Kind,
@@ -224,6 +225,7 @@ def create_app(queries: Queries) -> FastAPI:
             "link": link,
             "marked": marked,
             "page": PAGE,
+            "floor_kr": round(FLOOR_KR),
         }
 
     templates = Jinja2Templates(directory=HERE / "templates", context_processors=[context])
@@ -337,8 +339,8 @@ def create_app(queries: Queries) -> FastAPI:
                 "base": str(request.base_url),
                 "proteins": ", ".join(KNOWN_PROTEINS),
                 "diets": api.DIETS,
-                "rule_links": [(d.value, f"{request.base_url}api/plan?{link(d.value)}") for d in Diet],
-                "place_links": [(p, f"{request.base_url}api/plan?{link('', place=p)}") for p in queries.snapshot.places],
+                "rule_links": [(d.value, f"{request.base_url}api/middager?{link(d.value)}") for d in Diet],
+                "place_links": [(p, f"{request.base_url}api/middager?{link('', place=p)}") for p in queries.snapshot.places],
             },
             media_type="text/plain",
         )

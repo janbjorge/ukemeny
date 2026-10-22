@@ -64,19 +64,6 @@ def build(queries: Queries) -> FastAPI:
         """This API's address, ending in "/", for the links in an answer."""
         return str(request.url.replace(path=request.url.path.rsplit("/", 1)[0] + "/", query=""))
 
-    @api.get("/plan", response_model=schema.PlanOut, summary="This week's dinners")
-    def plan(
-        request: Request,
-        q: Annotated[str | None, Query(description=f"Diet rules and allergies: {DIETS}")] = None,
-        sted: Annotated[str | None, near] = None,
-    ) -> schema.PlanOut:
-        """A varied week: one dinner per main protein (fish up to twice, never the same fish twice), drawn anew on
-        each call from the dinners on sale with the most kroner off, the more off the likelier. `links` adds or takes
-        away a diet rule, or picks a place."""
-        search, place = queries.parse(q or ""), queries.place(sted)
-        telemetry.counted(search, place, request.url.path)
-        return schema.plan(queries, queries.plan(*queries.rules(search, place)), search, base(request))
-
     @api.get("/middager", response_model=schema.DinnersOut, summary="Search the dinners that fit, best first")
     def dinners(
         request: Request,
@@ -89,8 +76,9 @@ def build(queries: Queries) -> FastAPI:
         sted: Annotated[str | None, near] = None,
     ) -> schema.DinnersOut:
         """Dinners whose name has a searched word first, then the most kroner off (every discounted
-        ingredient summed, `discounts`), rating and prep time. Without a protein or a word to find, the best 3 of each
-        main protein come first. `search` says how `q` was understood, and `links` adds or takes away a diet rule, or picks a place."""
+        ingredient summed, `discounts`), rating and prep time; only dinners with at least 20 kr off are listed. Without a
+        protein or a word to find, the best 3 of each main protein come first. `search` says how `q` was understood, and
+        `links` adds or takes away a diet rule, or picks a place."""
         choice = DinnerQuery.of(q=q, protein=protein, tilbud=tilbud, antall=antall, sted=sted)
         place = queries.place(choice.sted)
         found = telemetry.search(queries, choice.text(), place, request.url.path, limit=choice.antall)

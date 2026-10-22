@@ -7,7 +7,6 @@ from typer.testing import CliRunner
 from adapters import cli, profile
 from app.queries import Queries
 from core.models import Household, Onion, Rule
-from core.ranking import Week
 from tests.fakes import FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
@@ -24,21 +23,22 @@ def fixture_queries(monkeypatch: pytest.MonkeyPatch) -> None:
         offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale")],
         matches={"kyllingfilet": ["sale"]},
     )
-    q = Queries(FakeDatasets(s), Household(onion=Rule.NOTE), Week(days=1, fish=0))
+    q = Queries(FakeDatasets(s), Household(onion=Rule.NOTE))
     monkeypatch.setattr(cli, "queries", lambda as_json: q)
 
 
-def test_plan_json_is_one_document() -> None:
-    r = runner.invoke(cli.app, ["plan", "--json"])
+def test_candidates_json_is_one_document() -> None:
+    r = runner.invoke(cli.app, ["candidates", "--json"])
     assert r.exit_code == 0
     body = json.loads(r.stdout)
-    assert "swaps" not in body["dinners"][0]
+    assert (body["considered"], body["fitting"], body["on_sale"]) == (1, 1, 1)
+    assert "swaps" not in body["dinners"][0] and body["links"] is None  # the API's links; the CLI has none
     assert body["dinners"][0]["discounts"][0]["discount_percent"] == 27
 
 
-def test_plan_text_is_bokmal() -> None:
-    out = runner.invoke(cli.app, ["plan"]).stdout
-    assert "1 av 1 middager passer" in out and "merk: løk: inneholder løk" in out and "bytt" not in out
+def test_candidates_text_is_bokmal() -> None:
+    out = runner.invoke(cli.app, ["candidates"]).stdout
+    assert "1. Kyllinggryte | kylling | 20-40 min" in out and "merk: løk: inneholder løk" in out and "bytt" not in out
     assert "på tilbud: kyllingfilet -27%" in out
 
 
@@ -71,7 +71,7 @@ def test_errors_are_json_in_json_mode() -> None:
 def test_missing_profile_is_a_setup_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.undo()
     monkeypatch.setattr(profile, "PROFILE", tmp_path / "profile.yaml")
-    r = runner.invoke(cli.app, ["plan", "--json"])
+    r = runner.invoke(cli.app, ["candidates", "--json"])
     assert r.exit_code == 1 and json.loads(r.stdout)["error"]["kind"] == "setup"
 
 
@@ -86,7 +86,7 @@ def test_the_profile_place_is_where_the_cli_shops(monkeypatch: pytest.MonkeyPatc
     monkeypatch.setattr(cli, "JsonDatasets", lambda: FakeDatasets(s))
     monkeypatch.setattr(profile, "PROFILE", tmp_path / "profile.yaml")
     profile.PROFILE.write_text("place: tromso\n")
-    body = json.loads(runner.invoke(cli.app, ["plan", "--json"]).stdout)
+    body = json.loads(runner.invoke(cli.app, ["candidates", "--json"]).stdout)
     assert (body["place"], body["on_sale"]) == ("Tromsø", 0)
     body = json.loads(runner.invoke(cli.app, ["candidates", "--sted", "bergen", "--json"]).stdout)
     assert (body["place"], body["on_sale"]) == ("Bergen", 1)
@@ -96,5 +96,5 @@ def test_the_profile_place_is_where_the_cli_shops(monkeypatch: pytest.MonkeyPatc
         "message": "--sted: kjenner ikke Gotham; kjente steder er Bergen, Tromsø",
     }
     profile.PROFILE.write_text("place: Gotham\n")
-    r = runner.invoke(cli.app, ["plan", "--json"])
+    r = runner.invoke(cli.app, ["candidates", "--json"])
     assert r.exit_code == 1 and "kjenner ikke Gotham; kjente steder er Bergen, Tromsø" in json.loads(r.stdout)["error"]["message"]

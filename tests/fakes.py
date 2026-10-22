@@ -112,9 +112,9 @@ def offer(
 
 
 SIDE = ingredient("potet", 200, "g", "/poteter")
-"""A side on sale (SIDE_OFFER, SIDE_MATCH): the site only shows dinners with an ingredient on sale (app.queries), and
-50 g per portion is too little to make a dinner without meat or fish «på tilbud»."""
-SIDE_OFFER = offer("POTETER", 20, pre_price=25, id="potet")
+"""A side on sale (SIDE_OFFER, 25 kr off; SIDE_MATCH): the site only shows dinners that save core.ranking.FLOOR_KR
+(app.queries), and 50 g per portion is too little to make a dinner without meat or fish «på tilbud»."""
+SIDE_OFFER = offer("POTETER", 20, pre_price=45, id="potet")
 SIDE_MATCH = {"potet": ["potet"]}
 
 

@@ -1,29 +1,21 @@
 """Which dinners fit the household, and in what order. Pure: a snapshot in, ranked dinners out."""
 
 from collections import Counter
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 
 from core.diet import carbs, fodmap_out, judge
-from core.matching import FISH, cheapest_first, main_protein, per_dinner, weight
+from core.matching import cheapest_first, main_protein, per_dinner, weight
 from core.models import Buy, Dinner, Dish, Household, Item, Level, Offer, Part, Pregnancy, Snapshot
 
 TIME_BONUS: Mapping[str, float] = {"Under": 1.0, "20": 0.5, "40": 0.0, "Over": -1.0}
 """By the start of matprat's prep time bucket: small kids do not wait for a slow dinner."""
 
-
-@dataclass(frozen=True, slots=True)
-class Week:
-    days: int = 5
-    fish: int = 2
-    """Fish dinners per week, when enough fit."""
-    on_sale_only: bool = True
-    """Drawn from dinners whose main protein is on sale (`plan`); others only fill in when there are too few."""
-
-
-POOL = 5
-"""Per main protein, the dinners on sale with the most kroner off that the week is drawn from (fish: this many per fish
-dinner in the week, so two fish can differ)."""
+FLOOR_KR = 20.0
+"""A dinner is shown from this many kroner off, every discounted ingredient summed (Dinner.saving; app.queries
+`Queries.ranked`). jb 2026-10-22: "no point in showing 100 menues with tuna on sale for 8kr". With the offers of
+2026-10-22, 2 262 of 3 392 dinners had any kroner off, 1 467 had 20 or more, 1 180 had 30 or more and 582 had 50 or
+more; the median among those on sale was 31 kr. To tune on the cards (METHOD.md §3)."""
 
 
 def score(dish: Dish) -> float:
@@ -148,61 +140,6 @@ def dinners(snapshot: Snapshot, household: Household, prepared: Sequence[Prepare
             found.append(Dinner(p.dish, verdict, p.buys, p.score, p.protein, p.main))
     found.sort(key=rank)
     return found
-
-
-def pick(ranked: Sequence[Dinner], days: int, fish: int) -> list[Dinner]:
-    """A varied week, best first: one dinner per main protein, except fish, which may come
-    up to `fish` times but never the same fish twice. Fish dinners are picked first."""
-    chosen: list[Dinner] = []
-
-    def fits(dinner: Dinner) -> bool:
-        same = sum(c.protein == dinner.protein for c in chosen)
-        if dinner in chosen or (dinner.main and dinner.main in {c.main for c in chosen}):
-            return False
-        return same == 0 or (dinner.protein == FISH and same < fish)
-
-    for dinner in (d for d in ranked if d.protein == FISH):
-        if len(chosen) >= min(fish, days):
-            break
-        if fits(dinner):
-            chosen.append(dinner)
-    for dinner in ranked:
-        if len(chosen) >= days:
-            break
-        if fits(dinner):
-            chosen.append(dinner)
-    for dinner in ranked:  # Too few proteins for a fully varied week.
-        if len(chosen) >= days:
-            break
-        if dinner not in chosen:
-            chosen.append(dinner)
-    return chosen
-
-
-def kroner(dinner: Dinner) -> float:
-    """Kroner off every discounted ingredient (Dinner.saving); 0 without one."""
-    return dinner.saving
-
-
-def plan(ranked: Sequence[Dinner], week: Week, chance: Callable[[], float]) -> list[Dinner]:
-    """The week, drawn from the dinners on sale, the more kroner off the likelier (jb 2026-10-14: "I want a Ukens
-    middager that consist of the lowest prices, in rabatt kr, if we can make this semi random"): by the square of the
-    kroner off, so a small saving rarely wins a day (METHOD.md §5). Per main protein the
-    POOL with the most kroner off are in the draw, and `pick` keeps the week varied. Topped up from
-    the ranking when too few are on sale; without `on_sale_only`, the ranking alone. `chance` gives a random number
-    from 0 to 1 (random.Random.random), so the caller decides how often the week changes."""
-    if not week.on_sale_only:
-        return pick(ranked, week.days, week.fish)
-    pools: dict[str, list[Dinner]] = {}
-    for d in sorted((d for d in ranked if d.on_sale and kroner(d) > 0), key=lambda d: -kroner(d)):
-        pools.setdefault(d.protein, []).append(d)
-    drawn = [d for protein, pool in pools.items() for d in pool[: POOL * max(week.fish, 1) if protein == FISH else POOL]]
-    # A weighted draw (Efraimidis and Spirakis): each dinner's place is a random number to the power 1 / weight
-    drawn.sort(key=lambda d: chance() ** (1 / kroner(d) ** 2), reverse=True)
-    chosen = pick(drawn, week.days, week.fish)
-    have_fish = sum(d.protein == FISH for d in chosen)
-    rest = [d for d in ranked if not d.on_sale]
-    return chosen + pick(rest, week.days - len(chosen), max(week.fish - have_fish, 0))
 
 
 def varied(ranked: Sequence[Dinner], per_protein: int) -> list[Dinner]:

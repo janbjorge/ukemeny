@@ -74,7 +74,9 @@ ALLERGY_CHIPS = (
     Diet.LUPIN,
     Diet.LEGUME,
 )
-KIND_CHIPS = (Tag.QUICK, Tag.UNDER_40, Tag.ON_SALE, Tag.LIKED, Tag.MILD)
+# «På tilbud» is no chip: every dinner shown has something on sale (jb 2026-10-22: "the filter; Hva slags - paa tilbud can
+# also be removed"); the words still work in the search
+KIND_CHIPS = (Tag.QUICK, Tag.UNDER_40, Tag.LIKED, Tag.MILD)
 # The elements whose own answer must not replace the search box: the box and its form send what was typed, and «Sted»
 # leaves the text as it is
 KEEP_BOX = {"q", "sok", "sted"}

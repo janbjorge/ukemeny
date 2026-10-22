@@ -89,7 +89,7 @@ def test_nothing_found_offers_what_to_drop(client: TestClient) -> None:
 
 def test_chips_toggle_and_count(client: TestClient) -> None:
     html = client.get("/middager?q=kylling", headers=HX).text
-    assert f'hx-get="/middager?q=kylling+p%C3%A5+tilbud"{GO}>På tilbud <span class="n">1</span>' in html
+    assert "På tilbud" not in html  # no chip (jb 2026-10-22)
     assert f'hx-get="/middager?q=kylling+eller+fisk"{GO} data-protein="fisk">Fisk <span class="n">2</span>' in html
     assert 'data-protein="kylling" aria-current="true">Kylling</a>' in html
     assert '<span class="off">Godt likt</span>' in html  # nothing would match

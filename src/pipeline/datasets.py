@@ -7,6 +7,7 @@ Jev's labels for every ingredient and offer. Nothing is kept between runs. Run o
     uv run python -m pipeline.datasets -vv   # also a line per page, ingredient, offer match and Jev call
     uv run python -m pipeline.datasets -vvv  # also every HTTP request
     uv run python -m pipeline.datasets --known  # godt.no's pages from the dinners in datasets/, not its sitemap
+    uv run python -m pipeline.datasets --offers  # only this week's offers and their matches, for the dinners in datasets/
 
 Needs TYPESAFE_API_KEY. The site reads only datasets/.
 """
@@ -50,7 +51,8 @@ class SetupError(Exception):
 @dataclass(frozen=True, slots=True)
 class Result:
     snapshot: Snapshot
-    recipes: RefreshReport
+    recipes: RefreshReport | None
+    """None when only the offers were refreshed."""
     sizes: dict[str, int]
     jev: str
 
@@ -129,29 +131,61 @@ def known_godt(root: Path = datasets.DATASETS) -> tuple[str, ...]:
     return urls
 
 
-async def run(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None, known: bool = False) -> Result:
-    """`fetching` hears every URL matprat.no, godt.no and mattilbud.no are asked for. `known`: godt.no's pages are the
-    dinners already in datasets/ (known_godt), not its sitemap's."""
+def _key() -> str:
     key = os.environ.get("TYPESAFE_API_KEY", "").strip()
     if not key:
         raise SetupError("TYPESAFE_API_KEY is not set. Get a TypeSafe API key at https://console.typesafe.ai")
+    return key
+
+
+def _reporting(jev: Jev, progress: build.Progress | None) -> build.Progress:
+    """`progress`, and Jev's cost so far after each Jev step (-v)."""
+
+    def step(name: str, done: int, due: int) -> None:
+        if progress:
+            progress(name, done, due)
+        if done == due and name in ("departments", "ingredients", "offers"):
+            logging.getLogger("matris.jev").info("so far: %s", jev.status())
+
+    return step
+
+
+async def offers(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None) -> Result:
+    """Only this week's offers and their matches, for the dinners and traits in datasets/ (app.build.reprice): no recipe
+    page is read and no ingredient labelled again. `fetching` hears every URL mattilbud.no is asked for."""
+    key = _key()
+    try:
+        base = datasets.JsonDatasets().snapshot()
+    except FileNotFoundError as e:
+        raise SetupError(f"--offers reads {datasets.DATASETS}, which is missing: {e}") from e
+    async with (
+        TjekOfferSource.open(fetching=fetching) as tjek,
+        AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
+    ):
+        jev = Jev(client, max_in_flight=JEV_IN_FLIGHT)
+        snapshot = await build.reprice(base, tjek, JevOfferMatcher(jev), _reporting(jev, progress))
+    return Result(snapshot, None, datasets.write(snapshot), jev.status())
+
+
+async def run(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None, known: bool = False) -> Result:
+    """`fetching` hears every URL matprat.no, godt.no and mattilbud.no are asked for. `known`: godt.no's pages are the
+    dinners already in datasets/ (known_godt), not its sitemap's."""
+    key = _key()
     godt_pages = known_godt() if known else ()
     async with (
         MatpratRecipeSource.open(CRAWL_WORKERS, fetching) as matprat,
         GodtRecipeSource.open(fetching=fetching, known=godt_pages) as godt,
-        TjekOfferSource.open(fetching=fetching) as offers,
+        TjekOfferSource.open(fetching=fetching) as tjek,
         AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client,
     ):
         jev = Jev(client, max_in_flight=JEV_IN_FLIGHT)
-
-        def step(name: str, done: int, due: int) -> None:
-            if progress:
-                progress(name, done, due)
-            if done == due and name in ("departments", "ingredients", "offers"):
-                logging.getLogger("matris.jev").info("so far: %s", jev.status())
-
         snapshot, report = await build.snapshot(
-            (matprat, godt), JevDepartmentClassifier(jev), JevIngredientClassifier(jev), offers, JevOfferMatcher(jev), step
+            (matprat, godt),
+            JevDepartmentClassifier(jev),
+            JevIngredientClassifier(jev),
+            tjek,
+            JevOfferMatcher(jev),
+            _reporting(jev, progress),
         )
     return Result(snapshot, report, datasets.write(snapshot), jev.status())
 
@@ -159,17 +193,20 @@ async def run(progress: build.Progress | None = None, fetching: Callable[[str], 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build datasets/ from scratch: matprat.no, godt.no, mattilbud.no and Jev.")
     parser.add_argument("-v", "--verbose", action="count", default=0, help="more detail: -v, -vv or -vvv")
-    parser.add_argument("--known", action="store_true", help="godt.no: read the dinners in datasets/, not the sitemap")
+    only = parser.add_mutually_exclusive_group()
+    only.add_argument("--known", action="store_true", help="godt.no: read the dinners in datasets/, not the sitemap")
+    only.add_argument("--offers", action="store_true", help="only this week's offers and matches, for the dinners in datasets/")
     args = parser.parse_args()
     configure(args.verbose)
     try:
         with closing(Bars(STEPS)) as bars:
-            result = asyncio.run(run(bars, bars.fetching, args.known))
+            result = asyncio.run(offers(bars, bars.fetching) if args.offers else run(bars, bars.fetching, args.known))
     except SetupError as e:
         sys.exit(f"error: {e}")
     s, r = result.snapshot, result.recipes
     sites = Counter((urlsplit(d.url).hostname or "").removeprefix("www.") for d in s.dishes)
-    print(f"recipes: {r.listed:,} pages, {r.failed:,} failed")
+    if r:
+        print(f"recipes: {r.listed:,} pages, {r.failed:,} failed")
     print(
         f"{len(s.dishes):,} dinners ({', '.join(f'{site} {n:,}' for site, n in sorted(sites.items()))}), "
         f"{len(s.traits):,} ingredients, {len(s.offers):,} offers in {len(s.places)} places, "

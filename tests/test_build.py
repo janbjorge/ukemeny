@@ -4,6 +4,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 
 from app import build
+from core.dishes import dish
 from core.models import LABELS, Item, Level, Onion, Part
 from tests.fakes import (
     FakeClassifier,
@@ -14,6 +15,7 @@ from tests.fakes import (
     ingredient,
     offer,
     recipe,
+    snapshot,
     traits,
 )
 
@@ -111,7 +113,7 @@ async def test_meat_and_fish_are_asked_about_per_dinner_and_the_rest_by_name() -
         offer("TOMATER", 20, pre_price=30, id="tomat"),
     ]
     matcher = FakeMatcher({"tunfisk": "tunfisk", "tomat": "tomat"}, wrong={"Nigiri": "boks"})
-    matched, served = await build.match([raw, salad, soup], offers, matcher)
+    matched, served = await build.match([dish(r) for r in (raw, salad, soup)], offers, matcher)
     assert matched == {"tomat": ("tomat",)}
     assert served == {salad.url: {"tunfisk": ("tin",)}}  # The tin is no tuna for nigiri
     assert sorted(matcher.asked) == [("tomat", 1, ""), ("tunfisk", 1, "Nigiri"), ("tunfisk", 1, "Tunfisksalat")]
@@ -119,7 +121,7 @@ async def test_meat_and_fish_are_asked_about_per_dinner_and_the_rest_by_name() -
 
 async def test_a_dinner_without_a_discount_costs_nothing() -> None:
     matcher = FakeMatcher({"kyllingfilet": "kylling"})
-    assert await build.match([DINNER], [offer("KYLLINGBRYST", 99, id="bryst")], matcher) == ({}, {})
+    assert await build.match([dish(DINNER)], [offer("KYLLINGBRYST", 99, id="bryst")], matcher) == ({}, {})
     assert matcher.asked == []
 
 
@@ -140,6 +142,23 @@ async def test_snapshot_holds_every_dinner_and_the_shoppable_matches() -> None:
     assert s.served == {DINNER.url: {"kyllingfilet": ("bryst",)}}  # Salt is pantry: never looked up
     assert s.matches == {} and len(s.offers) == 2 and report.dinners == 2
     assert list(s.places.items()) == [("Bergen", ("KIWI",)), ("Tromsø", ("KIWI",))]  # sorted, as datasets/ has them
+
+
+async def test_reprice_keeps_the_dinners_and_takes_this_weeks_offers() -> None:
+    base = snapshot(DINNER, offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="old")], matches={"kyllingfilet": ["old"]})
+    seen: list[tuple[str, int, int]] = []
+    matcher = FakeMatcher({"kyllingfilet": "kylling"})
+    s = await build.reprice(
+        base,
+        FakeOffers([offer("KYLLINGFILET", 89, pre_price=120, id="new")], {"Bergen": ("KIWI",)}),
+        matcher,
+        lambda step, done, due: seen.append((step, done, due)),
+    )
+    assert s.dishes == base.dishes and s.traits == base.traits
+    assert [o.id for o in s.offers] == ["new"] and s.places == {"Bergen": ("KIWI",)}
+    assert s.served == {DINNER.url: {"kyllingfilet": ("new",)}} and s.matches == {}
+    assert matcher.asked == [("kyllingfilet", 1, "Kyllinggryte")]
+    assert [step for step, _, _ in seen] == ["catalogs", "catalogs", "offers", "offers"]
 
 
 async def test_snapshot_reports_each_step() -> None:

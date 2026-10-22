@@ -16,7 +16,7 @@ from datetime import UTC, datetime
 from core.dishes import dish
 from core.errors import SourceUnavailableError
 from core.matching import ELSEWHERE, agrees, candidates, doubted, not_an_ingredient, per_dinner, weight
-from core.models import Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
+from core.models import Dish, Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
 from core.ports import DepartmentClassifier, IngredientClassifier, OfferMatcher, OfferSource, RecipeSource
 
 log = logging.getLogger("matris.build")
@@ -175,16 +175,19 @@ class Question:
 
 
 async def match(
-    dinners: Sequence[Recipe],
+    dishes: Sequence[Dish],
     offers: Sequence[Offer],
     matcher: OfferMatcher,
+    lines: Mapping[str, Sequence[str]] | None = None,
     threshold: float = MATCH_THRESHOLD,
     progress: Callable[[int, int], None] | None = None,
 ) -> tuple[dict[str, tuple[str, ...]], dict[str, dict[str, tuple[str, ...]]]]:
     """The ids of the offers a cook can buy as each ingredient that matters for the shop: per name, and for meat, fish and
     shellfish per dinner (Snapshot.matches, Snapshot.served). Only discounted offers are asked about, since nothing else
     reaches a card (jb 2026-10-22: "make sure that we do not waaste effort on dishes that do not have any discounts"), so a
-    dinner without one costs nothing. Snacks and pålegg are left out without asking (core.matching.not_an_ingredient)."""
+    dinner without one costs nothing. Snacks and pålegg are left out without asking (core.matching.not_an_ingredient).
+    `lines`: per Dish.url, the recipe's line for each part; without them (datasets/ keeps no wording) the line is the
+    ingredient's name (METHOD.md §2)."""
     on_sale = [o for o in offers if o.saving]
     found: dict[str, tuple[Offer, ...]] = {}
 
@@ -195,12 +198,13 @@ async def match(
 
     by_name: dict[str, Question] = {}
     by_dinner: dict[tuple[str, str], Question] = {}
-    for recipe in dinners:
-        for part, ingredient in zip(dish(recipe).parts, recipe.ingredients, strict=True):
+    for d in dishes:
+        written = (lines or {}).get(d.url) or [p.name for p in d.parts]
+        for part, line in zip(d.parts, written, strict=True):
             if not weight(part) or not (maybe := could_be(part.name)):
                 continue
             if per_dinner(part):
-                by_dinner.setdefault((recipe.url, part.name), Question(part.name, maybe, ingredient.text, recipe.name))
+                by_dinner.setdefault((d.url, part.name), Question(part.name, maybe, line, d.name))
             else:
                 by_name.setdefault(part.name, Question(part.name, maybe))
     due = len(by_name) + len(by_dinner)
@@ -260,21 +264,41 @@ async def snapshot(
     dinners, report = await recipes(sources, step("recipes"))
     known = await classify(dinners, classifier, step("ingredients"))
     dinners, known = await fill_departments(dinners, departments, known, step("departments"))
+    dinners = sorted(dinners, key=lambda r: r.url)
+    lines = {r.url: [i.text for i in r.ingredients] for r in dinners}
+    base = Snapshot(
+        built=datetime.now(UTC),
+        dishes=tuple(dish(r) for r in dinners),
+        traits=dict(sorted(known.items())),
+        offers=(),
+        matches={},
+        places={},
+    )
+    return await reprice(base, offers, matcher, progress, lines), report
+
+
+async def reprice(
+    base: Snapshot,
+    offers: OfferSource,
+    matcher: OfferMatcher,
+    progress: Progress | None = None,
+    lines: Mapping[str, Sequence[str]] | None = None,
+) -> Snapshot:
+    """`base`'s dinners and traits with this week's offers and their matches (`match`); the steps "catalogs" and
+    "offers". The weekly refresh runs only this on the snapshot in datasets/ (jb 2026-10-22: "i want sometihng that
+    fetches the updated tilbud and does the matching")."""
     if progress:
         progress("catalogs", 0, 1)
     current = await offers.current()
     if progress:
         progress("catalogs", 1, 1)
-    dinners = sorted(dinners, key=lambda r: r.url)
-    dishes = tuple(dish(r) for r in dinners)
-    matched, served = await match(dinners, current.offers, matcher, progress=step("offers"))
-    built = Snapshot(
+    step = (lambda done, due: progress("offers", done, due)) if progress else None
+    matched, served = await match(base.dishes, current.offers, matcher, lines, progress=step)
+    return replace(
+        base,
         built=datetime.now(UTC),
-        dishes=dishes,
-        traits=dict(sorted(known.items())),
         offers=tuple(sorted(current.offers, key=lambda o: (o.store, o.heading, o.id))),
         matches=matched,
         places={place: tuple(sorted(catalogs)) for place, catalogs in sorted(current.places.items())},
         served=served,
     )
-    return built, report

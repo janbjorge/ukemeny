@@ -152,6 +152,7 @@ def check(url: Annotated[str, typer.Argument(help="En oppskrift på matprat.no e
 def build(
     verbose: Annotated[int, typer.Option("--verbose", "-v", count=True, help="Mer detaljer: -v, -vv eller -vvv.")] = 0,
     known: Annotated[bool, typer.Option("--known", help="godt.no: les middagene i datasets/, ikke sitemapet.")] = False,
+    offers: Annotated[bool, typer.Option("--offers", help="Bare ukens tilbud og matchene, for middagene i datasets/.")] = False,
 ) -> None:
     """Lag datasets/ fra bunnen: matprat.no, godt.no, mattilbud.no og Jev. Trenger TYPESAFE_API_KEY."""
     from pipeline import datasets as pipeline
@@ -166,7 +167,7 @@ def build(
     }
     try:
         with closing(pipeline.Bars(steps)) as bars:
-            result = asyncio.run(pipeline.run(bars, bars.fetching, known))
+            result = asyncio.run(pipeline.offers(bars, bars.fetching) if offers else pipeline.run(bars, bars.fetching, known))
     except pipeline.SetupError as e:
         fail("setup", str(e), False)
     s = result.snapshot

@@ -19,7 +19,7 @@ DIETS = ", ".join(f"`{d}`" for d in Diet)
 """Every diet rule and allergy a search can name."""
 
 DESCRIPTION = f"""\
-Dinner ideas from matprat.no and godt.no, ranked by this week's grocery offers from mattilbud.no, searchable
+Dinner ideas from matprat.no and godt.no, ranked by this week's grocery offers, searchable
 in plain bokmål (`q`). No diet rule applies unless `q` names one: {DIETS}. A rule that leaves something out
 (vegetar, melkefri, uten egg, ...) also leaves out dinners with an ingredient that may hold it, such as a stock cube.
 The offers are from stores all over Norway until `sted` names a place (`sted=bergen`); then from the stores near it.

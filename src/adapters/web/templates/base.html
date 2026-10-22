@@ -30,8 +30,7 @@
 {% if stale %}<p class="banner">Tilbudene på siden er fra uka som gikk. Middagene passer fortsatt, men prisene kan ha endret seg.</p>{% endif %}
 {% block main %}{% endblock %}
   <footer>
-    <p>Oppskriftene er fra <a href="https://www.matprat.no">matprat.no</a> og <a href="https://www.godt.no">godt.no</a>, og hver middag lenker dit. Tilbudene er fra butikkenes kundeaviser, slik
-      <a href="https://mattilbud.no">mattilbud.no</a> viser dem{% if offers_until %} (de fleste gjelder til {{ offers_until|dato }}){% endif %}.
+    <p>Oppskriftene er fra <a href="https://www.matprat.no">matprat.no</a> og <a href="https://www.godt.no">godt.no</a>, og hver middag lenker dit. Tilbudene er fra butikkenes kundeaviser{% if offers_until %} (de fleste gjelder til {{ offers_until|dato }}){% endif %}.
       Sjekk alltid etiketten: vi kan ta feil om hva en vare inneholder.</p>
     <p class="muted">Bygget {{ built|dato }} · <a href="/om">Slik virker det</a> · <a href="/llms.txt">For KI-agenter</a> · <a href="/api/openapi.json">API</a></p>
   </footer>

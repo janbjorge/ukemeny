@@ -1,6 +1,6 @@
 # matris.app
 
-> Dinner ideas from matprat.no and godt.no, ranked by this week's grocery offers from mattilbud.no. Diet rules and allergies (vegetarian, vegan, gluten-free, milk-free, no onion, low FODMAP, pregnant, the EU allergens, ...) apply when a search names them, and the offers are from the stores near a place when `sted` names one; until then, from stores all over Norway.
+> Dinner ideas from matprat.no and godt.no, ranked by this week's grocery offers. Diet rules and allergies (vegetarian, vegan, gluten-free, milk-free, no onion, low FODMAP, pregnant, the EU allergens, ...) apply when a search names them, and the offers are from the stores near a place when `sted` names one; until then, from stores all over Norway.
 
 The site is in Norwegian (bokmål). Recipes belong to matprat.no and godt.no; link to them, do not copy them. Offers are from the stores' weekly catalogs. What an ingredient holds (gluten, onion, lactose, the allergens, meat, FODMAP, ...) was judged by a small language model and can be wrong; tell people to check the label.
 

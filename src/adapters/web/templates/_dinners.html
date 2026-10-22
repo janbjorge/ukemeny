@@ -6,7 +6,10 @@
 {% set s = found.search %}
 <div id="forslag-liste" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste">
   {# One bar of filters, each a panel of chips (jb 2026-10-22: the rows of chips were "a bit hard to navigate" and "reanders
-     really awfull on smart phones"), then what is picked, each a chip that takes it out #}
+     really awfull on smart phones"), then what is picked, each a chip that takes it out. On a phone the panels are one
+     sheet behind «Filtre» (jb 2026-10-22: "i do not like the right left swipe on the fitlters on mobile"); the checkbox
+     opens it without JavaScript. #}
+  {% set picked = (chips.proteins + chips.kinds + chips.diets + chips.allergies + chips.stomach)|selectattr("on")|rejectattr("label", "equalto", "Alle")|list %}
   <div class="filters">
     <div class="bar">
     {% if places %}
@@ -17,12 +20,16 @@
       {% for p in places %}<option value="{{ p|lower }}"{% if p == found.place %} selected{% endif %}>{{ p }}</option>{% endfor %}
     </select>
     {% endif %}
-    {{ pick("hovedravare", "Hovedråvare", chips.proteins, "proteins") }}
-    {{ pick("hva-slags", "Hva slags", chips.kinds) }}
-    {{ pick("kosthold", "Kosthold", chips.diets, "diet") }}
-    {{ pick("allergier", "Allergier", chips.allergies, "diet", chips.stomach, "Tåler dårlig") }}
+    <input type="checkbox" id="alle-filtre" class="vh">
+    <label for="alle-filtre" class="all-open{% if picked %} on{% endif %}">Filtre{% if picked %} <span class="k">{{ picked|length }}</span>{% endif %}</label>
+    <div class="all">
+      <p class="head"><b>Filtre</b><label for="alle-filtre" class="done">Ferdig</label></p>
+      {{ pick("hovedravare", "Hovedråvare", chips.proteins, "proteins") }}
+      {{ pick("hva-slags", "Hva slags", chips.kinds) }}
+      {{ pick("kosthold", "Kosthold", chips.diets, "diet") }}
+      {{ pick("allergier", "Allergier", chips.allergies, "diet", chips.stomach, "Tåler dårlig") }}
     </div>
-    {% set picked = (chips.proteins + chips.kinds + chips.diets + chips.allergies + chips.stomach)|selectattr("on")|rejectattr("label", "equalto", "Alle")|list %}
+    </div>
     {% if picked %}
     <p class="picked">{% for c in picked %}<a {{ go(c.text) }} aria-label="Fjern {{ c.label }}">{{ c.label }}<span aria-hidden="true">×</span></a> {% endfor %}
       {%- if picked|length > 1 %}<a class="clear" {{ go(cleared) }}>Nullstill</a>{% endif %}</p>

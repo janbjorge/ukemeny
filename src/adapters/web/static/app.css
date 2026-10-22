@@ -115,7 +115,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 /* The filter bar: «Sted» and a button per panel, chip-shaped, filled once something in it is picked. --chip is their height */
 .filters { --chip: 40px; --chip-pad: calc((var(--chip) - 22px) / 2); margin: 16px 0 8px; }
 .bar { display: flex; flex-wrap: wrap; gap: 8px; }
-.bar select, .pick summary {
+.bar select, .pick summary, .all-open {
   display: inline-flex; align-items: center; gap: 6px; max-width: 100%; margin: 0; font: inherit; font-size: var(--t-small); line-height: 20px;
   color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 999px; cursor: pointer;
   padding: var(--chip-pad) 34px var(--chip-pad) 16px; -webkit-appearance: none; appearance: none; list-style: none; user-select: none;
@@ -123,13 +123,17 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
   background-repeat: no-repeat; background-position: right 14px center; background-size: 11px;
 }
 .pick summary::-webkit-details-marker { display: none; }
-.bar select.on, .pick summary.on {
+.bar select.on, .pick summary.on, .all-open.on {
   background-color: var(--accent); border-color: var(--accent); color: #fff; font-weight: 650;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23ffffff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
 }
 .bar option { color: var(--text-primary); background: var(--surface-1); font-weight: 400; }
 /* How many are picked in a panel */
-.pick summary .k { min-width: 20px; padding: 0 6px; border-radius: 999px; background: #fff; color: var(--accent-strong); font-size: var(--t-chart); text-align: center; }
+.pick summary .k, .all-open .k { min-width: 20px; padding: 0 6px; border-radius: 999px; background: #fff; color: var(--accent-strong); font-size: var(--t-chart); text-align: center; }
+
+/* «Filtre» and its sheet are for phones; wider, the panels sit in the bar */
+.all-open, .all > .head { display: none; }
+.all { display: contents; }
 
 /* A panel under its button; a click beside it lands on the backdrop, its summary's, and closes it */
 .pick { position: relative; }
@@ -195,7 +199,7 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   .card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
   .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
   .card h3 a:hover { color: var(--accent); text-decoration: underline; }
-  .bar select:hover, .pick summary:hover { border-color: var(--accent); }
+  .bar select:hover, .pick summary:hover, .all-open:hover { border-color: var(--accent); }
   .bar select.on:hover, .pick summary.on:hover { border-color: var(--accent-strong); background-color: var(--accent-strong); }
   .chips a:hover { background: var(--surface-2); }
   .chips a[aria-current]:hover { background: var(--accent-soft); text-decoration: line-through; }
@@ -231,28 +235,37 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   .search button { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
   .search input { padding: 11px 16px 11px 46px; background-position: 15px center; }
 
-  /* The bar is one line to swipe; a panel's sheet is fixed, so the bar's scrolling does not clip it */
-  .bar {
-    flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
-    margin-inline: calc(-1 * var(--gutter)); padding: 2px var(--gutter); scroll-padding-inline: var(--gutter);
+  /* «Sted» and «Filtre», whose sheet from the bottom holds every panel as a section, over the dimmed page; a tap on the
+     page is a tap on «Filtre»'s label, the backdrop, and closes it */
+  .all-open { display: inline-flex; }
+  #alle-filtre:checked + .all-open::before { content: ""; position: fixed; inset: 0; z-index: 29; background: rgb(20 20 15 / 40%); }
+  .all { display: none; }
+  #alle-filtre:checked ~ .all {
+    display: block; position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; max-height: 85dvh; overflow-y: auto; overscroll-behavior: contain;
+    background: var(--surface-1); border-radius: 20px 20px 0 0; padding: 0 12px calc(16px + env(safe-area-inset-bottom));
   }
-  .bar::-webkit-scrollbar { display: none; }
-  .bar > * { flex: none; }
-  /* A panel is a sheet from the bottom over a dimmed page, with its name and «Ferdig» on top */
-  .pick { position: static; }
-  .pick[open] summary::before { z-index: 29; background: rgb(20 20 15 / 40%); }
-  .panel {
-    position: fixed; z-index: 30; top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 80dvh; overflow-y: auto; overscroll-behavior: contain;
-    border: 0; border-radius: 20px 20px 0 0; padding: 0 12px calc(16px + env(safe-area-inset-bottom));
-  }
-  .panel .head {
+  .all > .head {
     display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1;
     margin: 0 -12px 4px; padding: 12px 12px 12px 20px; background: var(--surface-1); border-bottom: 1px solid var(--hairline);
     font-family: var(--serif); font-size: var(--t-heading);
   }
-  .panel .done {
-    font: inherit; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; font-size: var(--t-body); font-weight: 650;
-    color: #fff; background: var(--accent); border: 0; border-radius: 999px; padding: 8px 18px; cursor: pointer;
+  .all .done {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; font-size: var(--t-body); font-weight: 650;
+    color: #fff; background: var(--accent); border-radius: 999px; padding: 8px 18px; cursor: pointer;
+  }
+  /* In the sheet a panel is a section under its name */
+  .all .pick summary {
+    padding: 16px 8px 4px; border: 0; border-radius: 0; background: none; color: var(--text-muted); font-size: var(--t-chart);
+    font-weight: 650; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .all .pick summary .k { background: var(--accent-soft); }
+  .all .pick[open] summary::before { content: none; }
+  .all .panel { position: static; width: auto; border: 0; border-radius: 0; box-shadow: none; padding: 0; }
+  .all .panel .head { display: none; }
+  /* Every section open, whether or not its <details> is (a browser without this opens them one by one) */
+  @supports selector(::details-content) {
+    .all .pick::details-content { content-visibility: visible; }
+    .all .pick summary { pointer-events: none; }
   }
   .chips a, .chips .off { font-size: var(--t-body); min-height: 48px; padding-block: 13px; }
 }

@@ -18,12 +18,26 @@
 <meta name="htmx-config" content='{"allowEval":false}'>
 <script src="{{ static_url('htmx.min.js') }}" defer></script>
 <script>
-// A filter panel (_ui.html pick) stays open while its chips are picked: each pick swaps in the list, panel and all
-let openPick = null;
-addEventListener("htmx:beforeSwap", () => { openPick = document.querySelector("details.pick[open]")?.id ?? null; });
-addEventListener("htmx:afterSwap", () => { if (openPick) document.getElementById(openPick)?.setAttribute("open", ""); openPick = null; });
+// A filter panel (_ui.html pick), or on a phone the sheet of them all, stays open while its chips are picked: each pick
+// swaps in the list, panels and all
+let openPick = null, openAll = false;
+addEventListener("htmx:beforeSwap", () => {
+  openPick = document.querySelector("details.pick[open]")?.id ?? null;
+  openAll = document.getElementById("alle-filtre")?.checked ?? false;
+});
+addEventListener("htmx:afterSwap", () => {
+  if (openPick) document.getElementById(openPick)?.setAttribute("open", "");
+  const all = document.getElementById("alle-filtre");
+  if (all) all.checked = openAll;
+  openPick = null;
+});
 addEventListener("click", (e) => { const done = e.target.closest?.(".pick .done"); if (done) done.closest("details").open = false; });
-addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll("details.pick[open]").forEach((d) => { d.open = false; }); });
+addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  document.querySelectorAll("details.pick[open]").forEach((d) => { d.open = false; });
+  const all = document.getElementById("alle-filtre");
+  if (all) all.checked = false;
+});
 </script>
 <style>{{ style }}</style>
 </head>

@@ -129,9 +129,10 @@ def chips(found: Found) -> dict[str, list[Chip]]:
     for p in KNOWN_PROTEINS:
         if p == VEGETARIAN:
             continue  # «Vegetar» is a rule in Kosthold: no meat or fish in any ingredient, not just the main one
-        if n := found.counts.proteins.get(p):
+        n = found.counts.proteins.get(p, 0)
+        on = chosen is not None and p in chosen.values
+        if on or n:  # a chosen one stays, so it can be taken out, even when nothing is left with it
             clause = protein_clause(protein_word(p))
-            on = chosen is not None and p in chosen.values
             proteins.append(Chip(protein_word(p).capitalize(), s.toggle(clause).text, on, None if on else n, p))
 
     # In the order written: a panel shows them all, and the row under the bar the chosen ones

@@ -102,6 +102,8 @@ def test_chips_toggle_and_count(client: TestClient) -> None:
     proteins = html[html.index('class="chips proteins"') :]
     assert proteins.index(">Alle ") < proteins.index(">Kylling<")  # in the order written: a panel shows every chip
     assert 'class="picked"><a href="/#forslag" hx-get="/middager"' in html and 'aria-label="Fjern Kylling">Kylling' in html
+    none_left = client.get("/middager?q=kylling+vegansk", headers=HX).text
+    assert 'aria-label="Fjern Kylling">Kylling' in none_left and 'data-protein="kylling" aria-current="true">Kylling</a>' in none_left
     both = client.get("/middager?q=kylling+eller+fisk", headers=HX).text
     assert f'hx-get="/middager?q=fisk"{GO} data-protein="kylling" aria-current="true">Kylling</a>' in both
     assert f'hx-get="/middager?q=kylling"{GO} data-protein="fisk" aria-current="true">Fisk</a>' in both

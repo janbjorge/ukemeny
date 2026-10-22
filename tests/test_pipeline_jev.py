@@ -15,6 +15,7 @@ from typesafe_sdk import (
 from core.errors import ClassifierUnavailableError
 from core.models import LABELS, Carbs, Fodmap, Gluten, Kids, Lactose, Level, Onion, Pregnancy, Traits
 from pipeline.jev import (
+    AS_NAMED,
     QUESTIONS_PER_CALL,
     Jev,
     JevCategoryClassifier,
@@ -198,13 +199,15 @@ async def test_matcher_asks_once_per_heading_and_scores_each_offer() -> None:
     assert "KYLLINGPØLSER" in str(questions["1"].instructions)
 
 
-async def test_matcher_asks_with_the_recipe_line_and_the_dinner() -> None:
+async def test_matcher_asks_with_the_form_and_the_dinner() -> None:
     tin = offer("Tunfisk", 15, store="MENY")
     client = FakeNoulClient({"0": 0.1})
-    await JevOfferMatcher(Jev(client)).rank("tunfisk", [tin], "tunfisk", "Hjemmelaget nigiri sushi")
+    await JevOfferMatcher(Jev(client)).rank("tunfisk", [tin], "", "Hjemmelaget nigiri sushi")
     state, questions = client.calls[0]
-    assert state == {"ingredient": "tunfisk", "line": "tunfisk", "dish": "Hjemmelaget nigiri sushi"}
-    assert "`dish`" in str(questions["0"].instructions) and "canned" in str(questions["0"].criteria)
+    assert state == {"ingredient": "tunfisk", "form": AS_NAMED, "dish": "Hjemmelaget nigiri sushi"}
+    assert "`form`" in str(questions["0"].instructions) and "canned" in str(questions["0"].criteria)
+    await JevOfferMatcher(Jev(client)).rank("tunfisk", [tin], "hermetisk", "Tunfisksalat")
+    assert client.calls[1][0] == {"ingredient": "tunfisk", "form": "hermetisk", "dish": "Tunfisksalat"}
 
 
 async def test_matcher_splits_long_lists() -> None:

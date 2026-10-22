@@ -107,15 +107,28 @@ async def test_meat_and_fish_are_asked_about_per_dinner_and_the_rest_by_name() -
         offer("TOMATER", 20, pre_price=30, id="tomat"),
     ]
     matcher = FakeMatcher({"tunfisk": "tunfisk", "tomat": "tomat"}, wrong={"Nigiri": "boks"})
-    matched, served = await build.match([dish(r) for r in (raw, salad, soup)], offers, matcher)
+    matched, served = await build.match([dish(r) for r in (raw, salad, soup)], offers, matcher, {})
     assert matched == {"tomat": ("tomat",)}
     assert served == {salad.url: {"tunfisk": ("tin",)}}  # The tin is no tuna for nigiri
-    assert sorted(matcher.asked) == [("tomat", 1, ""), ("tunfisk", 1, "Nigiri"), ("tunfisk", 1, "Tunfisksalat")]
+    # Meat and fish with the form the line asks for («1 boks tunfisk») and the dinner; the rest by name
+    assert sorted(matcher.asked) == [("tomat", 1, "", ""), ("tunfisk", 1, "", "Nigiri"), ("tunfisk", 1, "hermetisk", "Tunfisksalat")]
+
+
+async def test_two_names_of_one_product_are_asked_once_and_both_written() -> None:
+    tomatoes = ingredient("tomater", 400, "g", "/grønnsaker")
+    cherry = ingredient("cherrytomater", 200, "g", "/grønnsaker")
+    vocabulary = {"tomater": traits(product="tomat"), "cherrytomater": traits(product="tomat"), "tomat": traits()}
+    matcher = FakeMatcher({"tomat": "tomat"})
+    matched, _ = await build.match(
+        [dish(recipe("Salat", tomatoes, cherry))], [offer("TOMATER", 20, pre_price=30, id="t")], matcher, vocabulary
+    )
+    assert matched == {"cherrytomater": ("t",), "tomater": ("t",)}
+    assert matcher.asked == [("tomat", 1, "", "")]
 
 
 async def test_a_dinner_without_a_discount_costs_nothing() -> None:
     matcher = FakeMatcher({"kyllingfilet": "kylling"})
-    assert await build.match([dish(DINNER)], [offer("KYLLINGBRYST", 99, id="bryst")], matcher) == ({}, {})
+    assert await build.match([dish(DINNER)], [offer("KYLLINGBRYST", 99, id="bryst")], matcher, {}) == ({}, {})
     assert matcher.asked == []
 
 
@@ -152,7 +165,7 @@ async def test_reprice_keeps_the_dinners_and_takes_this_weeks_offers() -> None:
     assert s.dishes == base.dishes and s.traits == base.traits
     assert [o.id for o in s.offers] == ["new"] and s.places == {"Bergen": ("KIWI",)}
     assert s.served == {DINNER.url: {"kyllingfilet": ("new",)}} and s.matches == {}
-    assert matcher.asked == [("kyllingfilet", 1, "Kyllinggryte")]
+    assert matcher.asked == [("kyllingfilet", 1, "", "Kyllinggryte")]
     assert [step for step, _, _ in seen] == ["catalogs", "catalogs", "offers", "offers"]
 
 

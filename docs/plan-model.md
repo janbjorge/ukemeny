@@ -80,10 +80,11 @@ name, so the site's lookup stays as it is.
       is the near-name key.
 - [x] src/pipeline/jev.py: the `dish` context is gone from both classifiers; `JevDepartmentClassifier` is
       `JevCategoryClassifier`; `JEV_MODEL` stays.
-- [ ] Form: a function in core that both parsers call on the line; `Part.form` with a default of "" so the site's
-      reader does not care; written to dishes.json. src/pipeline/matprat.py, godt.py, src/adapters/datasets.py.
-- [ ] `match` asks per product with the form and the dinner's name, and writes per name; the `lines` plumbing through
-      `snapshot`, `reprice` and `match` goes. src/pipeline/jev.py `_offer_question` says what the dinner wants it as.
+- [x] Form: core.dishes `form` reads the line when a Dish is made (the parsers are untouched); `Part.form` with a
+      default of "" so the site's reader does not care; written to dishes.json and read back when there.
+- [x] `match` asks per product with the form and the dinner's name, and writes per name; the `lines` plumbing through
+      `snapshot`, `reprice` and `match` is gone. src/pipeline/jev.py `_offer_question` says what the dinner wants it
+      as (`form`, or AS_NAMED when the line says none).
 - [ ] The vanished lines: «Svinespyd med østerssaus og kokosmelk» (godt.no 17056) and «Ribbesandwich» have no pork
       part. Read the page (jb's OK first); if the main ingredient is a nameless line, src/pipeline/godt.py keeps it.
 - [x] Tests: tests/test_build.py's classify and department tests follow the new shape; tests/test_pipeline_jev.py loses

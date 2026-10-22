@@ -1,19 +1,24 @@
 from pathlib import Path
 
 from adapters.datasets import JsonDatasets, write
-from core.models import Gluten
+from core.models import Gluten, Ingredient
 from tests.fakes import ingredient, offer, recipe, snapshot, traits
 
 
 def test_snapshot_round_trip(tmp_path: Path) -> None:
+    bacon = ingredient("bacon", 100, "g", "/kjøtt/svinekjøtt")
+    bacon = Ingredient(bacon.name, "100 g røkt bacon", bacon.amount, bacon.unit, bacon.category)
     s = snapshot(
-        recipe("Kyllinggryte", ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns"), ingredient("hvetemel", 2, "ss", "/korn")),
+        recipe(
+            "Kyllinggryte", ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns"), ingredient("hvetemel", 2, "ss", "/korn"), bacon
+        ),
         known={"hvetemel": traits(gluten=Gluten.YES)},
         offers=[offer("KYLLINGBRYST", 99, pre_price=135, per_kg=141.0, id="a", catalog="kiwi-vest")],
         matches={"kyllingfilet": ["a"]},
         places={"Bergen": ["kiwi-vest", "rema"], "Stavanger": ["kiwi-vest"]},
     )
     assert s.served  # kyllingfilet is meat: matched per dinner
+    assert s.dishes[0].parts[2].form == "røkt"
     sizes = write(s, tmp_path)
     assert set(sizes) == {"dishes.json", "traits.json", "offers.json"}
     assert JsonDatasets(tmp_path).snapshot() == s

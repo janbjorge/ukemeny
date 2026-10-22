@@ -148,12 +148,12 @@ def filed(dinners: Iterable[Recipe], vocabulary: Mapping[str, Traits]) -> list[R
 
 @dataclass(frozen=True, slots=True)
 class Question:
-    """One request to the offer matcher: an ingredient and the offers that could be it, with a dinner's context for meat,
-    fish and shellfish (core.matching.per_dinner)."""
+    """One request to the offer matcher: a product and the offers that could be it, and for meat, fish and shellfish
+    (core.matching.per_dinner) the form the recipe asks for and the dinner."""
 
-    name: str
+    product: str
     offers: tuple[Offer, ...]
-    line: str = ""
+    form: str = ""
     dish: str = ""
 
 
@@ -161,41 +161,49 @@ async def match(
     dishes: Sequence[Dish],
     offers: Sequence[Offer],
     matcher: OfferMatcher,
-    lines: Mapping[str, Sequence[str]] | None = None,
+    vocabulary: Mapping[str, Traits],
     threshold: float = MATCH_THRESHOLD,
     progress: Callable[[int, int], None] | None = None,
 ) -> tuple[dict[str, tuple[str, ...]], dict[str, dict[str, tuple[str, ...]]]]:
     """The ids of the offers a cook can buy as each ingredient that matters for the shop: per name, and for meat, fish and
-    shellfish per dinner (Snapshot.matches, Snapshot.served). Only discounted offers are asked about, since nothing else
-    reaches a card (jb 2026-10-22: "make sure that we do not waaste effort on dishes that do not have any discounts"), so a
-    dinner without one costs nothing. Snacks and pålegg are left out without asking (core.matching.not_an_ingredient).
-    `lines`: per Dish.url, the recipe's line for each part; without them (datasets/ keeps no wording) the line is the
-    ingredient's name (METHOD.md §2)."""
+    shellfish per dinner (Snapshot.matches, Snapshot.served). A question is about the product a name stands for in the
+    vocabulary (Traits.product; the name itself until set), so two names of one product are asked once and both written;
+    for meat, fish and shellfish it carries the form the recipe line asks for (Part.form) and the dinner (METHOD.md §2).
+    Only discounted offers are asked about, since nothing else reaches a card (jb 2026-10-22: "make sure that we do not
+    waaste effort on dishes that do not have any discounts"), so a dinner without one costs nothing. Snacks and pålegg are
+    left out without asking (core.matching.not_an_ingredient)."""
     on_sale = [o for o in offers if o.saving]
     found: dict[str, tuple[Offer, ...]] = {}
 
-    def could_be(name: str) -> tuple[Offer, ...]:
-        if name not in found:
-            found[name] = tuple(o for o in candidates(name, on_sale) if not not_an_ingredient(name, o.heading))
-        return found[name]
+    def could_be(product: str) -> tuple[Offer, ...]:
+        if product not in found:
+            found[product] = tuple(o for o in candidates(product, on_sale) if not not_an_ingredient(product, o.heading))
+        return found[product]
 
-    by_name: dict[str, Question] = {}
+    def product_of(name: str) -> str:
+        return (t.product if (t := vocabulary.get(name)) else "") or name
+
+    by_product: dict[str, Question] = {}
     by_dinner: dict[tuple[str, str], Question] = {}
+    names: dict[str, set[str]] = {}
+    dinner_names: dict[tuple[str, str], set[str]] = {}
     for d in dishes:
-        written = (lines or {}).get(d.url) or [p.name for p in d.parts]
-        for part, line in zip(d.parts, written, strict=True):
-            if not weight(part) or not (maybe := could_be(part.name)):
+        for part in d.parts:
+            product = product_of(part.name)
+            if not weight(part) or not (maybe := could_be(product)):
                 continue
             if per_dinner(part):
-                by_dinner.setdefault((d.url, part.name), Question(part.name, maybe, line, d.name))
+                by_dinner.setdefault((d.url, product), Question(product, maybe, part.form, d.name))
+                dinner_names.setdefault((d.url, product), set()).add(part.name)
             else:
-                by_name.setdefault(part.name, Question(part.name, maybe))
-    due = len(by_name) + len(by_dinner)
+                by_product.setdefault(product, Question(product, maybe))
+                names.setdefault(product, set()).add(part.name)
+    due = len(by_product) + len(by_dinner)
     log.info(
-        "offers: %d of %d discounted, %d names and %d dinner ingredients to ask about",
+        "offers: %d of %d discounted, %d products and %d dinner products to ask about",
         len(on_sale),
         len(offers),
-        len(by_name),
+        len(by_product),
         len(by_dinner),
     )
     done = 0
@@ -204,11 +212,12 @@ async def match(
 
     async def ask(q: Question) -> tuple[str, ...]:
         nonlocal done
-        ranked = await matcher.rank(q.name, q.offers, q.line, q.dish)
+        ranked = await matcher.rank(q.product, q.offers, q.form, q.dish)
         ids = tuple(o.id for o in q.offers if ranked.get(o.id, 0.0) >= threshold)
         log.debug(
-            "%s%s: %d of %d offers match %s",
-            q.name,
+            "%s%s%s: %d of %d offers match %s",
+            q.product,
+            f" ({q.form})" if q.form else "",
             f" in {q.dish}" if q.dish else "",
             len(ids),
             len(q.offers),
@@ -220,14 +229,14 @@ async def match(
         return ids
 
     async with asyncio.TaskGroup() as tg:
-        names = {name: tg.create_task(ask(q)) for name, q in by_name.items()}
+        products = {product: tg.create_task(ask(q)) for product, q in by_product.items()}
         served = {key: tg.create_task(ask(q)) for key, q in by_dinner.items()}
-    matched = {name: ids for name, task in sorted(names.items()) if (ids := task.result())}
+    matched = {name: ids for product, task in products.items() if (ids := task.result()) for name in names[product]}
     per_dish: dict[str, dict[str, tuple[str, ...]]] = {}
-    for (url, name), task in sorted(served.items()):
+    for (url, product), task in sorted(served.items()):
         if ids := task.result():
-            per_dish.setdefault(url, {})[name] = ids
-    return matched, per_dish
+            per_dish.setdefault(url, {}).update(dict.fromkeys(sorted(dinner_names[url, product]), ids))
+    return dict(sorted(matched.items())), per_dish
 
 
 async def snapshot(
@@ -249,7 +258,6 @@ async def snapshot(
     dinners, report = await recipes(sources, step("recipes"))
     known = await draft(dinners, vocabulary, categories, classifier, progress)
     dinners = sorted(filed(dinners, known), key=lambda r: r.url)
-    lines = {r.url: [i.text for i in r.ingredients] for r in dinners}
     base = Snapshot(
         built=datetime.now(UTC),
         dishes=tuple(dish(r) for r in dinners),
@@ -258,26 +266,21 @@ async def snapshot(
         matches={},
         places={},
     )
-    return await reprice(base, offers, matcher, progress, lines), report
+    return await reprice(base, offers, matcher, progress), report
 
 
-async def reprice(
-    base: Snapshot,
-    offers: OfferSource,
-    matcher: OfferMatcher,
-    progress: Progress | None = None,
-    lines: Mapping[str, Sequence[str]] | None = None,
-) -> Snapshot:
+async def reprice(base: Snapshot, offers: OfferSource, matcher: OfferMatcher, progress: Progress | None = None) -> Snapshot:
     """`base`'s dinners and traits with this week's offers and their matches (`match`); the steps "catalogs" and
     "offers". The weekly refresh runs only this on the snapshot in datasets/ (jb 2026-10-22: "i want sometihng that
-    fetches the updated tilbud and does the matching")."""
+    fetches the updated tilbud and does the matching"), on the same footing as a full build: the form a line asks for is
+    in dishes.json (Part.form)."""
     if progress:
         progress("catalogs", 0, 1)
     current = await offers.current()
     if progress:
         progress("catalogs", 1, 1)
     step = (lambda done, due: progress("offers", done, due)) if progress else None
-    matched, served = await match(base.dishes, current.offers, matcher, lines, progress=step)
+    matched, served = await match(base.dishes, current.offers, matcher, base.traits, progress=step)
     return replace(
         base,
         built=datetime.now(UTC),

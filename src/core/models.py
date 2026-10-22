@@ -211,6 +211,9 @@ class Part:
     """Per portion, rounded to 5 g; None when matprat's unit has no weight ("en klype")."""
     unit: str
     """matprat's unit without the dot ("g", "dl", "stk"), so liquids can be told apart."""
+    form: str = ""
+    """The form the recipe line asks for, one word of core.dishes.FORMS ("røkt", "hermetisk"), or "" for what the name
+    means: told to the offer matcher, so a tin is no tuna for nigiri. The site does not read it."""
 
 
 @dataclass(frozen=True, slots=True)

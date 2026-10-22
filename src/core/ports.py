@@ -62,9 +62,10 @@ class CategoryClassifier(Protocol):
 
 
 class OfferMatcher(Protocol):
-    """Which of these offers is this recipe ingredient?"""
+    """Which of these offers is this product?"""
 
-    async def rank(self, ingredient: str, offers: Sequence[Offer], line: str = "", dish: str = "") -> Mapping[str, float]:
-        """Per offer id, the probability that a cook can buy it as the ingredient: as the recipe writes it in `line`
-        ("200 g tunfisk, av sushikvalitet") for the dinner `dish`, when given."""
+    async def rank(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "") -> Mapping[str, float]:
+        """Per offer id, the probability that a cook can buy it as the product (a name in the vocabulary, or what it
+        stands for: Traits.product), in `form` (Part.form: "røkt", "hermetisk"; "" for what the name means) for the
+        dinner `dish`, when given."""
         ...

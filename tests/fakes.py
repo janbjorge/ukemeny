@@ -39,10 +39,21 @@ def traits(
     carbs: Carbs | None = Carbs.NONE,
     pregnancy: Pregnancy | None = Pregnancy.OK,
     category: str = "",
+    product: str = "",
 ) -> Traits:
     """An ingredient with every label asked: it holds nothing, unless told otherwise."""
     return Traits(
-        gluten, onion, lactose, kids, "", {item: Level.NO for item in Item} | dict(contains or {}), fodmap, carbs, pregnancy, category
+        gluten,
+        onion,
+        lactose,
+        kids,
+        "",
+        {item: Level.NO for item in Item} | dict(contains or {}),
+        fodmap,
+        carbs,
+        pregnancy,
+        category,
+        product,
     )
 
 
@@ -149,17 +160,18 @@ class FakeOffers:
 
 @dataclass
 class FakeMatcher:
-    """An offer is the ingredient when its heading contains `matches[ingredient]`."""
+    """An offer is the product when its heading contains `matches[product]`, unless the dinner wants another form:
+    `wrong` names a word in an offer's description that rules it out for a dinner, as a tin for nigiri."""
 
     matches: Mapping[str, str] = field(default_factory=dict)
     wrong: Mapping[str, str] = field(default_factory=dict)
     """Per dinner, a word in an offer's description that rules it out there: {"Nigiri": "boks"}."""
-    asked: list[tuple[str, int, str]] = field(default_factory=list)
-    """(ingredient, offers, dinner) per request."""
+    asked: list[tuple[str, int, str, str]] = field(default_factory=list)
+    """(product, offers, form, dinner) per request."""
 
-    async def rank(self, ingredient: str, offers: Sequence[Offer], line: str = "", dish: str = "") -> dict[str, float]:
-        self.asked.append((ingredient, len(offers), dish))
-        word, bad = self.matches.get(ingredient), self.wrong.get(dish)
+    async def rank(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "") -> dict[str, float]:
+        self.asked.append((product, len(offers), form, dish))
+        word, bad = self.matches.get(product), self.wrong.get(dish)
         return {o.id: float(bool(word and word in o.heading.lower() and not (bad and bad in o.description))) for o in offers}
 
 

@@ -1,8 +1,8 @@
 """The snapshot on disk: datasets/*.json, written by the offline build and read by the site at start-up.
 
 dishes.json holds the facts the rules need from each matprat.no and godt.no dinner, per portion, without its wording
-(docs/plan-web.md); traits.json changes when new ingredients appear; offers.json every week. offers.json also says which
-catalogs reach each place (`places`).
+(docs/plan-web.md); traits.json is the vocabulary, kept and fixed by hand, which a build adds a row to for each new name;
+offers.json changes every week, and also says which catalogs reach each place (`places`).
 """
 
 from collections.abc import Mapping
@@ -25,6 +25,8 @@ class PartJSON(TypedDict):
     category: str
     grams: float | None
     unit: str
+    form: NotRequired[str]
+    """Missing in dishes.json from before 2026-10-22."""
 
 
 class DishJSON(TypedDict):
@@ -106,7 +108,9 @@ def _dish(d: DishJSON) -> Dish:
         prep_time=intern(d["prep_time"]),
         rating=d["rating"],
         rating_count=d["rating_count"],
-        parts=tuple(Part(intern(p["name"]), intern(p["category"]), p["grams"], intern(p["unit"])) for p in d["parts"]),
+        parts=tuple(
+            Part(intern(p["name"]), intern(p["category"]), p["grams"], intern(p["unit"]), intern(p.get("form", ""))) for p in d["parts"]
+        ),
     )
 
 

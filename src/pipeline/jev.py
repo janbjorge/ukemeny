@@ -430,16 +430,21 @@ class JevCategoryClassifier:
 QUESTIONS_PER_CALL = 100
 
 
+AS_NAMED = "fresh or raw, as a recipe means by the name alone"
+"""The form sent when the recipe line names none (Part.form "")."""
+
+
 def _offer_question(offer: Offer, dinner: bool) -> Noul:
-    where = " for the dinner `dish`, where the recipe writes `line`" if dinner else ""
+    where = ", in the form `form`, for the dinner `dish`" if dinner else ""
+    wanted = "the form the dinner wants (`form`)" if dinner else "a form a recipe means by the name"
     return Noul(
         instructions=f"Can a cook buy the grocery offer «{offer.heading}: {offer.description[:90]}» as the recipe ingredient "
         f"`ingredient`{where}?",
         criteria={
-            "true": "Yes: it is that product, in any brand, size or cut that a recipe means by the name, and in a form the dinner can use",
+            "true": f"Yes: it is that product, in any brand, size or cut that a recipe means by the name, and in {wanted}",
             "false": "No: a different product or animal, a different cut or animal part, a ready meal, pålegg, snack or "
-            "sweet, or another form than the recipe means: canned, smoked, cured, salted, dried, marinated, breaded or "
-            "pre-cooked when it means raw or fresh, or the other way round",
+            "sweet, or another form than wanted: canned, smoked, cured, salted, dried, marinated, breaded or "
+            "pre-cooked when fresh or raw is wanted, or the other way round",
         },
     )
 
@@ -451,13 +456,14 @@ class JevOfferMatcher:
     A single Choice over the offers split its probability between several right answers
     (KYLLINGFILET and KYLLINGBRYST) and dropped some. Questions that pointed at `offers[i]`
     in a list mixed offers up (KINDEREGG for "egg"). Each question carries its own offer.
-    Offers with the same heading (one product at several chains) are asked about once. With a recipe line and a dinner,
-    the form counts: King Oskar's tinned tuna is tunfisk in a tunfisksalat, not in nigiri.
+    Offers with the same heading (one product at several chains) are asked about once. With a dinner, the form counts:
+    the recipe line's word (røkt, hermetisk), or AS_NAMED when it says none, so King Oskar's tinned tuna is tunfisk in
+    a tunfisksalat («1 boks tunfisk»), not in nigiri.
     """
 
     jev: Jev
 
-    async def rank(self, ingredient: str, offers: Sequence[Offer], line: str = "", dish: str = "") -> Mapping[str, float]:
+    async def rank(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "") -> Mapping[str, float]:
         groups: dict[str, list[Offer]] = {}
         for offer in offers:
             groups.setdefault(offer.heading.strip().upper(), []).append(offer)
@@ -467,7 +473,7 @@ class JevOfferMatcher:
             chunk = options[start : start + QUESTIONS_PER_CALL]
             response = await self.jev.ask(
                 "offer matcher",
-                {"ingredient": ingredient, "line": line, "dish": dish} if dish else {"ingredient": ingredient},
+                {"ingredient": product, "form": form or AS_NAMED, "dish": dish} if dish else {"ingredient": product},
                 {str(i): _offer_question(group[0], bool(dish)) for i, group in enumerate(chunk)},
             )
             for i, group in enumerate(chunk):

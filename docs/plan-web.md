@@ -8,7 +8,7 @@ jb 2026-10-13: "Lets make this into a fly.io service, see ex. over at statsbudsj
 
 ## What we measured
 
-- The ranking over 1 943 dinners takes well under a second and is done once at start-up; the app used 67 MiB in Docker.
+- The ranking over 1 943 dinners takes well under a second and is done once at start-up; the app used 67 MiB in Docker. (Since 2026-10-14 a ranking is worked out when a search first needs it, FACTS.md §1.)
 - Every build starts from scratch (jb 2026-10-13): the matprat crawl and every Jev question, each time.
 - The snapshot is 4.1 MB of JSON (dishes.json 3.6 MB), fine for git and the image.
 
@@ -17,7 +17,7 @@ jb 2026-10-13: "Lets make this into a fly.io service, see ex. over at statsbudsj
 - Jev stays offline: `src/pipeline/` builds `datasets/` on a laptop and the site reads it. The server has no Jev key and calls neither matprat.no nor Tjek, and the image does not contain the pipeline.
 - The snapshot holds every dinner and every shoppable ingredient's matches, independent of the household, so the site applies the rules itself and other households are possible later. A dish is facts only (jb: "there are loads of other constaints that might apply, so we can not have these attched to the dish").
 - The repo is public (jb, 2026-10-13), so dishes.json keeps no ingredient wording or method from matprat: per ingredient only name, department, unit and grams per portion rounded to 5 g, which the rules need. `/api/oppskrift` and `matris check --json` give no ingredient lists. profile.yaml says `small_kids`, not ages.
-- The site uses our profile.yaml "for now" and shows the rules without saying why. profile.yaml's comments name no conditions or family details, since the repo is public.
+- The site used our profile.yaml "for now"; the same day jb turned that down ("why would i have a profile for the webpage?"), so it starts with no rules and a visitor picks them in the search (AGENTS.md). It shows the rules without saying why. profile.yaml's comments name no conditions or family details, since the repo is public.
 - Layout, docs, Docker, Fly and CI copy statsbudsjett. ty and tests/test_boundary.py replace mypy and import-linter from the ezwork-style version.
 - User-facing text is bokmål; API and CLI JSON keys stay English, the same shape as before.
 - The project is called matris after the domain; the folder is still ~/src/fooood.

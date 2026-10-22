@@ -109,7 +109,7 @@ def candidates(
     sted: Annotated[str | None, typer.Option(help="Tilbud fra butikkene nær dette stedet, ikke stedet i profile.yaml.")] = None,
     as_json: JsonOption = False,
 ) -> None:
-    """Middager som passer, færrest bytter først, så mest spart i kroner. Med et søk: de som passer søket."""
+    """Middager som passer, mest spart i kroner først. Med et søk: de som passer søket."""
     q = queries(as_json)
     place = q.place(sted)
     if sted and place is None:

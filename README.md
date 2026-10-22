@@ -1,6 +1,6 @@
 # matris
 
-Dinner ideas from [matprat.no](https://www.matprat.no) and [godt.no](https://www.godt.no), with the week picked from dinners whose main protein is on sale ([mattilbud.no](https://mattilbud.no)). Diet rules (uten løk, glutenfri, lite laktose) are picked in the search, and the place in a select beside it. The site is at https://matris.app (in Norwegian).
+Dinner ideas from [matprat.no](https://www.matprat.no) and [godt.no](https://www.godt.no) with an ingredient on sale this week ([mattilbud.no](https://mattilbud.no)), the most kroner off first. Diet rules (uten løk, glutenfri, lite laktose) are picked in the search, and the place in a select beside it. The site is at https://matris.app (in Norwegian).
 
 Code: https://github.com/janbjorge/ukemeny. `profile.yaml` holds our household's rules and place for the CLI; the site and the build do not use it. FACTS.md says how everything works, METHOD.md every judgement call, TODO.md what is open.
 
@@ -28,5 +28,5 @@ Then commit `datasets/` and push; a push to main deploys (.github/workflows/depl
 ## Check
 
 ```sh
-uvx ruff check . && uv run ty check src tests && uv run pytest -q
+uvx ruff check . && uv run ty check src tests && uv run mypy && uv run pytest -q
 ```

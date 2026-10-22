@@ -37,8 +37,8 @@ def test_front_page_is_the_search_with_no_rules_until_picked(client: TestClient)
     assert "<h1>Finn en middag</h1>" in html
     assert 'id="uka"' not in html and "Nye middager" not in html  # no week on the page (jb 2026-10-14)
     assert all(n in html for n in ("Kyllinggryte", "Laks i ovn", "Torsk med bacon"))  # the list leaves nothing out
-    assert '<span class="pct">\u221241\u00a0kr</span> <span class="n">på 2 varer</span>' in html  # 135 to 99 kr, 25 to 20 kr
-    assert 'kyllingfilet<span class="store"> · KIWI</span></span><span class="off">\u221236\u00a0kr</span>' in html
+    assert '<span class="sum">\u221241\u00a0kr</span> <span class="n">på 2 varer</span>' in html  # 135 to 99 kr, 25 to 20 kr
+    assert 'kyllingfilet</span><span class="store">KIWI</span><span class="lead"></span><span class="off">\u221236\u00a0kr</span>' in html
     assert "%" not in html[html.index('class="cards"') :]  # no percent (jb 2026-10-22)
     assert "Bytt:" not in html and "Glutenfritt" not in html  # no rules on the page until a visitor picks them
     for gone in ("ting å sjekke", "Også på tilbud", "Prøv for eksempel", "Søker etter", "Uten bytter"):
@@ -61,7 +61,7 @@ def test_an_old_sort_link_still_opens(client: TestClient) -> None:
     r = client.get("/middager?q=kylling&sorter=kroner", headers=HX)
     assert r.headers["HX-Replace-Url"] == "/?q=kylling#forslag"  # «Sorter» is gone (jb 2026-10-22)
     ideas = r.text
-    assert '<span class="pct">\u221241\u00a0kr</span>' in ideas
+    assert '<span class="sum">\u221241\u00a0kr</span>' in ideas
     assert '<span class="off">\u221236\u00a0kr</span>' in ideas and '<span class="off">\u22125\u00a0kr</span>' in ideas
 
 

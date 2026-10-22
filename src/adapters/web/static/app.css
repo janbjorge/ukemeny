@@ -1,41 +1,41 @@
 :root {
   color-scheme: light;
-  /* A fresh market, light always (jb 2026-10-13: "its pretty dark"): cream page, tomato for what you can
-     click, basil for what fits, lemon price tags for discounts, and a colour per main protein below.
-     Every colour is picked in OKLCH at a fixed lightness per role, so all hues read alike, and checked with
-     APCA (the WCAG 3 draft) and WCAG 2: text and labels Lc 75 or more (about WCAG 7:1, less only for the
-     mid-tones under white chip text, where WCAG AA is the floor), card edges Lc 15 or more against the page.
-     tests/test_palette.py holds the pairs. */
-  --surface-0: #fcf4ec; --surface-1: #ffffff; --surface-2: #fef0e0;
-  --text-primary: #282017; --text-secondary: #4f463b; --text-muted: #5d5448;
-  --hairline: #dacfc2;
-  --accent: #a62407; --accent-strong: #8d1d05; --accent-soft: #fee2dc;
-  --good: #207029; --good-ink: #15561d; --good-soft: #dff6de;
-  --sale: #ffd23f; --sale-ink: #3c2b02;
-  --mark: #fff0a8; --star: #ab7302;
-  --shadow: 0 1px 2px rgb(60 30 0 / 8%), 0 6px 18px rgb(60 30 0 / 7%);
-  --shadow-lift: 0 2px 4px rgb(60 30 0 / 10%), 0 14px 30px rgb(60 30 0 / 13%);
+  /* Fjord (jb 2026-10-22: "it feels generic", ink on paper was "pretty grey and boring", a pale blue panel "a baby
+     page", a dark band behind the search grabbed "to muth attetion"): light paper, petrol for what you can click and
+     Søk, one red for the kroner you save, and a colour per main protein only on its dot.
+     Checked with APCA (the WCAG 3 draft) and WCAG 2: text and labels Lc 75 or more (about WCAG 7:1), card edges Lc 15
+     or more against the page. tests/test_palette.py holds the pairs. */
+  --surface-0: #f7f5f0; --surface-1: #ffffff; --surface-2: #ebe8df;
+  --text-primary: #1c1b18; --text-secondary: #4a463f; --text-muted: #524d46;
+  --hairline: #b3cacf;
+  --accent: #0b5263; --accent-strong: #083e4a; --accent-soft: #cfe6ea;
+  --save: #c2362b;
+  --mark: #fdeea6; --star: #9a6700;
+  --shadow: 0 1px 2px rgb(40 30 10 / 6%), 0 4px 14px rgb(40 30 10 / 5%);
+  --shadow-lift: 0 2px 4px rgb(40 30 10 / 8%), 0 12px 28px rgb(40 30 10 / 10%);
   /* Page gutter, wider than the notch on a phone held sideways */
   --gutter: max(16px, env(safe-area-inset-left), env(safe-area-inset-right));
   /* The type scale: every font-size uses one of these, at weight 400 or 650 (as in statsbudsjett) */
   --t-display: clamp(32px, 5.5vw, 52px); --t-title: clamp(26px, 4vw, 36px); --t-heading: clamp(20px, 2.4vw, 24px);
   --t-body: 17px; --t-small: 14px; --t-chart: 12px;
+  /* Headings in a book serif, the rest in the system's sans */
+  --serif: "Iowan Old Style", Charter, "Palatino Linotype", Georgia, ui-serif, serif;
 }
-/* One colour per main protein: --p for the card's top edge, dots and chosen chips (white text on it),
-   --p-ink on --p-soft for the protein label. Hues spread so neighbours differ: fjord blue fish, amber chicken. */
-[data-protein="fisk"] { --p: #0568a4; --p-ink: #014b79; --p-soft: #e5f2fe; }
-[data-protein="and"] { --p: #067272; --p-ink: #015353; --p-soft: #d6f8f7; }
-[data-protein="vegetar"] { --p: #03791f; --p-ink: #005813; --p-soft: #e2f7e2; }
-[data-protein="vilt"] { --p: #5b6c02; --p-ink: #424e02; --p-soft: #edf4da; }
-[data-protein="kylling"] { --p: #7e5e01; --p-ink: #5c4300; --p-soft: #fbefd6; }
-[data-protein="kalkun"] { --p: #8b5505; --p-ink: #653d03; --p-soft: #ffeddb; }
-[data-protein="kjøtt"] { --p: #8a542d; --p-ink: #643d20; --p-soft: #feece1; }
-[data-protein="pølser"] { --p: #a24102; --p-ink: #772e00; --p-soft: #feece4; }
-[data-protein="storfe"] { --p: #ac312c; --p-ink: #831a18; --p-soft: #feebe9; }
-[data-protein="skalldyr"] { --p: #ad274d; --p-ink: #840e35; --p-soft: #feebed; }
-[data-protein="kjøttdeig"] { --p: #a72a68; --p-ink: #7f124c; --p-soft: #ffeaf1; }
-[data-protein="svin"] { --p: #95388b; --p-ink: #702268; --p-soft: #fee8fa; }
-[data-protein="lam"] { --p: #6d47b8; --p-ink: #502e8e; --p-soft: #f1edfe; }
+/* One colour per main protein, for its dot and a chosen chip (white text on it). Hues spread so neighbours differ:
+   fjord blue fish, amber chicken. */
+[data-protein="fisk"] { --p: #0568a4; }
+[data-protein="and"] { --p: #067272; }
+[data-protein="vegetar"] { --p: #03791f; }
+[data-protein="vilt"] { --p: #5b6c02; }
+[data-protein="kylling"] { --p: #7e5e01; }
+[data-protein="kalkun"] { --p: #8b5505; }
+[data-protein="kjøtt"] { --p: #8a542d; }
+[data-protein="pølser"] { --p: #a24102; }
+[data-protein="storfe"] { --p: #ac312c; }
+[data-protein="skalldyr"] { --p: #ad274d; }
+[data-protein="kjøttdeig"] { --p: #a72a68; }
+[data-protein="svin"] { --p: #95388b; }
+[data-protein="lam"] { --p: #6d47b8; }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 12px; }
@@ -46,7 +46,7 @@ body {
 }
 a { color: var(--accent); }
 b, strong, th { font-weight: 650; }
-h1, h2, h3 { font-weight: 650; line-height: 1.2; text-wrap: balance; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 650; line-height: 1.2; text-wrap: balance; }
 p, li { text-wrap: pretty; }
 h1 { font-size: var(--t-display); margin: 0 0 12px; }
 h2 { font-size: var(--t-title); margin: 48px 0 8px; }
@@ -56,54 +56,58 @@ h3 { font-size: var(--t-heading); margin: 0 0 4px; }
 mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
-/* A market-stall stripe over the menu: tomato, carrot, lemon, basil, fjord */
-nav.top {
-  background: var(--surface-1); border-top: 5px solid; border-image: linear-gradient(90deg, #a62407, #ef8a17, #ffd23f, #6fb33f, #0568a4) 1;
-  border-bottom: 1px solid var(--hairline); padding-top: env(safe-area-inset-top);
-}
+nav.top { background: var(--surface-0); border-bottom: 1px solid var(--hairline); padding-top: env(safe-area-inset-top); }
 nav.top .in { max-width: 1120px; margin: 0 auto; display: flex; gap: 4px; align-items: center; padding: 8px var(--gutter); overflow-x: auto; scrollbar-width: none; }
 nav.top .in::-webkit-scrollbar { display: none; }
 nav.top a { flex: none; color: var(--text-secondary); text-decoration: none; font-size: var(--t-small); padding: 8px 10px; border-radius: 8px; white-space: nowrap; }
 nav.top a[aria-current] { color: var(--accent-strong); font-weight: 650; background: var(--accent-soft); }
-nav.top .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 650; font-size: var(--t-body); color: var(--accent); margin-right: auto; padding-left: 0; }
+nav.top .brand { display: inline-flex; align-items: center; gap: 8px; font-family: var(--serif); font-weight: 650; font-size: var(--t-heading); color: var(--accent); margin-right: auto; padding-left: 0; }
 
 main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px + env(safe-area-inset-bottom)); }
 .banner { background: var(--mark); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 10px; }
 
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 16px; margin: 16px 0; align-items: start; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 16px; margin: 16px 0; }
+/* Cards in a row are as tall as the tallest, and share its five rows (meta, name, «Med», what you save, «Bytt»), so the
+   names and the sums line up across the row (jb 2026-10-22: cards in different sizes "fuckes with my brain") */
 .card {
-  background: var(--surface-1); border: 1px solid var(--hairline); border-top: 6px solid var(--p, var(--accent));
-  border-radius: 16px; padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0;
-  box-shadow: var(--shadow);
+  background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 14px; padding: 16px 20px 18px;
+  display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; align-content: start; min-width: 0;
 }
+.card .meta { grid-row: 1; }
+.card .via { grid-row: 3; margin-top: 6px; }
+.card .save { grid-row: 4; }
+.card .swaps { grid-row: 5; margin-top: 8px; }
+.card h3 { grid-row: 2; margin: 6px 0 0; font-size: 22px; letter-spacing: -0.005em; }
 .card h3 a { color: var(--text-primary); text-decoration: none; overflow-wrap: anywhere; }
-.card .meta { margin: 0; font-size: var(--t-small); color: var(--text-muted); }
-.card .protein { display: inline-block; text-transform: capitalize; color: var(--p-ink, var(--text-secondary)); background: var(--p-soft, var(--surface-2)); font-weight: 650; border-radius: 999px; padding: 1px 10px; margin-right: 2px; }
+/* Above the name: the main protein with its dot, time and rating, in small capitals */
+.card .meta { margin: 0; font-size: var(--t-chart); line-height: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+.card .protein { font-weight: 650; color: var(--accent); }
+.card .protein::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--p); margin: 0 7px 1px 0; }
 .card .star { color: var(--star); }
-.card .hot { color: var(--accent-strong); font-weight: 650; }
 .card p { margin: 0; font-size: var(--t-small); }
-.card .save { margin-top: 6px; }
-.card .total { display: flex; align-items: baseline; gap: 8px; margin: 0 0 6px; }
-.card .total .pct { font-size: var(--t-heading); padding: 2px 10px; border-radius: 8px; margin: 0; }
+/* What you save: the sum in red, then each ingredient on sale with its store, dotted to its kroner off, as on a menu */
+.card .save { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--hairline); }
+.card .total { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px; }
+.card .total .sum { font-size: 26px; line-height: 1; font-weight: 650; letter-spacing: -0.01em; color: var(--save); }
 .card .total .n { color: var(--text-muted); font-size: var(--t-small); }
 .card .save ul { list-style: none; margin: 0; padding: 0; font-size: var(--t-small); }
-.card .save li { display: flex; align-items: baseline; gap: 12px; padding: 1px 0; }
-.card .save .what { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card .save .store { color: var(--text-muted); }
-.card .save .off { color: var(--text-secondary); white-space: nowrap; }
-.card .pct { display: inline-block; font-weight: 650; color: var(--sale-ink); background: var(--sale); border-radius: 6px; padding: 0 7px; margin-right: 4px; }
+.card .save li { display: flex; align-items: baseline; gap: 8px; padding: 2px 0; }
+.card .save .what { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card .save .what::first-letter { text-transform: uppercase; }
+.card .save .store { flex: none; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+.card .save .lead { flex: 1; min-width: 12px; border-bottom: 1px dotted var(--hairline); }
+.card .save .off { flex: none; color: var(--text-primary); white-space: nowrap; }
 .card .via, .card .swaps { color: var(--text-secondary); }
 .card .swaps b { color: var(--accent-strong); }
 .card .swaps b::before { content: "↺ "; }
 
-/* Finn en middag: the search box and the chips */
-.finder { background: var(--surface-2); border-radius: 24px; padding: 8px 24px 24px; }
-.finder h1 { font-size: var(--t-title); margin: 20px 0 8px; }
+/* Finn en middag: the title and search box on the paper, then the chips */
+.hero h1 { font-size: var(--t-title); margin: 8px 0 8px; }
 .search { display: flex; gap: 8px; margin: 12px 0 8px; }
 .search input {
   flex: 1; min-width: 0; font: inherit; font-size: var(--t-heading); color: var(--text-primary);
-  padding: 12px 18px 12px 50px; border: 2px solid var(--hairline); border-radius: 999px; box-shadow: var(--shadow);
-  background: var(--surface-1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a62407' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M15.5 15.5 21 21'/%3E%3C/svg%3E") no-repeat 18px center / 22px;
+  padding: 12px 18px 12px 50px; border: 1px solid var(--hairline); border-radius: 999px; box-shadow: var(--shadow);
+  background: var(--surface-1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b5263' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M15.5 15.5 21 21'/%3E%3C/svg%3E") no-repeat 18px center / 22px;
   -webkit-appearance: none; appearance: none;
 }
 .search input::placeholder { color: var(--text-muted); }
@@ -123,7 +127,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 /* line-height 20px, padding and a 1px border make --chip; the label and the count share a baseline */
 .chips a, .chips .off {
   display: inline-flex; align-items: baseline; gap: 5px; font-size: var(--t-small); line-height: 20px; text-decoration: none; white-space: nowrap;
-  color: var(--text-secondary); background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 999px; padding: var(--chip-pad) 14px;
+  color: var(--text-secondary); background: var(--surface-2); border: 1px solid transparent; border-radius: 999px; padding: var(--chip-pad) 14px;
 }
 .chips a:active { border-color: var(--accent); }
 .chips a[aria-current] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 650; }
@@ -131,13 +135,12 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 /* line-height 1: on the label's baseline its own 20 px line would reach 1 px below the chip's */
 .chips .n { font-size: var(--t-chart); line-height: 1; color: var(--text-muted); }
 .chips a[aria-current] .n { color: inherit; }
-.chips.diet a[aria-current] { background: var(--good); border-color: var(--good); }
 .chips [data-protein]::before { content: ""; align-self: center; width: 9px; height: 9px; border-radius: 50%; background: var(--p); }
 /* «Sted»: a select shaped like a chip, filled like a chosen chip once a place is picked */
 .filters select {
   justify-self: start; max-width: 100%; margin: 0; font: inherit; font-size: var(--t-small); line-height: 20px; color: var(--text-secondary);
-  padding: var(--chip-pad) 36px var(--chip-pad) 14px; border: 1px solid var(--hairline); border-radius: 999px; cursor: pointer;
-  background: var(--surface-1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%235d5448' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E") no-repeat right 14px center / 11px;
+  padding: var(--chip-pad) 36px var(--chip-pad) 14px; border: 1px solid transparent; border-radius: 999px; cursor: pointer;
+  background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%235d5448' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E") no-repeat right 14px center / 11px;
   -webkit-appearance: none; appearance: none;
 }
 .filters select.on { background-color: var(--accent); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23ffffff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E"); border-color: var(--accent); color: #fff; font-weight: 650; }
@@ -146,7 +149,8 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .chips a[data-protein][aria-current]::before { background: #fff; }
 
 .note { background: var(--mark); border-radius: 10px; padding: 8px 12px; font-size: var(--t-small); margin: 8px 0; }
-.count { font-size: var(--t-small); color: var(--text-secondary); margin: 8px 0 0; }
+/* Over the cards, in the headings' serif: it ends the filters and starts the list */
+.count { font-family: var(--serif); font-size: var(--t-heading); font-weight: 650; color: var(--text-primary); margin: 28px 0 0; }
 .empty { background: var(--surface-1); border-radius: 16px; padding: 16px 20px; box-shadow: var(--shadow); }
 .empty p { margin: 4px 0; }
 .more { grid-column: 1 / -1; text-align: center; margin: 4px 0 0; position: relative; }
@@ -196,12 +200,17 @@ footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--hairli
   h2 { margin-top: 32px; }
 
   .cards { gap: 12px; }
-  .card { padding: 12px 16px 14px; border-radius: 14px; }
+  .card { padding: 14px 16px 16px; border-radius: 12px; }
 
-  .finder { margin: 0 calc(-1 * var(--gutter)); border-radius: 0; padding: 4px var(--gutter) 24px; }
+  .hero {
+    /* Scrolls up by its padding, the title's margin and 32 px line, and 8 of the box's 12 px margin: the box stays */
+    position: sticky; top: -60px; z-index: 2; background: var(--surface-0);
+    margin: 0 calc(-1 * var(--gutter)); padding: 4px var(--gutter) 12px;
+  }
+  .hero h1 { margin: 16px 0 0; line-height: 32px; }
   /* Flush under the menu, unless the note about old offers is above it */
-  .finder:first-child { margin-top: -16px; }
-  .search { position: sticky; top: 0; z-index: 2; margin: 8px calc(-1 * var(--gutter)); padding: 8px var(--gutter); background: var(--surface-2); }
+  .finder:first-child .hero { margin-top: -16px; }
+  .search { margin: 12px 0 0; }
   .search button { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
   .search input { padding: 11px 16px 11px 46px; background-position: 15px center; }
 

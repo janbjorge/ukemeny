@@ -2,6 +2,8 @@
 {% from "_search.html" import search_box %}
 {% block main %}
 <section id="forslag" class="finder">
+  {# The title and the search box; on a phone the box stays on top as the title scrolls away #}
+  <div class="hero">
   <h1>Finn en middag</h1>
   <form class="search" id="sok" action="/#forslag" method="get" role="search"
     hx-get="/middager" hx-target="#forslag-liste" hx-swap="outerHTML" hx-indicator="#forslag-liste"
@@ -9,6 +11,7 @@
     {{ search_box(found.search.text) }}
     <button type="submit">Søk</button>
   </form>
+  </div>
   {% include "_dinners.html" %}
 </section>
 {% endblock %}

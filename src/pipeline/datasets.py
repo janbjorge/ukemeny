@@ -37,7 +37,9 @@ from pipeline.jev import Jev, JevDepartmentClassifier, JevIngredientClassifier, 
 from pipeline.matprat import MatpratRecipeSource
 from pipeline.tjek import TjekOfferSource
 
-JEV_MODEL = os.environ.get("JEV_MODEL", "jev-latest")
+JEV_MODEL = os.environ.get("JEV_MODEL", "jev-1.14.0")
+"""Pinned (jb 2026-10-22: "lets pin to jev-1.14.0"): jev-latest moved from 1.13.0 to 1.14.0 under a build, which changed a
+label of 596 names. JEV_MODEL in the environment names another, for a relabel on purpose (METHOD.md §2)."""
 JEV_IN_FLIGHT = 8
 """Requests to Jev at a time."""
 CRAWL_WORKERS = 16

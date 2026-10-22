@@ -31,6 +31,9 @@ addEventListener("htmx:afterSwap", () => {
   if (all) all.checked = openAll;
   openPick = null;
 });
+// htmx focuses the new «Sted» after the swap, as it was focused, and an iPhone then opens its picker again (jb 2026-10-22:
+// "it re-trigger or re-shown when i slect a city on iphone")
+addEventListener("change", (e) => { if (e.target.id === "sted") e.target.blur(); });
 addEventListener("click", (e) => { const done = e.target.closest?.(".pick .done"); if (done) done.closest("details").open = false; });
 addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;

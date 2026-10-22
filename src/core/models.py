@@ -428,6 +428,10 @@ class Snapshot:
     offers: tuple[Offer, ...]
     """This week's grocery offers, from the stores near every place."""
     matches: Mapping[str, tuple[str, ...]]
-    """Per ingredient name, the ids of the offers a cook can buy as it."""
+    """Per ingredient name, the ids of the discounted offers a cook can buy as it; not meat, fish or shellfish
+    (`served`)."""
     places: Mapping[str, tuple[str, ...]]
     """Per place, the catalogs (Offer.catalog) of the stores near it (Offers.places)."""
+    served: Mapping[str, Mapping[str, tuple[str, ...]]] = field(default_factory=dict)
+    """Per dinner (Dish.url), per meat, fish or shellfish ingredient, the ids of the discounted offers a cook can buy
+    as it for that dinner (core.matching.per_dinner)."""

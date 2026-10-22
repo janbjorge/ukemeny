@@ -176,15 +176,20 @@ def heading_key(heading: str) -> str:
     return " ".join(heading.lower().split())
 
 
-def obvious(ingredient: str, heading: str) -> float | None:
-    """Answers that need no classifier: an offer named exactly like the ingredient is it,
-    a snack or pålegg is not. None when it takes judgment."""
+def not_an_ingredient(ingredient: str, heading: str) -> bool:
+    """A snack or pålegg, which needs no classifier. An offer named like the ingredient is still asked about: «Tunfisk»
+    is King Oskar's tin, no tuna for sushi."""
     key = heading_key(heading)
-    if key == ingredient:
-        return 1.0
-    if any(word in key and word not in ingredient for word in NOT_AN_INGREDIENT):
-        return 0.0
-    return None
+    return any(word in key and word not in ingredient for word in NOT_AN_INGREDIENT)
+
+
+PER_DINNER = ("/kjøtt", "/fisk og sjømat", "/skalldyr")
+"""Departments whose offers are matched per dinner, with the recipe's line: the dinner says whether tunfisk is raw or
+tinned, laks fresh or smoked, ribbe raw or grilled. Other ingredients are matched by name (METHOD.md §2)."""
+
+
+def per_dinner(part: Part) -> bool:
+    return part.category.startswith(PER_DINNER)
 
 
 def cheapest_first(offers: Sequence[Offer]) -> tuple[Offer, ...]:

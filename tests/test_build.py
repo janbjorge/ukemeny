@@ -99,12 +99,28 @@ async def test_every_ingredient_gets_every_label() -> None:
     assert known["løk"].onion is Onion.ONION
 
 
-async def test_obvious_offers_are_never_asked_about() -> None:
-    offers = [offer("KYLLINGBRYST", id="bryst"), offer("Kyllingfilet", id="filet"), offer("KYLLINGPÅLEGG", id="pålegg")]
+async def test_meat_and_fish_are_asked_about_per_dinner_and_the_rest_by_name() -> None:
+    raw = recipe("Nigiri", ingredient("tunfisk", 200, "g", "/fisk og sjømat"))
+    tomato = ingredient("tomat", 400, "g", "/grønnsaker")
+    salad = recipe("Tunfisksalat", ingredient("tunfisk", 1, "boks", "/fisk og sjømat"), tomato)
+    soup = recipe("Tomatsuppe", tomato)
+    offers = [
+        offer("Tunfisk", 15, pre_price=23.9, id="tin", description="85 g, boks"),
+        offer("TUNFISKFILET", 99, id="loin"),  # No discount: never asked about
+        offer("TUNFISKPÅLEGG", 20, pre_price=30, id="pålegg"),  # Never an ingredient
+        offer("TOMATER", 20, pre_price=30, id="tomat"),
+    ]
+    matcher = FakeMatcher({"tunfisk": "tunfisk", "tomat": "tomat"}, wrong={"Nigiri": "boks"})
+    matched, served = await build.match([raw, salad, soup], offers, matcher)
+    assert matched == {"tomat": ("tomat",)}
+    assert served == {salad.url: {"tunfisk": ("tin",)}}  # The tin is no tuna for nigiri
+    assert sorted(matcher.asked) == [("tomat", 1, ""), ("tunfisk", 1, "Nigiri"), ("tunfisk", 1, "Tunfisksalat")]
+
+
+async def test_a_dinner_without_a_discount_costs_nothing() -> None:
     matcher = FakeMatcher({"kyllingfilet": "kylling"})
-    matched = await build.match(["kyllingfilet"], offers, matcher)
-    assert matched == {"kyllingfilet": ("bryst", "filet")}
-    assert matcher.asked == [("kyllingfilet", 1)]  # Only KYLLINGBRYST took judgment
+    assert await build.match([DINNER], [offer("KYLLINGBRYST", 99, id="bryst")], matcher) == ({}, {})
+    assert matcher.asked == []
 
 
 async def test_snapshot_holds_every_dinner_and_the_shoppable_matches() -> None:
@@ -121,8 +137,8 @@ async def test_snapshot_holds_every_dinner_and_the_shoppable_matches() -> None:
     assert [d.name for d in s.dishes] == ["Brokkoligrateng", "Kyllinggryte"]
     assert s.dishes[1].parts[0] == Part("kyllingfilet", "/kjøtt/kylling/høns", 150, "g")  # Per portion
     assert set(s.traits) == {"kyllingfilet", "salt", "brokkoli"}
-    assert s.matches == {"kyllingfilet": ("bryst",)}  # Salt is pantry: never looked up
-    assert len(s.offers) == 2 and report.dinners == 2
+    assert s.served == {DINNER.url: {"kyllingfilet": ("bryst",)}}  # Salt is pantry: never looked up
+    assert s.matches == {} and len(s.offers) == 2 and report.dinners == 2
     assert list(s.places.items()) == [("Bergen", ("KIWI",)), ("Tromsø", ("KIWI",))]  # sorted, as datasets/ has them
 
 
@@ -132,7 +148,7 @@ async def test_snapshot_reports_each_step() -> None:
         [FakeSource({DINNER.url: DINNER})],
         FakeDepartments(),
         FakeClassifier(),
-        FakeOffers([offer("KYLLINGBRYST", id="bryst")]),
+        FakeOffers([offer("KYLLINGBRYST", 99, pre_price=135, id="bryst")]),
         FakeMatcher(),
         progress=lambda step, done, due: seen.append((step, done, due)),
     )

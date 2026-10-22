@@ -434,13 +434,16 @@ class JevDepartmentClassifier:
 QUESTIONS_PER_CALL = 100
 
 
-def _offer_question(offer: Offer) -> Noul:
+def _offer_question(offer: Offer, dinner: bool) -> Noul:
+    where = " for the dinner `dish`, where the recipe writes `line`" if dinner else ""
     return Noul(
-        instructions=f"Can a cook buy the grocery offer «{offer.heading}: {offer.description[:90]}» as the recipe ingredient `ingredient`?",
+        instructions=f"Can a cook buy the grocery offer «{offer.heading}: {offer.description[:90]}» as the recipe ingredient "
+        f"`ingredient`{where}?",
         criteria={
-            "true": "Yes: it is that product, in any brand, size or cut that a recipe means by the name",
-            "false": "No: a different product, a different cut or animal part, or a ready meal, "
-            "pålegg, snack, sweet, or a marinated, breaded or pre-cooked version",
+            "true": "Yes: it is that product, in any brand, size or cut that a recipe means by the name, and in a form the dinner can use",
+            "false": "No: a different product or animal, a different cut or animal part, a ready meal, pålegg, snack or "
+            "sweet, or another form than the recipe means: canned, smoked, cured, salted, dried, marinated, breaded or "
+            "pre-cooked when it means raw or fresh, or the other way round",
         },
     )
 
@@ -452,12 +455,13 @@ class JevOfferMatcher:
     A single Choice over the offers split its probability between several right answers
     (KYLLINGFILET and KYLLINGBRYST) and dropped some. Questions that pointed at `offers[i]`
     in a list mixed offers up (KINDEREGG for "egg"). Each question carries its own offer.
-    Offers with the same heading (one product at several chains) are asked about once.
+    Offers with the same heading (one product at several chains) are asked about once. With a recipe line and a dinner,
+    the form counts: King Oskar's tinned tuna is tunfisk in a tunfisksalat, not in nigiri.
     """
 
     jev: Jev
 
-    async def rank(self, ingredient: str, offers: Sequence[Offer]) -> Mapping[str, float]:
+    async def rank(self, ingredient: str, offers: Sequence[Offer], line: str = "", dish: str = "") -> Mapping[str, float]:
         groups: dict[str, list[Offer]] = {}
         for offer in offers:
             groups.setdefault(offer.heading.strip().upper(), []).append(offer)
@@ -467,8 +471,8 @@ class JevOfferMatcher:
             chunk = options[start : start + QUESTIONS_PER_CALL]
             response = await self.jev.ask(
                 "offer matcher",
-                {"ingredient": ingredient},
-                {str(i): _offer_question(group[0]) for i, group in enumerate(chunk)},
+                {"ingredient": ingredient, "line": line, "dish": dish} if dish else {"ingredient": ingredient},
+                {str(i): _offer_question(group[0], bool(dish)) for i, group in enumerate(chunk)},
             )
             for i, group in enumerate(chunk):
                 probability = response.nouls[str(i)].noul

@@ -6,7 +6,8 @@ from core.matching import (
     doubted,
     heading_key,
     main_protein,
-    obvious,
+    not_an_ingredient,
+    per_dinner,
     stems,
     weight,
 )
@@ -47,12 +48,18 @@ def test_cheapest_per_kg_first() -> None:
     assert cheapest_first([dear, cheap]) == (cheap, dear)
 
 
-def test_obvious_answers() -> None:
+def test_snacks_and_pålegg_are_no_ingredient() -> None:
     assert heading_key("  Kylling  FILET ") == "kylling filet"
-    assert obvious("poteter", "POTETER") == 1.0
-    assert obvious("kyllingfilet", "Coop kyllingpålegg") == 0.0
-    assert obvious("hamburgerbrød", "HAMBURGERBRØD GROVE") is None
-    assert obvious("kyllingfilet", "KYLLINGBRYST") is None
+    assert not_an_ingredient("kyllingfilet", "Coop kyllingpålegg")
+    assert not not_an_ingredient("hamburgerbrød", "HAMBURGERBRØD GROVE")
+    assert not not_an_ingredient("tunfisk", "Tunfisk")  # Named alike, still asked: it may be a tin
+
+
+def test_meat_fish_and_shellfish_are_matched_per_dinner() -> None:
+    assert per_dinner(Part("tunfisk", "/fisk og sjømat", 50, "g"))
+    assert per_dinner(Part("reker", "/skalldyr", 50, "g"))
+    assert per_dinner(Part("ribbe", "/kjøtt/svinekjøtt", 300, "g"))
+    assert not per_dinner(Part("tomat", "/grønnsaker", 100, "g"))
 
 
 def test_main_protein_is_the_heaviest_meat_or_fish() -> None:

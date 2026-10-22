@@ -153,7 +153,8 @@ def main() -> None:
     print(f"recipes: {r.listed:,} pages, {r.failed:,} failed")
     print(
         f"{len(s.dishes):,} dinners ({', '.join(f'{site} {n:,}' for site, n in sorted(sites.items()))}), "
-        f"{len(s.traits):,} ingredients, {len(s.offers):,} offers in {len(s.places)} places, {len(s.matches):,} ingredients on offer"
+        f"{len(s.traits):,} ingredients, {len(s.offers):,} offers in {len(s.places)} places, "
+        f"{len(s.matches):,} ingredients and {len(s.served):,} dinners' meat or fish on offer"
     )
     print(", ".join(f"{name} {size / 1e6:.1f} MB" for name, size in result.sizes.items()))
     print(result.jev)

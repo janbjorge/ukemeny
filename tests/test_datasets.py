@@ -13,6 +13,7 @@ def test_snapshot_round_trip(tmp_path: Path) -> None:
         matches={"kyllingfilet": ["a"]},
         places={"Bergen": ["kiwi-vest", "rema"], "Stavanger": ["kiwi-vest"]},
     )
+    assert s.served  # kyllingfilet is meat: matched per dinner
     sizes = write(s, tmp_path)
     assert set(sizes) == {"dishes.json", "traits.json", "offers.json"}
     assert JsonDatasets(tmp_path).snapshot() == s

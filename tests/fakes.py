@@ -6,6 +6,7 @@ from datetime import UTC, date, datetime
 
 from core.dishes import dish
 from core.errors import SourceUnavailableError
+from core.matching import per_dinner
 from core.models import (
     LABELS,
     Carbs,
@@ -80,6 +81,7 @@ def offer(
     per_kg: float | None = None,
     pre_price: float | None = None,
     id: str | None = None,
+    description: str = "",
 ) -> Offer:
     """`catalog` defaults to the store's name: one catalog per chain."""
     return Offer(
@@ -87,7 +89,7 @@ def offer(
         store=store,
         catalog=catalog or store,
         heading=heading,
-        description="",
+        description=description,
         price=price,
         pre_price=pre_price,
         per_kg=per_kg,
@@ -147,12 +149,15 @@ class FakeMatcher:
     """An offer is the ingredient when its heading contains `matches[ingredient]`."""
 
     matches: Mapping[str, str] = field(default_factory=dict)
-    asked: list[tuple[str, int]] = field(default_factory=list)
+    wrong: Mapping[str, str] = field(default_factory=dict)
+    """Per dinner, a word in an offer's description that rules it out there: {"Nigiri": "boks"}."""
+    asked: list[tuple[str, int, str]] = field(default_factory=list)
+    """(ingredient, offers, dinner) per request."""
 
-    async def rank(self, ingredient: str, offers: Sequence[Offer]) -> dict[str, float]:
-        self.asked.append((ingredient, len(offers)))
-        word = self.matches.get(ingredient)
-        return {o.id: float(bool(word and word in o.heading.lower())) for o in offers}
+    async def rank(self, ingredient: str, offers: Sequence[Offer], line: str = "", dish: str = "") -> dict[str, float]:
+        self.asked.append((ingredient, len(offers), dish))
+        word, bad = self.matches.get(ingredient), self.wrong.get(dish)
+        return {o.id: float(bool(word and word in o.heading.lower() and not (bad and bad in o.description))) for o in offers}
 
 
 @dataclass
@@ -179,16 +184,26 @@ def snapshot(
     matches: Mapping[str, Sequence[str]] | None = None,
     places: Mapping[str, Sequence[str]] | None = None,
 ) -> Snapshot:
-    """A snapshot where every ingredient is PLAIN unless `known` says otherwise. `places`: per place, its catalogs."""
+    """A snapshot where every ingredient is PLAIN unless `known` says otherwise. `matches`: per ingredient name, filed
+    as the build does: meat, fish and shellfish under every dinner with it (Snapshot.served). `places`: per place, its
+    catalogs."""
     names = {i.name for r in recipes for i in r.ingredients}
     traits = {name: (known or {}).get(name, PLAIN) for name in names}
+    dishes = tuple(dish(r) for r in recipes)
+    found = {name: tuple(ids) for name, ids in (matches or {}).items()}
+    served: dict[str, dict[str, tuple[str, ...]]] = {}
+    for d in dishes:
+        for p in d.parts:
+            if per_dinner(p) and p.name in found:
+                served.setdefault(d.url, {})[p.name] = found[p.name]
     return Snapshot(
         built=datetime(2026, 10, 13, 12, tzinfo=UTC),
-        dishes=tuple(dish(r) for r in recipes),
+        dishes=dishes,
         traits=traits,
         offers=tuple(offers),
-        matches={name: tuple(ids) for name, ids in (matches or {}).items()},
+        matches=found,
         places={place: tuple(ids) for place, ids in (places or {}).items()},
+        served=served,
     )
 
 

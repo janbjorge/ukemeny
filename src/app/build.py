@@ -10,12 +10,12 @@ import asyncio
 import logging
 from collections import Counter, defaultdict
 from collections.abc import Callable, Iterable, Mapping, Sequence
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 
 from core.dishes import dish
 from core.errors import SourceUnavailableError
-from core.matching import ELSEWHERE, agrees, candidates, doubted, heading_key, obvious, weight
+from core.matching import ELSEWHERE, agrees, candidates, doubted, not_an_ingredient, per_dinner, weight
 from core.models import Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
 from core.ports import DepartmentClassifier, IngredientClassifier, OfferMatcher, OfferSource, RecipeSource
 
@@ -163,49 +163,84 @@ async def classify(
     return {name: task.result() for name, task in tasks.items()}
 
 
+@dataclass(frozen=True, slots=True)
+class Question:
+    """One request to the offer matcher: an ingredient and the offers that could be it, with a dinner's context for meat,
+    fish and shellfish (core.matching.per_dinner)."""
+
+    name: str
+    offers: tuple[Offer, ...]
+    line: str = ""
+    dish: str = ""
+
+
 async def match(
-    names: Iterable[str],
+    dinners: Sequence[Recipe],
     offers: Sequence[Offer],
     matcher: OfferMatcher,
     threshold: float = MATCH_THRESHOLD,
     progress: Callable[[int, int], None] | None = None,
-) -> dict[str, tuple[str, ...]]:
-    """Per ingredient name, the ids of the offers a cook can buy as it. The matcher is asked about every
-    (ingredient, offer heading) pair that is not obvious (core.matching.obvious)."""
-    lookups = {name: found for name in sorted(set(names)) if (found := candidates(name, offers))}
-    scores: dict[tuple[str, str], float] = {}
-    ask: dict[str, list[Offer]] = {}
-    for name, found in lookups.items():
-        for o in found:
-            pair = (name, heading_key(o.heading))
-            if (answer := obvious(*pair)) is not None:
-                scores[pair] = answer
+) -> tuple[dict[str, tuple[str, ...]], dict[str, dict[str, tuple[str, ...]]]]:
+    """The ids of the offers a cook can buy as each ingredient that matters for the shop: per name, and for meat, fish and
+    shellfish per dinner (Snapshot.matches, Snapshot.served). Only discounted offers are asked about, since nothing else
+    reaches a card (jb 2026-10-22: "make sure that we do not waaste effort on dishes that do not have any discounts"), so a
+    dinner without one costs nothing. Snacks and pålegg are left out without asking (core.matching.not_an_ingredient)."""
+    on_sale = [o for o in offers if o.saving]
+    found: dict[str, tuple[Offer, ...]] = {}
+
+    def could_be(name: str) -> tuple[Offer, ...]:
+        if name not in found:
+            found[name] = tuple(o for o in candidates(name, on_sale) if not not_an_ingredient(name, o.heading))
+        return found[name]
+
+    by_name: dict[str, Question] = {}
+    by_dinner: dict[tuple[str, str], Question] = {}
+    for recipe in dinners:
+        for part, ingredient in zip(dish(recipe).parts, recipe.ingredients, strict=True):
+            if not weight(part) or not (maybe := could_be(part.name)):
+                continue
+            if per_dinner(part):
+                by_dinner.setdefault((recipe.url, part.name), Question(part.name, maybe, ingredient.text, recipe.name))
             else:
-                ask.setdefault(name, []).append(o)
-    log.info("offers: %d ingredients with candidates, %d pairs settled without Jev", len(lookups), len(scores))
+                by_name.setdefault(part.name, Question(part.name, maybe))
+    due = len(by_name) + len(by_dinner)
+    log.info(
+        "offers: %d of %d discounted, %d names and %d dinner ingredients to ask about",
+        len(on_sale),
+        len(offers),
+        len(by_name),
+        len(by_dinner),
+    )
     done = 0
     if progress:
-        progress(done, len(ask))
+        progress(done, due)
 
-    async def one(name: str, found: Sequence[Offer]) -> Mapping[str, float]:
+    async def ask(q: Question) -> tuple[str, ...]:
         nonlocal done
-        ranked = await matcher.rank(name, found)
-        hits = sorted({o.heading for o in found if ranked.get(o.id, 0.0) >= threshold})
-        log.debug("%s: %d of %d offers match %s", name, len(hits), len(found), hits)
+        ranked = await matcher.rank(q.name, q.offers, q.line, q.dish)
+        ids = tuple(o.id for o in q.offers if ranked.get(o.id, 0.0) >= threshold)
+        log.debug(
+            "%s%s: %d of %d offers match %s",
+            q.name,
+            f" in {q.dish}" if q.dish else "",
+            len(ids),
+            len(q.offers),
+            sorted({o.heading for o in q.offers if o.id in ids}),
+        )
         done += 1
         if progress:
-            progress(done, len(ask))
-        return ranked
+            progress(done, due)
+        return ids
 
     async with asyncio.TaskGroup() as tg:
-        tasks = {name: tg.create_task(one(name, found)) for name, found in ask.items()}
-    scores |= {(name, heading_key(o.heading)): tasks[name].result().get(o.id, 0.0) for name, found in ask.items() for o in found}
-    matched: dict[str, tuple[str, ...]] = {}
-    for name, found in lookups.items():
-        ids = tuple(o.id for o in found if scores[name, heading_key(o.heading)] >= threshold)
-        if ids:
-            matched[name] = ids
-    return matched
+        names = {name: tg.create_task(ask(q)) for name, q in by_name.items()}
+        served = {key: tg.create_task(ask(q)) for key, q in by_dinner.items()}
+    matched = {name: ids for name, task in sorted(names.items()) if (ids := task.result())}
+    per_dish: dict[str, dict[str, tuple[str, ...]]] = {}
+    for (url, name), task in sorted(served.items()):
+        if ids := task.result():
+            per_dish.setdefault(url, {})[name] = ids
+    return matched, per_dish
 
 
 async def snapshot(
@@ -230,15 +265,16 @@ async def snapshot(
     current = await offers.current()
     if progress:
         progress("catalogs", 1, 1)
-    dishes = tuple(dish(r) for r in sorted(dinners, key=lambda r: r.url))
-    shoppable = (p.name for d in dishes for p in d.parts if weight(p))
-    matched = await match(shoppable, current.offers, matcher, progress=step("offers"))
+    dinners = sorted(dinners, key=lambda r: r.url)
+    dishes = tuple(dish(r) for r in dinners)
+    matched, served = await match(dinners, current.offers, matcher, progress=step("offers"))
     built = Snapshot(
         built=datetime.now(UTC),
         dishes=dishes,
         traits=dict(sorted(known.items())),
         offers=tuple(sorted(current.offers, key=lambda o: (o.store, o.heading, o.id))),
-        matches=dict(sorted(matched.items())),
+        matches=matched,
         places={place: tuple(sorted(catalogs)) for place, catalogs in sorted(current.places.items())},
+        served=served,
     )
     return built, report

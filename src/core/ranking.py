@@ -5,8 +5,8 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 
 from core.diet import carbs, fodmap_out, judge
-from core.matching import FISH, cheapest_first, main_protein, weight
-from core.models import Buy, Dinner, Dish, Household, Item, Level, Offer, Pregnancy, Snapshot
+from core.matching import FISH, cheapest_first, main_protein, per_dinner, weight
+from core.models import Buy, Dinner, Dish, Household, Item, Level, Offer, Part, Pregnancy, Snapshot
 
 TIME_BONUS: Mapping[str, float] = {"Under": 1.0, "20": 0.5, "40": 0.0, "Over": -1.0}
 """By the start of matprat's prep time bucket: small kids do not wait for a slow dinner."""
@@ -39,14 +39,28 @@ def rank(dinner: Dinner) -> tuple[float, float]:
     return (-dinner.saving, -dinner.score)
 
 
-def buys(dish: Dish, matched: Mapping[str, tuple[Offer, ...]]) -> tuple[Buy, ...]:
+@dataclass(frozen=True, slots=True)
+class Shelf:
+    """The offers a cook can buy as each ingredient, cheapest first (`offered`)."""
+
+    by_name: Mapping[str, tuple[Offer, ...]]
+    by_dinner: Mapping[str, Mapping[str, tuple[Offer, ...]]]
+    """Per Dish.url, for meat, fish and shellfish (core.matching.per_dinner)."""
+
+    def get(self, dish: Dish, part: Part) -> tuple[Offer, ...]:
+        if per_dinner(part):
+            return self.by_dinner.get(dish.url, {}).get(part.name, ())
+        return self.by_name.get(part.name, ())
+
+
+def buys(dish: Dish, shelf: Shelf) -> tuple[Buy, ...]:
     """The dish's ingredients that are on offer, most important first."""
     seen: set[str] = set()
     found = []
     for part in dish.parts:
-        if matched.get(part.name) and part.name not in seen and weight(part):
+        if part.name not in seen and weight(part) and (offers := shelf.get(dish, part)):
             seen.add(part.name)
-            found.append(Buy(part, matched[part.name], weight(part)))
+            found.append(Buy(part, offers, weight(part)))
     return tuple(sorted(found, key=lambda b: b.weight, reverse=True))
 
 
@@ -80,17 +94,20 @@ class Prepared:
         )
 
 
-def offered(snapshot: Snapshot, place: str | None = None) -> dict[str, tuple[Offer, ...]]:
-    """Per ingredient name, the offers a cook can buy as it, cheapest first: at the stores near `place`, or at every
-    store."""
+def offered(snapshot: Snapshot, place: str | None = None) -> Shelf:
+    """The offers a cook can buy as each ingredient: at the stores near `place`, or at every store."""
     near = frozenset(snapshot.places[place]) if place else None
     by_id = {o.id: o for o in snapshot.offers if near is None or o.catalog in near}
-    return {name: cheapest_first([by_id[i] for i in ids if i in by_id]) for name, ids in snapshot.matches.items()}
+
+    def shelf(matches: Mapping[str, tuple[str, ...]]) -> dict[str, tuple[Offer, ...]]:
+        return {name: cheapest_first([by_id[i] for i in ids if i in by_id]) for name, ids in matches.items()}
+
+    return Shelf(shelf(snapshot.matches), {url: shelf(matches) for url, matches in snapshot.served.items()})
 
 
 def prepare(snapshot: Snapshot) -> tuple[Prepared, ...]:
     """Every dinner with the offers at every store; `nearby` gives one place's."""
-    matched = offered(snapshot)
+    shelf = offered(snapshot)
     prepared = []
     for dish in snapshot.dishes:
         protein, main = main_protein(dish)
@@ -101,7 +118,7 @@ def prepare(snapshot: Snapshot) -> tuple[Prepared, ...]:
                 protein,
                 main,
                 score(dish),
-                buys(dish, matched),
+                buys(dish, shelf),
                 holds=frozenset(item for item in Item if any(t.contains.get(item, Level.YES) is not Level.NO for _, t in known)),
                 not_for_pregnant=any(t.pregnancy is not Pregnancy.OK for _, t in known),
                 high_fodmap=any(fodmap_out(t, p.category) for p, t in known),
@@ -115,8 +132,8 @@ def nearby(prepared: Sequence[Prepared], snapshot: Snapshot, place: str | None) 
     """The same dinners with the offers at the stores near `place`; None: every store, as `prepare` has them."""
     if place is None:
         return tuple(prepared)
-    matched = offered(snapshot, place)
-    return tuple(replace(p, buys=buys(p.dish, matched)) for p in prepared)
+    shelf = offered(snapshot, place)
+    return tuple(replace(p, buys=buys(p.dish, shelf)) for p in prepared)
 
 
 def dinners(snapshot: Snapshot, household: Household, prepared: Sequence[Prepared] | None = None) -> list[Dinner]:

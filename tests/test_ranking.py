@@ -1,5 +1,6 @@
 import random
 from collections import Counter
+from dataclasses import replace
 
 from adapters.datasets import JsonDatasets
 from core.diet import judge
@@ -61,6 +62,18 @@ def test_offers_missing_from_the_snapshot_are_ignored() -> None:
     s = snapshot(recipe("Kylling", CHICKEN), matches={"kyllingfilet": ["gone"]})
     (dinner,) = dinners(s, HOUSEHOLD)
     assert dinner.buys == ()
+
+
+def test_meat_and_fish_offers_count_per_dinner() -> None:
+    raw = recipe("Nigiri", ingredient("tunfisk", 400, "g", "/fisk og sjømat"))
+    salad = recipe("Tunfisksalat", ingredient("tunfisk", 2, "boks", "/fisk og sjømat"))
+    s = replace(
+        snapshot(raw, salad, offers=[offer("Tunfisk", 15, pre_price=23.9, id="tin")]),
+        served={salad.url: {"tunfisk": ("tin",)}},
+        matches={"tunfisk": ("tin",)},  # By name, meat and fish are never looked up
+    )
+    found = {d.dish.name: [b.best.id for b in d.buys] for d in dinners(s, HOUSEHOLD)}
+    assert found == {"Nigiri": [], "Tunfisksalat": ["tin"]}
 
 
 def test_week_is_varied_and_never_the_same_fish_twice() -> None:

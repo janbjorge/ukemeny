@@ -206,6 +206,15 @@ async def test_matcher_asks_once_per_heading_and_scores_each_offer() -> None:
     assert "KYLLINGPØLSER" in str(questions["1"].instructions)
 
 
+async def test_matcher_asks_with_the_recipe_line_and_the_dinner() -> None:
+    tin = offer("Tunfisk", 15, store="MENY")
+    client = FakeNoulClient({"0": 0.1})
+    await JevOfferMatcher(Jev(client)).rank("tunfisk", [tin], "tunfisk", "Hjemmelaget nigiri sushi")
+    state, questions = client.calls[0]
+    assert state == {"ingredient": "tunfisk", "line": "tunfisk", "dish": "Hjemmelaget nigiri sushi"}
+    assert "`dish`" in str(questions["0"].instructions) and "canned" in str(questions["0"].criteria)
+
+
 async def test_matcher_splits_long_lists() -> None:
     many = [offer(f"KYLLING {i}") for i in range(QUESTIONS_PER_CALL + 1)]
     client = FakeNoulClient({str(i): 0.5 for i in range(QUESTIONS_PER_CALL)})

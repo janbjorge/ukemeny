@@ -32,8 +32,24 @@ addEventListener("htmx:afterSwap", () => {
   openPick = null;
 });
 // htmx focuses the new «Sted» after the swap, as it was focused, and an iPhone then opens its picker again (jb 2026-10-22:
-// "it re-trigger or re-shown when i slect a city on iphone")
-addEventListener("change", (e) => { if (e.target.id === "sted") e.target.blur(); });
+// "it re-trigger or re-shown when i slect a city on iphone"). The place picked is kept in this browser (localStorage, no
+// cookie: nothing but the search itself reaches the server) and forgotten with «Hele landet» (jb 2026-10-23: "Can we have
+// the browser save our prefnces, like location"; "local storage works for me")
+const kept = (use) => { try { return use(localStorage); } catch { return null; } };
+addEventListener("change", (e) => {
+  if (e.target.id !== "sted") return;
+  e.target.blur();
+  kept((s) => e.target.value ? s.setItem("sted", e.target.value) : s.removeItem("sted"));
+});
+// A page opened without a place in its address searches with the one kept, once htmx has the page: the list is swapped in
+// and the address gets the place, as when it is picked
+addEventListener("htmx:load", () => {
+  const sted = document.getElementById("sted"), place = kept((s) => s.getItem("sted"));
+  if (!sted || !place || new URLSearchParams(location.search).has("sted")) return;
+  sted.value = place;
+  if (sted.value === place) sted.dispatchEvent(new Event("change", { bubbles: true }));
+  else kept((s) => s.removeItem("sted"));  // a place no longer on the list
+}, { once: true });
 addEventListener("click", (e) => { const done = e.target.closest?.(".pick .done"); if (done) done.closest("details").open = false; });
 addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;

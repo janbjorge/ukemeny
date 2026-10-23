@@ -133,3 +133,22 @@ def test_a_place_in_answers_and_links() -> None:
     assert "order" not in body
     assert body["links"]["add"]["vegansk"] == "http://testserver/api/middager?q=melkefri+vegansk&sted=bergen"
     assert "- [Bergen](http://testserver/api/middager?sted=bergen)" in api.get("/llms.txt").text
+
+
+def test_the_place_is_kept_in_the_browser_not_in_a_cookie() -> None:
+    """«Sted» is remembered by the page's own script in localStorage (jb 2026-10-23: "local storage works for me"): no cookie is
+    ever set, so pages stay cacheable by their address; the script and the select agree on the name; the address gets the place
+    when the script searches with it, as when it is picked; and /om says what is kept."""
+    s = snapshot(
+        KYLLING,
+        offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale", catalog="kiwi-vest")],
+        matches={"kyllingfilet": ["sale"]},
+        places={"Bergen": ["kiwi-vest"]},
+    )
+    site = TestClient(main.create_app(Queries(FakeDatasets(s), Household())))
+    page = site.get("/")
+    fragment = site.get("/middager?sted=bergen", headers={"HX-Request": "true"})
+    assert "set-cookie" not in page.headers and "set-cookie" not in fragment.headers
+    assert fragment.headers["hx-replace-url"] == "/?sted=bergen#forslag"
+    assert 'name="sted"' in page.text and 'getItem("sted")' in page.text and 'removeItem("sted")' in page.text
+    assert "Nettleseren din husker stedet du velger" in site.get("/om").text

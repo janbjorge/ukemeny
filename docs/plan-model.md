@@ -85,8 +85,10 @@ name, so the site's lookup stays as it is.
 - [x] `match` asks per product with the form and the dinner's name, and writes per name; the `lines` plumbing through
       `snapshot`, `reprice` and `match` is gone. src/pipeline/jev.py `_offer_question` says what the dinner wants it
       as (`form`, or AS_NAMED when the line says none).
-- [ ] The vanished lines: «Svinespyd med østerssaus og kokosmelk» (godt.no 17056) and «Ribbesandwich» have no pork
-      part. Read the page (jb's OK first); if the main ingredient is a nameless line, src/pipeline/godt.py keeps it.
+- [ ] The vanished lines: «Ribbesandwich» has its pork since «ribberester» was filed under /kjøtt/svinekjøtt by hand.
+      «Svinespyd med østerssaus og kokosmelk» (godt.no 17056) still has none in the build of 2026-10-23. Read the
+      page (jb's OK first); if the main ingredient is a nameless line, src/pipeline/godt.py (which drops a line
+      without a name) keeps it.
 - [x] Tests: tests/test_build.py's classify and department tests follow the new shape; tests/test_pipeline_jev.py loses
       the hint-dinner tests; tests/fakes.py loses `dish` arguments.
 - [x] FACTS.md §4 and §6, METHOD.md §2, AGENTS.md's `datasets/` line and README.md say what the build does now.
@@ -117,4 +119,5 @@ green. jb before every push.
 3. The build on the vocabulary; the hint dinner and the doubt check gone (§2). Commit.
 4. Form, products, the matcher's question, no `lines` (§2). Commit.
 5. The floor; the week's draw deleted (§3). Commit.
-6. The vanished lines (§2). Rebuild dishes.json and offers.json, look at the cards, push with jb's OK.
+6. The vanished lines (§2). Rebuild dishes.json and offers.json (jb, 2026-10-23, 62134ab), look at the cards (done: 37
+   rows and two snack words fixed by hand, METHOD.md §2), push with jb's OK.

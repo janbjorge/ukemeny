@@ -50,6 +50,7 @@ def test_cheapest_per_kg_first() -> None:
 def test_snacks_and_pålegg_are_no_ingredient() -> None:
     assert heading_key("  Kylling  FILET ") == "kylling filet"
     assert not_an_ingredient("kyllingfilet", "Coop kyllingpålegg")
+    assert not_an_ingredient("potet", "MAARUD POTETGULL") and not_an_ingredient("nudler", "COOP KOPPNUDLER")
     assert not not_an_ingredient("hamburgerbrød", "HAMBURGERBRØD GROVE")
     assert not not_an_ingredient("tunfisk", "Tunfisk")  # Named alike, still asked: it may be a tin
 

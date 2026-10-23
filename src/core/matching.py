@@ -163,7 +163,8 @@ def main_protein(dish: Dish) -> tuple[str, str]:
     """(group, ingredient name) of the heaviest meat, fish or shellfish in the dish, such as
     ("kylling", "kyllingfilet"). matprat's own main-ingredient label is not used: it files
     "Kyllingfilet med spekeskinke" under pork. Stock and other liquids only count when nothing solid is there:
-    matprat files kjøttkraft under /kjøtt, so the stock for a surkål outweighed the pork chops."""
+    matprat files kjøttkraft under /kjøtt, so the stock for a surkål outweighed the pork chops. Since 2026-10-23 the
+    vocabulary files stocks, bouillons and sauces under /diverse (METHOD.md §2), so they are not here at all."""
     found = [
         (p.unit not in LIQUID_UNITS, p.grams or 0.0, group, p.name)
         for p in dish.parts
@@ -194,15 +195,18 @@ NOT_AN_INGREDIENT = (
     "chips",
     "godteri",
     "kjeks",
+    "koppnudler",
     "nuggets",
     "postei",
+    "potetgull",
     "pålegg",
     "sjokolade",
     "smårett",
     "snacks",
 )
 """Offers with these in the heading are never a recipe ingredient, unless the ingredient's
-own name has the word too (hamburgerbrød)."""
+own name has the word too (hamburgerbrød). Jev said yes to MAARUD POTETGULL for «potet» in 239 of the dinners listed
+on 2026-10-23, and to COOP KOPPNUDLER for «nudler»."""
 
 
 def heading_key(heading: str) -> str:

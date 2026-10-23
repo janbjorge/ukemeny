@@ -5044,7 +5044,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -5121,7 +5121,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -9541,7 +9541,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -9959,7 +9959,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttkraft",
@@ -10060,7 +10060,7 @@
         "unit": ""
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "skalldyrkraft",
@@ -11157,7 +11157,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "sweet chili saus",
@@ -11523,7 +11523,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 65,
         "name": "kyllingbuljong",
@@ -13022,7 +13022,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -14405,7 +14405,7 @@
         "unit": ""
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "blåskjellkraft",
@@ -15005,7 +15005,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -15078,7 +15078,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "fiskebuljong",
@@ -17466,7 +17466,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "sweet chili saus",
@@ -17518,7 +17518,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -21086,7 +21086,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "kyllingbuljong",
@@ -23695,7 +23695,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 90,
         "name": "fiskekraft",
@@ -24848,7 +24848,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttkraft",
@@ -24935,7 +24935,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "fiskebuljong",
@@ -25074,7 +25074,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 30,
         "name": "fiskekraft",
@@ -25356,7 +25356,7 @@
         "unit": ""
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 30,
         "name": "fiskesaus",
@@ -25478,7 +25478,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "kyllingbuljong",
@@ -26119,7 +26119,7 @@
         "unit": "g"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -26314,7 +26314,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -26889,7 +26889,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -28181,7 +28181,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 35,
         "name": "kjøttkraft",
@@ -29348,7 +29348,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttkraft",
@@ -30983,7 +30983,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -32096,7 +32096,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -32851,7 +32851,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttkraft",
@@ -34925,7 +34925,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "kyllingfond",
@@ -36591,7 +36591,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": null,
         "name": "kjøttkraft",
@@ -39087,7 +39087,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong",
@@ -39647,7 +39647,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 600,
         "name": "kjøttbuljong",
@@ -40055,7 +40055,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "fiskesaus",
@@ -40135,7 +40135,7 @@
         "unit": "kvast"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "lammekraft",
@@ -41132,7 +41132,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "fiskekraft",
@@ -41327,7 +41327,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "skalldyrkraft",
@@ -41456,7 +41456,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -41798,7 +41798,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -42035,7 +42035,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "viltkraft",
@@ -42136,7 +42136,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "oksekraft",
@@ -42244,7 +42244,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kalvekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kalvekraft",
@@ -42502,7 +42502,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "oksekraft",
@@ -42732,7 +42732,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kjøttbuljong",
@@ -42892,7 +42892,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttkraft",
@@ -43091,7 +43091,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -43342,7 +43342,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -43820,7 +43820,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "lammekraft",
@@ -44165,7 +44165,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "kjøttbuljong",
@@ -44360,7 +44360,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "oksekraft",
@@ -44677,7 +44677,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kyllingbuljong",
@@ -44928,7 +44928,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 90,
         "name": "kjøttkraft",
@@ -45591,7 +45591,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -45901,7 +45901,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -46201,7 +46201,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "oksekraft",
@@ -46351,7 +46351,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "lammekraft",
@@ -46372,7 +46372,7 @@
         "unit": "ml"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -46885,7 +46885,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "lammekraft",
@@ -47000,7 +47000,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "oksekraft",
@@ -47164,7 +47164,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "kjøttkraft",
@@ -47307,7 +47307,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -47746,7 +47746,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -49399,7 +49399,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -49476,7 +49476,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -50651,7 +50651,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "oksekraft",
@@ -51523,7 +51523,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 190,
         "name": "hønsebuljong",
@@ -52043,7 +52043,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "oksekraft",
@@ -52502,7 +52502,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -52822,7 +52822,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "oksekraft",
@@ -53111,7 +53111,7 @@
         "unit": "potte"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": null,
         "name": "oksekraft",
@@ -54701,14 +54701,14 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "sweet chili saus",
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -55015,7 +55015,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -55667,7 +55667,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "oksekraft",
@@ -55810,7 +55810,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -56333,7 +56333,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -57037,7 +57037,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "lammekraft",
@@ -57919,7 +57919,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "lammekraft",
@@ -58225,7 +58225,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "lammekraft",
@@ -58403,7 +58403,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "lammekraft",
@@ -59162,7 +59162,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -60407,7 +60407,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 175,
         "name": "lammekraft",
@@ -61728,7 +61728,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -62195,7 +62195,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "kjøttbuljong",
@@ -62303,7 +62303,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -62558,7 +62558,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "oksekraft",
@@ -62732,7 +62732,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -63133,7 +63133,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttkraft",
@@ -63300,7 +63300,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "kyllingfond",
@@ -63788,7 +63788,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 110,
         "name": "oksekraft",
@@ -64007,7 +64007,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -64070,7 +64070,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -65415,7 +65415,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kalvekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kalvekraft",
@@ -65725,7 +65725,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kyllingbuljong",
@@ -65826,7 +65826,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "oksekraft",
@@ -65997,7 +65997,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "oksekraft",
@@ -66516,7 +66516,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "oksekraft",
@@ -68140,7 +68140,7 @@
     "name": "Svinespyd med østerssaus og kokosmelk",
     "parts": [
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "østerssaus",
@@ -68523,7 +68523,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -68826,7 +68826,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -69122,7 +69122,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -69136,7 +69136,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -69192,7 +69192,7 @@
         "unit": ""
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": null,
         "name": "sweet chili saus",
@@ -69972,7 +69972,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 190,
         "name": "kjøttkraft",
@@ -70146,7 +70146,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -70463,7 +70463,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "sweet chili saus",
@@ -70864,7 +70864,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -70934,7 +70934,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -71617,7 +71617,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kjøttkraft",
@@ -73332,7 +73332,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kjøttkraft",
@@ -73482,7 +73482,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kalvekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "kalvekraft",
@@ -73949,7 +73949,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttkraft",
@@ -74113,7 +74113,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttkraft",
@@ -74179,7 +74179,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -74357,7 +74357,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -74500,7 +74500,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "viltfond",
@@ -74940,7 +74940,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "viltkraft",
@@ -75090,7 +75090,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "viltkraft",
@@ -75484,7 +75484,7 @@
         "unit": ""
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -76146,7 +76146,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -76787,7 +76787,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -77310,7 +77310,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "fiskesaus",
@@ -77572,7 +77572,7 @@
         "unit": "potte"
       },
       {
-        "category": "/kjøtt/and/gås",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "andekraft",
@@ -77649,7 +77649,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/and/gås",
+        "category": "/diverse",
         "form": "",
         "grams": 165,
         "name": "andekraft",
@@ -77946,7 +77946,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -78127,7 +78127,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -78444,7 +78444,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -79476,7 +79476,7 @@
         "unit": "stilk"
       },
       {
-        "category": "/kjøtt/and/gås",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "andekraft",
@@ -79783,7 +79783,7 @@
         "unit": ""
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "plommesaus",
@@ -80093,7 +80093,7 @@
         "unit": "g"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -81131,7 +81131,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -81667,7 +81667,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": null,
         "name": "kyllingbuljong",
@@ -82200,7 +82200,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": null,
         "name": "kyllingbuljong",
@@ -82842,7 +82842,7 @@
         "unit": "pose"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "kjøttbuljong",
@@ -83093,7 +83093,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "østerssaus",
@@ -86095,7 +86095,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -86158,7 +86158,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -86496,7 +86496,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -86587,7 +86587,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "sweet chili saus",
@@ -86883,7 +86883,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -87002,7 +87002,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -87096,7 +87096,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -87810,7 +87810,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kyllingfond",
@@ -88054,7 +88054,7 @@
         "unit": "stilk"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -89935,14 +89935,14 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "østerssaus",
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -90116,7 +90116,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "oksefond",
@@ -90527,7 +90527,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -90572,7 +90572,7 @@
     "name": "Sursøte calamari",
     "parts": [
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 30,
         "name": "fiskesaus",
@@ -91171,7 +91171,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "østerssaus",
@@ -92094,7 +92094,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "østerssaus",
@@ -92167,7 +92167,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "østerssaus",
@@ -92181,7 +92181,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -92261,7 +92261,7 @@
         "unit": "bit"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -92449,7 +92449,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -93031,7 +93031,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "oksekraft",
@@ -93947,7 +93947,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "kjøttkraft",
@@ -95399,7 +95399,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "oksekraft",
@@ -96897,7 +96897,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "fiskekraft",
@@ -96946,7 +96946,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -97496,7 +97496,7 @@
         "unit": "g"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 20,
         "name": "fiskesaus",
@@ -98351,7 +98351,7 @@
     "name": "Tortellini i kraft - Tortellini in brodo",
     "parts": [
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "saltet",
         "grams": 335,
         "name": "kjøttkraft",
@@ -100185,7 +100185,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttkraft",
@@ -100665,7 +100665,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttkraft",
@@ -101357,7 +101357,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "kjøttkraft",
@@ -102119,7 +102119,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "kjøttkraft",
@@ -102335,7 +102335,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "fiskekraft",
@@ -103084,7 +103084,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kyllingbuljong",
@@ -103376,7 +103376,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttkraft",
@@ -105918,7 +105918,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttkraft",
@@ -106737,14 +106737,14 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "sweet chili saus",
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -106772,7 +106772,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -112177,14 +112177,14 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "østerssaus",
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -112240,7 +112240,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 20,
         "name": "fiskesaus",
@@ -113305,7 +113305,7 @@
         "unit": "båt"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "blåskjellkraft",
@@ -113514,7 +113514,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong",
@@ -114803,7 +114803,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -119180,7 +119180,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -119515,7 +119515,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -119978,7 +119978,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "nampla fiskesaus",
@@ -121476,7 +121476,7 @@
         "unit": ""
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -123316,7 +123316,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -123602,7 +123602,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "fiskesaus",
@@ -125697,7 +125697,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -126592,7 +126592,7 @@
         "unit": "båt"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -129072,7 +129072,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong",
@@ -129406,7 +129406,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "østerssaus",
@@ -129420,7 +129420,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -130678,7 +130678,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "østerssaus",
@@ -131201,7 +131201,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -132295,7 +132295,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -132344,7 +132344,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -132483,7 +132483,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 20,
         "name": "østerssaus",
@@ -133660,7 +133660,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttkraft",
@@ -134085,7 +134085,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": null,
         "name": "fiskesaus",
@@ -134165,7 +134165,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "fiskekraft",
@@ -134691,7 +134691,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -134778,7 +134778,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong",
@@ -135015,7 +135015,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -135576,7 +135576,7 @@
         "unit": "båt"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "fiskekraft",
@@ -136029,7 +136029,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -136060,7 +136060,7 @@
     "name": "Nudelsuppe med biff",
     "parts": [
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 500,
         "name": "oksekraft",
@@ -136095,7 +136095,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 20,
         "name": "fiskesaus",
@@ -136830,7 +136830,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": null,
         "name": "kyllingbuljong",
@@ -137004,7 +137004,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "fiskekraft",
@@ -137610,7 +137610,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kjøttkraft",
@@ -137798,7 +137798,7 @@
         "unit": ""
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "fiskebuljong",
@@ -137913,7 +137913,7 @@
         "unit": "boks"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -138164,7 +138164,7 @@
         "unit": "g"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "fiskesaus",
@@ -139456,7 +139456,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 20,
         "name": "fiskesaus",
@@ -139592,7 +139592,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong",
@@ -140477,7 +140477,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "fiskekraft",
@@ -140620,7 +140620,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 300,
         "name": "kjøttkraft",
@@ -140906,7 +140906,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -141209,7 +141209,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "oksekraft",
@@ -141603,7 +141603,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong",
@@ -141847,7 +141847,7 @@
     "name": "«Pekingsuppe» med kylling, bambusskudd og eggetråder",
     "parts": [
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 375,
         "name": "kyllingbuljong",
@@ -142133,7 +142133,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "kyllingbuljong",
@@ -142147,7 +142147,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -142910,7 +142910,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus",
@@ -143032,7 +143032,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "kyllingbuljong",
@@ -143161,7 +143161,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus",
@@ -144071,7 +144071,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -144221,7 +144221,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kyllingbuljong",
@@ -144517,7 +144517,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "kyllingbuljong",
@@ -150316,7 +150316,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "kyllingbuljong",
@@ -151681,7 +151681,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong",
@@ -151785,7 +151785,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "fiskekraft",
@@ -151844,7 +151844,7 @@
     "name": "Portvinsaus",
     "parts": [
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttkraft",
@@ -152338,7 +152338,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "lammekraft",
@@ -153787,7 +153787,7 @@
         "unit": "pakke"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -153822,7 +153822,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kyllingbuljong",
@@ -154038,7 +154038,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -154132,7 +154132,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "sweet chili saus",
@@ -154254,7 +154254,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "kyllingbuljong",
@@ -154355,7 +154355,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 20,
         "name": "østerssaus",
@@ -154456,7 +154456,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -154707,7 +154707,7 @@
         "unit": "håndfull"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "sweet chili saus",
@@ -154780,7 +154780,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -154916,7 +154916,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -155080,7 +155080,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -155202,7 +155202,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -155303,7 +155303,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "sweet chili saus",
@@ -155439,7 +155439,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "fiskesaus",
@@ -155540,7 +155540,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -155627,7 +155627,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -155683,7 +155683,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus",
@@ -156252,7 +156252,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/pølser",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "østerssaus",
@@ -157147,7 +157147,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljong (utblandet)",
@@ -157474,7 +157474,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -157568,7 +157568,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "fiskekraft",
@@ -157676,7 +157676,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljongterning",
@@ -158627,7 +158627,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -159118,7 +159118,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "fiskebuljong (terning)",
@@ -159285,7 +159285,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "kyllingbuljong (utblandet)",
@@ -159577,7 +159577,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "hønsebuljong (utblandet)",
@@ -159824,7 +159824,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kraft fra fiskeboller",
@@ -162780,7 +162780,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "hønsebuljong (utblandet)",
@@ -162867,7 +162867,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "kjøttbuljong (utblandet)",
@@ -163330,7 +163330,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttkraft",
@@ -163344,7 +163344,7 @@
         "unit": "pk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong (utblandet)",
@@ -163588,7 +163588,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljongterning",
@@ -163849,7 +163849,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 375,
         "name": "kjøttbuljong (utblandet)",
@@ -163908,7 +163908,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "hønsebuljong (utblandet)",
@@ -164465,7 +164465,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -164991,7 +164991,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong (utblandet)",
@@ -165120,7 +165120,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus (asiatisk)",
@@ -165461,7 +165461,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kyllingbuljong (utblandet)",
@@ -165506,7 +165506,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "fiskesaus (asiatisk)",
@@ -165962,7 +165962,7 @@
     "name": "Kremet fiskesuppe",
     "parts": [
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "fiskebuljong (utblandet)",
@@ -167173,7 +167173,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljong (utblandet)",
@@ -167333,7 +167333,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 375,
         "name": "hønsebuljong (utblandet)",
@@ -167556,7 +167556,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong (utblandet)",
@@ -168228,7 +168228,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kyllingbuljong (utblandet)",
@@ -168608,7 +168608,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "fiskebuljong (utblandet)",
@@ -169346,7 +169346,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -170384,7 +170384,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 175,
         "name": "kyllingbuljong (utblandet)",
@@ -170579,7 +170579,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljongterning",
@@ -170652,7 +170652,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljongterning",
@@ -170732,7 +170732,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttkraft",
@@ -171049,7 +171049,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "hønsebuljong (utblandet)",
@@ -172157,7 +172157,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 85,
         "name": "oksekraft",
@@ -172304,7 +172304,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus (asiatisk)",
@@ -173185,7 +173185,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kjøttkraft",
@@ -173408,7 +173408,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -173523,7 +173523,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -173652,7 +173652,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong (utblandet)",
@@ -173826,7 +173826,7 @@
         "unit": "båt"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "fiskesaus (asiatisk)",
@@ -174045,7 +174045,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong (utblandet)",
@@ -175496,7 +175496,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "hønsebuljong (utblandet)",
@@ -176212,7 +176212,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kyllingbuljong (utblandet)",
@@ -176306,7 +176306,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljongterning",
@@ -176609,7 +176609,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -176964,7 +176964,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -177138,7 +177138,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttbuljong (utblandet)",
@@ -177375,7 +177375,7 @@
         "unit": "stilk"
       },
       {
-        "category": "/kjøtt/reinsdyr",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "reinsdyrkraft",
@@ -177448,7 +177448,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong (utblandet)",
@@ -177775,7 +177775,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "kokt",
         "grams": 150,
         "name": "hønsekraft (kraft fra kokt høne)",
@@ -177883,7 +177883,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "fiskebuljong (terning)",
@@ -178064,7 +178064,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -178878,7 +178878,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kjøttbuljong (utblandet)",
@@ -179146,7 +179146,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "fiskebuljong (utblandet)",
@@ -179856,7 +179856,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljong (utblandet)",
@@ -181150,7 +181150,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "kjøttbuljongterning",
@@ -181313,7 +181313,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kjøttbuljong (utblandet)",
@@ -181728,7 +181728,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kyllingbuljong (utblandet)",
@@ -182671,7 +182671,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "hønsebuljong (utblandet)",
@@ -184227,7 +184227,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "lammekraft",
@@ -184523,7 +184523,7 @@
         "unit": "flaske"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -184753,7 +184753,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kalkun",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kalkunkraft (laget på innmatposen i kalkunen)",
@@ -185367,7 +185367,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -186311,7 +186311,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -186702,7 +186702,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 35,
         "name": "lammekraft",
@@ -186782,7 +186782,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "kjøttbuljong (utblandet)",
@@ -186946,7 +186946,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -187138,7 +187138,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -187239,7 +187239,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttkraft",
@@ -187563,7 +187563,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttbuljong (utblandet)",
@@ -187765,7 +187765,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 85,
         "name": "kjøttkraft",
@@ -187939,7 +187939,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "hønsebuljong (utblandet)",
@@ -188340,7 +188340,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "oksekraft",
@@ -188556,7 +188556,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong (utblandet)",
@@ -188685,7 +188685,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kyllingbuljong (utblandet)",
@@ -188884,7 +188884,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -190118,7 +190118,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -190425,7 +190425,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttkraft",
@@ -190648,7 +190648,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 500,
         "name": "hønsebuljong (utblandet)",
@@ -191292,7 +191292,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -191609,7 +191609,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "fiskebuljong (utblandet)",
@@ -191748,7 +191748,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 210,
         "name": "kjøttkraft",
@@ -191957,7 +191957,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kjøttbuljong (utblandet)",
@@ -192616,7 +192616,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttkraft",
@@ -192783,7 +192783,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljongterning",
@@ -193316,7 +193316,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "oksekraft",
@@ -193574,7 +193574,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "kyllingbuljongterning",
@@ -193766,7 +193766,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong (utblandet)",
@@ -193982,7 +193982,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -194069,7 +194069,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kyllingbuljong (utblandet)",
@@ -194369,7 +194369,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "fiskekraft",
@@ -194606,7 +194606,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "fiskekraft",
@@ -194665,7 +194665,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "fiskebuljong (utblandet)",
@@ -195087,7 +195087,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -196028,7 +196028,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "hønsebuljong (utblandet)",
@@ -196725,7 +196725,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "hønsebuljongterning",
@@ -199017,7 +199017,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 175,
         "name": "lammekraft",
@@ -199395,7 +199395,7 @@
         "unit": "stilk"
       },
       {
-        "category": "/kjøtt/kalkun",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "sjy/kraft",
@@ -199904,7 +199904,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -200148,7 +200148,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -200375,7 +200375,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kalkun",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kalkunkraft (laget på innmatposen i kalkunen)",
@@ -201180,7 +201180,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttbuljong (utblandet)",
@@ -201320,7 +201320,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kalvekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "kalvekraft",
@@ -201529,7 +201529,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kyllingbuljong (utblandet)",
@@ -202951,7 +202951,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 175,
         "name": "viltkraft",
@@ -203244,7 +203244,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "kokt",
         "grams": 250,
         "name": "hønsekraft (kraft fra kokt høne)",
@@ -203345,7 +203345,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 65,
         "name": "kyllingbuljongterning",
@@ -203683,7 +203683,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "fiskebuljong (utblandet)",
@@ -203843,7 +203843,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "viltkraft",
@@ -204115,7 +204115,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljong (utblandet)",
@@ -204275,7 +204275,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "hønsebuljong (utblandet)",
@@ -204523,7 +204523,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -205464,7 +205464,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "hønsebuljongterning",
@@ -205948,7 +205948,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "hønsebuljong (utblandet)",
@@ -206248,7 +206248,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kalvekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kalvekraft",
@@ -206485,7 +206485,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kalkun",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "sjy/kraft",
@@ -207468,7 +207468,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "kjøttbuljong (utblandet)",
@@ -207548,7 +207548,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "kjøttbuljong (utblandet)",
@@ -207705,7 +207705,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttkraft",
@@ -208192,7 +208192,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "fiskebuljong (utblandet)",
@@ -208310,7 +208310,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -208655,7 +208655,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttbuljong (utblandet)",
@@ -208913,7 +208913,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljong (utblandet)",
@@ -209979,7 +209979,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 500,
         "name": "lammekraft",
@@ -210701,7 +210701,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 190,
         "name": "kyllingbuljong (utblandet)",
@@ -211858,7 +211858,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "lammekraft",
@@ -212998,7 +212998,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "lammekraft",
@@ -213169,7 +213169,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kjøttbuljong (utblandet)",
@@ -213847,7 +213847,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kyllingbuljong (utblandet)",
@@ -214133,7 +214133,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "lammekraft",
@@ -214464,7 +214464,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "lammekraft",
@@ -214666,7 +214666,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "lammekraft",
@@ -214969,7 +214969,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "viltkraft",
@@ -215227,7 +215227,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kyllingbuljong (utblandet)",
@@ -215746,7 +215746,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kjøttbuljong (utblandet)",
@@ -216056,7 +216056,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong (utblandet)",
@@ -218217,7 +218217,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "kokt",
         "grams": 250,
         "name": "hønsekraft (kraft fra kokt høne)",
@@ -218381,7 +218381,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "kokt",
         "grams": 125,
         "name": "viltkraft",
@@ -219107,7 +219107,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -219798,7 +219798,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kyllingbuljong (utblandet)",
@@ -219847,7 +219847,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong (utblandet)",
@@ -220478,7 +220478,7 @@
         "unit": "flaske"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljongterning",
@@ -220865,7 +220865,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 85,
         "name": "lammekraft",
@@ -221217,7 +221217,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "kjøttbuljong (utblandet)",
@@ -221353,7 +221353,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kyllingbuljong (utblandet)",
@@ -221638,7 +221638,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kyllingbuljongterning",
@@ -222000,7 +222000,7 @@
         "unit": "g"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus (asiatisk)",
@@ -222192,7 +222192,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong (utblandet)",
@@ -222718,7 +222718,7 @@
         "unit": "g"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -223070,7 +223070,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kjøttkraft",
@@ -223613,7 +223613,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -224826,7 +224826,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "lammekraft",
@@ -225119,7 +225119,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttkraft",
@@ -225628,7 +225628,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kalkun",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kalkunkraft (laget på innmatposen i kalkunen)",
@@ -225774,7 +225774,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "hønsebuljongterning",
@@ -226035,7 +226035,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "viltkraft",
@@ -226537,7 +226537,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "viltkraft",
@@ -226697,7 +226697,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "viltkraft",
@@ -227050,7 +227050,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "viltkraft",
@@ -227350,7 +227350,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "viltkraft",
@@ -227563,7 +227563,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "viltkraft",
@@ -227828,7 +227828,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/reinsdyr",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "reinsdyrkraft",
@@ -228340,7 +228340,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "viltkraft",
@@ -228483,7 +228483,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/reinsdyr",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "reinsdyrkraft",
@@ -228598,7 +228598,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/reinsdyr",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "reinsdyrkraft",
@@ -230350,7 +230350,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljong (utblandet)",
@@ -230517,7 +230517,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 90,
         "name": "lammekraft",
@@ -231903,7 +231903,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -232685,7 +232685,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "hønsebuljong (utblandet)",
@@ -232943,7 +232943,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kyllingbuljong (utblandet)",
@@ -234436,7 +234436,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "hønsebuljong (utblandet)",
@@ -234788,7 +234788,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 85,
         "name": "hønsebuljong (utblandet)",
@@ -234924,7 +234924,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 500,
         "name": "hønsebuljong (utblandet)",
@@ -235774,7 +235774,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "buljongpulver",
@@ -235955,7 +235955,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -238276,7 +238276,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 300,
         "name": "kjøttbuljong (utblandet)",
@@ -238524,7 +238524,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kalkun",
+        "category": "/diverse",
         "form": "",
         "grams": 190,
         "name": "kalkunkraft (laget på innmatposen i kalkunen)",
@@ -238977,7 +238977,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "oksekraft",
@@ -239141,7 +239141,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -239511,7 +239511,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "lammekraft",
@@ -239626,7 +239626,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kjøttbuljong (utblandet)",
@@ -240002,7 +240002,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kalkun",
+        "category": "/diverse",
         "form": "",
         "grams": 165,
         "name": "kalkunkraft (laget på innmatposen i kalkunen)",
@@ -240929,7 +240929,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -241058,7 +241058,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "lammekraft",
@@ -241173,7 +241173,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "hønsebuljong (utblandet)",
@@ -241713,7 +241713,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "fiskesaus (asiatisk)",
@@ -242521,7 +242521,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttkraft",
@@ -243728,7 +243728,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "oksekraft",
@@ -244073,7 +244073,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -244682,7 +244682,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -245065,7 +245065,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttbuljong (utblandet)",
@@ -245295,7 +245295,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "fiskesaus (asiatisk)",
@@ -245647,7 +245647,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "oksekraft",
@@ -245975,7 +245975,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "oksekraft",
@@ -248683,7 +248683,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong (utblandet)",
@@ -250575,7 +250575,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong (utblandet)",
@@ -250840,7 +250840,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskekraft",
@@ -251529,7 +251529,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kjøttkraft",
@@ -252086,7 +252086,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kyllingbuljong (utblandet)",
@@ -252573,7 +252573,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -253151,7 +253151,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong (utblandet)",
@@ -256648,7 +256648,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "kjøttbuljongterning",
@@ -257416,7 +257416,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kjøttbuljong (utblandet)",
@@ -257681,7 +257681,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "hønsebuljong (utblandet)",
@@ -258401,7 +258401,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljong (utblandet)",
@@ -258694,7 +258694,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "lammekraft",
@@ -258774,7 +258774,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljongterning",
@@ -259381,7 +259381,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 140,
         "name": "hønsebuljong (utblandet)",
@@ -259468,7 +259468,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -259583,7 +259583,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljong (utblandet)",
@@ -260018,7 +260018,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kyllingbuljong (utblandet)",
@@ -260534,7 +260534,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 20,
         "name": "fiskesaus (asiatisk)",
@@ -262796,7 +262796,7 @@
         "unit": "beger"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttbuljong (utblandet)",
@@ -264106,7 +264106,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -265157,7 +265157,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kyllingbuljongterning",
@@ -265324,7 +265324,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljong (utblandet)",
@@ -265627,7 +265627,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "hønsebuljong (utblandet)",
@@ -267229,7 +267229,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong (utblandet)",
@@ -267511,7 +267511,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "lammekraft",
@@ -270626,7 +270626,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "hønsebuljongterning",
@@ -271957,7 +271957,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "lammekraft",
@@ -272124,7 +272124,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong (utblandet)",
@@ -272476,7 +272476,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -272588,7 +272588,7 @@
         "unit": "ss"
       },
       {
-        "category": "/skalldyr",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "rekepasta",
@@ -273584,7 +273584,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "hønsebuljong (utblandet)",
@@ -274201,7 +274201,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 190,
         "name": "kyllingbuljong (utblandet)",
@@ -274459,7 +274459,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "lammekraft",
@@ -275271,7 +275271,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -275494,7 +275494,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "kyllingbuljong (utblandet)",
@@ -275543,7 +275543,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 65,
         "name": "kjøttbuljong (utblandet)",
@@ -276639,7 +276639,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -276761,7 +276761,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -276953,7 +276953,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus (asiatisk)",
@@ -277061,7 +277061,7 @@
         "unit": "bit"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus (asiatisk)",
@@ -277082,7 +277082,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 500,
         "name": "kjøttbuljong (utblandet)",
@@ -277246,7 +277246,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "fiskesaus (asiatisk)",
@@ -277375,7 +277375,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus (asiatisk)",
@@ -279134,7 +279134,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -280867,7 +280867,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong (utblandet)",
@@ -281636,7 +281636,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttbuljong (utblandet)",
@@ -282215,7 +282215,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -282316,7 +282316,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -283392,7 +283392,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "viltkraft",
@@ -283563,7 +283563,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong (utblandet)",
@@ -284570,7 +284570,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttbuljong (utblandet)",
@@ -284650,7 +284650,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/reinsdyr",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "reinsdyrkraft",
@@ -285416,7 +285416,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "kjøttkraft",
@@ -286956,7 +286956,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljongterning",
@@ -287496,7 +287496,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "hønsebuljong (utblandet)",
@@ -290582,7 +290582,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 30,
         "name": "hønsebuljong (utblandet)",
@@ -292189,7 +292189,7 @@
         "unit": "ts"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 20,
         "name": "fiskesaus (asiatisk)",
@@ -292210,7 +292210,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "hønsebuljong (utblandet)",
@@ -292290,7 +292290,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "kokt",
         "grams": 250,
         "name": "hønsekraft (kraft fra kokt høne)",
@@ -295024,7 +295024,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "buljongpulver",
@@ -295399,7 +295399,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "kyllingbuljong (utblandet)",
@@ -297956,7 +297956,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttkraft",
@@ -298946,7 +298946,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kyllingbuljongterning",
@@ -299419,7 +299419,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljong (utblandet)",
@@ -300396,7 +300396,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -302378,7 +302378,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -302566,7 +302566,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljong (utblandet)",
@@ -302681,7 +302681,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "kyllingbuljong (utblandet)",
@@ -304140,7 +304140,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "oksekraft",
@@ -304321,7 +304321,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus (asiatisk)",
@@ -304415,7 +304415,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "lammekraft",
@@ -306844,7 +306844,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -307897,7 +307897,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kyllingbuljong (utblandet)",
@@ -308210,7 +308210,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "lammekraft",
@@ -308332,7 +308332,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "kjøttbuljongterning",
@@ -308714,7 +308714,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljongterning",
@@ -311159,7 +311159,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong (utblandet)",
@@ -311900,7 +311900,7 @@
         "unit": "pose"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kjøttbuljong (utblandet)",
@@ -312661,7 +312661,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong (utblandet)",
@@ -312741,7 +312741,7 @@
         "unit": "g"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -312755,7 +312755,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljong (utblandet)",
@@ -313089,7 +313089,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "kjøttkraft",
@@ -313190,7 +313190,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "hønsebuljong (utblandet)",
@@ -313545,7 +313545,7 @@
         "unit": "stk"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 5,
         "name": "fiskesaus (asiatisk)",
@@ -314447,7 +314447,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kjøttbuljong (utblandet)",
@@ -315913,7 +315913,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -316561,7 +316561,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "hønsebuljong (utblandet)",
@@ -316968,7 +316968,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kyllingbuljongterning",
@@ -317560,7 +317560,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -321737,7 +321737,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -321925,7 +321925,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "hønsebuljong (utblandet)",
@@ -322012,7 +322012,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljongterning",
@@ -322733,7 +322733,7 @@
     "name": "Høstsuppe med kylling",
     "parts": [
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kyllingbuljong (utblandet)",
@@ -322876,7 +322876,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljong (utblandet)",
@@ -323015,7 +323015,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 190,
         "name": "hønsebuljong (utblandet)",
@@ -323130,7 +323130,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "hønsebuljong (utblandet)",
@@ -323266,7 +323266,7 @@
         "unit": "g"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "fiskesaus (asiatisk)",
@@ -323283,7 +323283,7 @@
     "name": "Japansk biffsuppe",
     "parts": [
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 500,
         "name": "kjøttkraft",
@@ -323555,7 +323555,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "hønsebuljong (utblandet)",
@@ -323635,7 +323635,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 375,
         "name": "kyllingbuljong (utblandet)",
@@ -323830,7 +323830,7 @@
         "unit": "båt"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "hønsebuljong (utblandet)",
@@ -324084,7 +324084,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kyllingbuljongterning",
@@ -324244,7 +324244,7 @@
         "unit": "g"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "fiskekraft",
@@ -324366,7 +324366,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -324411,7 +324411,7 @@
     "name": "Klar nudelsuppe med reinsdyr",
     "parts": [
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 500,
         "name": "viltkraft",
@@ -324752,7 +324752,7 @@
         "unit": "pose"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "hønsebuljong (utblandet)",
@@ -325344,7 +325344,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -326193,7 +326193,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -326388,7 +326388,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -326830,7 +326830,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -327213,7 +327213,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -327394,7 +327394,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljongterning",
@@ -327718,7 +327718,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 65,
         "name": "hønsebuljongterning",
@@ -328136,7 +328136,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 200,
         "name": "kyllingbuljong (utblandet)",
@@ -329390,7 +329390,7 @@
         "unit": "ss"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -329766,7 +329766,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -329867,7 +329867,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -330017,7 +330017,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -330069,7 +330069,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -333654,7 +333654,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "fiskesaus (asiatisk)",
@@ -333915,7 +333915,7 @@
         "unit": "dl"
       },
       {
-        "category": "/fisk og sjømat",
+        "category": "/diverse",
         "form": "",
         "grams": 0,
         "name": "fiskesaus (asiatisk)",
@@ -334347,7 +334347,7 @@
         "unit": "boks"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -334981,7 +334981,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "oksekraft",
@@ -335144,7 +335144,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 40,
         "name": "kjøttbuljong (utblandet)",
@@ -335900,7 +335900,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "hønsebuljongterning",
@@ -336081,7 +336081,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "oksekraft",
@@ -336182,7 +336182,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljongterning",
@@ -336307,7 +336307,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/reinsdyr",
+        "category": "/diverse",
         "form": "",
         "grams": 175,
         "name": "reinsdyrkraft",
@@ -337083,7 +337083,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kjøttbuljong (utblandet)",
@@ -337799,7 +337799,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljongterning",
@@ -337935,7 +337935,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttkraft",
@@ -338537,7 +338537,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "hønsebuljongterning",
@@ -338902,7 +338902,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kalkun",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kalkunkraft (laget på innmatposen i kalkunen)",
@@ -339386,7 +339386,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kjøttbuljong (utblandet)",
@@ -339480,7 +339480,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "kokt",
         "grams": 200,
         "name": "hønsekraft (kraft fra kokt høne)",
@@ -339626,7 +339626,7 @@
         "unit": "l"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljongterning",
@@ -339748,7 +339748,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "kjøttkraft",
@@ -340075,7 +340075,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kjøttkraft",
@@ -340225,7 +340225,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttkraft",
@@ -340239,7 +340239,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong (utblandet)",
@@ -340392,7 +340392,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttbuljongterning",
@@ -340796,7 +340796,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "kjøttkraft",
@@ -341618,7 +341618,7 @@
         "unit": "pose"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 150,
         "name": "kjøttbuljong (utblandet)",
@@ -342214,7 +342214,7 @@
         "unit": "g"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 300,
         "name": "lammekraft",
@@ -342444,7 +342444,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/lamme-/fåre-/sauekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "lammekraft",
@@ -342726,7 +342726,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "hønsebuljongterning",
@@ -342980,7 +342980,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 65,
         "name": "kjøttkraft",
@@ -343367,7 +343367,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 15,
         "name": "hønsebuljongterning",
@@ -343506,7 +343506,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljongterning",
@@ -344417,7 +344417,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/kylling/høns",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "kyllingbuljong (utblandet)",
@@ -344793,7 +344793,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "oksekraft",
@@ -345690,7 +345690,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "viltkraft",
@@ -345861,7 +345861,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 10,
         "name": "kjøttbuljongterning",
@@ -346004,7 +346004,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 90,
         "name": "viltkraft",
@@ -346126,7 +346126,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 135,
         "name": "kjøttkraft",
@@ -346269,7 +346269,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/kalkun",
+        "category": "/diverse",
         "form": "",
         "grams": 115,
         "name": "sjy/kraft",
@@ -346915,7 +346915,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "viltkraft",
@@ -347298,7 +347298,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttbuljong (utblandet)",
@@ -347754,7 +347754,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 250,
         "name": "kjøttkraft",
@@ -348175,7 +348175,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 65,
         "name": "oksekraft",
@@ -348551,7 +348551,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 25,
         "name": "kjøttkraft",
@@ -348753,7 +348753,7 @@
         "unit": "stk"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 75,
         "name": "kjøttkraft",
@@ -348833,7 +348833,7 @@
         "unit": "ts"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 60,
         "name": "kjøttkraft",
@@ -348875,7 +348875,7 @@
         "unit": "ss"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 125,
         "name": "kjøttkraft",
@@ -349571,7 +349571,7 @@
         "unit": "flaske"
       },
       {
-        "category": "/kjøtt/elg/annet vilt",
+        "category": "/diverse",
         "form": "",
         "grams": 100,
         "name": "viltkraft",
@@ -349616,7 +349616,7 @@
         "unit": "dl"
       },
       {
-        "category": "/kjøtt/storfekjøtt",
+        "category": "/diverse",
         "form": "",
         "grams": 50,
         "name": "kjøttkraft",

@@ -1,6 +1,6 @@
-{# One dinner as a card: the main protein, time and rating over the name, the kroner off every ingredient on sale, what
-   that is a head («ca.» when a piece weight, a density or the midpoint of a size range went into it: Dinner.pricing), then
-   each ingredient with its store and discount. With a search, the searched words are marked. The rest is on matprat.no or
+{# One dinner as a card: the main protein, time and rating over the name, the kroner off every ingredient on sale, then
+   each ingredient with its store and discount. The kroner a head (Dinner.per_person) are in the API and the CLI, not here
+   (jb 2026-10-23). With a search, the searched words are marked. The rest is on matprat.no or
    godt.no (the link). #}
 {% macro card(d, search=none, via=()) %}
 <article class="card" data-protein="{{ d.protein }}">
@@ -11,9 +11,6 @@
   {% set deals = d.deals %}{% if deals %}
   <div class="save">
     <p class="total"><span class="sum">{{ d.saving|spart }}</span>{% if deals|length > 1 %} <span class="n">på {{ deals|length }} varer</span>{% endif %}</p>
-    {%- if d.per_person is not none %}
-    <p class="head">{% if d.pricing == "indirect" %}ca. {% endif %}{{ d.per_person|rundt }} per person</p>
-    {%- endif %}
     <ul>{% for x in deals %}
       <li title="{{ x.sale.price|kr }}, før {{ x.sale.pre_price|kr }}, til {{ x.sale.valid_until|dato }}"><span class="what">{{ x.part.name }}</span><span class="store">{{ x.sale.store }}</span><span class="lead"></span><span class="off">{{ x.sale.saving|spart }}</span></li>
     {%- endfor %}</ul>

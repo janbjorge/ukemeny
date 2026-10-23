@@ -94,7 +94,7 @@ Jev ─ once per name counted in stk ───────────► app.bu
                                                                                                                       │
       core.units: per_portion(part), bought(offer), the piece weight ─► price(part, offer, traits) ─► (kroner a head, Pricing)
                                                                                                                       │
-      core.ranking.buys ─► Buy.per_person, Buy.pricing ─► Dinner.per_person, Dinner.pricing ─► the card, the API, the CLI
+      core.ranking.buys ─► Buy.per_person, Buy.pricing ─► Dinner.per_person, Dinner.pricing ─► the API, the CLI
 ```
 
 The site reads no catalog text and no recipe line. The pipeline writes amounts, the vocabulary holds the one bridge, and
@@ -146,10 +146,10 @@ unit and the size is exact.
 
 The lines are the card's (Dinner.deals: one per offer, most important first, the offer with the biggest discount per
 ingredient, as today). `per_person` is the sum of the lines with a figure. `pricing` is direct when every line with a
-figure is direct, indirect as soon as one is, none when no line has a figure, and then the card has no per-person line.
-A line with no figure is not a reason to write «ca.»: it counts for nothing (koriander, persille, parmesan, lime, where
-the saving is pennies). The card writes «18 kr per person» for direct and «ca. 18 kr per person» for indirect, whole
-kroner. Portions are the source's: a batch recipe for «1 portion» shows the batch's figure, as the source has it.
+figure is direct, indirect as soon as one is, none when no line has a figure. A line with no figure is not a reason to
+call it indirect: it counts for nothing (koriander, persille, parmesan, lime, where the saving is pennies). The figure is
+in the API and the CLI; the card had it under the sum for one look and jb took it off (2026-10-23: "lets remove the ; ca. 57 kr per person text, i dont want that").
+Portions are the source's: a batch recipe for «1 portion» gives the batch's figure, as the source has it.
 
 ### «Innbakt biff», 2 portions, 238,40 kr per pack on the card today
 
@@ -271,9 +271,9 @@ the pack size, the recipe's amount and the portions are read, not guessed.
 
 ## Decisions for jb
 
-1. **Where it shows.** Recommended: a line under the sum on every card («18 kr per person», «ca.» when indirect),
-   `per_person` and `pricing` on the dinner and on each discount in the API, a column in the CLI; nothing to toggle, the
-   site stays as it is. Else: a switch beside «Sted» that turns the sum and the order to per person.
+1. **Where it shows.** Decided 2026-10-23: not on the card ("lets remove the ; ca. 57 kr per person text, i dont want that"). `per_person` and `pricing` stay on the dinner
+   and on each discount in the API, and in the CLI's text. The card showed the line under the per-pack sum for one look,
+   and the two cannot agree: for Innbakt biff for two, 238 kr per pack beside 57 kr a head.
 2. **The order.** Unchanged at first. Once the piece weights are in, by per person: that ends the per-kilo against
    per-pack mix at the top of the list. Before them, «4 stk kyllingfilet» would rank under a 25 g line of bacon.
 3. **The floor.** 20 kr per pack stays until the order changes. A per-person floor of 5 kr is the same for four at the
@@ -336,13 +336,24 @@ the pack size, the recipe's amount and the portions are read, not guessed.
 - [x] `Traits.piece_g`; tests/test_traits.py bounds; app.build `weighed` (a step of `draft`) asks Jev once for the names
       counted in stk (the Score over ten bands above, `weigh` in src/pipeline/jev.py and core.ports; a weight in the
       name, «(ca. 1500 g)», is read without Jev: core.units.stated_weight); the bridge in core.units.
-- [ ] `uv run python -m pipeline.datasets --weights` for the 499 names (Jev, the OK first; app.build.reweigh reads
-      datasets/ and asks nothing else); `git diff datasets/traits.json` is the review.
+- [x] `uv run python -m pipeline.datasets --weights` for the 499 names (jb, 2026-10-23; 512 rows got a weight,
+      uncommitted). The review: tests/test_traits.py fails on six names over 3× off the recipes (svisker 120 g against 9,
+      aromasopp 140 against 30, fennikel 440 against 100, løk 110 against the recipes' 380, medisterpølse and vossakorv
+      120 against a 500 g coil) and seven outside their band; Jev runs heavy on the names with the big discounts (a
+      ytrefilet steak 300 g where the recipes imply 150, an indrefilet 540, kylling lårfilet 210 where the catalog's pack
+      says «2 stk 240 g», mozzarella 250 for a 125 g ball). The recipes' implied weight cannot win by rule either (løk
+      380 g, gulrøtter 275: by weight they come in bigger amounts than by piece). Left: about 25 names fixed by hand,
+      two bands widened where the data is right (a turkey with «ca. 6 kg» in its name, kongekrabbe).
 - [x] The recipes' implied weight per name (median g a head ÷ median stk a head, core.units.implied_weights) logged
       beside Jev's by the build; tests/test_traits.py: within 3× unless a named exception, and the bands per category.
 - [ ] Jev asked the 54 names that carry their weight, without the hint, before the run: the measured error rate (the OK
       first; a few calls).
-- [ ] A look at the cards, then decisions 2 and 3.
+- [x] A look at the cards (jb, 2026-10-23): the line taken off the card (decision 1); the order and the floor stay per
+      pack (decisions 2 and 3 fall away with it).
+- [ ] No figure for a recipe of one portion (146 of 3 401 dishes: matprat's batch recipes, pølser with 1 kg kjøttdeig,
+      and godt.no's single portions), where the figure is the whole batch.
+- [ ] A multi-buy written «1 pk fra 44,50» against 74,00 before 89,00 (Obs mozzarella) is read as one pack
+      (pipeline.tjek.pieces, the `_SINGLE` regex has no «fra»); this week's offers.json refilled from the stored text.
 
 ## Order of work
 

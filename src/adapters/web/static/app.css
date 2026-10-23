@@ -89,7 +89,6 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .card .total { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px; }
 .card .total .sum { font-size: 26px; line-height: 1; font-weight: 650; letter-spacing: -0.01em; color: var(--save); }
 .card .total .n { color: var(--text-muted); font-size: var(--t-small); }
-.card .head { margin: -4px 0 8px; font-size: var(--t-small); color: var(--text-muted); }
 .card .save ul { list-style: none; margin: 0; padding: 0; font-size: var(--t-small); }
 .card .save li { display: flex; align-items: baseline; gap: 8px; padding: 2px 0; }
 .card .save .what { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

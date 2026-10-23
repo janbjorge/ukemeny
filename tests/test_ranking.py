@@ -1,8 +1,10 @@
 from dataclasses import replace
 
+import pytest
+
 from adapters.datasets import JsonDatasets
 from core.diet import judge
-from core.models import Gluten, Household, Onion
+from core.models import Gluten, Household, Onion, Pricing
 from core.ranking import dinners, prepare, varied
 from core.search import Diet, household
 from tests.fakes import ingredient, offer, recipe, snapshot, traits
@@ -88,6 +90,27 @@ def test_the_most_kroner_off_comes_first() -> None:
         matches={f"kylling {kr}": [str(kr)] for kr in off},
     )
     assert [d.dish.name for d in dinners(s, HOUSEHOLD)] == ["Kylling 70", "Kylling 40", "Kylling 10"]
+
+
+def test_a_dinner_sums_the_kroner_a_head_and_is_indirect_as_soon_as_one_line_is() -> None:
+    broccoli = ingredient("brokkoli", 1, "stk", "/grønnsaker")
+    chicken = offer("KYLLINGFILET", 99, pre_price=135, id="c", size=700, unit="g")  # 36 kr on 700 g; 150 g a head
+    heads = offer("BROKKOLI", 20, pre_price=30, id="b", size=1, unit="kg")  # 10 kr a kilo; a quarter head at 350 g
+    s = snapshot(
+        recipe("Kylling", CHICKEN, broccoli),
+        offers=[chicken, heads],
+        matches={"kyllingfilet": ["c"], "brokkoli": ["b"]},
+        known={"brokkoli": traits(category="/grønnsaker", piece_g=350)},
+    )
+    (dinner,) = dinners(s, HOUSEHOLD)
+    assert [(b.part.name, round(b.per_person or 0, 2), b.pricing) for b in dinner.deals] == [
+        ("kyllingfilet", 7.71, Pricing.DIRECT),
+        ("brokkoli", 0.88, Pricing.INDIRECT),
+    ]
+    assert dinner.per_person == pytest.approx(7.71 + 0.875, abs=0.01) and dinner.pricing is Pricing.INDIRECT
+    # Without the piece weight the broccoli line has no figure, and the dinner's is direct
+    (dinner,) = dinners(replace(s, traits={**s.traits, "brokkoli": traits(category="/grønnsaker")}), HOUSEHOLD)
+    assert dinner.deals[1].per_person is None and dinner.per_person == pytest.approx(7.71, abs=0.01) and dinner.pricing is Pricing.DIRECT
 
 
 def test_varied_puts_a_few_of_each_protein_first() -> None:

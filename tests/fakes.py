@@ -40,6 +40,7 @@ def traits(
     pregnancy: Pregnancy | None = Pregnancy.OK,
     category: str = "",
     product: str = "",
+    piece_g: float | None = None,
 ) -> Traits:
     """An ingredient with every label asked: it holds nothing, unless told otherwise."""
     return Traits(
@@ -54,6 +55,7 @@ def traits(
         pregnancy,
         category,
         product,
+        piece_g,
     )
 
 
@@ -137,7 +139,7 @@ class FakeClassifier:
     labels: tuple[str, ...] = LABELS
     context: dict[str, str] = field(default_factory=dict)
 
-    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str]:
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str | float]:
         keys = tuple(labels)
         self.asked.append((ingredient.name, keys))
         self.context[ingredient.name] = ingredient.category

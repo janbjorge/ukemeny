@@ -294,9 +294,9 @@ the pack size, the recipe's amount and the portions are read, not guessed.
 
 ### 1. Units (core)
 
-- [ ] src/core/units.py: the base units, the recipe's units per dimension, `per_portion(part)` as (amount, unit) or
-      None, `bought(offer)`, `Pricing` (DIRECT, INDIRECT), `price(part, offer, traits)` as (kroner, Pricing) or None.
-      tests/test_units.py, one test per row of the table.
+- [x] src/core/units.py: the base units, the recipe's units per dimension, `per_portion(part)` as (amount, unit) or
+      None, `bought(offer)`, `Pricing` (DIRECT, INDIRECT; core.models), `price(part, offer, piece_g)` as (kroner,
+      Pricing) or None. tests/test_units.py, one test per row of the table.
 
 ### 2. The offer's amount (pipeline, data)
 
@@ -317,9 +317,10 @@ the pack size, the recipe's amount and the portions are read, not guessed.
 
 ### 4. The figure (core)
 
-- [ ] `Buy.per_person` (None without a figure) and `Buy.pricing`, `Dinner.per_person` and `Dinner.pricing` (indirect
-      as soon as one line is); the ranking untouched. tests/test_ranking.py, tests/test_queries.py.
-- [ ] The cap: an amount a head above 1 000 g, 1 000 ml or 20 stk gives no figure.
+- [x] `Buy.per_person` (None without a figure) and `Buy.pricing`, `Dinner.per_person` and `Dinner.pricing` (indirect
+      as soon as one line is); the ranking untouched; `Traits.piece_g` read and written, so a hand can set one before
+      Jev does. tests/test_ranking.py.
+- [x] The cap (core.units.CAP): an amount a head above 1 000 g, 1 000 ml, 20 stk or 5 packs gives no figure.
 
 ### 5. Shown (web, API, CLI, docs)
 

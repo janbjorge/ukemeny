@@ -147,6 +147,9 @@ def build(
     verbose: Annotated[int, typer.Option("--verbose", "-v", count=True, help="Mer detaljer: -v, -vv eller -vvv.")] = 0,
     known: Annotated[bool, typer.Option("--known", help="godt.no: les middagene i datasets/, ikke oppskriftslisten.")] = False,
     offers: Annotated[bool, typer.Option("--offers", help="Bare ukens tilbud og matchene, for middagene i datasets/.")] = False,
+    weights: Annotated[
+        bool, typer.Option("--weights", help="Bare vekt per stykk der den mangler, for navn middagene teller i stk.")
+    ] = False,
 ) -> None:
     """Lag datasets/ fra bunnen: matprat.no, godt.no, mattilbud.no og Jev. Trenger TYPESAFE_API_KEY."""
     from pipeline import datasets as pipeline
@@ -156,12 +159,18 @@ def build(
         "recipes": "sider fra matprat.no og godt.no",
         "categories": "kategorier hos Jev for nye navn",
         "ingredients": "fakta hos Jev for nye navn",
+        "weights": "vekt per stykk hos Jev",
         "catalogs": "kundeaviser fra mattilbud.no",
         "offers": "tilbudsmatcher hos Jev",
     }
+    if offers and weights:
+        fail("setup", "--offers og --weights utelukker hverandre", False)
     try:
         with closing(pipeline.Bars(steps)) as bars:
-            result = asyncio.run(pipeline.offers(bars, bars.fetching) if offers else pipeline.run(bars, bars.fetching, known))
+            if weights:
+                result = asyncio.run(pipeline.weights(bars))
+            else:
+                result = asyncio.run(pipeline.offers(bars, bars.fetching) if offers else pipeline.run(bars, bars.fetching, known))
     except pipeline.SetupError as e:
         fail("setup", str(e), False)
     s = result.snapshot
@@ -169,6 +178,8 @@ def build(
     if result.recipes:
         drafted = ", ".join(result.drafted) or "ingen"
         typer.echo(f"{len(result.drafted):,} nye navn i ordlisten (se git diff datasets/traits.json): {drafted}")
+    if result.recipes or weights:
+        typer.echo(f"{len(result.weighed):,} navn fikk vekt per stykk (se git diff datasets/traits.json)")
     typer.echo(result.jev, err=True)
 
 

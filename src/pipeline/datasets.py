@@ -9,6 +9,7 @@ once. The vocabulary is the one thing kept between runs; it is fixed by hand, ne
     uv run python -m pipeline.datasets -vvv  # also every HTTP request
     uv run python -m pipeline.datasets --known  # godt.no's pages from the dinners in datasets/, not its list
     uv run python -m pipeline.datasets --offers  # only this week's offers and their matches, for the dinners in datasets/
+    uv run python -m pipeline.datasets --weights  # only a piece weight for each name the dinners count in stk that lacks one
 
 Needs TYPESAFE_API_KEY. The site reads only datasets/.
 """
@@ -62,6 +63,8 @@ class Result:
     jev: str
     drafted: tuple[str, ...] = ()
     """The names the vocabulary got a row for in this build: review them in `git diff datasets/traits.json`."""
+    weighed: tuple[str, ...] = ()
+    """The names that got a piece weight in this build (Traits.piece_g): the same review."""
 
 
 STEPS = {
@@ -201,6 +204,21 @@ async def offers(progress: build.Progress | None = None, fetching: Callable[[str
     return Result(snapshot, None, datasets.write(snapshot), jev.status())
 
 
+async def weights(progress: build.Progress | None = None) -> Result:
+    """Only a piece weight for each name the dinners in datasets/ count in stk that lacks one (app.build.reweigh): no
+    recipe page or catalog is read. The run that fills Traits.piece_g the first time (docs/plan-per-person.md)."""
+    key = _key()
+    try:
+        base = datasets.JsonDatasets().snapshot()
+    except FileNotFoundError as e:
+        raise SetupError(f"--weights reads {datasets.DATASETS}, which is missing: {e}") from e
+    async with AsyncTypeSafeClient(api_key=key, model=JEV_MODEL) as client:
+        jev = Jev(client, max_in_flight=JEV_IN_FLIGHT)
+        snapshot = await build.reweigh(base, JevIngredientClassifier(jev), _reporting(jev, progress))
+    weighed = tuple(name for name, t in snapshot.traits.items() if t.piece_g is not None and base.traits[name].piece_g is None)
+    return Result(snapshot, None, datasets.write(snapshot), jev.status(), weighed=weighed)
+
+
 async def run(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None, known: bool = False) -> Result:
     """`fetching` hears every URL matprat.no, godt.no and mattilbud.no are asked for. `known`: godt.no's pages are the
     dinners already in datasets/ (known_godt), not its dinner list's. The vocabulary in datasets/ is read first and
@@ -225,7 +243,10 @@ async def run(progress: build.Progress | None = None, fetching: Callable[[str], 
             _reporting(jev, progress),
         )
     drafted = tuple(name for name in snapshot.traits if name not in kept)
-    return Result(snapshot, report, datasets.write(snapshot), jev.status(), drafted)
+    weighed = tuple(
+        name for name, t in snapshot.traits.items() if t.piece_g is not None and (name not in kept or kept[name].piece_g is None)
+    )
+    return Result(snapshot, report, datasets.write(snapshot), jev.status(), drafted, weighed)
 
 
 def main() -> None:
@@ -234,11 +255,15 @@ def main() -> None:
     only = parser.add_mutually_exclusive_group()
     only.add_argument("--known", action="store_true", help="godt.no: read the dinners in datasets/, not the dinner list")
     only.add_argument("--offers", action="store_true", help="only this week's offers and matches, for the dinners in datasets/")
+    only.add_argument("--weights", action="store_true", help="only a piece weight for each name the dinners count in stk that lacks one")
     args = parser.parse_args()
     configure(args.verbose)
     try:
         with closing(Bars(STEPS)) as bars:
-            result = asyncio.run(offers(bars, bars.fetching) if args.offers else run(bars, bars.fetching, args.known))
+            if args.weights:
+                result = asyncio.run(weights(bars))
+            else:
+                result = asyncio.run(offers(bars, bars.fetching) if args.offers else run(bars, bars.fetching, args.known))
     except SetupError as e:
         sys.exit(f"error: {e}")
     s, r = result.snapshot, result.recipes
@@ -246,6 +271,8 @@ def main() -> None:
     if r:
         print(f"recipes: {r.listed:,} pages, {r.failed:,} failed")
         print(f"vocabulary: {len(result.drafted):,} new names drafted by Jev: {', '.join(result.drafted) or 'none'}")
+    if r or args.weights:
+        print(f"vocabulary: {len(result.weighed):,} names got a piece weight (review them in git diff datasets/traits.json)")
     print(
         f"{len(s.dishes):,} dinners ({', '.join(f'{site} {n:,}' for site, n in sorted(sites.items()))}), "
         f"{len(s.traits):,} ingredients, {len(s.offers):,} offers in {len(s.places)} places, "

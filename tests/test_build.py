@@ -103,6 +103,20 @@ async def test_a_name_counted_in_pieces_gets_a_piece_weight_once() -> None:
     assert known["kyllingfilet"].piece_g is None and known["egg"].source == "fake"
 
 
+async def test_reweigh_weighs_the_names_the_dishes_count_in_stk_without_reading_anything() -> None:
+    eggs = ingredient("egg", 2, "stk.", "/egg")
+    base = snapshot(recipe("Omelett", eggs, CHICKEN), known={"egg": traits(category="/egg"), "kyllingfilet": VOCABULARY["kyllingfilet"]})
+    classifier = FakeClassifier(weights={"egg": 60})
+    seen: list[tuple[str, int, int]] = []
+    s = await build.reweigh(base, classifier, lambda step, done, due: seen.append((step, done, due)))
+    assert classifier.weighed == ["egg"] and classifier.context["egg"] == "/egg"
+    assert s.traits["egg"].piece_g == 60 and s.traits["kyllingfilet"].piece_g is None
+    assert s.dishes == base.dishes and s.offers == base.offers
+    assert seen == [("weights", 0, 1), ("weights", 1, 1)]
+    again = await build.reweigh(s, classifier)
+    assert classifier.weighed == ["egg"] and again.traits == s.traits  # Asked once
+
+
 def test_every_part_is_filed_as_the_vocabulary_has_it() -> None:
     (dinner,) = build.filed([recipe("Kyllinggryte", ingredient("kyllingfilet", 600, "g", "/kjøtt/pålegg"))], VOCABULARY)
     assert dinner.ingredients[0].category == "/kjøtt/kylling/høns"

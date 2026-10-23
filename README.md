@@ -20,6 +20,7 @@ Each read command takes `--json` for agents: one JSON document on stdout, errors
 ```sh
 export TYPESAFE_API_KEY=...                   # https://console.typesafe.ai
 uv run python -m pipeline.datasets --offers   # this week's offers and their matches (Jev)
+uv run python -m pipeline.datasets --weights  # a piece weight for each ingredient name the dinners count in stk (Jev, once per name)
 uv run python -m pipeline.datasets            # also every recipe again, and a row for each new ingredient name
 ```
 

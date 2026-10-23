@@ -140,25 +140,26 @@ async def draft(
     async with asyncio.TaskGroup() as tg:
         rows = {name: tg.create_task(facts(name)) for name in new}
     known_rows = {**vocabulary, **{name: task.result() for name, task in rows.items()}}
-    return dict(sorted((await weighed(dinners, known_rows, wanted, classifier, progress)).items()))
+    counted = {i.name for r in dinners for i in r.ingredients if i.unit.rstrip(".").lower() == PIECE}
+    implied = implied_weights(dish(r) for r in dinners)
+    return dict(sorted((await weighed(counted, known_rows, classifier, implied, progress)).items()))
 
 
 async def weighed(
-    dinners: Sequence[Recipe],
+    counted: Iterable[str],
     vocabulary: Mapping[str, Traits],
-    lines: Mapping[str, Ingredient],
     classifier: IngredientClassifier,
+    implied: Mapping[str, float],
     progress: Progress | None = None,
 ) -> dict[str, Traits]:
-    """The vocabulary with a piece weight (Traits.piece_g) for every name some recipe counts in stk that lacks one, asked
-    once, as a label added later is asked only for the rows without it: Jev's band read as grams, or the name's own
-    weight («kylling (ca. 1500 g)») without asking. The weight the recipes themselves imply, where they weigh the same
-    name in other recipes (core.units.implied_weights), is logged beside Jev's; tests/test_traits.py holds the two
-    within 3 times (docs/plan-per-person.md, the guards)."""
-    counted = sorted({i.name for r in dinners for i in r.ingredients if i.unit.rstrip(".").lower() == PIECE})
+    """The vocabulary with a piece weight (Traits.piece_g) for every name in `counted` (the names some recipe counts in
+    stk) that lacks one, asked once, as a label added later is asked only for the rows without it: Jev's band read as
+    grams, with the row's category as context, or the name's own weight («kylling (ca. 1500 g)») without asking.
+    `implied`, what the recipes themselves say a piece weighs (core.units.implied_weights), is logged beside Jev's;
+    tests/test_traits.py holds the two within 3 times (docs/plan-per-person.md, the guards)."""
     rows = dict(vocabulary)
     to_ask = []
-    for name in counted:
+    for name in sorted(counted):
         if name not in rows or rows[name].piece_g is not None:
             continue
         if (grams := stated_weight(name)) is not None:
@@ -166,14 +167,13 @@ async def weighed(
             log.debug("%s: %s g a piece, from the name", name, grams)
         else:
             to_ask.append(name)
-    implied = implied_weights(dish(r) for r in dinners)
     done = 0
     if progress:
         progress("weights", done, len(to_ask))
 
     async def weigh(name: str) -> float | None:
         nonlocal done
-        grams = await classifier.weigh(replace(lines[name], category=rows[name].category))
+        grams = await classifier.weigh(Ingredient(name, name, None, PIECE, rows[name].category))
         said = f", the recipes say {implied[name]:.0f} g" if name in implied else ""
         log.info("%s: %s g a piece%s", name, grams, said)
         done += 1
@@ -187,6 +187,14 @@ async def weighed(
         if (grams := task.result()) is not None:
             rows[name] = replace(rows[name], piece_g=grams)
     return rows
+
+
+async def reweigh(base: Snapshot, classifier: IngredientClassifier, progress: Progress | None = None) -> Snapshot:
+    """`base` with a piece weight for every name its dinners count in stk that lacks one (`weighed`), without reading a
+    recipe page or a catalog: the step "weights" alone, on the snapshot in datasets/ (`--weights`)."""
+    counted = {p.name for d in base.dishes for p in d.parts if p.unit == PIECE}
+    traits = await weighed(counted, base.traits, classifier, implied_weights(base.dishes), progress)
+    return replace(base, traits=dict(sorted(traits.items())))
 
 
 def filed(dinners: Iterable[Recipe], vocabulary: Mapping[str, Traits]) -> list[Recipe]:

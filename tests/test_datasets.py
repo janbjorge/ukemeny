@@ -32,6 +32,24 @@ def test_snapshot_round_trip(tmp_path: Path) -> None:
     assert text.endswith("}\n") and '\n  "hvetemel": {\n' in text  # Formatted like `jq .`
 
 
+def test_a_dishes_file_from_before_the_pieces_reads_them_from_the_grams(tmp_path: Path) -> None:
+    omelette = recipe(
+        "Omelett",
+        ingredient("egg", 2, "stk.", "/egg"),
+        ingredient("hakkede tomater", 1, "boks", "/hermetikk"),
+        ingredient("salat", 1, "pose", "/grønnsaker"),
+        ingredient("melk", 1, "dl", "/melk/melkeprodukter"),
+    )
+    write(snapshot(omelette), tmp_path)
+    path = tmp_path / "dishes.json"
+    document = orjson.loads(path.read_bytes())
+    for p in document[0]["parts"]:
+        del p["pieces"]
+    path.write_bytes(orjson.dumps(document))
+    (read,) = JsonDatasets(tmp_path).snapshot().dishes
+    assert [p.pieces for p in read.parts] == [0.5, 0.25, None, None]  # 50 g at 100 g a stk; 100 g at 400 g a boks; no pose in the table
+
+
 def test_an_offers_file_from_before_the_amounts_reads_as_unknown(tmp_path: Path) -> None:
     s = snapshot(
         recipe("Kyllinggryte", ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")),

@@ -214,6 +214,10 @@ class Part:
     form: str = ""
     """The form the recipe line asks for, one word of core.dishes.FORMS ("røkt", "hermetisk"), or "" for what the name
     means: told to the offer matcher, so a tin is no tuna for nigiri. The site does not read it."""
+    pieces: float | None = None
+    """Per portion, for a line counted in pieces (core.units.counted: stk, båt, boks, …): «2 stk» for four is 0.5. None
+    for mass and volume, and for a line with no amount. The kroner a head go by it (core.units); `grams` keeps the rough
+    table's guess for the diet rules."""
 
 
 @dataclass(frozen=True, slots=True)

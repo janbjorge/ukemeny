@@ -311,8 +311,9 @@ the pack size, the recipe's amount and the portions are read, not guessed.
 
 ### 3. The recipe's pieces (pipeline, data)
 
-- [ ] `Part.pieces`; core.dishes.dish; PartJSON; datasets `_dish` derives it from `grams` and GRAMS_PER_UNIT when the
-      file lacks it; tests/test_dishes.py, tests/test_pipeline_datasets.py. The next full build writes it.
+- [x] `Part.pieces`; core.dishes.dish; PartJSON; datasets `_pieces` reads it from `grams` and GRAMS_PER_UNIT when the
+      file lacks it; core.units `counted`; tests/test_dishes.py, tests/test_datasets.py, tests/test_units.py. The next
+      full build writes it.
 
 ### 4. The figure (core)
 

@@ -97,9 +97,9 @@ class Pregnancy(StrEnum):
     AVOID = "avoid"
 
 
-type Levels = Mapping[str, str | float]
-"""A row of the vocabulary as stored and written: a level per label key ("gluten": "no", "egg": "maybe"), "category",
-"product" and "source" (Traits), and the one number, "piece_g"."""
+type Levels = Mapping[str, str]
+"""A row of the vocabulary as stored and written: a level per label key ("gluten": "no", "egg": "maybe"), and
+"category", "product" and "source" (Traits)."""
 LABELS = ("gluten", "onion", "lactose", "kids", *Item, "fodmap", "carbs", "pregnancy")
 """Every label key an ingredient is asked about."""
 HAND = "hand"
@@ -128,31 +128,24 @@ class Traits:
     product: str = ""
     """What the name is in the shop, which the offers are matched to: "kyllingfilet" for "kyllingfilet i strimler".
     "" is the name itself."""
-    piece_g: float | None = None
-    """Grams per stk, for a name a recipe counts in pieces: the bridge from «2 stk kyllingfilet» to grams against a price
-    per kilo (core.units; docs/plan-per-person.md). Drafted once by Jev, fixed by hand. None: not asked."""
 
     @classmethod
     def of(cls, levels: Levels) -> Traits:
-        def level(key: str) -> str:
-            return str(levels[key])
-
         return cls(
-            gluten=Gluten(level("gluten")),
-            onion=Onion(level("onion")),
-            lactose=Lactose(level("lactose")),
-            kids=Kids(level("kids")),
-            source=str(levels.get("source", "")),
-            contains={item: Level(level(item)) for item in Item if item in levels},
-            fodmap=Fodmap(level("fodmap")) if "fodmap" in levels else None,
-            carbs=Carbs(level("carbs")) if "carbs" in levels else None,
-            pregnancy=Pregnancy(level("pregnancy")) if "pregnancy" in levels else None,
-            category=str(levels.get("category", "")),
-            product=str(levels.get("product", "")),
-            piece_g=float(levels["piece_g"]) if "piece_g" in levels else None,
+            gluten=Gluten(levels["gluten"]),
+            onion=Onion(levels["onion"]),
+            lactose=Lactose(levels["lactose"]),
+            kids=Kids(levels["kids"]),
+            source=levels.get("source", ""),
+            contains={item: Level(levels[item]) for item in Item if item in levels},
+            fodmap=Fodmap(levels["fodmap"]) if "fodmap" in levels else None,
+            carbs=Carbs(levels["carbs"]) if "carbs" in levels else None,
+            pregnancy=Pregnancy(levels["pregnancy"]) if "pregnancy" in levels else None,
+            category=levels.get("category", ""),
+            product=levels.get("product", ""),
         )
 
-    def levels(self) -> dict[str, str | float]:
+    def levels(self) -> dict[str, str]:
         optional = {"fodmap": self.fodmap, "carbs": self.carbs, "pregnancy": self.pregnancy}
         return {
             "gluten": self.gluten.value,
@@ -164,7 +157,6 @@ class Traits:
             "category": self.category,
             "product": self.product,
             "source": self.source,
-            **({"piece_g": self.piece_g} if self.piece_g is not None else {}),
         }
 
 
@@ -222,10 +214,6 @@ class Part:
     form: str = ""
     """The form the recipe line asks for, one word of core.dishes.FORMS ("røkt", "hermetisk"), or "" for what the name
     means: told to the offer matcher, so a tin is no tuna for nigiri. The site does not read it."""
-    pieces: float | None = None
-    """Per portion, for a line counted in pieces (core.units.counted: stk, båt, boks, …): «2 stk» for four is 0.5. None
-    for mass and volume, and for a line with no amount. The kroner a head go by it (core.units); `grams` keeps the rough
-    table's guess for the diet rules."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -264,15 +252,6 @@ class Offer:
     per_kg: float | None
     """NOK per kg when the catalog says or the pack size gives it."""
     valid_until: date
-    size: float | None = None
-    """What the price buys, in `unit`: one pack, 400 (g), 1 (l), 12 (stk); goods priced by weight, 1 (kg), or 0.1 (kg) for a
-    price per 100 g. None: the catalog does not say (core.units; docs/plan-per-person.md)."""
-    size_to: float | None = None
-    """The top of a size range («250-500 g»: `size` 250, `size_to` 500); None when `size` is exact."""
-    unit: str = ""
-    """kg or l for goods priced by weight or volume, g, ml or stk for a pack, "" when the catalog does not say."""
-    pieces: int = 1
-    """Packs the price buys: 2 for «2 for 80» (the before-price is for the same two, pipeline.tjek.before_price)."""
 
     @property
     def discount(self) -> float | None:
@@ -357,16 +336,6 @@ class Verdict:
     """Lactose per portion."""
 
 
-class Pricing(StrEnum):
-    """How the kroner a head on a discount line were worked out (core.units.price; jb 2026-10-23: "direct is when we can
-    du stright math, in-direct, we have to had-wave-gesstimate")."""
-
-    DIRECT = "direct"
-    """Straight math: the recipe's amount and what the price buys are in the same unit, and the size is exact."""
-    INDIRECT = "indirect"
-    """A bridge or an estimate: a piece weight, a solid by volume at a gram a ml, the midpoint of a size range."""
-
-
 @dataclass(frozen=True, slots=True)
 class Buy:
     """An ingredient of a dinner that is on offer this week."""
@@ -376,14 +345,6 @@ class Buy:
     """Cheapest per kg first."""
     weight: float
     """How much a deal on it counts for the dinner (core.matching.weight)."""
-    saving: float = 0.0
-    """Kroner off this line for what the recipe needs (core.units.needed): the catalog's saving per lot times the lots
-    the recipe fills, at least one, or the need's share of a kilo for goods priced by weight; the catalog's saving once
-    when a side says no amount. 0 without a sale."""
-    per_person: float | None = None
-    """Kroner a head on `sale` (core.units.price); None when one side says no amount, or the two do not meet."""
-    pricing: Pricing | None = None
-    """How `per_person` was worked out; None with it."""
 
     @property
     def best(self) -> Offer:
@@ -430,25 +391,9 @@ class Dinner:
 
     @property
     def saving(self) -> float:
-        """Kroner off for what the recipe needs, every discounted ingredient summed (Buy.saving): the card's number, the
-        order and the floor. jb 2026-10-23: "say the recepie calls for 2kg of chicken, we should then make sure that we
-        multiplie up the savings if the chickon on sale is ex. 1kg"."""
-        return sum(b.saving for b in self.deals)
-
-    @property
-    def per_person(self) -> float | None:
-        """Kroner a head, the discounted ingredients with a figure summed (docs/plan-per-person.md); None when none has
-        one. A line without one counts for nothing: koriander, persille, where the saving is pennies."""
-        found = [b.per_person for b in self.deals if b.per_person is not None]
-        return sum(found) if found else None
-
-    @property
-    def pricing(self) -> Pricing | None:
-        """Indirect as soon as one line with a figure is; direct when every one is; None without a figure."""
-        kinds = {b.pricing for b in self.deals if b.pricing is not None}
-        if not kinds:
-            return None
-        return Pricing.INDIRECT if Pricing.INDIRECT in kinds else Pricing.DIRECT
+        """Kroner off every discounted ingredient, as the catalogs have it (per pack, not per portion: jb 2026-10-22,
+        "its a rabbit hole")."""
+        return sum((b.sale.saving or 0.0) for b in self.deals if b.sale)
 
     @property
     def on_sale(self) -> bool:

@@ -24,7 +24,7 @@ def client() -> TestClient:
         recipe("Laks i ovn", SALMON, SIDE),
         recipe("Torsk med bacon", COD, SIDE),
         known={"løk": traits(onion=Onion.ONION)},
-        offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale", size=700, unit="g"), SIDE_OFFER],
+        offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale"), SIDE_OFFER],
         matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
     )
     queries = Queries(FakeDatasets(s))  # as on the site: no rules until searched for
@@ -38,7 +38,6 @@ def test_front_page_is_the_search_with_no_rules_until_picked(client: TestClient)
     assert all(n in html for n in ("Kyllinggryte", "Laks i ovn", "Torsk med bacon"))  # the list leaves nothing out
     assert '<span class="sum">\u221261\u00a0kr</span> <span class="n">på 2 varer</span>' in html  # 135 to 99 kr, 45 to 20 kr
     assert 'kyllingfilet</span><span class="store">KIWI</span><span class="lead"></span><span class="off">\u221236\u00a0kr</span>' in html
-    assert "per person" not in html  # the kroner a head are in the API and the CLI, not on the card (jb 2026-10-23)
     assert "%" not in html[html.index('class="cards"') :]  # no percent (jb 2026-10-22)
     assert "Bytt:" not in html and "Glutenfritt" not in html  # no rules on the page until a visitor picks them
     for gone in ("ting å sjekke", "Også på tilbud", "Prøv for eksempel", "Søker etter", "Uten bytter"):

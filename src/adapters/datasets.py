@@ -14,10 +14,7 @@ from typing import NotRequired, TypedDict
 
 import orjson
 
-from core.diet import GRAMS_PER_UNIT
-from core.dishes import ROUND_PIECES
 from core.models import Dish, Offer, Part, Snapshot, Traits
-from core.units import counted
 
 DATASETS = Path(__file__).parents[2] / "datasets"
 
@@ -30,8 +27,6 @@ class PartJSON(TypedDict):
     unit: str
     form: NotRequired[str]
     """Missing in dishes.json from before 2026-10-22."""
-    pieces: NotRequired[float | None]
-    """Missing in dishes.json from before 2026-10-24: then read from `grams` and the rough table (`_pieces`)."""
 
 
 class DishJSON(TypedDict):
@@ -55,11 +50,6 @@ class OfferJSON(TypedDict):
     pre_price: float | None
     per_kg: float | None
     valid_until: str
-    size: NotRequired[float | None]
-    """Missing in offers.json from before 2026-10-24, as are `size_to`, `unit` and `pieces`: then the catalog said nothing."""
-    size_to: NotRequired[float | None]
-    unit: NotRequired[str]
-    pieces: NotRequired[int]
 
 
 _JSON = orjson.OPT_INDENT_2 | orjson.OPT_APPEND_NEWLINE | orjson.OPT_SORT_KEYS
@@ -110,17 +100,6 @@ def write(snapshot: Snapshot, root: Path = DATASETS) -> dict[str, int]:
     return sizes
 
 
-def _pieces(p: PartJSON) -> float | None:
-    """Part.pieces as written, or for a file from before it, back out of the grams the rough table made of the pieces:
-    «2 stk» for four, 50 g, is 0.5 at 100 g a stk; a unit the table lacks (potte) gives None."""
-    if "pieces" in p:
-        return p["pieces"]
-    per_unit = GRAMS_PER_UNIT.get(p["unit"])
-    if p["grams"] is None or per_unit is None or not counted(p["unit"]):
-        return None
-    return round(p["grams"] / per_unit, ROUND_PIECES)
-
-
 def _dish(d: DishJSON) -> Dish:
     return Dish(
         url=d["url"],
@@ -130,8 +109,7 @@ def _dish(d: DishJSON) -> Dish:
         rating=d["rating"],
         rating_count=d["rating_count"],
         parts=tuple(
-            Part(intern(p["name"]), intern(p["category"]), p["grams"], intern(p["unit"]), intern(p.get("form", "")), _pieces(p))
-            for p in d["parts"]
+            Part(intern(p["name"]), intern(p["category"]), p["grams"], intern(p["unit"]), intern(p.get("form", ""))) for p in d["parts"]
         ),
     )
 
@@ -147,8 +125,4 @@ def _offer(o: OfferJSON) -> Offer:
         pre_price=o["pre_price"],
         per_kg=o["per_kg"],
         valid_until=date.fromisoformat(o["valid_until"]),
-        size=o.get("size"),
-        size_to=o.get("size_to"),
-        unit=intern(o.get("unit", "")),
-        pieces=o.get("pieces", 1),
     )

@@ -7,8 +7,6 @@ from typesafe_sdk import (
     ChoiceAnswer,
     JSONContent,
     NoulAnswer,
-    Score,
-    ScoreAnswer,
     SystemOneResponse,
     TypeSafeAPIConnectionError,
     Usage,
@@ -19,13 +17,11 @@ from core.models import LABELS, Carbs, Fodmap, Gluten, Kids, Lactose, Level, Oni
 from pipeline.jev import (
     AS_NAMED,
     QUESTIONS_PER_CALL,
-    WEIGHT_BANDS,
     Jev,
     JevCategoryClassifier,
     JevIngredientClassifier,
     JevOfferMatcher,
     Question,
-    grams_per_piece,
     ingredient_labels,
 )
 from tests.fakes import ingredient, offer
@@ -177,37 +173,6 @@ async def test_kids_label() -> None:
 )
 async def test_new_labels(key: str, answer: dict[str, float], expected: str) -> None:
     assert await level(key, answer) == expected
-
-
-@dataclass
-class FakeScoreClient:
-    """Answers every score question with the same expected band and confidence."""
-
-    score: float
-    confidence: float = 0.9
-    calls: list[tuple[JSONContent, Mapping[str, Question]]] = field(default_factory=list)
-
-    async def system_one(self, state: JSONContent, questions: Mapping[str, Question]) -> SystemOneResponse:
-        self.calls.append((state, questions))
-        return SystemOneResponse(
-            model="jev-1.14.0",
-            answers={
-                name: ScoreAnswer(score=self.score, confidence=self.confidence, legend={}, probabilities={int(self.score): 1.0})
-                for name in questions
-            },
-            usage=Usage(input_tokens=200, output_tokens=0),
-        )
-
-
-async def test_a_piece_weight_is_a_band_read_as_grams() -> None:
-    client = FakeScoreClient(4.5)  # A 50/50 between 80 to 160 g and 160 to 320 g
-    assert await JevIngredientClassifier(Jev(client)).weigh(KYLLING) == 160
-    state, questions = client.calls[0]
-    assert state == {"ingredient": "kyllingfilet", "category": "/kjøtt/kylling/høns"}
-    question = questions["piece_g"]
-    assert isinstance(question, Score) and len(question.criteria) == len(WEIGHT_BANDS) == 10
-    assert "one piece" in str(question.instructions) and "egg" in str(question.criteria[3])
-    assert (grams_per_piece(0), grams_per_piece(3), grams_per_piece(9)) == (7.1, 57, 3600)
 
 
 async def test_category_is_the_likeliest_of_those_offered_and_only_the_name_is_sent() -> None:

@@ -40,7 +40,6 @@ def traits(
     pregnancy: Pregnancy | None = Pregnancy.OK,
     category: str = "",
     product: str = "",
-    piece_g: float | None = None,
 ) -> Traits:
     """An ingredient with every label asked: it holds nothing, unless told otherwise."""
     return Traits(
@@ -55,7 +54,6 @@ def traits(
         pregnancy,
         category,
         product,
-        piece_g,
     )
 
 
@@ -98,13 +96,8 @@ def offer(
     pre_price: float | None = None,
     id: str | None = None,
     description: str = "",
-    size: float | None = None,
-    size_to: float | None = None,
-    unit: str = "",
-    pieces: int = 1,
 ) -> Offer:
-    """`catalog` defaults to the store's name: one catalog per chain. `size` in `unit` is what the price buys (400 g; 1 kg
-    for goods priced by weight), `pieces` the packs a multi-buy prices."""
+    """`catalog` defaults to the store's name: one catalog per chain."""
     return Offer(
         id=id or f"{store}:{heading}:{price}",
         store=store,
@@ -115,18 +108,13 @@ def offer(
         pre_price=pre_price,
         per_kg=per_kg,
         valid_until=date(2026, 10, 18),
-        size=size,
-        size_to=size_to,
-        unit=unit,
-        pieces=pieces,
     )
 
 
 SIDE = ingredient("potet", 200, "g", "/poteter")
 """A side on sale (SIDE_OFFER, 25 kr off; SIDE_MATCH): the site only shows dinners that save core.ranking.FLOOR_KR
 (app.queries), and 50 g per portion is too little to make a dinner without meat or fish «på tilbud»."""
-SIDE_OFFER = offer("POTETER", 20, pre_price=45, id="potet", size=1000, size_to=2000, unit="g")
-"""A bag of 1 to 2 kg: a line through it is indirect pricing, the midpoint (core.units)."""
+SIDE_OFFER = offer("POTETER", 20, pre_price=45, id="potet")
 SIDE_MATCH = {"potet": ["potet"]}
 
 
@@ -139,21 +127,13 @@ class FakeClassifier:
     asked: list[tuple[str, tuple[str, ...]]] = field(default_factory=list)
     labels: tuple[str, ...] = LABELS
     context: dict[str, str] = field(default_factory=dict)
-    weights: Mapping[str, float] = field(default_factory=dict)
-    """Grams per piece per name, for `weigh`; a name not here gets None."""
-    weighed: list[str] = field(default_factory=list)
 
-    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str | float]:
+    async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str]:
         keys = tuple(labels)
         self.asked.append((ingredient.name, keys))
         self.context[ingredient.name] = ingredient.category
         levels = self.known.get(ingredient.name, PLAIN).levels()
         return {key: levels[key] for key in keys} | {"source": "fake"}
-
-    async def weigh(self, ingredient: Ingredient) -> float | None:
-        self.weighed.append(ingredient.name)
-        self.context[ingredient.name] = ingredient.category
-        return self.weights.get(ingredient.name)
 
 
 @dataclass

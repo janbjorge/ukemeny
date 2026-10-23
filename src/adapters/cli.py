@@ -19,7 +19,7 @@ from pydantic import BaseModel
 from adapters import profile, schema
 from adapters.datasets import DATASETS, JsonDatasets
 from app.queries import Queries
-from core.models import Dinner, Dish, Pricing, Verdict
+from core.models import Dinner, Dish, Verdict
 from core.search import Tag, fold, protein_word
 
 app = typer.Typer(
@@ -70,23 +70,13 @@ def _dish_line(dish: Dish, protein: str) -> str:
     return f"{dish.name} | {protein} | {dish.prep_time.replace('\N{EN DASH}', '-')}{rating}"  # matprat's "20-40 min" has an en dash
 
 
-def _a_head(kroner: float | None, pricing: Pricing | None) -> str:
-    """«, ca. 18 kr per person» for a line or a dinner with a figure (docs/plan-per-person.md), else nothing."""
-    if kroner is None:
-        return ""
-    return f", {'ca. ' if pricing is Pricing.INDIRECT else ''}{kroner:.2f} kr per person"
-
-
 def _dinner(n: int, d: Dinner) -> str:
     lines = [f"{n}. {_dish_line(d.dish, d.protein)}", f"   {d.dish.url}"]
-    if d.deals:
-        lines.append(f"   spart: {d.saving:.2f} kr{_a_head(d.per_person, d.pricing)}")
     for buy in d.buys:
         if (sale := buy.sale) and sale.discount and sale.pre_price:
             lines.append(
                 f"   på tilbud: {buy.part.name} -{sale.discount:.0%} hos {sale.store} ({sale.heading}, "
-                f"{sale.price:.2f} kr, før {sale.pre_price:.2f}, til {sale.valid_until:%d.%m}, "
-                f"spart {buy.saving:.2f} kr{_a_head(buy.per_person, buy.pricing)})"
+                f"{sale.price:.2f} kr, før {sale.pre_price:.2f}, til {sale.valid_until:%d.%m})"
             )
     return "\n".join(lines + _verdict_lines(d.verdict))
 
@@ -148,9 +138,6 @@ def build(
     verbose: Annotated[int, typer.Option("--verbose", "-v", count=True, help="Mer detaljer: -v, -vv eller -vvv.")] = 0,
     known: Annotated[bool, typer.Option("--known", help="godt.no: les middagene i datasets/, ikke oppskriftslisten.")] = False,
     offers: Annotated[bool, typer.Option("--offers", help="Bare ukens tilbud og matchene, for middagene i datasets/.")] = False,
-    weights: Annotated[
-        bool, typer.Option("--weights", help="Bare vekt per stykk der den mangler, for navn middagene teller i stk.")
-    ] = False,
 ) -> None:
     """Lag datasets/ fra bunnen: matprat.no, godt.no, mattilbud.no og Jev. Trenger TYPESAFE_API_KEY."""
     from pipeline import datasets as pipeline
@@ -160,18 +147,12 @@ def build(
         "recipes": "sider fra matprat.no og godt.no",
         "categories": "kategorier hos Jev for nye navn",
         "ingredients": "fakta hos Jev for nye navn",
-        "weights": "vekt per stykk hos Jev",
         "catalogs": "kundeaviser fra mattilbud.no",
         "offers": "tilbudsmatcher hos Jev",
     }
-    if offers and weights:
-        fail("setup", "--offers og --weights utelukker hverandre", False)
     try:
         with closing(pipeline.Bars(steps)) as bars:
-            if weights:
-                result = asyncio.run(pipeline.weights(bars))
-            else:
-                result = asyncio.run(pipeline.offers(bars, bars.fetching) if offers else pipeline.run(bars, bars.fetching, known))
+            result = asyncio.run(pipeline.offers(bars, bars.fetching) if offers else pipeline.run(bars, bars.fetching, known))
     except pipeline.SetupError as e:
         fail("setup", str(e), False)
     s = result.snapshot
@@ -179,8 +160,6 @@ def build(
     if result.recipes:
         drafted = ", ".join(result.drafted) or "ingen"
         typer.echo(f"{len(result.drafted):,} nye navn i ordlisten (se git diff datasets/traits.json): {drafted}")
-    if result.recipes or weights:
-        typer.echo(f"{len(result.weighed):,} navn fikk vekt per stykk (se git diff datasets/traits.json)")
     typer.echo(result.jev, err=True)
 
 

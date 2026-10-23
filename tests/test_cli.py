@@ -39,7 +39,7 @@ def test_candidates_json_is_one_document() -> None:
 def test_candidates_text_is_bokmal() -> None:
     out = runner.invoke(cli.app, ["candidates"]).stdout
     assert "1. Kyllinggryte | kylling | 20-40 min" in out and "merk: løk: inneholder løk" in out and "bytt" not in out
-    assert "på tilbud: kyllingfilet -27%" in out and "spart 36.00 kr" in out
+    assert "på tilbud: kyllingfilet -27%" in out
 
 
 def test_candidates_and_check_json() -> None:

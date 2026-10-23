@@ -5,13 +5,10 @@ import re
 from collections.abc import Mapping
 
 from core.diet import grams
-from core.models import Dish, Ingredient, Part, Recipe
-from core.units import counted
+from core.models import Dish, Part, Recipe
 
 ROUND_G = 5
 """Grams per portion are rounded to this: enough for any rule, and no copy of the source's amounts."""
-ROUND_PIECES = 2
-"""Decimals of pieces per portion: a third of an egg is 0.33."""
 
 FORMS: Mapping[str, tuple[str, ...]] = {
     "røkt": ("røkt", "røkte", "varmrøkt", "kaldrøkt", "røykt"),
@@ -45,13 +42,6 @@ def dish(recipe: Recipe) -> Dish:
     def per_portion(g: float | None) -> float | None:
         return None if g is None else round(g / portions / ROUND_G) * ROUND_G
 
-    def pieces(i: Ingredient, unit: str) -> float | None:
-        return round(i.amount / portions, ROUND_PIECES) if i.amount is not None and counted(unit) else None
-
-    def part(i: Ingredient) -> Part:
-        unit = i.unit.rstrip(".").lower()
-        return Part(i.name, i.category, per_portion(grams(i)), unit, form(i.text), pieces(i, unit))
-
     return Dish(
         url=recipe.url,
         name=recipe.name,
@@ -59,5 +49,5 @@ def dish(recipe: Recipe) -> Dish:
         prep_time=recipe.prep_time,
         rating=recipe.rating,
         rating_count=recipe.rating_count,
-        parts=tuple(part(i) for i in recipe.ingredients),
+        parts=tuple(Part(i.name, i.category, per_portion(grams(i)), i.unit.rstrip(".").lower(), form(i.text)) for i in recipe.ingredients),
     )

@@ -11,73 +11,17 @@ from pipeline.tjek import (
     RawCatalog,
     RawOffer,
     TjekOfferSource,
-    amount,
     before_price,
-    confirmed,
     parse_offer,
     per_kg,
-    pieces,
 )
 
 HOME = {"Stavanger": (58.97, 5.73)}
 
-KG: Quantity = {
-    "unit": {"si": {"symbol": "kg", "factor": 0.001}},
+KG = {
+    "unit": {"symbol": "g", "si": {"symbol": "kg", "factor": 0.001}},
     "size": {"from": 400, "to": 400},
 }
-TWO_PACKS: Quantity = {**KG, "pieces": {"from": 2, "to": 2}}
-LITRE: Quantity = {"unit": {"si": {"symbol": "l", "factor": 1}}, "size": {"from": 1, "to": 1}}
-EGGS = "12 store egg. Fra 49,02/kg. 1 pk kr 58,50"
-
-
-@pytest.mark.parametrize(
-    ("price", "description", "quantity", "expected"),
-    [
-        (99.0, "700 g, Prior, pr. kg 141,43", None, (700.0, None, "g")),
-        (269.4, "SPAR, et utvalg, storfe, pr. kg 269,40\u2013281,40/kg Førpris: 449,00\u2013469,00/kg", None, (1.0, None, "kg")),
-        (319.9, "Gode hav, ca.400g, 319,90 pr. kg", None, (1.0, None, "kg")),  # Priced by weight: the 400 g is a guide
-        (29.9, "Pr kg 299,00. Førpris 339,00 pr kg", None, (0.1, None, "kg")),  # Priced per 100 g
-        (69.9, "400 g, Folkets", KG, (400.0, None, "g")),
-        (49.9, "", LITRE, (1000.0, None, "ml")),
-        (40.0, "250-500g, stort utvalg, Bertagni (80,00-160,00/kg) Førpris 69,90-72,90", None, (250.0, 500.0, "g")),
-        (49.9, "6 x 47 g, Freia, pr. kg 176,95", None, (282.0, None, "g")),
-        (20.0, "190g, Eldorado (200,00/kg) Førpris 28,90", None, (190.0, None, "g")),
-        (79.9, "2-pk, Folkets, ca. 370 g Førpris 129,00", None, (370.0, None, "g")),
-        (80.0, EGGS, None, (12.0, None, "stk")),
-        (25.0, "pr stk, fra ferskvaredisken Førpris 39,90", None, (1.0, None, "stk")),
-        (29.9, "Stort utvalg. 12 cm. Pr. stk", None, (1.0, None, "stk")),
-        (89.9, "CLP 40 klar, dim, E14, Osram", None, (None, None, "")),
-    ],
-)
-def test_amount(price: float, description: str, quantity: Quantity | None, expected: tuple[float | None, float | None, str]) -> None:
-    assert amount(price, description, quantity, per_kg(price, description, quantity)) == expected
-
-
-@pytest.mark.parametrize(
-    ("description", "quantity", "price", "pre_price", "expected"),
-    [
-        ("400 g, Folkets", TWO_PACKS, 100.0, 140.0, 2),
-        ("2 for 50, Prior", None, 50.0, None, 2),
-        (EGGS, None, 80.0, 117.0, 2),  # Two packs at 58,50
-        ("Malaco. Original. 220 g 1 pk kr 27,90", None, 40.0, 55.8, 2),
-        ("100-250 g Fra 148,00/kg. 1 pk fra 44,50", None, 74.0, 89.0, 2),  # Two packs at 44,50, the cheapest of a range
-        ("2-pk, Folkets, ca. 370 g Førpris 129,00", None, 79.9, 129.0, 1),  # A pack of two chops
-        ("700 g, Prior, pr. kg 141,43", None, 99.0, 123.0, 1),
-    ],
-)
-def test_pieces(description: str, quantity: Quantity | None, price: float, pre_price: float | None, expected: int) -> None:
-    assert pieces(description, quantity, price, pre_price) == expected
-
-
-def test_a_pack_size_the_per_kilo_price_does_not_confirm_is_dropped() -> None:
-    assert confirmed(20.0, 142.86, 140.0, None, "g", 1)
-    assert confirmed(40.0, 90.9, 220.0, None, "g", 2)  # Two packs
-    assert not confirmed(20.0, 1000.0, 140.0, None, "g", 1)
-    assert confirmed(20.0, 1000.0, 140.0, 300.0, "g", 1) and confirmed(80.0, None, 12.0, None, "stk", 2)  # Nothing to check
-    raw = _raw("x", "OST", pre_price=30)
-    raw["description"] = "140 g Enh.pris 1000,00 pr. kg"
-    raw["pricing"]["price"] = 20
-    assert (parse_offer(raw, "kiwi").size, parse_offer(raw, "kiwi").unit) == (None, "")
 
 
 @pytest.mark.parametrize(
@@ -119,20 +63,6 @@ def test_parse_offer() -> None:
     assert offer.per_kg == pytest.approx(141.43)
     assert offer.discount == pytest.approx((123 - 99) / 123)
     assert offer.valid_until == date(2026, 10, 18)
-    assert (offer.size, offer.size_to, offer.unit, offer.pieces) == (700.0, None, "g", 1)
-
-
-def test_parse_offer_reads_what_the_price_buys() -> None:
-    eggs = _raw("e", "GÅRDSEGG", dealer="Obs", pre_price=117)
-    eggs["description"] = EGGS
-    eggs["pricing"]["price"] = 80
-    offer = parse_offer(eggs, "obs")
-    assert (offer.size, offer.unit, offer.pieces, offer.pre_price) == (12.0, "stk", 2, 117.0)
-    biff = _raw("b", "Biff", dealer="SPAR", pre_price=449)
-    biff["description"] = "SPAR, et utvalg, storfe, pr. kg 269,40\u2013281,40/kg Førpris: 449,00\u2013469,00/kg"
-    biff["pricing"]["price"] = 269.4
-    offer = parse_offer(biff, "spar")
-    assert (offer.size, offer.unit, offer.pieces, offer.per_kg) == (1.0, "kg", 1, 269.4)
 
 
 def _catalog(id: str, dealer: str, offers: int = 2, days_left: int = 3) -> RawCatalog:

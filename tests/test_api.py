@@ -12,7 +12,7 @@ KYLLING = recipe("Kyllinggryte", CHICKEN)
 s = snapshot(
     KYLLING,
     recipe("Laks i ovn", SALMON, SIDE),
-    offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale", size=700, unit="g"), SIDE_OFFER],
+    offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale"), SIDE_OFFER],
     matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
 )
 client = TestClient(main.create_app(Queries(FakeDatasets(s), Household())))
@@ -24,8 +24,8 @@ def test_dinners() -> None:
     first = body["dinners"][0]
     assert first["rank"] == 1 and first["protein"] == "kylling"  # the most kroner off first
     assert "plan" not in body and "plan" not in body["links"]
-    chicken = next(d for d in body["dinners"] if d["name"] == "Kyllinggryte")
-    assert chicken["discounts"][0] == {
+    sale = next(d for d in body["dinners"] if d["name"] == "Kyllinggryte")["discounts"][0]
+    assert sale == {
         "ingredient": "kyllingfilet",
         "store": "KIWI",
         "offer": "KYLLINGBRYST",
@@ -33,13 +33,7 @@ def test_dinners() -> None:
         "before": 135.0,
         "discount_percent": 27,
         "valid_until": "2026-10-18",
-        "saving": 36.0,  # 600 g for four fills one 700 g pack
-        "per_person": 7.71,  # 36 kr on 700 g, 150 g a portion
-        "pricing": "direct",
     }
-    assert (chicken["saving"], chicken["per_person"], chicken["pricing"]) == (36.0, 7.71, "direct")  # its one discount
-    salmon = next(d for d in body["dinners"] if d["name"] == "Laks i ovn")
-    assert (salmon["per_person"], salmon["pricing"]) == (0.83, "indirect")  # 25 kr on a 1 to 2 kg bag at its midpoint, 50 g a portion
 
 
 def test_cors_is_open() -> None:

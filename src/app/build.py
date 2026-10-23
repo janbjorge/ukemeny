@@ -20,7 +20,6 @@ from core.errors import SourceUnavailableError
 from core.matching import CATEGORIES, candidates, not_an_ingredient, per_dinner, weight, words
 from core.models import Dish, Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
 from core.ports import CategoryClassifier, IngredientClassifier, OfferMatcher, OfferSource, RecipeSource
-from core.units import PIECE, implied_weights, stated_weight
 
 log = logging.getLogger("matris.build")
 """-v (info): failures and totals. -vv (debug): what each page, ingredient and offer became."""
@@ -34,8 +33,7 @@ EXAMPLES = 12
 type Progress = Callable[[str, int, int], None]
 """(step, done, due) for a person watching the build: called with done 0 as a step starts, then as each item is done.
 The steps: "recipes" (matprat.no and godt.no pages), "categories" (Jev's category for a new name neither its line nor a
-near-name files), "ingredients" (Jev's facts for every new name), "weights" (Jev's piece weight for every name counted in
-stk without one), "catalogs" (mattilbud.no), "offers" (Jev's matches)."""
+near-name files), "ingredients" (Jev's facts for every new name), "catalogs" (mattilbud.no), "offers" (Jev's matches)."""
 
 
 async def recipes(
@@ -139,62 +137,7 @@ async def draft(
 
     async with asyncio.TaskGroup() as tg:
         rows = {name: tg.create_task(facts(name)) for name in new}
-    known_rows = {**vocabulary, **{name: task.result() for name, task in rows.items()}}
-    counted = {i.name for r in dinners for i in r.ingredients if i.unit.rstrip(".").lower() == PIECE}
-    implied = implied_weights(dish(r) for r in dinners)
-    return dict(sorted((await weighed(counted, known_rows, classifier, implied, progress)).items()))
-
-
-async def weighed(
-    counted: Iterable[str],
-    vocabulary: Mapping[str, Traits],
-    classifier: IngredientClassifier,
-    implied: Mapping[str, float],
-    progress: Progress | None = None,
-) -> dict[str, Traits]:
-    """The vocabulary with a piece weight (Traits.piece_g) for every name in `counted` (the names some recipe counts in
-    stk) that lacks one, asked once, as a label added later is asked only for the rows without it: Jev's band read as
-    grams, with the row's category as context, or the name's own weight («kylling (ca. 1500 g)») without asking.
-    `implied`, what the recipes themselves say a piece weighs (core.units.implied_weights), is logged beside Jev's;
-    tests/test_traits.py holds the two within 3 times (docs/plan-per-person.md, the guards)."""
-    rows = dict(vocabulary)
-    to_ask = []
-    for name in sorted(counted):
-        if name not in rows or rows[name].piece_g is not None:
-            continue
-        if (grams := stated_weight(name)) is not None:
-            rows[name] = replace(rows[name], piece_g=grams)
-            log.debug("%s: %s g a piece, from the name", name, grams)
-        else:
-            to_ask.append(name)
-    done = 0
-    if progress:
-        progress("weights", done, len(to_ask))
-
-    async def weigh(name: str) -> float | None:
-        nonlocal done
-        grams = await classifier.weigh(Ingredient(name, name, None, PIECE, rows[name].category))
-        said = f", the recipes say {implied[name]:.0f} g" if name in implied else ""
-        log.info("%s: %s g a piece%s", name, grams, said)
-        done += 1
-        if progress:
-            progress("weights", done, len(to_ask))
-        return grams
-
-    async with asyncio.TaskGroup() as tg:
-        asked = {name: tg.create_task(weigh(name)) for name in to_ask}
-    for name, task in asked.items():
-        if (grams := task.result()) is not None:
-            rows[name] = replace(rows[name], piece_g=grams)
-    return rows
-
-
-async def reweigh(base: Snapshot, classifier: IngredientClassifier, progress: Progress | None = None) -> Snapshot:
-    """`base` with a piece weight for every name its dinners count in stk that lacks one (`weighed`), without reading a
-    recipe page or a catalog: the step "weights" alone, on the snapshot in datasets/ (`--weights`)."""
-    counted = {p.name for d in base.dishes for p in d.parts if p.unit == PIECE}
-    traits = await weighed(counted, base.traits, classifier, implied_weights(base.dishes), progress)
-    return replace(base, traits=dict(sorted(traits.items())))
+    return dict(sorted({**vocabulary, **{name: task.result() for name, task in rows.items()}}.items()))
 
 
 def filed(dinners: Iterable[Recipe], vocabulary: Mapping[str, Traits]) -> list[Recipe]:

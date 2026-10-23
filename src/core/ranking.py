@@ -6,8 +6,7 @@ from dataclasses import dataclass, replace
 
 from core.diet import carbs, fodmap_out, judge
 from core.matching import cheapest_first, main_protein, per_dinner, weight
-from core.models import Buy, Dinner, Dish, Household, Item, Level, Offer, Part, Pregnancy, Snapshot, Traits
-from core.units import needed, price
+from core.models import Buy, Dinner, Dish, Household, Item, Level, Offer, Part, Pregnancy, Snapshot
 
 TIME_BONUS: Mapping[str, float] = {"Under": 1.0, "20": 0.5, "40": 0.0, "Over": -1.0}
 """By the start of matprat's prep time bucket: small kids do not wait for a slow dinner."""
@@ -46,22 +45,14 @@ class Shelf:
         return self.by_name.get(part.name, ())
 
 
-def buys(dish: Dish, shelf: Shelf, traits: Mapping[str, Traits]) -> tuple[Buy, ...]:
-    """The dish's ingredients that are on offer, most important first, each with its kroner off for what the recipe
-    needs (Buy.saving) and a head (Buy.per_person) on the offer the card shows (Buy.sale), through the name's piece
-    weight in `traits` where pieces meet a price by weight (core.units)."""
+def buys(dish: Dish, shelf: Shelf) -> tuple[Buy, ...]:
+    """The dish's ingredients that are on offer, most important first."""
     seen: set[str] = set()
     found = []
     for part in dish.parts:
         if part.name not in seen and weight(part) and (offers := shelf.get(dish, part)):
             seen.add(part.name)
-            buy = Buy(part, offers, weight(part))
-            t = traits.get(part.name)
-            piece_g = t.piece_g if t else None
-            if (sale := buy.sale) is not None:
-                figure = price(part, sale, piece_g) or (None, None)
-                buy = replace(buy, saving=needed(part, sale, piece_g, dish.portions), per_person=figure[0], pricing=figure[1])
-            found.append(buy)
+            found.append(Buy(part, offers, weight(part)))
     return tuple(sorted(found, key=lambda b: b.weight, reverse=True))
 
 
@@ -119,7 +110,7 @@ def prepare(snapshot: Snapshot) -> tuple[Prepared, ...]:
                 protein,
                 main,
                 score(dish),
-                buys(dish, shelf, snapshot.traits),
+                buys(dish, shelf),
                 holds=frozenset(item for item in Item if any(t.contains.get(item, Level.YES) is not Level.NO for _, t in known)),
                 not_for_pregnant=any(t.pregnancy is not Pregnancy.OK for _, t in known),
                 high_fodmap=any(fodmap_out(t, p.category) for p, t in known),
@@ -134,7 +125,7 @@ def nearby(prepared: Sequence[Prepared], snapshot: Snapshot, place: str | None) 
     if place is None:
         return tuple(prepared)
     shelf = offered(snapshot, place)
-    return tuple(replace(p, buys=buys(p.dish, shelf, snapshot.traits)) for p in prepared)
+    return tuple(replace(p, buys=buys(p.dish, shelf)) for p in prepared)
 
 
 def dinners(snapshot: Snapshot, household: Household, prepared: Sequence[Prepared] | None = None) -> list[Dinner]:

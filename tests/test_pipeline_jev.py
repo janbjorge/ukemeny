@@ -200,14 +200,14 @@ class FakeScoreClient:
 
 
 async def test_a_piece_weight_is_a_band_read_as_grams() -> None:
-    client = FakeScoreClient(5.5)  # A 50/50 between 80 to 160 g and 160 to 320 g
+    client = FakeScoreClient(4.5)  # A 50/50 between 80 to 160 g and 160 to 320 g
     assert await JevIngredientClassifier(Jev(client)).weigh(KYLLING) == 160
     state, questions = client.calls[0]
     assert state == {"ingredient": "kyllingfilet", "category": "/kjøtt/kylling/høns"}
     question = questions["piece_g"]
-    assert isinstance(question, Score) and len(question.criteria) == len(WEIGHT_BANDS) == 11
-    assert "one piece" in str(question.instructions) and "egg" in str(question.criteria[4])
-    assert (grams_per_piece(0), grams_per_piece(4), grams_per_piece(10)) == (3.5, 57, 3600)
+    assert isinstance(question, Score) and len(question.criteria) == len(WEIGHT_BANDS) == 10
+    assert "one piece" in str(question.instructions) and "egg" in str(question.criteria[3])
+    assert (grams_per_piece(0), grams_per_piece(3), grams_per_piece(9)) == (7.1, 57, 3600)
 
 
 async def test_category_is_the_likeliest_of_those_offered_and_only_the_name_is_sent() -> None:

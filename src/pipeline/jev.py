@@ -428,8 +428,7 @@ WEIGHT_QUESTION = (
     "weigh: the whole item as a recipe means by one piece (an onion, a chicken fillet, an egg), not a serving and not a pack?"
 )
 WEIGHT_BANDS: tuple[str, ...] = (
-    "under 5 g: hvitløksfedd, oliven, kapers, basilikumblad",
-    "5 to 10 g: daddel, valnøtt, ansjosfilet, liten cherrytomat",
+    "under 10 g: hvitløksfedd, oliven, kapers, basilikumblad, daddel, valnøtt, ansjosfilet",
     "10 to 20 g: cherrytomat, sjampinjong, rød chili, reddik, eggeplomme, sitrongress",
     "20 to 40 g: stor sjampinjong, kjøttbolle, fiskebolle, scampi, kyllingvinge, skive loff",
     "40 to 80 g: egg, lime, sjalottløk, wienerpølse, liten potet, plomme, kiwi",
@@ -440,10 +439,11 @@ WEIGHT_BANDS: tuple[str, ...] = (
     "1280 to 2560 g: hel kylling, lammelår, hodekål, honningmelon, ribbe",
     "over 2560 g: kalkun, vannmelon, hel skinke, hel laks",
 )
-"""The Score rubric for a piece weight (docs/plan-per-person.md, «The question»): eleven bands, each twice the one before,
-from LIGHTEST_G, with Norwegian examples as the other questions have. Jev has no question that returns a number, and a band
-cannot slip a decimal point."""
-LIGHTEST_G = 2.5
+"""The Score rubric for a piece weight (docs/plan-per-person.md, «The question»): ten bands, each twice the one before,
+from LIGHTEST_G, with Norwegian examples as the other questions have. Jev has no question that returns a number, a band
+cannot slip a decimal point, and the API takes at most ten levels (a 422 with eleven, 2026-10-24), so the lightest band
+is open at the bottom, where the kroner are pennies."""
+LIGHTEST_G = 5.0
 """Where band 0 starts; band i spans LIGHTEST_G times 2^i to twice that."""
 UNSURE = 0.5
 """A confidence under this is logged, for the review."""
@@ -451,7 +451,7 @@ UNSURE = 0.5
 
 def grams_per_piece(score: float) -> float:
     """The band Jev expects (its probability-weighted mean) as grams: the geometric mean of the bands' midpoints, two
-    digits. 5.5, a 50/50 between 80 to 160 g and 160 to 320 g, is 160 g."""
+    digits. 4.5, a 50/50 between 80 to 160 g and 160 to 320 g, is 160 g."""
     return float(f"{LIGHTEST_G * 2 ** (score + 0.5):.2g}")
 
 

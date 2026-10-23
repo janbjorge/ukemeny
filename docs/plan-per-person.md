@@ -168,7 +168,7 @@ kr, indirect.
 ### Piece weights
 
 A fact per ingredient name in the vocabulary, `piece_g`: grams per stk (egg 60, kyllingfilet 150, brokkoli 350, mango
-300, potet 100), drafted once by Jev for a name that any recipe counts in stk (371 names), fixed by hand, bounded by
+300, potet 100), drafted once by Jev for a name that any recipe counts in stk (499 names), fixed by hand, bounded by
 tests/test_traits.py (5 g to 3 000 g). It is one question per name, once, not one per recipe line: the 8 681 lines in
 stk would be thousands of calls per build, the answers would wobble between builds, and dishes.json is rebuilt from the
 sources, so a wrong one could not be fixed by hand; a row in traits.json can. A name that carries its weight («kylling
@@ -178,8 +178,8 @@ lines carry money there. It feeds the per-person figure only; the diet rules kee
 
 **The question** (jb 2026-10-23: "what question do we ask jev?"). Jev answers three kinds of question, a yes/no (Noul), a
 choice between labels (Choice) and a score over an ordered rubric (Score), each with probabilities; none returns a free
-number (src/pipeline/jev.py; the typesafe_sdk question types). So the weight is a Score over eleven bands, each twice
-the one before, with Norwegian examples as the other questions have (the module docstring: examples moved Jev from
+number (src/pipeline/jev.py; the typesafe_sdk question types). So the weight is a Score over ten bands, each twice
+the one before (the API takes at most ten levels: a 422 with eleven, 2026-10-24), with Norwegian examples as the other questions have (the module docstring: examples moved Jev from
 guessing to right). The state is the name and its category, as for the facts, and nothing else: no recipe line, so the
 recipes' own implied weight stays an independent check.
 
@@ -189,17 +189,16 @@ recipes' own implied weight stays an independent check.
 
 | band | grams         | examples                                                                                              |
 |-----:|---------------|-------------------------------------------------------------------------------------------------------|
-|    0 | under 5       | hvitløksfedd, oliven, kapers, basilikumblad                                                           |
-|    1 | 5–10          | daddel, valnøtt, ansjosfilet, liten cherrytomat                                                       |
-|    2 | 10–20         | cherrytomat, sjampinjong, rød chili, reddik, eggeplomme, sitrongress                                  |
-|    3 | 20–40         | stor sjampinjong, kjøttbolle, fiskebolle, scampi, kyllingvinge, skive loff                            |
-|    4 | 40–80         | egg, lime, sjalottløk, wienerpølse, liten potet, plomme, kiwi                                         |
-|    5 | 80–160        | løk, potet, tomat, gulrot, sitron, banan, eple, kjøttpølse, laksefilet (porsjon), hamburger           |
-|    6 | 160–320       | kyllingfilet, svinekotelett, paprika, avokado, mango, søtpotet, appelsin, purre, kyllinglår med bein   |
-|    7 | 320–640       | brokkoli, fennikel, agurk, squash, aubergine, granateple, liten sellerirot, hel ørret                 |
-|    8 | 640–1 300     | blomkål, sellerirot, kålrot, ananas, liten hodekål, liten hel kylling, butternut                       |
-|    9 | 1 300–2 600   | hel kylling, lammelår, hodekål, honningmelon, ribbe                                                   |
-|   10 | over 2 600    | kalkun, vannmelon, hel skinke, hel laks                                                               |
+|    0 | under 10      | hvitløksfedd, oliven, kapers, basilikumblad, daddel, valnøtt, ansjosfilet                             |
+|    1 | 10–20         | cherrytomat, sjampinjong, rød chili, reddik, eggeplomme, sitrongress                                  |
+|    2 | 20–40         | stor sjampinjong, kjøttbolle, fiskebolle, scampi, kyllingvinge, skive loff                            |
+|    3 | 40–80         | egg, lime, sjalottløk, wienerpølse, liten potet, plomme, kiwi                                         |
+|    4 | 80–160        | løk, potet, tomat, gulrot, sitron, banan, eple, kjøttpølse, laksefilet (porsjon), hamburger           |
+|    5 | 160–320       | kyllingfilet, svinekotelett, paprika, avokado, mango, søtpotet, appelsin, purre, kyllinglår med bein   |
+|    6 | 320–640       | brokkoli, fennikel, agurk, squash, aubergine, granateple, liten sellerirot, hel ørret                 |
+|    7 | 640–1 280     | blomkål, sellerirot, kålrot, ananas, liten hodekål, liten hel kylling, butternut                       |
+|    8 | 1 280–2 560   | hel kylling, lammelår, hodekål, honningmelon, ribbe                                                   |
+|    9 | over 2 560    | kalkun, vannmelon, hel skinke, hel laks                                                               |
 
 The answer is read as the geometric mean of the bands' midpoints weighted by the probabilities, so a 50/50 between
 80–160 and 160–320 reads 160 g, rounded to two digits. When the likeliest band has less than half the probability the
@@ -238,7 +237,7 @@ the pack size, the recipe's amount and the portions are read, not guessed.
    20–300 g, sopp 5–100 g, grønnsaker 2–2 000 g, frukt 5–3 000 g, kjøtt 20–5 000 g, fisk 20–3 000 g, skalldyr 5–1 000 g,
    ost 5–500 g. The implied weights run from 6 g (oliven) to 1 000 g (hodekål) among vegetables and 38 g (pølse) to
    3 125 g (lammelår) among meat, so a band cannot do more than that.
-4. **The name's own weight** («kylling (ca. 1500 g)», 54 lines) overrides Jev. Before the run over the 371 names, Jev is
+4. **The name's own weight** («kylling (ca. 1500 g)», 54 lines) overrides Jev. Before the run over the 499 names, Jev is
    asked those 54 without the hint and compared: the measured error rate of Jev's weights, and whether 3× in 2 is right.
 5. **A cap at runtime** in core.units: a line whose amount a head comes out above 1 000 g, 1 000 ml or 20 stk gets no
    figure rather than a number. Batch recipes for «1 portion» lose their line; a hallucinated weight cannot make a card.
@@ -335,9 +334,9 @@ the pack size, the recipe's amount and the portions are read, not guessed.
 ### 6. Piece weights (vocabulary)
 
 - [x] `Traits.piece_g`; tests/test_traits.py bounds; app.build `weighed` (a step of `draft`) asks Jev once for the names
-      counted in stk (the Score over eleven bands above, `weigh` in src/pipeline/jev.py and core.ports; a weight in the
+      counted in stk (the Score over ten bands above, `weigh` in src/pipeline/jev.py and core.ports; a weight in the
       name, «(ca. 1500 g)», is read without Jev: core.units.stated_weight); the bridge in core.units.
-- [ ] `uv run python -m pipeline.datasets --weights` for the 371 names (Jev, the OK first; app.build.reweigh reads
+- [ ] `uv run python -m pipeline.datasets --weights` for the 499 names (Jev, the OK first; app.build.reweigh reads
       datasets/ and asks nothing else); `git diff datasets/traits.json` is the review.
 - [x] The recipes' implied weight per name (median g a head ÷ median stk a head, core.units.implied_weights) logged
       beside Jev's by the build; tests/test_traits.py: within 3× unless a named exception, and the bands per category.

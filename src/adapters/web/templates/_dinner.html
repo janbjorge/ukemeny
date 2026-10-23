@@ -9,7 +9,7 @@
   {% if via %}<p class="via">Med {% for name in via %}<mark>{{ name }}</mark>{{ ", " if not loop.last }}{% endfor %}</p>{% endif %}
   {% set deals = d.deals %}{% if deals %}
   <div class="save">
-    <p class="total"><span class="sum">{{ d.saving|spart }}</span>{% if deals|length > 1 %} <span class="n">på {{ deals|length }} varer</span>{% endif %}</p>
+    <p class="total"><span class="sum">{{ d.saving|spart }}</span></p>
     <ul>{% for x in deals %}
       <li title="{{ x.sale.price|kr }}, før {{ x.sale.pre_price|kr }}, til {{ x.sale.valid_until|dato }}"><span class="what">{{ x.part.name }}</span><span class="store">{{ x.sale.store }}</span><span class="lead"></span><span class="off">{{ x.sale.saving|spart }}</span></li>
     {%- endfor %}</ul>

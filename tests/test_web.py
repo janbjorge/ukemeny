@@ -36,7 +36,7 @@ def test_front_page_is_the_search_with_no_rules_until_picked(client: TestClient)
     assert "<h1>Finn en middag</h1>" in html
     assert 'id="uka"' not in html and "Nye middager" not in html  # no week on the page (jb 2026-10-14)
     assert all(n in html for n in ("Kyllinggryte", "Laks i ovn", "Torsk med bacon"))  # the list leaves nothing out
-    assert '<span class="sum">\u221261\u00a0kr</span> <span class="n">på 2 varer</span>' in html  # 135 to 99 kr, 45 to 20 kr
+    assert '<span class="sum">\u221261\u00a0kr</span></p>' in html and "varer</span>" not in html  # 135 to 99 kr, 45 to 20 kr
     assert 'kyllingfilet</span><span class="store">KIWI</span><span class="lead"></span><span class="off">\u221236\u00a0kr</span>' in html
     assert "%" not in html[html.index('class="cards"') :]  # no percent (jb 2026-10-22)
     assert "Bytt:" not in html and "Glutenfritt" not in html  # no rules on the page until a visitor picks them

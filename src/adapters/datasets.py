@@ -50,6 +50,11 @@ class OfferJSON(TypedDict):
     pre_price: float | None
     per_kg: float | None
     valid_until: str
+    size: NotRequired[float | None]
+    """Missing in offers.json from before 2026-10-24, as are `size_to`, `unit` and `pieces`: then the catalog said nothing."""
+    size_to: NotRequired[float | None]
+    unit: NotRequired[str]
+    pieces: NotRequired[int]
 
 
 _JSON = orjson.OPT_INDENT_2 | orjson.OPT_APPEND_NEWLINE | orjson.OPT_SORT_KEYS
@@ -125,4 +130,8 @@ def _offer(o: OfferJSON) -> Offer:
         pre_price=o["pre_price"],
         per_kg=o["per_kg"],
         valid_until=date.fromisoformat(o["valid_until"]),
+        size=o.get("size"),
+        size_to=o.get("size_to"),
+        unit=intern(o.get("unit", "")),
+        pieces=o.get("pieces", 1),
     )

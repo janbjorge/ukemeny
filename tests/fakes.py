@@ -96,8 +96,13 @@ def offer(
     pre_price: float | None = None,
     id: str | None = None,
     description: str = "",
+    size: float | None = None,
+    size_to: float | None = None,
+    unit: str = "",
+    pieces: int = 1,
 ) -> Offer:
-    """`catalog` defaults to the store's name: one catalog per chain."""
+    """`catalog` defaults to the store's name: one catalog per chain. `size` in `unit` is what the price buys (400 g; 1 kg
+    for goods priced by weight), `pieces` the packs a multi-buy prices."""
     return Offer(
         id=id or f"{store}:{heading}:{price}",
         store=store,
@@ -108,6 +113,10 @@ def offer(
         pre_price=pre_price,
         per_kg=per_kg,
         valid_until=date(2026, 10, 18),
+        size=size,
+        size_to=size_to,
+        unit=unit,
+        pieces=pieces,
     )
 
 

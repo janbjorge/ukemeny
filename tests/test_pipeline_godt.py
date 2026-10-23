@@ -11,6 +11,7 @@ from pipeline.pages import Pages
 
 URL = "https://www.godt.no/oppskrifter/suppe/9662/tomatsuppe"
 
+
 def card(path: str, updated: str = "2026-10-13T13:29:42.000Z") -> dict[str, object]:
     return {"links": {"relativeUrl": path}, "changes": {"updated": updated}}
 
@@ -18,6 +19,7 @@ def card(path: str, updated: str = "2026-10-13T13:29:42.000Z") -> dict[str, obje
 def listing(items: list[dict[str, object]], total: int, size: int = 2) -> str:
     props = {"props": {"pageProps": {"recipes": {"items": items, "pagination": {"total": total, "page": 1, "size": size}}}}}
     return f'<html><script id="__NEXT_DATA__" type="application/json">{json.dumps(props)}</script>'
+
 
 INGREDIENTS: list[dict[str, object]] = [
     {"amount": 1, "description": None, "id": "1319", "maxAmount": None, "name": "løk", "unit": "stk"},

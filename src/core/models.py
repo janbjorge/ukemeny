@@ -252,6 +252,15 @@ class Offer:
     per_kg: float | None
     """NOK per kg when the catalog says or the pack size gives it."""
     valid_until: date
+    size: float | None = None
+    """What the price buys, in `unit`: one pack, 400 (g), 1 (l), 12 (stk); goods priced by weight, 1 (kg), or 0.1 (kg) for a
+    price per 100 g. None: the catalog does not say (core.units; docs/plan-per-person.md)."""
+    size_to: float | None = None
+    """The top of a size range («250-500 g»: `size` 250, `size_to` 500); None when `size` is exact."""
+    unit: str = ""
+    """kg or l for goods priced by weight or volume, g, ml or stk for a pack, "" when the catalog does not say."""
+    pieces: int = 1
+    """Packs the price buys: 2 for «2 for 80» (the before-price is for the same two, pipeline.tjek.before_price)."""
 
     @property
     def discount(self) -> float | None:

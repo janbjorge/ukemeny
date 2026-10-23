@@ -94,6 +94,7 @@ _Size = TypedDict("_Size", {"from": float, "to": float}, total=False)
 class Quantity(TypedDict, total=False):
     unit: _Unit | None
     size: _Size | None
+    pieces: _Size | None
 
 
 class _Pricing(TypedDict):
@@ -169,11 +170,99 @@ def before_price(price: float, pre_price: float | None, description: str, kg_pri
     return float(pre_price)
 
 
+_SIZE_UNIT = r"(kg|g|ml|cl|dl|l|liter)"
+_RANGE = re.compile(_NUMBER + r"\s*[-\u2013]\s*" + _NUMBER + r"\s*" + _SIZE_UNIT + r"\b", re.IGNORECASE)
+_SIZE = re.compile(r"(?<![\d,.\-\u2013])" + _NUMBER + r"\s*" + _SIZE_UNIT + r"\b", re.IGNORECASE)
+_TIMES = re.compile(r"\b(\d+)\s*x\s*" + _NUMBER + r"\s*" + _SIZE_UNIT + r"\b", re.IGNORECASE)
+_COUNT = re.compile(r"\b(\d{1,3})\s*(?:store\s+|små\s+)?(?:stk\.?|egg)\b(?!\s*for\b)", re.IGNORECASE)
+_PER_STK = re.compile(r"\bpr\.?\s*stk", re.IGNORECASE)
+_FOR = re.compile(r"\b(\d)\s*(?:stk|pk)?\.?\s*for\s*(?:kr\.?\s*)?" + _NUMBER, re.IGNORECASE)
+_SINGLE = re.compile(r"\b1\s*(?:pk|stk)\.?\s*(?:kr\.?\s*)?" + _NUMBER, re.IGNORECASE)
+_BASE: Mapping[str, tuple[float, str]] = {
+    "kg": (1000.0, "g"),
+    "g": (1.0, "g"),
+    "ml": (1.0, "ml"),
+    "cl": (10.0, "ml"),
+    "dl": (100.0, "ml"),
+    "l": (1000.0, "ml"),
+    "liter": (1000.0, "ml"),
+    "stk": (1.0, "stk"),
+    "pcs": (1.0, "stk"),
+}
+"""A catalog's size units in g, ml or stk (core.units): the factor and the base unit."""
+SIZE_TOLERANCE = 0.10
+"""A pack size the catalog's own numbers do not confirm is not used: price is the per-kilo price times size times pieces,
+within this."""
+
+
+def pieces(description: str, quantity: Quantity | None, price: float, pre_price: float | None) -> int:
+    """Packs the price buys. Tjek's `pieces`, else «2 for 80», else a single-pack price the before-price or the price is a
+    multiple of («1 pk kr 58,50» against 117,00). 1 otherwise; «2-pk» is a pack of two, not two packs."""
+    counted = (quantity or {}).get("pieces") or {}
+    low, high = counted.get("from"), counted.get("to")
+    if low and low == high and low >= 2:
+        return int(low)
+    if (match := _FOR.search(description)) and abs(_number(match.group(2)) - price) <= 0.01 * price:
+        return int(match.group(1))
+    if match := _SINGLE.search(description):
+        single = _number(match.group(1))
+        for total in (pre_price, price):
+            if total and single and 2 <= (n := round(total / single)) <= 6 and abs(total / single - n) <= 0.02:
+                return n
+    return 1
+
+
+def amount(price: float, description: str, quantity: Quantity | None, kg_price: float | None) -> tuple[float | None, float | None, str]:
+    """What one pack holds, as (size, the top of a range or None, unit): Offer.size, size_to and unit. Goods priced by
+    weight come first («pr. kg»: 1 kg; a price a tenth of the per-kilo price: 0.1 kg), then Tjek's `quantity`, then the
+    catalog text («700 g», «250-500 g», «6 x 47 g», «12 stk», «12 store egg», «pr stk»)."""
+    if kg_price is not None and abs(kg_price - price) <= 0.005 * price:
+        return 1.0, None, "kg"
+    if kg_price is not None and abs(price * 10 - kg_price) <= 0.05 * kg_price:
+        return 0.1, None, "kg"
+    unit = (quantity or {}).get("unit") or {}
+    si = unit.get("si") or {}
+    size = (quantity or {}).get("size") or {}
+    low, high, factor = size.get("from"), size.get("to"), si.get("factor")
+    if low and factor and (base := _BASE.get(str(si.get("symbol", "")).lower())):
+        scale, in_unit = base
+        return low * factor * scale, high * factor * scale if high and high != low else None, in_unit
+    if match := _RANGE.search(description):
+        scale, in_unit = _BASE[match.group(3).lower()]
+        return _number(match.group(1)) * scale, _number(match.group(2)) * scale, in_unit
+    if match := _TIMES.search(description):
+        scale, in_unit = _BASE[match.group(3).lower()]
+        return int(match.group(1)) * _number(match.group(2)) * scale, None, in_unit
+    if match := _SIZE.search(description):
+        scale, in_unit = _BASE[match.group(2).lower()]
+        return _number(match.group(1)) * scale, None, in_unit
+    if match := _COUNT.search(description):
+        return float(match.group(1)), None, "stk"
+    if _PER_STK.search(description):
+        return 1.0, None, "stk"
+    return None, None, ""
+
+
+def confirmed(price: float, kg_price: float | None, size: float | None, size_to: float | None, unit: str, packs: int) -> bool:
+    """Whether the catalog's own numbers agree on a pack by weight: the price is the per-kilo price times size times
+    pieces (every one of the 217 offers on a card with both agreed on 2026-10-23). Without a per-kilo price, with a
+    range, or in another unit there is nothing to check against."""
+    if unit != "g" or size is None or size_to is not None or kg_price is None:
+        return True
+    return abs(price / (packs * size / 1000) - kg_price) <= SIZE_TOLERANCE * kg_price
+
+
 def parse_offer(raw: RawOffer, catalog: str) -> Offer:
     description = " ".join((raw.get("description") or "").split())
     price = float(raw["pricing"]["price"])
-    kg_price = per_kg(price, description, raw.get("quantity"))
+    quantity = raw.get("quantity")
+    kg_price = per_kg(price, description, quantity)
     pre_price = before_price(price, raw["pricing"].get("pre_price"), description, kg_price)
+    packs = pieces(description, quantity, price, pre_price)
+    size, size_to, unit = amount(price, description, quantity, kg_price)
+    if not confirmed(price, kg_price, size, size_to, unit, packs):
+        log.info("size not confirmed: %s «%s» %s g for %s, pr. kg %s", raw["dealer"]["name"], raw["heading"], size, price, kg_price)
+        size, size_to, unit = None, None, ""
     return Offer(
         id=raw["id"],
         store=raw["dealer"]["name"],
@@ -184,6 +273,10 @@ def parse_offer(raw: RawOffer, catalog: str) -> Offer:
         pre_price=pre_price,
         per_kg=kg_price,
         valid_until=datetime.fromisoformat(raw["run_till"]).date(),
+        size=size,
+        size_to=size_to,
+        unit=unit,
+        pieces=packs,
     )
 
 

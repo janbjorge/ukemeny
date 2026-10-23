@@ -20,6 +20,7 @@ from core.errors import SourceUnavailableError
 from core.matching import CATEGORIES, candidates, not_an_ingredient, per_dinner, weight, words
 from core.models import Dish, Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
 from core.ports import CategoryClassifier, IngredientClassifier, OfferMatcher, OfferSource, RecipeSource
+from core.units import PIECE, implied_weights, stated_weight
 
 log = logging.getLogger("matris.build")
 """-v (info): failures and totals. -vv (debug): what each page, ingredient and offer became."""
@@ -33,7 +34,8 @@ EXAMPLES = 12
 type Progress = Callable[[str, int, int], None]
 """(step, done, due) for a person watching the build: called with done 0 as a step starts, then as each item is done.
 The steps: "recipes" (matprat.no and godt.no pages), "categories" (Jev's category for a new name neither its line nor a
-near-name files), "ingredients" (Jev's facts for every new name), "catalogs" (mattilbud.no), "offers" (Jev's matches)."""
+near-name files), "ingredients" (Jev's facts for every new name), "weights" (Jev's piece weight for every name counted in
+stk without one), "catalogs" (mattilbud.no), "offers" (Jev's matches)."""
 
 
 async def recipes(
@@ -137,7 +139,54 @@ async def draft(
 
     async with asyncio.TaskGroup() as tg:
         rows = {name: tg.create_task(facts(name)) for name in new}
-    return dict(sorted({**vocabulary, **{name: task.result() for name, task in rows.items()}}.items()))
+    known_rows = {**vocabulary, **{name: task.result() for name, task in rows.items()}}
+    return dict(sorted((await weighed(dinners, known_rows, wanted, classifier, progress)).items()))
+
+
+async def weighed(
+    dinners: Sequence[Recipe],
+    vocabulary: Mapping[str, Traits],
+    lines: Mapping[str, Ingredient],
+    classifier: IngredientClassifier,
+    progress: Progress | None = None,
+) -> dict[str, Traits]:
+    """The vocabulary with a piece weight (Traits.piece_g) for every name some recipe counts in stk that lacks one, asked
+    once, as a label added later is asked only for the rows without it: Jev's band read as grams, or the name's own
+    weight («kylling (ca. 1500 g)») without asking. The weight the recipes themselves imply, where they weigh the same
+    name in other recipes (core.units.implied_weights), is logged beside Jev's; tests/test_traits.py holds the two
+    within 3 times (docs/plan-per-person.md, the guards)."""
+    counted = sorted({i.name for r in dinners for i in r.ingredients if i.unit.rstrip(".").lower() == PIECE})
+    rows = dict(vocabulary)
+    to_ask = []
+    for name in counted:
+        if name not in rows or rows[name].piece_g is not None:
+            continue
+        if (grams := stated_weight(name)) is not None:
+            rows[name] = replace(rows[name], piece_g=grams)
+            log.debug("%s: %s g a piece, from the name", name, grams)
+        else:
+            to_ask.append(name)
+    implied = implied_weights(dish(r) for r in dinners)
+    done = 0
+    if progress:
+        progress("weights", done, len(to_ask))
+
+    async def weigh(name: str) -> float | None:
+        nonlocal done
+        grams = await classifier.weigh(replace(lines[name], category=rows[name].category))
+        said = f", the recipes say {implied[name]:.0f} g" if name in implied else ""
+        log.info("%s: %s g a piece%s", name, grams, said)
+        done += 1
+        if progress:
+            progress("weights", done, len(to_ask))
+        return grams
+
+    async with asyncio.TaskGroup() as tg:
+        asked = {name: tg.create_task(weigh(name)) for name in to_ask}
+    for name, task in asked.items():
+        if (grams := task.result()) is not None:
+            rows[name] = replace(rows[name], piece_g=grams)
+    return rows
 
 
 def filed(dinners: Iterable[Recipe], vocabulary: Mapping[str, Traits]) -> list[Recipe]:

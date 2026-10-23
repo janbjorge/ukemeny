@@ -10,9 +10,11 @@ amounts in the same unit. When they are in the same unit to begin with that is d
 both sides say; a bridge (a piece weight, a gram a ml) or an estimate (the midpoint of a size range) makes it indirect
 (core.models.Pricing)."""
 
-from collections.abc import Mapping
+import re
+from collections.abc import Iterable, Mapping
+from statistics import median
 
-from core.models import Offer, Part, Pricing
+from core.models import Dish, Offer, Part, Pricing
 
 MASS: Mapping[str, float] = {"g": 1.0, "kg": 1000.0}
 """A recipe's mass units in g."""
@@ -45,6 +47,36 @@ def counted(unit: str) -> bool:
     """Whether a recipe line counts pieces (Part.pieces): any unit that is not a mass, a volume or nothing: stk, båt,
     skive, boks, bunt, potte, kvist."""
     return bool(unit) and unit not in MASS and unit not in VOLUME
+
+
+_STATED = re.compile(r"ca\.?\s*(\d+(?:[,.]\d+)?)\s*(g|kg)\b")
+
+
+def stated_weight(name: str) -> float | None:
+    """Grams per piece a name carries itself: «kylling (ca. 1500 g)», «kalkun, ca. 5 kg». None otherwise."""
+    if match := _STATED.search(name.lower()):
+        return float(match.group(1).replace(",", ".")) * MASS[match.group(2)]
+    return None
+
+
+def implied_weights(dishes: Iterable[Dish], least: int = 3) -> dict[str, float]:
+    """What the recipes say a piece weighs, per name weighed in one recipe and counted in another («600 g kyllingfilet»
+    for four, «4 kyllingfileter» for four): the median grams a head over its g lines divided by the median pieces a head
+    over its stk lines, for names with `least` lines of each kind. No Jev in it: the check on Traits.piece_g
+    (docs/plan-per-person.md, the guards)."""
+    weighed: dict[str, list[float]] = {}
+    pieces: dict[str, list[float]] = {}
+    for d in dishes:
+        for p in d.parts:
+            if p.unit in MASS and p.grams:
+                weighed.setdefault(p.name, []).append(p.grams)
+            elif p.unit == PIECE and p.pieces:
+                pieces.setdefault(p.name, []).append(p.pieces)
+    return {
+        name: median(weighed[name]) / median(pieces[name])
+        for name in sorted(pieces)
+        if len(pieces[name]) >= least and len(weighed.get(name, ())) >= least
+    }
 
 
 def per_portion(part: Part) -> Amount | None:

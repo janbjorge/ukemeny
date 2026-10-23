@@ -31,7 +31,9 @@ from typesafe_sdk import AsyncTypeSafeClient
 
 from adapters import datasets
 from app import build
+from core import ranking
 from core.models import RefreshReport, Snapshot, Traits
+from core.search import ANYTHING
 from pipeline.godt import BASE as GODT
 from pipeline.godt import GodtRecipeSource
 from pipeline.jev import Jev, JevCategoryClassifier, JevIngredientClassifier, JevOfferMatcher
@@ -66,6 +68,7 @@ STEPS = {
     "recipes": "matprat.no and godt.no pages",
     "categories": "Jev categories for new names",
     "ingredients": "Jev facts for new names",
+    "weights": "Jev piece weights for names counted in stk",
     "catalogs": "mattilbud.no catalogs",
     "offers": "Jev offer matches",
 }
@@ -157,10 +160,28 @@ def _reporting(jev: Jev, progress: build.Progress | None) -> build.Progress:
     def step(name: str, done: int, due: int) -> None:
         if progress:
             progress(name, done, due)
-        if done == due and name in ("categories", "ingredients", "offers"):
+        if done == due and name in ("categories", "ingredients", "weights", "offers"):
             logging.getLogger("matris.jev").info("so far: %s", jev.status())
 
     return step
+
+
+def largest_a_head(snapshot: Snapshot, n: int = 20) -> list[str]:
+    """The `n` largest kroner a head on one discount line this week, every store and no rules, as lines to print: a wrong
+    piece weight or pack size floats to the top (docs/plan-per-person.md, the guards)."""
+    found = [
+        (b.per_person, b.pricing, d.dish.name, b.part.name, b.sale)
+        for d in ranking.dinners(snapshot, ANYTHING)
+        for b in d.deals
+        if b.per_person is not None and b.sale is not None
+    ]
+    found.sort(key=lambda row: -(row[0] or 0.0))
+    return [
+        f"{kroner:7.2f} kr {pricing or '':8} {dish[:40]}: {part} <- {sale.store} {sale.heading[:30]} "
+        f"({sale.saving or 0:.2f} kr on {sale.pieces} x {sale.size:g} {sale.unit})"
+        for kroner, pricing, dish, part, sale in found[:n]
+        if kroner is not None and sale.size is not None
+    ]
 
 
 async def offers(progress: build.Progress | None = None, fetching: Callable[[str], None] | None = None) -> Result:
@@ -232,6 +253,8 @@ def main() -> None:
     )
     print(", ".join(f"{name} {size / 1e6:.1f} MB" for name, size in result.sizes.items()))
     print(result.jev)
+    print("the largest kroner a head on one line this week (a wrong weight or size would be here):")
+    print("\n".join(f"  {line}" for line in largest_a_head(s)) or "  none")
 
 
 if __name__ == "__main__":

@@ -404,6 +404,56 @@ class JevIngredientClassifier:
         response = await self.jev.ask("ingredient", state, self.registry.questions(keys))
         return {**self.registry.read(response, keys), "source": response.model}
 
+    async def weigh(self, ingredient: Ingredient) -> float | None:
+        """The piece weight as a Score over WEIGHT_BANDS, read as grams (`grams_per_piece`). A low confidence is logged
+        as unsure, for the review of `git diff datasets/traits.json`."""
+        state: dict[str, JSONContent] = {"ingredient": ingredient.name, "category": ingredient.category}
+        question = Score(instructions=WEIGHT_QUESTION, criteria=list(WEIGHT_BANDS))
+        response = await self.jev.ask("piece weight", state, {"piece_g": question})
+        answer = response.scores["piece_g"]
+        grams = grams_per_piece(answer.score)
+        if answer.confidence < UNSURE:
+            log.info(
+                "%s: unsure about the piece weight, %s g (band %.1f, confidence %.2f)",
+                ingredient.name,
+                grams,
+                answer.score,
+                answer.confidence,
+            )
+        return grams
+
+
+WEIGHT_QUESTION = (
+    "How much does one piece («1 stk») of the Norwegian grocery ingredient `ingredient`, sold in the `category` department, "
+    "weigh: the whole item as a recipe means by one piece (an onion, a chicken fillet, an egg), not a serving and not a pack?"
+)
+WEIGHT_BANDS: tuple[str, ...] = (
+    "under 5 g: hvitløksfedd, oliven, kapers, basilikumblad",
+    "5 to 10 g: daddel, valnøtt, ansjosfilet, liten cherrytomat",
+    "10 to 20 g: cherrytomat, sjampinjong, rød chili, reddik, eggeplomme, sitrongress",
+    "20 to 40 g: stor sjampinjong, kjøttbolle, fiskebolle, scampi, kyllingvinge, skive loff",
+    "40 to 80 g: egg, lime, sjalottløk, wienerpølse, liten potet, plomme, kiwi",
+    "80 to 160 g: løk, potet, tomat, gulrot, sitron, banan, eple, kjøttpølse, laksefilet (en porsjon), hamburger",
+    "160 to 320 g: kyllingfilet, svinekotelett, paprika, avokado, mango, søtpotet, appelsin, purre, kyllinglår med bein",
+    "320 to 640 g: brokkoli, fennikel, agurk, squash, aubergine, granateple, liten sellerirot, hel ørret",
+    "640 to 1280 g: blomkål, sellerirot, kålrot, ananas, liten hodekål, liten hel kylling, butternut",
+    "1280 to 2560 g: hel kylling, lammelår, hodekål, honningmelon, ribbe",
+    "over 2560 g: kalkun, vannmelon, hel skinke, hel laks",
+)
+"""The Score rubric for a piece weight (docs/plan-per-person.md, «The question»): eleven bands, each twice the one before,
+from LIGHTEST_G, with Norwegian examples as the other questions have. Jev has no question that returns a number, and a band
+cannot slip a decimal point."""
+LIGHTEST_G = 2.5
+"""Where band 0 starts; band i spans LIGHTEST_G times 2^i to twice that."""
+UNSURE = 0.5
+"""A confidence under this is logged, for the review."""
+
+
+def grams_per_piece(score: float) -> float:
+    """The band Jev expects (its probability-weighted mean) as grams: the geometric mean of the bands' midpoints, two
+    digits. 5.5, a 50/50 between 80 to 160 g and 160 to 320 g, is 160 g."""
+    return float(f"{LIGHTEST_G * 2 ** (score + 0.5):.2g}")
+
 
 @dataclass
 class JevCategoryClassifier:

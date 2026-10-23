@@ -2,9 +2,10 @@
 
 import pytest
 
+from core.dishes import dish
 from core.models import Offer, Part, Pricing
-from core.units import bought, counted, per_portion, price
-from tests.fakes import offer
+from core.units import bought, counted, implied_weights, per_portion, price, stated_weight
+from tests.fakes import ingredient, offer, recipe
 
 DIRECT, INDIRECT = Pricing.DIRECT, Pricing.INDIRECT
 
@@ -16,6 +17,18 @@ def part(unit: str, grams: float | None = None, pieces: float | None = None, nam
 def test_a_unit_counts_pieces_unless_it_is_a_mass_a_volume_or_nothing() -> None:
     assert all(counted(unit) for unit in ("stk", "båt", "skive", "boks", "pk", "bunt", "potte", "kvist"))
     assert not any(counted(unit) for unit in ("g", "kg", "ml", "dl", "l", "ss", "ts", ""))
+
+
+def test_a_name_can_carry_its_own_weight() -> None:
+    assert stated_weight("kylling (ca. 1500 g)") == 1500 and stated_weight("kalkun, ca. 5 kg") == 5000
+    assert stated_weight("kalkunfilet, ca. 1,5 kg (med skinn)") == 1500 and stated_weight("kyllingfilet") is None
+
+
+def test_the_recipes_imply_a_piece_weight_where_they_weigh_and_count_the_same_name() -> None:
+    weighed = [recipe(f"Vekt {n}", ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")) for n in range(3)]
+    counted = [recipe(f"Stk {n}", ingredient("kyllingfilet", 4, "stk", "/kjøtt/kylling/høns")) for n in range(3)]
+    once = [recipe("Løk", ingredient("løk", 100, "g", "/grønnsaker"), ingredient("løk", 1, "stk", "/grønnsaker"))]
+    assert implied_weights(dish(r) for r in weighed + counted + once) == {"kyllingfilet": 150.0}  # 150 g a head over 1 a head
 
 
 def test_what_the_recipe_wants_a_head_is_in_g_ml_stk_or_packs() -> None:

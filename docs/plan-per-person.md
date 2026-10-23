@@ -329,16 +329,17 @@ the pack size, the recipe's amount and the portions are read, not guessed.
       METHOD.md §4 and §6. A look at the front page with this week's data (2026-10-24): 84 of the first 100 cards have
       a line, 15 of them «ca.»; «Innbakt biff» says «ca. 2 kr» until the biff's piece weight is in.
 - [ ] The push with jb's OK.
-- [ ] The build prints the 20 largest per-person lines of the week with their pricing.
+- [x] The build prints the 20 largest per-person lines of the week with their pricing (src/pipeline/datasets.py
+      `largest_a_head`).
 
 ### 6. Piece weights (vocabulary)
 
-- [ ] `Traits.piece_g`; tests/test_traits.py bounds; app.build.draft asks Jev once for the names counted in stk (the
-      Score over eleven bands above, `weigh` in src/pipeline/jev.py and core.ports; a weight in the name, «(ca. 1500 g)»,
-      is read without Jev); a run for the 371 names (Jev, the OK first); `git diff datasets/traits.json` is the
-      review; the bridge in core.units.
-- [ ] The recipes' implied weight per name (median g a head ÷ median stk a head) printed beside Jev's by the build;
-      tests/test_traits.py: within 3× unless `hand`, and the bands per category.
+- [x] `Traits.piece_g`; tests/test_traits.py bounds; app.build `weighed` (a step of `draft`) asks Jev once for the names
+      counted in stk (the Score over eleven bands above, `weigh` in src/pipeline/jev.py and core.ports; a weight in the
+      name, «(ca. 1500 g)», is read without Jev: core.units.stated_weight); the bridge in core.units.
+- [ ] A run for the 371 names (Jev, the OK first); `git diff datasets/traits.json` is the review.
+- [x] The recipes' implied weight per name (median g a head ÷ median stk a head, core.units.implied_weights) logged
+      beside Jev's by the build; tests/test_traits.py: within 3× unless a named exception, and the bands per category.
 - [ ] Jev asked the 54 names that carry their weight, without the hint, before the run: the measured error rate (the OK
       first; a few calls).
 - [ ] A look at the cards, then decisions 2 and 3.

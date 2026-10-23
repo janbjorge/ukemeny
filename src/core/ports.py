@@ -51,6 +51,11 @@ class IngredientClassifier(Protocol):
         """These labels of the ingredient's name, and "source", the model that answered; its category is context."""
         ...
 
+    async def weigh(self, ingredient: Ingredient) -> float | None:
+        """Grams per piece («1 stk») of the ingredient's name, the whole item as a recipe means by one piece; its category
+        is context (Traits.piece_g, docs/plan-per-person.md). None when it cannot say."""
+        ...
+
 
 class CategoryClassifier(Protocol):
     """Which of our categories (core.matching.CATEGORIES) a new ingredient name belongs to, when neither its recipe line

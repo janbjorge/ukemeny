@@ -139,6 +139,9 @@ class FakeClassifier:
     asked: list[tuple[str, tuple[str, ...]]] = field(default_factory=list)
     labels: tuple[str, ...] = LABELS
     context: dict[str, str] = field(default_factory=dict)
+    weights: Mapping[str, float] = field(default_factory=dict)
+    """Grams per piece per name, for `weigh`; a name not here gets None."""
+    weighed: list[str] = field(default_factory=list)
 
     async def classify(self, ingredient: Ingredient, labels: Iterable[str]) -> dict[str, str | float]:
         keys = tuple(labels)
@@ -146,6 +149,11 @@ class FakeClassifier:
         self.context[ingredient.name] = ingredient.category
         levels = self.known.get(ingredient.name, PLAIN).levels()
         return {key: levels[key] for key in keys} | {"source": "fake"}
+
+    async def weigh(self, ingredient: Ingredient) -> float | None:
+        self.weighed.append(ingredient.name)
+        self.context[ingredient.name] = ingredient.category
+        return self.weights.get(ingredient.name)
 
 
 @dataclass

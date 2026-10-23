@@ -7,6 +7,7 @@ import pytest
 from adapters.datasets import JsonDatasets
 from core.matching import CATEGORIES, HOLDS
 from core.models import HAND, Item, Level, Snapshot, Traits
+from core.units import implied_weights
 from tests.fakes import traits
 
 ANIMAL = (Item.MEAT, Item.FISH, Item.CRUSTACEAN, Item.MOLLUSC, Item.MILK, Item.EGG)
@@ -83,3 +84,44 @@ def test_no_row_contradicts_itself(live: Snapshot) -> None:
 
 def test_every_exception_is_still_needed(live: Snapshot) -> None:
     assert {name for name in EXCEPTIONS if problems(live.traits[name])} == set(EXCEPTIONS)
+
+
+WEIGHT_BANDS: dict[str, tuple[float, float]] = {
+    "/egg": (10, 80),
+    "/poteter": (20, 300),
+    "/sopp": (5, 100),
+    "/grønnsaker": (2, 2000),
+    "/frukt": (5, 3000),
+    "/bær": (1, 50),
+    "/kjøtt": (20, 5000),
+    "/fisk og sjømat": (10, 3000),
+    "/skalldyr": (5, 1000),
+    "/ost": (5, 500),
+}
+"""Grams a piece can weigh, by category: the order-of-magnitude guard on Traits.piece_g (docs/plan-per-person.md)."""
+ANY_WEIGHT = (1.0, 5000.0)
+WEIGHT_AGREEMENT = 3.0
+"""Jev's piece weight against the one the recipes imply: within this factor, either way."""
+
+
+def test_every_piece_weight_is_in_its_categorys_band(live: Snapshot) -> None:
+    out = {}
+    for name, t in live.traits.items():
+        if t.piece_g is not None:
+            low, high = next((band for prefix, band in WEIGHT_BANDS.items() if t.category.startswith(prefix)), ANY_WEIGHT)
+            if not low <= t.piece_g <= high:
+                out[name] = (t.piece_g, t.category)
+    assert out == {}
+
+
+def test_the_piece_weights_agree_with_what_the_recipes_imply(live: Snapshot) -> None:
+    implied = implied_weights(live.dishes)
+    off = {
+        name: (t.piece_g, round(grams))
+        for name, grams in implied.items()
+        if (t := live.traits.get(name))
+        and t.piece_g is not None
+        and name not in EXCEPTIONS
+        and not (1 / WEIGHT_AGREEMENT <= t.piece_g / grams <= WEIGHT_AGREEMENT)
+    }
+    assert off == {}

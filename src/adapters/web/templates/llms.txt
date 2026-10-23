@@ -24,7 +24,7 @@ Read-only, no key, CORS open. `{{ base }}api` redirects to the schema. Keys are 
 
 ## Method
 
-- Dinners with the most kroner off every ingredient on sale come first, then rating and prep time. That sum is per pack, as the catalogs have it.
+- Dinners with the most kroner off every ingredient on sale come first, then rating and prep time. That sum (`saving`, on the dinner and on each discount) is for what the recipe needs: by weight, the recipe's share of a kilo, so 2 kg of chicken against a kilo price counts the saving twice; as packs, whole packs, at least one. The catalog's saving once where the catalog or the recipe says no amount, or the recipe needs more than ten packs or ten kilos.
 - `per_person` on a dinner and on each discount is kroner a head: the saving per unit of what the price buys, times the recipe's amount per portion. `pricing` says how: `direct` is straight math from the recipe's amount and the pack size; `indirect` went through an estimate (a piece weight, a solid by volume at a gram a ml, the midpoint of a size range). Null when the catalog or the recipe says no amount.
 - A dinner is on sale when its main protein (the heaviest meat or fish; without one, a main vegetable) has a before-price in this week's catalog, at the stores near the place searched for or, without one, at any store.
 - [How it works, in Norwegian]({{ base }}om)

@@ -79,13 +79,14 @@ def _a_head(kroner: float | None, pricing: Pricing | None) -> str:
 
 def _dinner(n: int, d: Dinner) -> str:
     lines = [f"{n}. {_dish_line(d.dish, d.protein)}", f"   {d.dish.url}"]
-    if d.per_person is not None:
+    if d.deals:
         lines.append(f"   spart: {d.saving:.2f} kr{_a_head(d.per_person, d.pricing)}")
     for buy in d.buys:
         if (sale := buy.sale) and sale.discount and sale.pre_price:
             lines.append(
                 f"   på tilbud: {buy.part.name} -{sale.discount:.0%} hos {sale.store} ({sale.heading}, "
-                f"{sale.price:.2f} kr, før {sale.pre_price:.2f}, til {sale.valid_until:%d.%m}{_a_head(buy.per_person, buy.pricing)})"
+                f"{sale.price:.2f} kr, før {sale.pre_price:.2f}, til {sale.valid_until:%d.%m}, "
+                f"spart {buy.saving:.2f} kr{_a_head(buy.per_person, buy.pricing)})"
             )
     return "\n".join(lines + _verdict_lines(d.verdict))
 

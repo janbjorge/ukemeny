@@ -4,7 +4,7 @@ import pytest
 
 from core.dishes import dish
 from core.models import Offer, Part, Pricing
-from core.units import bought, counted, implied_weights, per_portion, price, stated_weight
+from core.units import bought, counted, implied_weights, needed, per_portion, price, stated_weight
 from tests.fakes import ingredient, offer, recipe
 
 DIRECT, INDIRECT = Pricing.DIRECT, Pricing.INDIRECT
@@ -87,3 +87,43 @@ def test_kroner_a_head(line: Part, sale: Offer, piece_g: float | None, expected:
         assert found is None
     else:
         assert found is not None and found[0] == pytest.approx(expected[0], abs=0.005) and found[1] is expected[1]
+
+
+# For what the recipe needs, four portions (jb 2026-10-23: "say the recepie calls for 2kg of chicken, we should then make
+# sure that we multiplie up the savings if the chickon on sale is ex. 1kg")
+@pytest.mark.parametrize(
+    ("line", "sale", "piece_g", "expected"),
+    [
+        (part("g", 500), KILO, None, 179.6 * 2),  # 2 kg against a kilo price counts twice
+        (part("g", 75), KILO, None, 179.6 * 0.3),  # 300 g counts 0,3
+        (part("g", 75), HECTO, None, 4.0 * 3),  # 300 g against a price per 100 g
+        (part("dl", 50), LITRE, None, 10 * 0.2),  # 2 dl of a litre
+        (part("g", 150), PACK, None, 30.0),  # 600 g fills one 700 g pack
+        (part("g", 375), PACK, None, 30.0 * 3),  # 1,5 kg fills three
+        (part("g", 175), PACK, None, 30.0),  # 700 g is one pack exactly, not two
+        (part("stk", 50, 1), EGGS, None, 37.0),  # 4 eggs: the lot of two dozen, once
+        (part("stk", 100, 2), EACH, None, 14.9 * 8),  # 8 thighs priced each
+        (part("boks", 100, 0.5), TIN, None, 8.9 * 2),  # 2 tins
+        (part("stk", 50, 1), KILO, 150, 179.6 * 0.6),  # 4 steaks of 150 g against a kilo price
+        (part("g", 300), RANGE, None, 29.9 * 4),  # 1,2 kg of 250 to 500 g packs, at the midpoint: four
+        (part("boks", 100, 0.25), KILO, None, 179.6),  # A tin against a kilo price: the catalog's saving once
+        (part("stk", 50, 0.5), PACK, None, 30.0),  # No piece weight: once
+        (part("", None), PACK, None, 30.0),  # No amount: once
+        (part("g", 1200), KILO, None, 179.6),  # Past the cap a head: once
+        (
+            part("stk", 100, 0.5),
+            offer("Kyllingfilet", 30, pre_price=42, size=110, unit="g"),
+            3400,
+            12.0,
+        ),  # A turkey against a 110 g pack: once
+        (part("g", 150), HECTO, None, 4.0 * 6),  # 600 g of ribbe at a price per 100 g: six times, under the ten kilos
+        (part("g", 100), offer("FULL PRICE", 10, size=100, unit="g"), None, 0.0),  # No saving
+    ],
+)
+def test_kroner_for_what_the_recipe_needs(line: Part, sale: Offer, piece_g: float | None, expected: float) -> None:
+    assert needed(line, sale, piece_g, 4) == pytest.approx(expected, abs=0.005)
+
+
+def test_a_recipe_for_thirty_past_ten_kilos_counts_the_saving_once() -> None:
+    assert needed(part("g", 400), KILO, None, 30) == pytest.approx(179.6)  # 12 kg of biff: once
+    assert needed(part("g", 400), KILO, None, 20) == pytest.approx(179.6 * 8)  # 8 kg

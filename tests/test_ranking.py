@@ -113,6 +113,22 @@ def test_a_dinner_sums_the_kroner_a_head_and_is_indirect_as_soon_as_one_line_is(
     assert dinner.deals[1].per_person is None and dinner.per_person == pytest.approx(7.71, abs=0.01) and dinner.pricing is Pricing.DIRECT
 
 
+def test_a_dinner_sums_the_kroner_for_what_the_recipe_needs() -> None:
+    # jb 2026-10-23: "say the recepie calls for 2kg of chicken, we should then make sure that we multiplie up the savings
+    # if the chickon on sale is ex. 1kg"
+    chicken = ingredient("kylling", 2000, "g", "/kjøtt/kylling/høns")
+    kilo = offer("KYLLING", 69, pre_price=149, id="k", size=1, unit="kg")  # 80 kr a kilo
+    rice = ingredient("ris", 300, "g", "/pasta/ris")
+    bag = offer("RIS", 20, pre_price=30, id="r", size=1000, unit="g")  # 10 kr on a kilo bag
+    s = snapshot(recipe("Kylling", chicken, rice), offers=[kilo, bag], matches={"kylling": ["k"], "ris": ["r"]})
+    (dinner,) = dinners(s, HOUSEHOLD)
+    assert [(b.part.name, b.saving) for b in dinner.deals] == [("kylling", 160.0), ("ris", 10.0)]  # 2 kg at 80 a kilo; one bag
+    assert dinner.saving == 170.0
+    # Without a size on the offer, the catalog's saving once, as the card had it before
+    (dinner,) = dinners(replace(s, offers=(offer("KYLLING", 69, pre_price=149, id="k"), bag)), HOUSEHOLD)
+    assert dinner.saving == 90.0
+
+
 def test_varied_puts_a_few_of_each_protein_first() -> None:
     s = snapshot(
         recipe("Kylling 1", CHICKEN, rating=5.0, rating_count=10),

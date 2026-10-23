@@ -10,6 +10,7 @@ amounts in the same unit. When they are in the same unit to begin with that is d
 both sides say; a bridge (a piece weight, a gram a ml) or an estimate (the midpoint of a size range) makes it indirect
 (core.models.Pricing)."""
 
+import math
 import re
 from collections.abc import Iterable, Mapping
 from statistics import median
@@ -32,6 +33,12 @@ type Amount = tuple[float, str]
 CAP: Mapping[str, float] = {"g": 1000.0, "ml": 1000.0, PIECE: 20.0, PACK: 5.0}
 """A head, more than this is no portion: a batch recipe for «1 portion» (a kilo of kjøttdeig for pølser), or a wrong piece
 weight. No figure rather than a number."""
+
+MOST_LOTS = 10
+MOST_WEIGHED = 10_000.0
+"""For the whole recipe, more than ten lots of a pack, or ten kilos or litres of goods priced by weight, is no dinner's
+shopping: the offer is not the product the recipe means (a whole turkey against a 110 g pack of fillet, a stew against a
+stew mix), or a piece weight is wrong. Then the catalog's saving counts once, as the card had it before."""
 
 _OFFER_UNITS: Mapping[str, tuple[float, str]] = {
     "kg": (1000.0, "g"),
@@ -108,11 +115,13 @@ def packed(offer: Offer) -> bool:
     return offer.unit in ("g", "ml", PIECE)
 
 
-def price(part: Part, offer: Offer, piece_g: float | None) -> tuple[float, Pricing] | None:
-    """Kroner a head on this line, and how: the table in docs/plan-per-person.md. `piece_g` is the name's grams per stk
-    from the vocabulary (Traits.piece_g), the one bridge between pieces and weight; None when not known."""
-    wanted, have, saving = per_portion(part), bought(offer), offer.saving
-    if wanted is None or have is None or not saving:
+def _met(part: Part, offer: Offer, piece_g: float | None) -> tuple[float, float, str, Pricing] | None:
+    """Where the recipe's line and the offer meet: what the recipe wants a head in the offer's unit, what the price buys
+    in it, that unit (g, ml, stk or pk) and how they met (the table in docs/plan-per-person.md). `piece_g` is the name's
+    grams per stk from the vocabulary (Traits.piece_g), the one bridge between pieces and weight; None when not known.
+    None when a side says no amount, the two do not meet, or a head is past CAP."""
+    wanted, have = per_portion(part), bought(offer)
+    if wanted is None or have is None:
         return None
     amount, unit = wanted
     total, in_unit = have
@@ -133,4 +142,34 @@ def price(part: Part, offer: Offer, piece_g: float | None) -> tuple[float, Prici
         return None
     if amount > CAP[in_unit] or total <= 0:
         return None
-    return saving / total * amount, pricing
+    return amount, total, in_unit, pricing
+
+
+def price(part: Part, offer: Offer, piece_g: float | None) -> tuple[float, Pricing] | None:
+    """Kroner a head on this line, and how: the saving divided by what the price buys, times what the recipe wants a
+    head (`_met`). None without a saving, or when the two do not meet."""
+    met = _met(part, offer, piece_g)
+    if met is None or not offer.saving:
+        return None
+    amount, total, _, pricing = met
+    return offer.saving / total * amount, pricing
+
+
+def needed(part: Part, offer: Offer, piece_g: float | None, portions: int) -> float:
+    """Kroner off this line for what the recipe needs, the card's number (jb 2026-10-23: "say the recepie calls for 2kg
+    of chicken, we should then make sure that we multiplie up the savings if the chickon on sale is ex. 1kg"). Priced
+    by weight or volume (per kg, per l, per 100 g): the saving times the need's share of what the price buys, so 2 kg
+    against a kilo price counts twice and 300 g counts 0,3. Sold as packs: the saving on every lot the price buys («2
+    for 80» is one lot of two), as many lots as the need fills, at least one. The catalog's saving once when a side
+    says no amount, the two do not meet (`_met`) or the need is past MOST_LOTS or MOST_WEIGHED, as the card had it
+    before; 0 without a saving."""
+    saving = offer.saving or 0.0
+    met = _met(part, offer, piece_g)
+    if not saving or met is None:
+        return saving
+    amount, total, _, _ = met
+    need = amount * portions
+    if not packed(offer):
+        return saving * need / total if need <= MOST_WEIGHED else saving
+    lots = max(1, math.ceil(round(need / total, 6)))
+    return saving * lots if lots <= MOST_LOTS else saving

@@ -268,16 +268,19 @@ the pack size, the recipe's amount and the portions are read, not guessed.
 - [x] Two kinds of pricing ("I wonder if we should call these two direct, and in-direct pricing, direct is when we can
       du stright math, in-direct, we have to had-wave-gesstimate"): a flag per line and per dinner, «ca.» on the card
       for indirect only.
+- [x] The card's sum is for what the recipe needs (jb 2026-10-23: "i do however want the menues to try to estimater better in terms of the needs, say the recepie calls for 2kg of chicken, we should then make sure that we multiplie up the savings if the chickon on sale is ex. 1kg"): the same meeting of line and offer as the
+      figure a head, times the portions; whole lots for packs, at least one, the share of a kilo by weight
+      (core.units.needed, Buy.saving, Dinner.saving). The order and the floor go by it. The catalog's saving once where
+      the two do not meet, as before.
 
 ## Decisions for jb
 
 1. **Where it shows.** Decided 2026-10-23: not on the card ("lets remove the ; ca. 57 kr per person text, i dont want that"). `per_person` and `pricing` stay on the dinner
    and on each discount in the API, and in the CLI's text. The card showed the line under the per-pack sum for one look,
    and the two cannot agree: for Innbakt biff for two, 238 kr per pack beside 57 kr a head.
-2. **The order.** Unchanged at first. Once the piece weights are in, by per person: that ends the per-kilo against
-   per-pack mix at the top of the list. Before them, «4 stk kyllingfilet» would rank under a 25 g line of bacon.
-3. **The floor.** 20 kr per pack stays until the order changes. A per-person floor of 5 kr is the same for four at the
-   table (554 dinners on this week's direct lines; 321 at 10 kr).
+2. **The order.** Decided 2026-10-23: by the kroner off for what the recipe needs (Dinner.saving), not a head. That
+   ends the per-kilo against per-pack mix at the top of the list the same way.
+3. **The floor.** 20 kr on that sum.
 4. **The Tjek probe**, an outside read that needs the OK: one read of this week's offers through the API the build
    already uses, no key, no Jev, to see what `quantity` holds for Norwegian grocers: which unit symbols, how often the
    size is a range, whether `pieces` is filled, what the egg offer says about «12» and «2 for 80». It decides whether the
@@ -342,18 +345,19 @@ the pack size, the recipe's amount and the portions are read, not guessed.
       120 against a 500 g coil) and seven outside their band; Jev runs heavy on the names with the big discounts (a
       ytrefilet steak 300 g where the recipes imply 150, an indrefilet 540, kylling lårfilet 210 where the catalog's pack
       says «2 stk 240 g», mozzarella 250 for a 125 g ball). The recipes' implied weight cannot win by rule either (løk
-      380 g, gulrøtter 275: by weight they come in bigger amounts than by piece). Left: about 25 names fixed by hand,
-      two bands widened where the data is right (a turkey with «ca. 6 kg» in its name, kongekrabbe).
+      380 g, gulrøtter 275: by weight they come in bigger amounts than by piece). Fixed by hand the same day: 22 names
+      (METHOD.md §2); three bands widened where the data is right (an anchovy fillet at 7 g, a turkey with «ca. 6 kg» in
+      its name, kongekrabbe); løk and pepperoni named as exceptions.
 - [x] The recipes' implied weight per name (median g a head ÷ median stk a head, core.units.implied_weights) logged
       beside Jev's by the build; tests/test_traits.py: within 3× unless a named exception, and the bands per category.
 - [ ] Jev asked the 54 names that carry their weight, without the hint, before the run: the measured error rate (the OK
       first; a few calls).
-- [x] A look at the cards (jb, 2026-10-23): the line taken off the card (decision 1); the order and the floor stay per
-      pack (decisions 2 and 3 fall away with it).
+- [x] A look at the cards (jb, 2026-10-23): the line taken off the card (decision 1); the sum, the order and the floor
+      go by what the recipe needs instead (decisions 2 and 3).
 - [ ] No figure for a recipe of one portion (146 of 3 401 dishes: matprat's batch recipes, pølser with 1 kg kjøttdeig,
       and godt.no's single portions), where the figure is the whole batch.
-- [ ] A multi-buy written «1 pk fra 44,50» against 74,00 before 89,00 (Obs mozzarella) is read as one pack
-      (pipeline.tjek.pieces, the `_SINGLE` regex has no «fra»); this week's offers.json refilled from the stored text.
+- [x] A multi-buy written «1 pk fra 44,50» against 74,00 before 89,00 (Obs mozzarella) was read as one pack
+      (pipeline.tjek.pieces); two since 2026-10-23, and this week's offers.json refilled from the stored text.
 
 ## Order of work
 

@@ -177,7 +177,7 @@ _TIMES = re.compile(r"\b(\d+)\s*x\s*" + _NUMBER + r"\s*" + _SIZE_UNIT + r"\b", r
 _COUNT = re.compile(r"\b(\d{1,3})\s*(?:store\s+|små\s+)?(?:stk\.?|egg)\b(?!\s*for\b)", re.IGNORECASE)
 _PER_STK = re.compile(r"\bpr\.?\s*stk", re.IGNORECASE)
 _FOR = re.compile(r"\b(\d)\s*(?:stk|pk)?\.?\s*for\s*(?:kr\.?\s*)?" + _NUMBER, re.IGNORECASE)
-_SINGLE = re.compile(r"\b1\s*(?:pk|stk)\.?\s*(?:kr\.?\s*)?" + _NUMBER, re.IGNORECASE)
+_SINGLE = re.compile(r"\b1\s*(?:pk|stk)\.?\s*(?:kr\.?\s*|fra\s*(?:kr\.?\s*)?)?" + _NUMBER, re.IGNORECASE)
 _BASE: Mapping[str, tuple[float, str]] = {
     "kg": (1000.0, "g"),
     "g": (1.0, "g"),
@@ -197,7 +197,7 @@ within this."""
 
 def pieces(description: str, quantity: Quantity | None, price: float, pre_price: float | None) -> int:
     """Packs the price buys. Tjek's `pieces`, else «2 for 80», else a single-pack price the before-price or the price is a
-    multiple of («1 pk kr 58,50» against 117,00). 1 otherwise; «2-pk» is a pack of two, not two packs."""
+    multiple of («1 pk kr 58,50» against 117,00; «1 pk fra 44,50» against 89,00). 1 otherwise; «2-pk» is a pack of two, not two packs."""
     counted = (quantity or {}).get("pieces") or {}
     low, high = counted.get("from"), counted.get("to")
     if low and low == high and low >= 2:

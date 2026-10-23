@@ -376,6 +376,10 @@ class Buy:
     """Cheapest per kg first."""
     weight: float
     """How much a deal on it counts for the dinner (core.matching.weight)."""
+    saving: float = 0.0
+    """Kroner off this line for what the recipe needs (core.units.needed): the catalog's saving per lot times the lots
+    the recipe fills, at least one, or the need's share of a kilo for goods priced by weight; the catalog's saving once
+    when a side says no amount. 0 without a sale."""
     per_person: float | None = None
     """Kroner a head on `sale` (core.units.price); None when one side says no amount, or the two do not meet."""
     pricing: Pricing | None = None
@@ -426,9 +430,10 @@ class Dinner:
 
     @property
     def saving(self) -> float:
-        """Kroner off every discounted ingredient, as the catalogs have it (per pack, not per portion: jb 2026-10-22,
-        "its a rabbit hole")."""
-        return sum((b.sale.saving or 0.0) for b in self.deals if b.sale)
+        """Kroner off for what the recipe needs, every discounted ingredient summed (Buy.saving): the card's number, the
+        order and the floor. jb 2026-10-23: "say the recepie calls for 2kg of chicken, we should then make sure that we
+        multiplie up the savings if the chickon on sale is ex. 1kg"."""
+        return sum(b.saving for b in self.deals)
 
     @property
     def per_person(self) -> float | None:

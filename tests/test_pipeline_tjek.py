@@ -60,6 +60,7 @@ def test_amount(price: float, description: str, quantity: Quantity | None, expec
         ("2 for 50, Prior", None, 50.0, None, 2),
         (EGGS, None, 80.0, 117.0, 2),  # Two packs at 58,50
         ("Malaco. Original. 220 g 1 pk kr 27,90", None, 40.0, 55.8, 2),
+        ("100-250 g Fra 148,00/kg. 1 pk fra 44,50", None, 74.0, 89.0, 2),  # Two packs at 44,50, the cheapest of a range
         ("2-pk, Folkets, ca. 370 g Førpris 129,00", None, 79.9, 129.0, 1),  # A pack of two chops
         ("700 g, Prior, pr. kg 141,43", None, 99.0, 123.0, 1),
     ],

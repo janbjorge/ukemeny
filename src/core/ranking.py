@@ -7,7 +7,7 @@ from dataclasses import dataclass, replace
 from core.diet import carbs, fodmap_out, judge
 from core.matching import cheapest_first, main_protein, per_dinner, weight
 from core.models import Buy, Dinner, Dish, Household, Item, Level, Offer, Part, Pregnancy, Snapshot, Traits
-from core.units import price
+from core.units import needed, price
 
 TIME_BONUS: Mapping[str, float] = {"Under": 1.0, "20": 0.5, "40": 0.0, "Over": -1.0}
 """By the start of matprat's prep time bucket: small kids do not wait for a slow dinner."""
@@ -47,8 +47,9 @@ class Shelf:
 
 
 def buys(dish: Dish, shelf: Shelf, traits: Mapping[str, Traits]) -> tuple[Buy, ...]:
-    """The dish's ingredients that are on offer, most important first, each with its kroner a head on the offer the card
-    shows (Buy.sale), through the name's piece weight in `traits` where pieces meet a price by weight (core.units)."""
+    """The dish's ingredients that are on offer, most important first, each with its kroner off for what the recipe
+    needs (Buy.saving) and a head (Buy.per_person) on the offer the card shows (Buy.sale), through the name's piece
+    weight in `traits` where pieces meet a price by weight (core.units)."""
     seen: set[str] = set()
     found = []
     for part in dish.parts:
@@ -56,8 +57,11 @@ def buys(dish: Dish, shelf: Shelf, traits: Mapping[str, Traits]) -> tuple[Buy, .
             seen.add(part.name)
             buy = Buy(part, offers, weight(part))
             t = traits.get(part.name)
-            figure = price(part, buy.sale, t.piece_g if t else None) if buy.sale else None
-            found.append(replace(buy, per_person=figure[0], pricing=figure[1]) if figure else buy)
+            piece_g = t.piece_g if t else None
+            if (sale := buy.sale) is not None:
+                figure = price(part, sale, piece_g) or (None, None)
+                buy = replace(buy, saving=needed(part, sale, piece_g, dish.portions), per_person=figure[0], pricing=figure[1])
+            found.append(buy)
     return tuple(sorted(found, key=lambda b: b.weight, reverse=True))
 
 

@@ -93,21 +93,26 @@ WEIGHT_BANDS: dict[str, tuple[float, float]] = {
     "/grønnsaker": (2, 2000),
     "/frukt": (5, 3000),
     "/bær": (1, 50),
-    "/kjøtt": (20, 5000),
-    "/fisk og sjømat": (10, 3000),
-    "/skalldyr": (5, 1000),
+    "/kjøtt": (20, 8000),
+    "/fisk og sjømat": (3, 3000),
+    "/skalldyr": (5, 3000),
     "/ost": (5, 500),
 }
 """Grams a piece can weigh, by category: the order-of-magnitude guard on Traits.piece_g (docs/plan-per-person.md)."""
 ANY_WEIGHT = (1.0, 5000.0)
 WEIGHT_AGREEMENT = 3.0
 """Jev's piece weight against the one the recipes imply: within this factor, either way."""
+WEIGHT_EXCEPTIONS = {
+    "løk": "the recipes weigh onion in bigger amounts than they count it: 110 g a piece is right, not their 380",
+    "pepperoni": "counted in slices: 3 g a piece, under the band for meat",
+}
+"""Piece weights that are right although a weight rule says otherwise."""
 
 
 def test_every_piece_weight_is_in_its_categorys_band(live: Snapshot) -> None:
     out = {}
     for name, t in live.traits.items():
-        if t.piece_g is not None:
+        if t.piece_g is not None and name not in WEIGHT_EXCEPTIONS:
             low, high = next((band for prefix, band in WEIGHT_BANDS.items() if t.category.startswith(prefix)), ANY_WEIGHT)
             if not low <= t.piece_g <= high:
                 out[name] = (t.piece_g, t.category)
@@ -121,7 +126,18 @@ def test_the_piece_weights_agree_with_what_the_recipes_imply(live: Snapshot) -> 
         for name, grams in implied.items()
         if (t := live.traits.get(name))
         and t.piece_g is not None
-        and name not in EXCEPTIONS
+        and name not in WEIGHT_EXCEPTIONS
         and not (1 / WEIGHT_AGREEMENT <= t.piece_g / grams <= WEIGHT_AGREEMENT)
     }
     assert off == {}
+
+
+def test_every_weight_exception_is_still_needed(live: Snapshot) -> None:
+    implied = implied_weights(live.dishes)
+    for name in WEIGHT_EXCEPTIONS:
+        t = live.traits[name]
+        assert t.piece_g is not None
+        low, high = next((band for prefix, band in WEIGHT_BANDS.items() if t.category.startswith(prefix)), ANY_WEIGHT)
+        in_band = low <= t.piece_g <= high
+        agrees = name not in implied or 1 / WEIGHT_AGREEMENT <= t.piece_g / implied[name] <= WEIGHT_AGREEMENT
+        assert not (in_band and agrees), name

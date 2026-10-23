@@ -35,6 +35,9 @@ class DiscountOut(Out):
     """Kroner before the offer."""
     discount_percent: int
     valid_until: date
+    saving: float
+    """Kroner off for what the recipe needs: the catalog's saving per lot times the lots the recipe fills, at least one;
+    by weight, the recipe's share of a kilo; the catalog's saving once when the catalog or the recipe says no amount."""
     per_person: float | None = None
     """Kroner a head on this ingredient: the saving per unit of what the price buys, times the recipe's amount per
     portion. Null when the catalog or the recipe says no amount, or the two do not meet."""
@@ -60,6 +63,8 @@ class DinnerOut(RecipeOut):
     on_sale: bool
     """The main protein (or, without meat or fish, a main vegetable) is discounted this week."""
     discounts: list[DiscountOut]
+    saving: float
+    """Kroner off for what the recipe needs, the discounts' saving summed: the order and the floor go by it."""
     per_person: float | None = None
     """Kroner a head, the discounts with a per_person summed; null when none has one."""
     pricing: Pricing | None = None
@@ -192,6 +197,7 @@ def dinner(d: Dinner, rank: int, matched: tuple[str, ...] = ()) -> DinnerOut:
             before=sale.pre_price,
             discount_percent=round(sale.discount * 100),
             valid_until=sale.valid_until,
+            saving=round(b.saving, 2),
             per_person=_kroner(b.per_person),
             pricing=b.pricing,
         )
@@ -203,6 +209,7 @@ def dinner(d: Dinner, rank: int, matched: tuple[str, ...] = ()) -> DinnerOut:
         rank=rank,
         on_sale=d.on_sale,
         discounts=discounts,
+        saving=round(d.saving, 2),
         per_person=_kroner(d.per_person),
         pricing=d.pricing,
         matched=list(matched),

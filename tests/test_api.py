@@ -33,10 +33,11 @@ def test_dinners() -> None:
         "before": 135.0,
         "discount_percent": 27,
         "valid_until": "2026-10-18",
+        "saving": 36.0,  # 600 g for four fills one 700 g pack
         "per_person": 7.71,  # 36 kr on 700 g, 150 g a portion
         "pricing": "direct",
     }
-    assert (chicken["per_person"], chicken["pricing"]) == (7.71, "direct")
+    assert (chicken["saving"], chicken["per_person"], chicken["pricing"]) == (36.0, 7.71, "direct")  # its one discount
     salmon = next(d for d in body["dinners"] if d["name"] == "Laks i ovn")
     assert (salmon["per_person"], salmon["pricing"]) == (0.83, "indirect")  # 25 kr on a 1 to 2 kg bag at its midpoint, 50 g a portion
 

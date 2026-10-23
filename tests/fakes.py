@@ -125,7 +125,8 @@ def offer(
 SIDE = ingredient("potet", 200, "g", "/poteter")
 """A side on sale (SIDE_OFFER, 25 kr off; SIDE_MATCH): the site only shows dinners that save core.ranking.FLOOR_KR
 (app.queries), and 50 g per portion is too little to make a dinner without meat or fish «på tilbud»."""
-SIDE_OFFER = offer("POTETER", 20, pre_price=45, id="potet")
+SIDE_OFFER = offer("POTETER", 20, pre_price=45, id="potet", size=1000, size_to=2000, unit="g")
+"""A bag of 1 to 2 kg: a line through it is indirect pricing, the midpoint (core.units)."""
 SIDE_MATCH = {"potet": ["potet"]}
 
 

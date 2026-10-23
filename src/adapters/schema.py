@@ -16,7 +16,7 @@ from pydantic import BaseModel, ConfigDict
 
 from app.queries import Check, Found, Queries
 from core.matching import main_protein
-from core.models import Dinner, Dish
+from core.models import Dinner, Dish, Pricing
 from core.search import Clause, Diet, Search, diet_clause
 
 
@@ -35,6 +35,12 @@ class DiscountOut(Out):
     """Kroner before the offer."""
     discount_percent: int
     valid_until: date
+    per_person: float | None = None
+    """Kroner a head on this ingredient: the saving per unit of what the price buys, times the recipe's amount per
+    portion. Null when the catalog or the recipe says no amount, or the two do not meet."""
+    pricing: Pricing | None = None
+    """How per_person was worked out: direct is straight math from the recipe's amount and the pack size; indirect went
+    through an estimate (a piece weight, a solid by volume at a gram a ml, the midpoint of a size range)."""
 
 
 class RecipeOut(Out):
@@ -54,6 +60,10 @@ class DinnerOut(RecipeOut):
     on_sale: bool
     """The main protein (or, without meat or fish, a main vegetable) is discounted this week."""
     discounts: list[DiscountOut]
+    per_person: float | None = None
+    """Kroner a head, the discounts with a per_person summed; null when none has one."""
+    pricing: Pricing | None = None
+    """indirect as soon as one discount's is; direct when every one is."""
     matched: list[str] = []
     """Ingredients that hold a searched word the dish name does not."""
 
@@ -182,6 +192,8 @@ def dinner(d: Dinner, rank: int, matched: tuple[str, ...] = ()) -> DinnerOut:
             before=sale.pre_price,
             discount_percent=round(sale.discount * 100),
             valid_until=sale.valid_until,
+            per_person=_kroner(b.per_person),
+            pricing=b.pricing,
         )
         for b in d.buys
         if (sale := b.sale) and sale.discount and sale.pre_price
@@ -191,8 +203,14 @@ def dinner(d: Dinner, rank: int, matched: tuple[str, ...] = ()) -> DinnerOut:
         rank=rank,
         on_sale=d.on_sale,
         discounts=discounts,
+        per_person=_kroner(d.per_person),
+        pricing=d.pricing,
         matched=list(matched),
     )
+
+
+def _kroner(value: float | None) -> float | None:
+    return None if value is None else round(value, 2)
 
 
 def _clause(c: Clause) -> ClauseOut:

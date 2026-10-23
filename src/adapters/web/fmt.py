@@ -2,7 +2,7 @@
 
 from datetime import date, datetime
 
-__all__ = ["dato", "kr", "spart", "tall"]
+__all__ = ["dato", "kr", "rundt", "spart", "tall"]
 
 NBSP = "\u00a0"
 MINUS = "\u2212"
@@ -23,6 +23,12 @@ def tall(value: int) -> str:
 def spart(value: float) -> str:
     """36.0 -> "-36 kr" with a real minus sign, for kroner off."""
     return MINUS + kr(value)
+
+
+def rundt(value: float) -> str:
+    """17.96 -> "18 kr", whole kroner, half up; under half a krone -> "under 1 kr". For the kroner a head."""
+    whole = int(value + 0.5)
+    return f"under 1{NBSP}kr" if whole == 0 else f"{whole:,}".replace(",", NBSP) + f"{NBSP}kr"
 
 
 def dato(value: date | datetime) -> str:

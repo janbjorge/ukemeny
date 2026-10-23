@@ -9,7 +9,10 @@
   <p>For hver ingrediens leter vi etter varer med samme ord i navnet («laks» finner LAKSEFILET), og en liten språkmodell
     avgjør om varen er den samme som ingrediensen. En vare er på tilbud når førprisen er høyere enn prisen nå.</p>
   <p>Bare middager der tilbudene sparer deg minst {{ floor_kr }} kroner til sammen vises. Kortet viser hvor mange kroner du
-    sparer, og under det hver vare med butikk og hvor mye den er satt ned. Beløpet er per pakke, ikke per porsjon.</p>
+    sparer, og under det hver vare med butikk og hvor mye den er satt ned. Beløpet er per pakke. Under det står hva det
+    blir per person: avslaget delt på det prisen gjelder for, ganget med det oppskriften bruker per porsjon. Står det
+    «ca.», har vi anslått noe på veien, som hva et stykke veier eller midten av et størrelsesspenn. Varer uten oppgitt
+    mengde teller ikke med der.</p>
   <p>Velger du kosthold eller allergier, vises bare middager som passer som de er. De som sparer mest kommer først, og så etter vurdering
     og tid. Øverst står noen middager av hver hovedråvare. Hovedråvaren er den tyngste kjøtt-, fisk- eller
     skalldyrsingrediensen, og uten kjøtt og fisk er middagen vegetar.</p>

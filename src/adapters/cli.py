@@ -19,7 +19,7 @@ from pydantic import BaseModel
 from adapters import profile, schema
 from adapters.datasets import DATASETS, JsonDatasets
 from app.queries import Queries
-from core.models import Dinner, Dish, Verdict
+from core.models import Dinner, Dish, Pricing, Verdict
 from core.search import Tag, fold, protein_word
 
 app = typer.Typer(
@@ -70,13 +70,22 @@ def _dish_line(dish: Dish, protein: str) -> str:
     return f"{dish.name} | {protein} | {dish.prep_time.replace('\N{EN DASH}', '-')}{rating}"  # matprat's "20-40 min" has an en dash
 
 
+def _a_head(kroner: float | None, pricing: Pricing | None) -> str:
+    """«, ca. 18 kr per person» for a line or a dinner with a figure (docs/plan-per-person.md), else nothing."""
+    if kroner is None:
+        return ""
+    return f", {'ca. ' if pricing is Pricing.INDIRECT else ''}{kroner:.2f} kr per person"
+
+
 def _dinner(n: int, d: Dinner) -> str:
     lines = [f"{n}. {_dish_line(d.dish, d.protein)}", f"   {d.dish.url}"]
+    if d.per_person is not None:
+        lines.append(f"   spart: {d.saving:.2f} kr{_a_head(d.per_person, d.pricing)}")
     for buy in d.buys:
         if (sale := buy.sale) and sale.discount and sale.pre_price:
             lines.append(
                 f"   på tilbud: {buy.part.name} -{sale.discount:.0%} hos {sale.store} ({sale.heading}, "
-                f"{sale.price:.2f} kr, før {sale.pre_price:.2f}, til {sale.valid_until:%d.%m})"
+                f"{sale.price:.2f} kr, før {sale.pre_price:.2f}, til {sale.valid_until:%d.%m}{_a_head(buy.per_person, buy.pricing)})"
             )
     return "\n".join(lines + _verdict_lines(d.verdict))
 

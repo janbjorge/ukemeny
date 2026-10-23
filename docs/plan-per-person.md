@@ -324,8 +324,11 @@ the pack size, the recipe's amount and the portions are read, not guessed.
 
 ### 5. Shown (web, API, CLI, docs)
 
-- [ ] The card line; `DiscountOut.per_person` and `pricing`, `DinnerOut.per_person` and `pricing`; the CLI line; /om
-      and llms.txt; FACTS.md §4, METHOD.md §4 and §5. A look at the cards in WebKit; the push with jb's OK.
+- [x] The card line (`.head`, whole kroner, «ca.» when indirect); `DiscountOut.per_person` and `pricing`,
+      `DinnerOut.per_person` and `pricing`; the CLI's «spart … kr per person»; /om and llms.txt; FACTS.md §1 and §4,
+      METHOD.md §4 and §6. A look at the front page with this week's data (2026-10-24): 84 of the first 100 cards have
+      a line, 15 of them «ca.»; «Innbakt biff» says «ca. 2 kr» until the biff's piece weight is in.
+- [ ] The push with jb's OK.
 - [ ] The build prints the 20 largest per-person lines of the week with their pricing.
 
 ### 6. Piece weights (vocabulary)

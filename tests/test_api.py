@@ -33,6 +33,8 @@ def test_dinners() -> None:
         "before": 135.0,
         "discount_percent": 27,
         "valid_until": "2026-10-18",
+        "fit": "exact",
+        "counted": True,
     }
 
 

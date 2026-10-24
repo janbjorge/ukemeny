@@ -1,3 +1,4 @@
+from dataclasses import replace
 from pathlib import Path
 
 from adapters.datasets import JsonDatasets, write
@@ -18,6 +19,7 @@ def test_snapshot_round_trip(tmp_path: Path) -> None:
         places={"Bergen": ["kiwi-vest", "rema"], "Stavanger": ["kiwi-vest"]},
     )
     assert s.served  # kyllingfilet is meat: matched per dinner
+    s = replace(s, near={"hvetemel": ("a",)}, near_served={s.dishes[0].url: {"bacon": ("a",)}})
     assert s.dishes[0].parts[2].form == "røkt"
     sizes = write(s, tmp_path)
     assert set(sizes) == {"dishes.json", "traits.json", "offers.json"}

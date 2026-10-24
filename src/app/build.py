@@ -18,14 +18,11 @@ from datetime import UTC, datetime
 from core.dishes import dish
 from core.errors import SourceUnavailableError
 from core.matching import CATEGORIES, candidates, not_an_ingredient, per_dinner, weight, words
-from core.models import Dish, Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
+from core.models import Dish, Fit, Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
 from core.ports import CategoryClassifier, IngredientClassifier, OfferMatcher, OfferSource, RecipeSource
 
 log = logging.getLogger("matris.build")
 """-v (info): failures and totals. -vv (debug): what each page, ingredient and offer became."""
-
-MATCH_THRESHOLD = 0.5
-"""An offer counts as the ingredient from this probability on."""
 
 EXAMPLES = 12
 """Names per category the category classifier is shown: those the dinners use most. 30 did no better (METHOD.md §2)."""
@@ -148,13 +145,29 @@ def filed(dinners: Iterable[Recipe], vocabulary: Mapping[str, Traits]) -> list[R
 
 @dataclass(frozen=True, slots=True)
 class Question:
-    """One request to the offer matcher: a product and the offers that could be it, and for meat, fish and shellfish
-    (core.matching.per_dinner) the form the recipe asks for and the dinner."""
+    """One request to the offer matcher: a product, its category and the offers that could be it, and for meat, fish and
+    shellfish (core.matching.per_dinner) the form the recipe asks for and the dinner."""
 
     product: str
     offers: tuple[Offer, ...]
     form: str = ""
     dish: str = ""
+    category: str = ""
+
+
+type ByName = dict[str, tuple[str, ...]]
+type ByDinner = dict[str, dict[str, tuple[str, ...]]]
+
+
+@dataclass(frozen=True, slots=True)
+class Matched:
+    """The offer ids per ingredient name and per dinner, as Snapshot has them: `matches` and `served` the exact
+    offers, `near` and `near_served` those a cook could use instead (Fit)."""
+
+    matches: ByName
+    served: ByDinner
+    near: ByName
+    near_served: ByDinner
 
 
 async def match(
@@ -162,16 +175,17 @@ async def match(
     offers: Sequence[Offer],
     matcher: OfferMatcher,
     vocabulary: Mapping[str, Traits],
-    threshold: float = MATCH_THRESHOLD,
     progress: Callable[[int, int], None] | None = None,
-) -> tuple[dict[str, tuple[str, ...]], dict[str, dict[str, tuple[str, ...]]]]:
+) -> Matched:
     """The ids of the offers a cook can buy as each ingredient that matters for the shop: per name, and for meat, fish and
-    shellfish per dinner (Snapshot.matches, Snapshot.served). A question is about the product a name stands for in the
-    vocabulary (Traits.product; the name itself until set), so two names of one product are asked once and both written;
-    for meat, fish and shellfish it carries the form the recipe line asks for (Part.form) and the dinner (METHOD.md §2).
-    Only discounted offers are asked about, since nothing else reaches a card (jb 2026-10-22: "make sure that we do not
-    waaste effort on dishes that do not have any discounts"), so a dinner without one costs nothing. Snacks and pålegg are
-    left out without asking (core.matching.not_an_ingredient)."""
+    shellfish per dinner (Snapshot.matches, Snapshot.served), and apart from them the ones to use instead (Snapshot.near,
+    Snapshot.near_served; jb 2026-10-24: "In cases where we cant match 'perfetct' lets list all of them"). A question is
+    about the product a name stands for in the vocabulary (Traits.product; the name itself until set), filed under the
+    name's category, so two names of one product are asked once and both written; for meat, fish and shellfish it
+    carries the form the recipe line asks for (Part.form) and the dinner (METHOD.md §2). Only discounted offers are
+    asked about, since nothing else reaches a card (jb 2026-10-22: "make sure that we do not waaste effort on dishes that
+    do not have any discounts"), so a dinner without one costs nothing. Snacks and pålegg are left out without asking
+    (core.matching.not_an_ingredient)."""
     on_sale = [o for o in offers if o.saving]
     found: dict[str, tuple[Offer, ...]] = {}
 
@@ -193,10 +207,10 @@ async def match(
             if not weight(part) or not (maybe := could_be(product)):
                 continue
             if per_dinner(part):
-                by_dinner.setdefault((d.url, product), Question(product, maybe, part.form, d.name))
+                by_dinner.setdefault((d.url, product), Question(product, maybe, part.form, d.name, part.category))
                 dinner_names.setdefault((d.url, product), set()).add(part.name)
             else:
-                by_product.setdefault(product, Question(product, maybe))
+                by_product.setdefault(product, Question(product, maybe, category=part.category))
                 names.setdefault(product, set()).add(part.name)
     due = len(by_product) + len(by_dinner)
     log.info(
@@ -210,18 +224,19 @@ async def match(
     if progress:
         progress(done, due)
 
-    async def ask(q: Question) -> tuple[str, ...]:
+    async def ask(q: Question) -> dict[Fit, tuple[str, ...]]:
         nonlocal done
-        ranked = await matcher.rank(q.product, q.offers, q.form, q.dish)
-        ids = tuple(o.id for o in q.offers if ranked.get(o.id, 0.0) >= threshold)
+        fits = await matcher.fit(q.product, q.offers, q.form, q.dish, q.category)
+        ids = {fit: tuple(o.id for o in q.offers if fits.get(o.id) is fit) for fit in Fit}
         log.debug(
-            "%s%s%s: %d of %d offers match %s",
+            "%s%s%s: %d exact and %d near of %d offers %s",
             q.product,
             f" ({q.form})" if q.form else "",
             f" in {q.dish}" if q.dish else "",
-            len(ids),
+            len(ids[Fit.EXACT]),
+            len(ids[Fit.NEAR]),
             len(q.offers),
-            sorted({o.heading for o in q.offers if o.id in ids}),
+            sorted({f"{o.heading} ({fit})" for o in q.offers if (fit := fits.get(o.id))}),
         )
         done += 1
         if progress:
@@ -231,12 +246,18 @@ async def match(
     async with asyncio.TaskGroup() as tg:
         products = {product: tg.create_task(ask(q)) for product, q in by_product.items()}
         served = {key: tg.create_task(ask(q)) for key, q in by_dinner.items()}
-    matched = {name: ids for product, task in products.items() if (ids := task.result()) for name in names[product]}
-    per_dish: dict[str, dict[str, tuple[str, ...]]] = {}
-    for (url, product), task in sorted(served.items()):
-        if ids := task.result():
-            per_dish.setdefault(url, {}).update(dict.fromkeys(sorted(dinner_names[url, product]), ids))
-    return dict(sorted(matched.items())), per_dish
+
+    def by_name(fit: Fit) -> ByName:
+        return dict(sorted((name, ids) for product, task in products.items() if (ids := task.result()[fit]) for name in names[product]))
+
+    def per_dish(fit: Fit) -> ByDinner:
+        kept: ByDinner = {}
+        for (url, product), task in sorted(served.items()):
+            if ids := task.result()[fit]:
+                kept.setdefault(url, {}).update(dict.fromkeys(sorted(dinner_names[url, product]), ids))
+        return kept
+
+    return Matched(by_name(Fit.EXACT), per_dish(Fit.EXACT), by_name(Fit.NEAR), per_dish(Fit.NEAR))
 
 
 async def snapshot(
@@ -280,12 +301,14 @@ async def reprice(base: Snapshot, offers: OfferSource, matcher: OfferMatcher, pr
     if progress:
         progress("catalogs", 1, 1)
     step = (lambda done, due: progress("offers", done, due)) if progress else None
-    matched, served = await match(base.dishes, current.offers, matcher, base.traits, progress=step)
+    matched = await match(base.dishes, current.offers, matcher, base.traits, progress=step)
     return replace(
         base,
         built=datetime.now(UTC),
         offers=tuple(sorted(current.offers, key=lambda o: (o.store, o.heading, o.id))),
-        matches=matched,
+        matches=matched.matches,
         places={place: tuple(sorted(catalogs)) for place, catalogs in sorted(current.places.items())},
-        served=served,
+        served=matched.served,
+        near=matched.near,
+        near_served=matched.near_served,
     )

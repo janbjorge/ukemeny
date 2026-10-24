@@ -1,5 +1,7 @@
 """The site: pages, the HTMX fragment and its no-JS fallback, headers."""
 
+from dataclasses import replace
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -13,6 +15,10 @@ SALMON = ingredient("laksefilet", 600, "g", "/fisk og sjømat")
 COD = ingredient("torskefilet", 600, "g", "/fisk og sjømat")
 ONION = ingredient("løk", 1, "stk.", "/grønnsaker")
 HX = {"HX-Request": "true"}
+KIWI_ROW = (
+    '<span class="what">kyllingfilet</span><span class="store">KIWI</span><span class="lead"></span><span class="price">99\u00a0kr</span>'
+)
+"""The chicken offer's row on a card: its store and price."""
 GO = ' hx-trigger="mousedown, click" hx-sync="this:drop"'
 """What a search link carries besides its hx-get: it starts on mouse-down."""
 
@@ -36,8 +42,8 @@ def test_front_page_is_the_search_with_no_rules_until_picked(client: TestClient)
     assert "<h1>Finn en middag</h1>" in html
     assert 'id="uka"' not in html and "Nye middager" not in html  # no week on the page (jb 2026-10-14)
     assert all(n in html for n in ("Kyllinggryte", "Laks i ovn", "Torsk med bacon"))  # the list leaves nothing out
-    assert '<span class="sum">\u221261\u00a0kr</span></p>' in html and "varer</span>" not in html  # 135 to 99 kr, 45 to 20 kr
-    assert 'kyllingfilet</span><span class="store">KIWI</span><span class="lead"></span><span class="off">\u221236\u00a0kr</span>' in html
+    assert '<span class="sum">\u221261\u00a0kr</span>' in html and "varer</span>" not in html  # 135 to 99 kr, 45 to 20 kr
+    assert KIWI_ROW in html
     assert "%" not in html[html.index('class="cards"') :]  # no percent (jb 2026-10-22)
     assert "Bytt:" not in html and "Glutenfritt" not in html  # no rules on the page until a visitor picks them
     for gone in ("ting å sjekke", "Også på tilbud", "Prøv for eksempel", "Søker etter", "Uten bytter"):
@@ -56,12 +62,36 @@ def test_cards_are_calm(client: TestClient) -> None:
     assert "Sterk" not in page
 
 
+def test_a_card_lists_every_offer_and_sums_the_most_kroner_off() -> None:
+    mince = ingredient("kjøttdeig av svin", 400, "g", "/kjøtt/svinekjøtt")
+    pork = recipe("Svinekjøttboller", mince)
+    offers = [
+        offer("SVINEKJØTTDEIG", 40, pre_price=70, id="rema", store="REMA 1000"),
+        offer("SVINEKJØTTDEIG", 40, pre_price=65, id="kiwi", store="KIWI"),
+        offer("Kjøttdeig av storfe&svin", 50, pre_price=74.9, id="mix", store="MENY"),
+    ]
+    s = replace(
+        snapshot(pork, offers=offers),
+        served={pork.url: {mince.name: ("rema", "kiwi")}},
+        near_served={pork.url: {mince.name: ("mix",)}},
+    )
+    html = TestClient(main.create_app(Queries(FakeDatasets(s)))).get("/").text
+    cards = html[html.index('class="cards"') :]
+    assert '<span class="sum">\u221230\u00a0kr</span>' in cards  # REMA's, the most kroner off
+    # Several offers: the name on its own line and every offer under it, the most kroner off first (jb 2026-10-24)
+    rows = cards[cards.index("<ul>", cards.index('class="save"')) : cards.index("</ul>")]
+    assert '<li class="item"><span class="what">kjøttdeig av svin</span></li>' in rows
+    rema, kiwi, meny = (rows.index(f'">{store}</span>') for store in ("REMA 1000", "KIWI", "≈ MENY"))
+    assert rema < kiwi < meny  # The offer to use instead is marked
+    assert '<span class="price">40\u00a0kr</span><span class="off">\u221230\u00a0kr</span>' in rows
+
+
 def test_an_old_sort_link_still_opens(client: TestClient) -> None:
     r = client.get("/middager?q=kylling&sorter=kroner", headers=HX)
     assert r.headers["HX-Replace-Url"] == "/?q=kylling#forslag"  # «Sorter» is gone (jb 2026-10-22)
     ideas = r.text
     assert '<span class="sum">\u221261\u00a0kr</span>' in ideas
-    assert '<span class="off">\u221236\u00a0kr</span>' in ideas and '<span class="off">\u221225\u00a0kr</span>' in ideas
+    assert KIWI_ROW in ideas
 
 
 def test_fragment_filters_and_falls_back_to_the_page(client: TestClient) -> None:

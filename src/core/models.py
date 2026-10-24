@@ -270,6 +270,15 @@ class Offer:
         return self.per_kg if self.per_kg is not None else self.price
 
 
+class Fit(StrEnum):
+    """How well an offer is an ingredient (core.ports.OfferMatcher)."""
+
+    EXACT = "exact"
+    """The kind the recipe names: «COOP KJØTTDEIG» for kjøttdeig."""
+    NEAR = "near"
+    """Another or a mixed kind a cook could use instead: «Kjøttdeig av storfe&svin» for kjøttdeig av svin."""
+
+
 @dataclass(frozen=True, slots=True)
 class Offers:
     """This week's offers, and the catalogs of the stores near each place."""
@@ -342,19 +351,37 @@ class Buy:
 
     part: Part
     offers: tuple[Offer, ...]
-    """Cheapest per kg first."""
+    """The offers that are the ingredient (Fit.EXACT), cheapest per kg first."""
     weight: float
     """How much a deal on it counts for the dinner (core.matching.weight)."""
+    near: tuple[Offer, ...] = ()
+    """The offers a cook could use instead (Fit.NEAR), cheapest per kg first."""
 
     @property
     def best(self) -> Offer:
-        return self.offers[0]
+        return (self.offers or self.near)[0]
 
     @property
     def sale(self) -> Offer | None:
-        """The offer with the biggest discount, if any is discounted."""
-        discounted = [o for o in self.offers if o.discount]
-        return max(discounted, key=lambda o: o.discount or 0.0) if discounted else None
+        """The offer the dinner's saving counts: the most kroner off among the exact offers on sale, or, with none, among
+        the near ones. The card shows kroner off, so its row is the biggest (jb 2026-10-24: the fewest, Obs's 5 kr on
+        karbonader, was "wrong", and the cheapest pack, SPAR's 23,90 kr off "while joker is at 39,10", still was)."""
+        for offers in (self.offers, self.near):
+            if discounted := [o for o in offers if o.saving]:
+                return min(discounted, key=lambda o: (-(o.saving or 0.0), o.store))
+        return None
+
+    @property
+    def sales(self) -> tuple[Offer, ...]:
+        """Every offer on sale, exact and near, the most kroner off first, then store: what the card lists (jb
+        2026-10-24: "Show all"). One offer in many catalogs (Obs has one per store) is listed once, as `sale` when it
+        is that one."""
+        sale = self.sale
+        kept: dict[tuple[str, str, float, float | None], Offer] = {}
+        for o in (*self.offers, *self.near):
+            if o.saving and ((key := (o.store, o.heading, o.price, o.pre_price)) not in kept or o == sale):
+                kept[key] = o
+        return tuple(sorted(kept.values(), key=lambda o: (-(o.saving or 0.0), o.store)))
 
 
 MAIN_WEIGHT = 1.0
@@ -448,3 +475,7 @@ class Snapshot:
     served: Mapping[str, Mapping[str, tuple[str, ...]]] = field(default_factory=dict)
     """Per dinner (Dish.url), per meat, fish or shellfish ingredient, the ids of the discounted offers a cook can buy
     as it for that dinner (core.matching.per_dinner)."""
+    near: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    """As `matches`, the offers a cook could use instead (Fit.NEAR)."""
+    near_served: Mapping[str, Mapping[str, tuple[str, ...]]] = field(default_factory=dict)
+    """As `served`, the offers a cook could use instead (Fit.NEAR)."""

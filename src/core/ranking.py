@@ -2,7 +2,7 @@
 
 from collections import Counter
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 
 from core.diet import carbs, fodmap_out, judge
 from core.matching import cheapest_first, main_protein, per_dinner, weight
@@ -38,11 +38,15 @@ class Shelf:
     by_name: Mapping[str, tuple[Offer, ...]]
     by_dinner: Mapping[str, Mapping[str, tuple[Offer, ...]]]
     """Per Dish.url, for meat, fish and shellfish (core.matching.per_dinner)."""
+    near_by_name: Mapping[str, tuple[Offer, ...]] = field(default_factory=dict)
+    near_by_dinner: Mapping[str, Mapping[str, tuple[Offer, ...]]] = field(default_factory=dict)
+    """As `by_name` and `by_dinner`, the offers a cook could use instead (Fit.NEAR)."""
 
-    def get(self, dish: Dish, part: Part) -> tuple[Offer, ...]:
+    def get(self, dish: Dish, part: Part) -> tuple[tuple[Offer, ...], tuple[Offer, ...]]:
+        """The exact offers, then the near ones."""
         if per_dinner(part):
-            return self.by_dinner.get(dish.url, {}).get(part.name, ())
-        return self.by_name.get(part.name, ())
+            return self.by_dinner.get(dish.url, {}).get(part.name, ()), self.near_by_dinner.get(dish.url, {}).get(part.name, ())
+        return self.by_name.get(part.name, ()), self.near_by_name.get(part.name, ())
 
 
 def buys(dish: Dish, shelf: Shelf) -> tuple[Buy, ...]:
@@ -50,9 +54,10 @@ def buys(dish: Dish, shelf: Shelf) -> tuple[Buy, ...]:
     seen: set[str] = set()
     found = []
     for part in dish.parts:
-        if part.name not in seen and weight(part) and (offers := shelf.get(dish, part)):
+        exact, near = shelf.get(dish, part)
+        if part.name not in seen and weight(part) and (exact or near):
             seen.add(part.name)
-            found.append(Buy(part, offers, weight(part)))
+            found.append(Buy(part, exact, weight(part), near))
     return tuple(sorted(found, key=lambda b: b.weight, reverse=True))
 
 
@@ -94,7 +99,12 @@ def offered(snapshot: Snapshot, place: str | None = None) -> Shelf:
     def shelf(matches: Mapping[str, tuple[str, ...]]) -> dict[str, tuple[Offer, ...]]:
         return {name: cheapest_first([by_id[i] for i in ids if i in by_id]) for name, ids in matches.items()}
 
-    return Shelf(shelf(snapshot.matches), {url: shelf(matches) for url, matches in snapshot.served.items()})
+    return Shelf(
+        shelf(snapshot.matches),
+        {url: shelf(matches) for url, matches in snapshot.served.items()},
+        shelf(snapshot.near),
+        {url: shelf(matches) for url, matches in snapshot.near_served.items()},
+    )
 
 
 def prepare(snapshot: Snapshot) -> tuple[Prepared, ...]:

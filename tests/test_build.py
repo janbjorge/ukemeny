@@ -107,9 +107,10 @@ async def test_meat_and_fish_are_asked_about_per_dinner_and_the_rest_by_name() -
         offer("TOMATER", 20, pre_price=30, id="tomat"),
     ]
     matcher = FakeMatcher({"tunfisk": "tunfisk", "tomat": "tomat"}, wrong={"Nigiri": "boks"})
-    matched, served = await build.match([dish(r) for r in (raw, salad, soup)], offers, matcher, {})
-    assert matched == {"tomat": ("tomat",)}
-    assert served == {salad.url: {"tunfisk": ("tin",)}}  # The tin is no tuna for nigiri
+    found = await build.match([dish(r) for r in (raw, salad, soup)], offers, matcher, {})
+    assert found.matches == {"tomat": ("tomat",)}
+    assert found.served == {salad.url: {"tunfisk": ("tin",)}}  # The tin is no tuna for nigiri
+    assert matcher.categories == {"tomat": "/grønnsaker", "tunfisk": "/fisk og sjømat"}
     # Meat and fish with the form the line asks for («1 boks tunfisk») and the dinner; the rest by name
     assert sorted(matcher.asked) == [("tomat", 1, "", ""), ("tunfisk", 1, "", "Nigiri"), ("tunfisk", 1, "hermetisk", "Tunfisksalat")]
 
@@ -119,16 +120,28 @@ async def test_two_names_of_one_product_are_asked_once_and_both_written() -> Non
     cherry = ingredient("cherrytomater", 200, "g", "/grønnsaker")
     vocabulary = {"tomater": traits(product="tomat"), "cherrytomater": traits(product="tomat"), "tomat": traits()}
     matcher = FakeMatcher({"tomat": "tomat"})
-    matched, _ = await build.match(
-        [dish(recipe("Salat", tomatoes, cherry))], [offer("TOMATER", 20, pre_price=30, id="t")], matcher, vocabulary
-    )
-    assert matched == {"cherrytomater": ("t",), "tomater": ("t",)}
+    found = await build.match([dish(recipe("Salat", tomatoes, cherry))], [offer("TOMATER", 20, pre_price=30, id="t")], matcher, vocabulary)
+    assert found.matches == {"cherrytomater": ("t",), "tomater": ("t",)}
     assert matcher.asked == [("tomat", 1, "", "")]
+
+
+async def test_offers_to_use_instead_are_kept_apart_from_the_exact_ones() -> None:
+    pork = recipe("Svinekjøttboller", ingredient("kjøttdeig av svin", 400, "g", "/kjøtt/svinekjøtt"))
+    offers = [
+        offer("COOP KJØTTDEIG", 59.9, pre_price=85.9, id="beef"),
+        offer("Kjøttdeig av storfe&svin", 50, pre_price=74.9, id="mix"),
+        offer("SVINEKJØTTDEIG", 30, pre_price=40, id="pork"),
+    ]
+    matcher = FakeMatcher({"kjøttdeig av svin": "svinekjøttdeig"}, near={"kjøttdeig av svin": "storfe&svin"})
+    found = await build.match([dish(pork)], offers, matcher, {})
+    assert found.served == {pork.url: {"kjøttdeig av svin": ("pork",)}}
+    assert found.near_served == {pork.url: {"kjøttdeig av svin": ("mix",)}}
+    assert found.matches == found.near == {}
 
 
 async def test_a_dinner_without_a_discount_costs_nothing() -> None:
     matcher = FakeMatcher({"kyllingfilet": "kylling"})
-    assert await build.match([dish(DINNER)], [offer("KYLLINGBRYST", 99, id="bryst")], matcher, {}) == ({}, {})
+    assert await build.match([dish(DINNER)], [offer("KYLLINGBRYST", 99, id="bryst")], matcher, {}) == build.Matched({}, {}, {}, {})
     assert matcher.asked == []
 
 

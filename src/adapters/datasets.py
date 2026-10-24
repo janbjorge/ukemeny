@@ -72,6 +72,10 @@ class JsonDatasets:
             matches={intern(name): tuple(ids) for name, ids in offers["matches"].items()},
             places={place: tuple(ids) for place, ids in offers.get("places", {}).items()},
             served={url: {intern(name): tuple(ids) for name, ids in found.items()} for url, found in offers.get("served", {}).items()},
+            near={intern(name): tuple(ids) for name, ids in offers.get("near", {}).items()},
+            near_served={
+                url: {intern(name): tuple(ids) for name, ids in found.items()} for url, found in offers.get("near_served", {}).items()
+            },
         )
 
     def snapshot(self) -> Snapshot:
@@ -90,6 +94,8 @@ def write(snapshot: Snapshot, root: Path = DATASETS) -> dict[str, int]:
             "matches": {name: list(ids) for name, ids in snapshot.matches.items()},
             "places": {place: list(ids) for place, ids in snapshot.places.items()},
             "served": {url: {name: list(ids) for name, ids in found.items()} for url, found in snapshot.served.items()},
+            "near": {name: list(ids) for name, ids in snapshot.near.items()},
+            "near_served": {url: {name: list(ids) for name, ids in found.items()} for url, found in snapshot.near_served.items()},
         },
     }
     sizes = {}

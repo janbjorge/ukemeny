@@ -6,14 +6,13 @@ from typesafe_sdk import (
     Choice,
     ChoiceAnswer,
     JSONContent,
-    NoulAnswer,
     SystemOneResponse,
     TypeSafeAPIConnectionError,
     Usage,
 )
 
 from core.errors import ClassifierUnavailableError
-from core.models import LABELS, Carbs, Fodmap, Gluten, Kids, Lactose, Level, Onion, Pregnancy, Traits
+from core.models import LABELS, Carbs, Fit, Fodmap, Gluten, Kids, Lactose, Level, Onion, Pregnancy, Traits
 from pipeline.jev import (
     AS_NAMED,
     QUESTIONS_PER_CALL,
@@ -55,17 +54,17 @@ class FakeClient:
 
 
 @dataclass
-class FakeNoulClient:
-    """Answers each yes/no question by name; unnamed questions get 0."""
+class FakeOfferClient:
+    """Answers each offer question by name; unnamed questions get «no»."""
 
-    answers: Mapping[str, float]
+    answers: Mapping[str, Mapping[str, float]]
     calls: list[tuple[JSONContent, Mapping[str, Question]]] = field(default_factory=list)
 
     async def system_one(self, state: JSONContent, questions: Mapping[str, Question]) -> SystemOneResponse:
         self.calls.append((state, questions))
         return SystemOneResponse(
             model="jev-1.13.0",
-            answers={name: NoulAnswer(noul=self.answers.get(name, 0.0)) for name in questions},
+            answers={name: choice(self.answers.get(name, {"no": 1.0})) for name in questions},
             usage=Usage(input_tokens=100, output_tokens=0),
         )
 
@@ -186,36 +185,45 @@ async def test_category_is_the_likeliest_of_those_offered_and_only_the_name_is_s
     assert dict(question.criteria) == {"/fisk og sjømat": ["torskefilet", "laksefilet"], "/pasta/ris": ["jasminris"]}
 
 
-async def test_matcher_asks_once_per_heading_and_scores_each_offer() -> None:
+async def test_matcher_asks_once_per_heading_and_reads_exact_near_or_no() -> None:
     kiwi = offer("KYLLINGFILET", 99, store="KIWI")
     rema = offer("Kyllingfilet ", 109, store="REMA 1000")
+    thigh = offer("KYLLINGLÅR", 59)
     sausage = offer("KYLLINGPØLSER", 39)
-    client = FakeNoulClient({"0": 0.9, "1": 0.05})
-    scores = await JevOfferMatcher(Jev(client)).rank("kyllingfilet", [kiwi, rema, sausage])
-    assert scores == {kiwi.id: 0.9, rema.id: 0.9, sausage.id: 0.05}
+    client = FakeOfferClient(
+        {
+            "0": {"exact": 0.9, "near": 0.05, "no": 0.05},
+            "1": {"exact": 0.3, "near": 0.4, "no": 0.3},  # Together likely: near
+            "2": {"exact": 0.1, "near": 0.2, "no": 0.7},
+        }
+    )
+    fits = await JevOfferMatcher(Jev(client)).fit("kyllingfilet", [kiwi, rema, thigh, sausage], category="/kjøtt/kylling/høns")
+    assert fits == {kiwi.id: Fit.EXACT, rema.id: Fit.EXACT, thigh.id: Fit.NEAR}
     state, questions = client.calls[0]
-    assert state == {"ingredient": "kyllingfilet"}
-    assert set(questions) == {"0", "1"}
-    assert "KYLLINGPØLSER" in str(questions["1"].instructions)
+    assert state == {"ingredient": "kyllingfilet", "category": "/kjøtt/kylling/høns"}
+    assert set(questions) == {"0", "1", "2"}
+    question = questions["2"]
+    assert isinstance(question, Choice) and set(question.criteria) == {"exact", "near", "no"}
+    assert "KYLLINGPØLSER" in str(question.instructions)
 
 
 async def test_matcher_asks_with_the_form_and_the_dinner() -> None:
     tin = offer("Tunfisk", 15, store="MENY")
-    client = FakeNoulClient({"0": 0.1})
-    await JevOfferMatcher(Jev(client)).rank("tunfisk", [tin], "", "Hjemmelaget nigiri sushi")
+    client = FakeOfferClient({})
+    assert await JevOfferMatcher(Jev(client)).fit("tunfisk", [tin], "", "Hjemmelaget nigiri sushi", "/fisk og sjømat") == {}
     state, questions = client.calls[0]
-    assert state == {"ingredient": "tunfisk", "form": AS_NAMED, "dish": "Hjemmelaget nigiri sushi"}
+    assert state == {"ingredient": "tunfisk", "category": "/fisk og sjømat", "form": AS_NAMED, "dish": "Hjemmelaget nigiri sushi"}
     assert "`form`" in str(questions["0"].instructions) and "canned" in str(questions["0"].criteria)
-    await JevOfferMatcher(Jev(client)).rank("tunfisk", [tin], "hermetisk", "Tunfisksalat")
-    assert client.calls[1][0] == {"ingredient": "tunfisk", "form": "hermetisk", "dish": "Tunfisksalat"}
+    await JevOfferMatcher(Jev(client)).fit("tunfisk", [tin], "hermetisk", "Tunfisksalat", "/fisk og sjømat")
+    assert client.calls[1][0] == {"ingredient": "tunfisk", "category": "/fisk og sjømat", "form": "hermetisk", "dish": "Tunfisksalat"}
 
 
 async def test_matcher_splits_long_lists() -> None:
     many = [offer(f"KYLLING {i}") for i in range(QUESTIONS_PER_CALL + 1)]
-    client = FakeNoulClient({str(i): 0.5 for i in range(QUESTIONS_PER_CALL)})
-    scores = await JevOfferMatcher(Jev(client)).rank("kyllingfilet", many)
+    client = FakeOfferClient({str(i): {"exact": 0.6, "no": 0.4} for i in range(QUESTIONS_PER_CALL)})
+    fits = await JevOfferMatcher(Jev(client)).fit("kyllingfilet", many)
     assert len(client.calls) == 2
-    assert len(scores) == QUESTIONS_PER_CALL + 1
+    assert len(fits) == QUESTIONS_PER_CALL + 1
 
 
 async def test_errors_become_classifier_unavailable() -> None:

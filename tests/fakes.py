@@ -10,6 +10,7 @@ from core.matching import per_dinner
 from core.models import (
     LABELS,
     Carbs,
+    Fit,
     Fodmap,
     Gluten,
     Ingredient,
@@ -166,13 +167,26 @@ class FakeMatcher:
     matches: Mapping[str, str] = field(default_factory=dict)
     wrong: Mapping[str, str] = field(default_factory=dict)
     """Per dinner, a word in an offer's description that rules it out there: {"Nigiri": "boks"}."""
+    near: Mapping[str, str] = field(default_factory=dict)
+    """Per product, a word in the heading of an offer to use instead: {"kjøttdeig av svin": "storfe&svin"}."""
     asked: list[tuple[str, int, str, str]] = field(default_factory=list)
     """(product, offers, form, dinner) per request."""
+    categories: dict[str, str] = field(default_factory=dict)
+    """Per product, the category it was asked with."""
 
-    async def rank(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "") -> dict[str, float]:
+    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> dict[str, Fit]:
         self.asked.append((product, len(offers), form, dish))
-        word, bad = self.matches.get(product), self.wrong.get(dish)
-        return {o.id: float(bool(word and word in o.heading.lower() and not (bad and bad in o.description))) for o in offers}
+        self.categories[product] = category
+        word, bad, close = self.matches.get(product), self.wrong.get(dish), self.near.get(product)
+        fits = {}
+        for o in offers:
+            if bad and bad in o.description:
+                continue
+            if close and close in o.heading.lower():
+                fits[o.id] = Fit.NEAR
+            elif word and word in o.heading.lower():
+                fits[o.id] = Fit.EXACT
+        return fits
 
 
 @dataclass

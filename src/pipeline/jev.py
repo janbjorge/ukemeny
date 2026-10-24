@@ -19,7 +19,7 @@ import httpx2
 from typesafe_sdk import Choice, JSONContent, Noul, Score, SystemOneResponse, TypeSafeError
 
 from core.errors import ClassifierUnavailableError
-from core.models import Ingredient, Item, Offer
+from core.models import Fit, Ingredient, Item, Offer
 
 type Question = Noul | Choice | Score
 
@@ -434,49 +434,56 @@ AS_NAMED = "fresh or raw, as a recipe means by the name alone"
 """The form sent when the recipe line names none (Part.form "")."""
 
 
-def _offer_question(offer: Offer, dinner: bool) -> Noul:
+def _offer_question(offer: Offer, dinner: bool) -> Choice:
     where = ", in the form `form`, for the dinner `dish`" if dinner else ""
     wanted = "the form the dinner wants (`form`)" if dinner else "a form a recipe means by the name"
-    return Noul(
+    return Choice(
         instructions=f"Can a cook buy the grocery offer «{offer.heading}: {offer.description[:90]}» as the recipe ingredient "
-        f"`ingredient`{where}?",
+        f"`ingredient` (filed under `category`){where}?",
         criteria={
-            "true": f"Yes: it is that product, in any brand, size or cut that a recipe means by the name, and in {wanted}",
-            "false": "No: a different product or animal, a different cut or animal part, a ready meal, pålegg, snack or "
-            "sweet, or another form than wanted: canned, smoked, cured, salted, dried, marinated, breaded or "
-            "pre-cooked when fresh or raw is wanted, or the other way round",
+            "exact": f"Yes: it is that product and the kind of meat, fish or plant the ingredient names, in any brand, "
+            f"size or cut that a recipe means by the name, and in {wanted}. An offer that names no kind is the plain "
+            "one: «KJØTTDEIG» is beef mince, so it is kjøttdeig, not kjøttdeig av svin or av lam",
+            "near": f"Close: the same product of another or a mixed kind that a cook could use instead, in {wanted}: "
+            "«Kjøttdeig av storfe&svin» for kjøttdeig av svin or for kjøttdeig, «KYLLINGLÅR» for kyllingfilet",
+            "no": "No: a different product, a different cut or animal part no cook would use instead, a ready meal, "
+            "pålegg, snack or sweet, or another form than wanted: canned, smoked, cured, salted, dried, marinated, "
+            "breaded or pre-cooked when fresh or raw is wanted, or the other way round",
         },
     )
 
 
 @dataclass
 class JevOfferMatcher:
-    """Implements core.ports.OfferMatcher with one yes/no question per offer, all in one request.
+    """Implements core.ports.OfferMatcher with one question per offer, all in one request: exact, near or no, read
+    as the labels are (`_label`): exact when it is likely, near when exact and near together are.
 
     A single Choice over the offers split its probability between several right answers
     (KYLLINGFILET and KYLLINGBRYST) and dropped some. Questions that pointed at `offers[i]`
     in a list mixed offers up (KINDEREGG for "egg"). Each question carries its own offer.
     Offers with the same heading (one product at several chains) are asked about once. With a dinner, the form counts:
     the recipe line's word (røkt, hermetisk), or AS_NAMED when it says none, so King Oskar's tinned tuna is tunfisk in
-    a tunfisksalat («1 boks tunfisk»), not in nigiri.
+    a tunfisksalat («1 boks tunfisk»), not in nigiri. The category says what the name holds: «kjøttdeig av svin» is
+    under /kjøtt/svinekjøtt, and a yes/no question without it took «COOP KJØTTDEIG», beef, for it (2026-10-24).
     """
 
     jev: Jev
 
-    async def rank(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "") -> Mapping[str, float]:
+    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> Mapping[str, Fit]:
         groups: dict[str, list[Offer]] = {}
         for offer in offers:
             groups.setdefault(offer.heading.strip().upper(), []).append(offer)
         options = list(groups.values())
-        scores: dict[str, float] = {}
+        state: dict[str, JSONContent] = {"ingredient": product, "category": category}
+        if dish:
+            state |= {"form": form or AS_NAMED, "dish": dish}
+        fits: dict[str, Fit] = {}
         for start in range(0, len(options), QUESTIONS_PER_CALL):
             chunk = options[start : start + QUESTIONS_PER_CALL]
             response = await self.jev.ask(
-                "offer matcher",
-                {"ingredient": product, "form": form or AS_NAMED, "dish": dish} if dish else {"ingredient": product},
-                {str(i): _offer_question(group[0], bool(dish)) for i, group in enumerate(chunk)},
+                "offer matcher", state, {str(i): _offer_question(group[0], bool(dish)) for i, group in enumerate(chunk)}
             )
             for i, group in enumerate(chunk):
-                probability = response.nouls[str(i)].noul
-                scores.update((offer.id, probability) for offer in group)
-        return scores
+                if found := _label(response.choices[str(i)].probabilities, Fit.EXACT, Fit.NEAR):
+                    fits.update((offer.id, Fit(found)) for offer in group)
+        return fits

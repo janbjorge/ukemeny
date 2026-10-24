@@ -84,17 +84,24 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .card .protein::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--p); margin: 0 7px 1px 0; }
 .card .star { color: var(--star); }
 .card p { margin: 0; font-size: var(--t-small); }
-/* What you save: the sum in red, then each ingredient on sale with its store, dotted to its kroner off, as on a menu */
+/* What you save: the sum in red, then every offer of each ingredient on sale: its store, dotted to its price and kroner
+   off, as on a menu, the stores, prices and savings each in a column */
 .card .save { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--hairline); }
 .card .total { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px; }
 .card .total .sum { font-size: 26px; line-height: 1; font-weight: 650; letter-spacing: -0.01em; color: var(--save); }
-.card .save ul { list-style: none; margin: 0; padding: 0; font-size: var(--t-small); }
-.card .save li { display: flex; align-items: baseline; gap: 8px; padding: 2px 0; }
+.card .save ul {
+  list-style: none; margin: 0; padding: 0; font-size: var(--t-small);
+  display: grid; grid-template-columns: minmax(0, max-content) max-content minmax(12px, 1fr) max-content max-content; column-gap: 8px;
+}
+.card .save li { display: contents; }
+.card .save li > * { padding: 2px 0; align-self: baseline; }
+.card .save .item .what { grid-column: 1 / -1; }
 .card .save .what { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .card .save .what::first-letter { text-transform: uppercase; }
-.card .save .store { flex: none; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
-.card .save .lead { flex: 1; min-width: 12px; border-bottom: 1px dotted var(--hairline); }
-.card .save .off { flex: none; color: var(--text-primary); white-space: nowrap; }
+.card .save .store { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
+.card .save .lead { align-self: end; margin-bottom: 0.5em; padding: 0; border-bottom: 1px dotted var(--hairline); }
+.card .save .price { text-align: right; color: var(--text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.card .save .off { text-align: right; color: var(--save); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .card .via { color: var(--text-secondary); }
 
 /* Finn en middag: the title and search box on the paper, then the filter bar */

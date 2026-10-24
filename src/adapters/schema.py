@@ -16,7 +16,7 @@ from pydantic import BaseModel, ConfigDict
 
 from app.queries import Check, Found, Queries
 from core.matching import main_protein
-from core.models import Dinner, Dish
+from core.models import Dinner, Dish, Fit
 from core.search import Clause, Diet, Search, diet_clause
 
 
@@ -35,6 +35,10 @@ class DiscountOut(Out):
     """Kroner before the offer."""
     discount_percent: int
     valid_until: date
+    fit: Fit
+    """«exact»: the kind the recipe names; «near»: another or a mixed kind to use instead."""
+    counted: bool
+    """Whether the dinner's saving counts this offer: per ingredient the most kroner off, exact before near."""
 
 
 class RecipeOut(Out):
@@ -182,9 +186,12 @@ def dinner(d: Dinner, rank: int, matched: tuple[str, ...] = ()) -> DinnerOut:
             before=sale.pre_price,
             discount_percent=round(sale.discount * 100),
             valid_until=sale.valid_until,
+            fit=Fit.NEAR if sale in b.near else Fit.EXACT,
+            counted=sale == b.sale,
         )
         for b in d.buys
-        if (sale := b.sale) and sale.discount and sale.pre_price
+        for sale in b.sales
+        if sale.discount and sale.pre_price
     ]
     return DinnerOut(
         **_dish(d.dish),

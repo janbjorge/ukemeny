@@ -73,11 +73,12 @@ def _dish_line(dish: Dish, protein: str) -> str:
 def _dinner(n: int, d: Dinner) -> str:
     lines = [f"{n}. {_dish_line(d.dish, d.protein)}", f"   {d.dish.url}"]
     for buy in d.buys:
-        if (sale := buy.sale) and sale.discount and sale.pre_price:
-            lines.append(
-                f"   på tilbud: {buy.part.name} -{sale.discount:.0%} hos {sale.store} ({sale.heading}, "
-                f"{sale.price:.2f} kr, før {sale.pre_price:.2f}, til {sale.valid_until:%d.%m})"
-            )
+        for sale in buy.sales:
+            if sale.discount and sale.pre_price:
+                lines.append(
+                    f"   på tilbud: {buy.part.name}{' (lignende)' if sale in buy.near else ''} -{sale.discount:.0%} hos "
+                    f"{sale.store} ({sale.heading}, {sale.price:.2f} kr, før {sale.pre_price:.2f}, til {sale.valid_until:%d.%m})"
+                )
     return "\n".join(lines + _verdict_lines(d.verdict))
 
 

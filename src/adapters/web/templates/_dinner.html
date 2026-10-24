@@ -1,11 +1,15 @@
 {# One dinner as a card: the main protein, time and rating over the name, the kroner off every ingredient on sale, then
-   each of them with every offer of it: store, price and kroner off, the stores, prices and savings each in a column. With
-   several offers the name is on its own line and every offer under it, the cheapest first, ≈ last (jb 2026-10-24: "If
-   there are more, move all under the item, noone gets speccial placement"). ≈ marks an offer to use instead; its heading
-   and end date are in the tooltip. With a search, the searched words are marked. The rest is on matprat.no or godt.no
-   (the link). #}
+   each of them in two lines: its name and kroner off, and under it, small, the store and price (jb 2026-10-24: names
+   squeezed beside four columns were "so badly formatted"; "Two-line rows"). With several offers the cheapest shows and
+   the rest are folded under it behind «+N», each a line of store, price and kroner off, ≈ last (jb 2026-10-24: "I think
+   we need to add the drop-down after all, it gets noisy"). ≈ marks an offer to use instead; its heading and end date are
+   in the tooltip. With a search, the searched words are marked. The rest is on matprat.no or godt.no (the link). #}
+{% macro tip(o) %}{{ o.heading }}: {{ o.price|kr }}, før {{ o.pre_price|kr }}, til {{ o.valid_until|dato }}{% endmacro %}
+{% macro where(o, x) -%}
+<span class="where"><span class="store">{% if o in x.near %}≈ {% endif %}{{ o.store }}</span> · <span class="price">{{ o.price|kr }}</span></span>
+{%- endmacro %}
 {% macro offer(o, x, name="") -%}
-<li title="{{ o.heading }}: {{ o.price|kr }}, før {{ o.pre_price|kr }}, til {{ o.valid_until|dato }}"><span class="what">{{ name }}</span><span class="store">{% if o in x.near %}≈ {% endif %}{{ o.store }}</span><span class="lead"></span><span class="price">{{ o.price|kr }}</span><span class="off">{{ o.saving|spart }}</span></li>
+<li title="{{ tip(o) }}">{% if name %}<span class="what">{{ name }}</span><span class="off">{{ o.saving|spart }}</span>{{ where(o, x) }}{% else %}{{ where(o, x) }}<span class="off">{{ o.saving|spart }}</span>{% endif %}</li>
 {%- endmacro %}
 {% macro card(d, search=none, via=()) %}
 <article class="card" data-protein="{{ d.protein }}">
@@ -20,10 +24,10 @@
       {%- if offers|length == 1 %}
       {{ offer(offers[0], x, x.part.name) }}
       {%- else %}
-      <li class="item"><span class="what">{{ x.part.name }}</span></li>
-      {%- for o in offers %}
-      {{ offer(o, x) }}
-      {%- endfor %}{% endif %}
+      <li class="item"><details><summary title="{{ tip(offers[0]) }}"><span class="what">{{ x.part.name }} <span class="n">+{{ offers|length - 1 }}</span></span><span class="off">{{ offers[0].saving|spart }}</span>{{ where(offers[0], x) }}</summary><ul>
+      {%- for o in offers[1:] %}
+        {{ offer(o, x) }}
+      {%- endfor %}</ul></details></li>{% endif %}
     {%- endfor %}</ul>
   </div>
   {% endif %}

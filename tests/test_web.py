@@ -15,9 +15,7 @@ SALMON = ingredient("laksefilet", 600, "g", "/fisk og sjømat")
 COD = ingredient("torskefilet", 600, "g", "/fisk og sjømat")
 ONION = ingredient("løk", 1, "stk.", "/grønnsaker")
 HX = {"HX-Request": "true"}
-KIWI_ROW = (
-    '<span class="what">kyllingfilet</span><span class="store">KIWI</span><span class="lead"></span><span class="price">99\u00a0kr</span>'
-)
+KIWI_ROW = '<span class="where"><span class="store">KIWI</span> · <span class="price">99\u00a0kr</span></span>'
 """The chicken offer's row on a card: its store and price."""
 GO = ' hx-trigger="mousedown, click" hx-sync="this:drop"'
 """What a search link carries besides its hx-get: it starts on mouse-down."""
@@ -78,12 +76,12 @@ def test_a_card_lists_every_offer_and_sums_the_cheapest() -> None:
     html = TestClient(main.create_app(Queries(FakeDatasets(s)))).get("/").text
     cards = html[html.index('class="cards"') :]
     assert '<span class="sum">\u221230\u00a0kr</span>' in cards  # REMA's: as cheap as KIWI's, more off
-    # Several offers: the name on its own line and every offer under it, the cheapest first (jb 2026-10-24)
-    rows = cards[cards.index("<ul>", cards.index('class="save"')) : cards.index("</ul>")]
-    assert '<li class="item"><span class="what">kjøttdeig av svin</span></li>' in rows
-    rema, kiwi, meny = (rows.index(f'">{store}</span>') for store in ("REMA 1000", "KIWI", "≈ MENY"))
-    assert rema < kiwi < meny  # The offer to use instead is marked
-    assert '<span class="price">40\u00a0kr</span><span class="off">\u221230\u00a0kr</span>' in rows
+    # Several offers: the cheapest on the ingredient's row, the rest folded under it (jb 2026-10-24)
+    rows = cards[cards.index("<ul>", cards.index('class="save"')) : cards.index("</details>")]
+    assert '<span class="what">kjøttdeig av svin <span class="n">+2</span></span><span class="off">\u221230\u00a0kr</span>' in rows
+    rema, fold, kiwi, meny = (rows.index(s) for s in ('">REMA 1000</span>', "</summary>", '">KIWI</span>', '">≈ MENY</span>'))
+    assert rema < fold < kiwi < meny  # The offer to use instead is marked
+    assert '<span class="store">REMA 1000</span> · <span class="price">40\u00a0kr</span>' in rows
 
 
 def test_an_old_sort_link_still_opens(client: TestClient) -> None:

@@ -38,7 +38,7 @@ class DiscountOut(Out):
     fit: Fit
     """«exact»: the kind the recipe names; «near»: another or a mixed kind to use instead."""
     counted: bool
-    """Whether the dinner's saving counts this offer: per ingredient the most kroner off, exact before near."""
+    """Whether the dinner's saving counts this offer: per ingredient the cheapest, exact before near."""
 
 
 class RecipeOut(Out):

@@ -62,7 +62,7 @@ def test_cards_are_calm(client: TestClient) -> None:
     assert "Sterk" not in page
 
 
-def test_a_card_lists_every_offer_and_sums_the_most_kroner_off() -> None:
+def test_a_card_lists_every_offer_and_sums_the_cheapest() -> None:
     mince = ingredient("kjøttdeig av svin", 400, "g", "/kjøtt/svinekjøtt")
     pork = recipe("Svinekjøttboller", mince)
     offers = [
@@ -77,8 +77,8 @@ def test_a_card_lists_every_offer_and_sums_the_most_kroner_off() -> None:
     )
     html = TestClient(main.create_app(Queries(FakeDatasets(s)))).get("/").text
     cards = html[html.index('class="cards"') :]
-    assert '<span class="sum">\u221230\u00a0kr</span>' in cards  # REMA's, the most kroner off
-    # Several offers: the name on its own line and every offer under it, the most kroner off first (jb 2026-10-24)
+    assert '<span class="sum">\u221230\u00a0kr</span>' in cards  # REMA's: as cheap as KIWI's, more off
+    # Several offers: the name on its own line and every offer under it, the cheapest first (jb 2026-10-24)
     rows = cards[cards.index("<ul>", cards.index('class="save"')) : cards.index("</ul>")]
     assert '<li class="item"><span class="what">kjøttdeig av svin</span></li>' in rows
     rema, kiwi, meny = (rows.index(f'">{store}</span>') for store in ("REMA 1000", "KIWI", "≈ MENY"))

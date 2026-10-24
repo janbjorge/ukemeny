@@ -363,25 +363,25 @@ class Buy:
 
     @property
     def sale(self) -> Offer | None:
-        """The offer the dinner's saving counts: the most kroner off among the exact offers on sale, or, with none, among
-        the near ones. The card shows kroner off, so its row is the biggest (jb 2026-10-24: the fewest, Obs's 5 kr on
-        karbonader, was "wrong", and the cheapest pack, SPAR's 23,90 kr off "while joker is at 39,10", still was)."""
+        """The offer the dinner's saving counts: the cheapest among the exact offers on sale, or, with none, among the
+        near ones; the first row on the card (jb 2026-10-24: "I would assume ppl. care about the end price, not how
+        mutch is off"; the most kroner off counted Joker's 79,90 kr karbonader over SPAR's 50 kr)."""
         for offers in (self.offers, self.near):
             if discounted := [o for o in offers if o.saving]:
-                return min(discounted, key=lambda o: (-(o.saving or 0.0), o.store))
+                return min(discounted, key=lambda o: (o.price, -(o.saving or 0.0), o.store))
         return None
 
     @property
     def sales(self) -> tuple[Offer, ...]:
-        """Every offer on sale, exact and near, the most kroner off first, then store: what the card lists (jb
-        2026-10-24: "Show all"). One offer in many catalogs (Obs has one per store) is listed once, as `sale` when it
-        is that one."""
+        """Every offer on sale, the exact ones before the near ones, each the cheapest first, then store: what the card
+        lists, `sale` first (jb 2026-10-24: "Show all"). One offer in many catalogs (Obs has one per store) is listed
+        once, as `sale` when it is that one."""
         sale = self.sale
         kept: dict[tuple[str, str, float, float | None], Offer] = {}
         for o in (*self.offers, *self.near):
             if o.saving and ((key := (o.store, o.heading, o.price, o.pre_price)) not in kept or o == sale):
                 kept[key] = o
-        return tuple(sorted(kept.values(), key=lambda o: (-(o.saving or 0.0), o.store)))
+        return tuple(sorted(kept.values(), key=lambda o: (o not in self.offers, o.price, -(o.saving or 0.0), o.store)))
 
 
 MAIN_WEIGHT = 1.0

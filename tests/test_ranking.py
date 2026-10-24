@@ -74,7 +74,7 @@ def test_meat_and_fish_offers_count_per_dinner() -> None:
     assert found == {"Nigiri": [], "Tunfisksalat": ["tin"]}
 
 
-def test_the_saving_counts_the_most_kroner_off_exact_before_near() -> None:
+def test_the_saving_counts_the_cheapest_offer_exact_before_near() -> None:
     mince = ingredient("kjøttdeig av svin", 400, "g", "/kjøtt/svinekjøtt")
     pork = recipe("Svinekjøttboller", mince)
     offers = [
@@ -89,8 +89,8 @@ def test_the_saving_counts_the_most_kroner_off_exact_before_near() -> None:
         near_served={pork.url: {mince.name: ("mix",)}},
     )
     (dinner,) = dinners(exact, HOUSEHOLD)
-    assert dinner.saving == 20  # REMA's 20 kr: the most off among the exact ones, before MENY's mix
-    assert [o.id for o in dinner.buys[0].sales] == ["mix", "rema", "kiwi"]  # Most kroner off first; KIWI's two catalogs once
+    assert dinner.saving == 10  # KIWI's 10 kr: the cheapest exact one, not REMA's 20 kr off nor MENY's mix
+    assert [o.id for o in dinner.buys[0].sales] == ["kiwi", "rema", "mix"]  # Cheapest first, near last; KIWI's two catalogs once
     near_only = replace(exact, served={})
     (dinner,) = dinners(near_only, HOUSEHOLD)
     assert dinner.buys[0].sale is not None and dinner.buys[0].sale.id == "mix" and dinner.on_sale

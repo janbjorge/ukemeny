@@ -16126,6 +16126,93 @@
     "url": "https://www.godt.no/oppskrifter/fisk/laks/1710/laksemiddag-med-pesto-paa-1-2-3"
   },
   {
+    "name": "Laks med kremet risoni og cherrytomater",
+    "parts": [
+      {
+        "category": "/fisk og sjømat",
+        "form": "",
+        "grams": 600,
+        "name": "laksefilet",
+        "unit": "g"
+      },
+      {
+        "category": "/margarin/olje/majones",
+        "form": "",
+        "grams": 30,
+        "name": "olivenolje",
+        "unit": "ss"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 100,
+        "name": "gul løk",
+        "unit": "stk"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 15,
+        "name": "hvitløk",
+        "unit": "båt"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 400,
+        "name": "cherrytomater",
+        "unit": "g"
+      },
+      {
+        "category": "/pasta/ris",
+        "form": "",
+        "grams": 300,
+        "name": "risoni",
+        "unit": "g"
+      },
+      {
+        "category": "/tørrvarer",
+        "form": "",
+        "grams": 700,
+        "name": "grønnsakskraft",
+        "unit": "dl"
+      },
+      {
+        "category": "/ost",
+        "form": "",
+        "grams": 125,
+        "name": "philadelphiaost",
+        "unit": "g"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": null,
+        "name": "basilikum",
+        "unit": "potte"
+      },
+      {
+        "category": "/frukt",
+        "form": "",
+        "grams": 50,
+        "name": "sitron",
+        "unit": "stk"
+      },
+      {
+        "category": "/krydder",
+        "form": "",
+        "grams": null,
+        "name": "salt og kvernet pepper",
+        "unit": ""
+      }
+    ],
+    "portions": 1,
+    "prep_time": "20–40 min",
+    "rating": null,
+    "rating_count": 0,
+    "url": "https://www.godt.no/oppskrifter/fisk/laks/17714/laks-i-gryte"
+  },
+  {
     "name": "Grillet laks og kamskjell på spyd med chimichurri og sitron",
     "parts": [
       {
@@ -24255,8 +24342,8 @@
     ],
     "portions": 4,
     "prep_time": "40–60 min",
-    "rating": 3.7857142857142856,
-    "rating_count": 70,
+    "rating": 3.8028169014084505,
+    "rating_count": 71,
     "url": "https://www.godt.no/oppskrifter/fisk/torsk/2135/torsk-i-form"
   },
   {
@@ -35518,8 +35605,8 @@
     ],
     "portions": 4,
     "prep_time": "20–40 min",
-    "rating": 3.4285714285714284,
-    "rating_count": 7,
+    "rating": 3.625,
+    "rating_count": 8,
     "url": "https://www.godt.no/oppskrifter/groennsaker/potet/1467/potet-og-selleristappe-med-parmesan"
   },
   {
@@ -42079,8 +42166,8 @@
     ],
     "portions": 4,
     "prep_time": "Over 60 min",
-    "rating": 4.72,
-    "rating_count": 25,
+    "rating": 4.730769230769231,
+    "rating_count": 26,
     "url": "https://www.godt.no/oppskrifter/gryte/kjoettgryte/10816/jegergryte"
   },
   {
@@ -42560,8 +42647,8 @@
     ],
     "portions": 4,
     "prep_time": "Over 60 min",
-    "rating": 4.270175438596488,
-    "rating_count": 285,
+    "rating": 4.275261324041809,
+    "rating_count": 287,
     "url": "https://www.godt.no/oppskrifter/gryte/kjoettgryte/1452/boeuf-bourguignon"
   },
   {
@@ -47581,8 +47668,8 @@
     ],
     "portions": 2,
     "prep_time": "20–40 min",
-    "rating": 4.545454545454546,
-    "rating_count": 11,
+    "rating": 4.250000000000001,
+    "rating_count": 12,
     "url": "https://www.godt.no/oppskrifter/gryte/kyllinggryte/10949/kylling-satay-gryte-med-peanoettsaus"
   },
   {
@@ -67933,8 +68020,8 @@
     ],
     "portions": 3,
     "prep_time": "40–60 min",
-    "rating": 4.818181818181818,
-    "rating_count": 11,
+    "rating": 4.833333333333333,
+    "rating_count": 12,
     "url": "https://www.godt.no/oppskrifter/kjoett/svin/158/svineknoke-i-oel-og-eplemost"
   },
   {
@@ -83152,7 +83239,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 5,
-    "rating_count": 1,
+    "rating_count": 2,
     "url": "https://www.godt.no/oppskrifter/kylling-og-fjaerkre/kylling/17385/kylling-med-brokkoli-i-oesterssaus"
   },
   {
@@ -88593,8 +88680,8 @@
     ],
     "portions": 4,
     "prep_time": "20–40 min",
-    "rating": 4.5,
-    "rating_count": 16,
+    "rating": 4.529411764705882,
+    "rating_count": 17,
     "url": "https://www.godt.no/oppskrifter/middag/10755/fiskesuppe-med-kokosmelk"
   },
   {
@@ -91504,8 +91591,8 @@
     ],
     "portions": 4,
     "prep_time": "20–40 min",
-    "rating": 5,
-    "rating_count": 4,
+    "rating": 4.166666666666667,
+    "rating_count": 6,
     "url": "https://www.godt.no/oppskrifter/middag/14315/biff-tataki"
   },
   {
@@ -97108,8 +97195,8 @@
     ],
     "portions": 8,
     "prep_time": "20–40 min",
-    "rating": 3,
-    "rating_count": 25,
+    "rating": 3.0384615384615383,
+    "rating_count": 26,
     "url": "https://www.godt.no/oppskrifter/pannekaker-og-vafler/4897/fleskepannekaker"
   },
   {
@@ -105723,6 +105810,121 @@
     "url": "https://www.godt.no/oppskrifter/pasta/9774/tomatpasta-paa-30-minutter"
   },
   {
+    "name": "Gresskarlasagne med salvie og spinat",
+    "parts": [
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 180,
+        "name": "flaskegresskar",
+        "unit": "g"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 20,
+        "name": "gul løk",
+        "unit": "stk"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 5,
+        "name": "hvitløk",
+        "unit": "båt"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "fersk",
+        "grams": 40,
+        "name": "spinat",
+        "unit": "g"
+      },
+      {
+        "category": "/margarin/olje/majones",
+        "form": "",
+        "grams": 5,
+        "name": "olivenolje",
+        "unit": "ss"
+      },
+      {
+        "category": "/ost",
+        "form": "",
+        "grams": 50,
+        "name": "ricotta",
+        "unit": "g"
+      },
+      {
+        "category": "/ost",
+        "form": "",
+        "grams": 40,
+        "name": "mozzarella",
+        "unit": "g"
+      },
+      {
+        "category": "/pasta/ris",
+        "form": "",
+        "grams": 220,
+        "name": "lasagneplater",
+        "unit": "stk"
+      },
+      {
+        "category": "/krydder",
+        "form": "",
+        "grams": null,
+        "name": "salt og kvernet pepper",
+        "unit": ""
+      },
+      {
+        "category": "/melk/melkeprodukter",
+        "form": "",
+        "grams": 10,
+        "name": "meierismør",
+        "unit": "g"
+      },
+      {
+        "category": "/korn/mel/bakervarer",
+        "form": "",
+        "grams": 10,
+        "name": "hvetemel",
+        "unit": "g"
+      },
+      {
+        "category": "/melk/melkeprodukter",
+        "form": "",
+        "grams": 140,
+        "name": "helmelk",
+        "unit": "dl"
+      },
+      {
+        "category": "/ost",
+        "form": "",
+        "grams": 20,
+        "name": "parmesan",
+        "unit": "g"
+      },
+      {
+        "category": "/krydder",
+        "form": "",
+        "grams": 0,
+        "name": "muskatnøtt",
+        "unit": "ts"
+      },
+      {
+        "category": "/krydder",
+        "form": "",
+        "grams": null,
+        "name": "salt og kvernet pepper",
+        "unit": ""
+      }
+    ],
+    "portions": 5,
+    "prep_time": "Over 60 min",
+    "rating": null,
+    "rating_count": 0,
+    "url": "https://www.godt.no/oppskrifter/pasta/lasagne/17747/gresskarlasagne"
+  },
+  {
     "name": "Grønnsakslasagne med sopp",
     "parts": [
       {
@@ -106004,8 +106206,8 @@
     ],
     "portions": 4,
     "prep_time": "Over 60 min",
-    "rating": 4.2589285714285685,
-    "rating_count": 112,
+    "rating": 4.271929824561401,
+    "rating_count": 114,
     "url": "https://www.godt.no/oppskrifter/pasta/lasagne/8210/klassisk-lasagne-med-kjoettsaus"
   },
   {
@@ -146169,8 +146371,8 @@
     ],
     "portions": 4,
     "prep_time": "20–40 min",
-    "rating": 3.975,
-    "rating_count": 80,
+    "rating": 3.9876543209876543,
+    "rating_count": 81,
     "url": "https://www.godt.no/oppskrifter/taco/665/enchiladas-med-kylling"
   },
   {
@@ -157641,7 +157843,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.8,
-    "rating_count": 4,
+    "rating_count": 5,
     "url": "https://www.matprat.no/oppskrifter/familien/brokkoli--og-ertesuppe-med-torsk/"
   },
   {
@@ -160753,7 +160955,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.6,
-    "rating_count": 109,
+    "rating_count": 110,
     "url": "https://www.matprat.no/oppskrifter/familien/flyvende-jacob/"
   },
   {
@@ -161393,7 +161595,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.7,
-    "rating_count": 243,
+    "rating_count": 244,
     "url": "https://www.matprat.no/oppskrifter/familien/gresskarsuppe/"
   },
   {
@@ -162918,8 +163120,8 @@
     ],
     "portions": 6,
     "prep_time": "20–40 min",
-    "rating": 4.6,
-    "rating_count": 54,
+    "rating": 4.7,
+    "rating_count": 55,
     "url": "https://www.matprat.no/oppskrifter/familien/gulrotsuppe-med-strimlet-svinekjott/"
   },
   {
@@ -166042,7 +166244,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.8,
-    "rating_count": 475,
+    "rating_count": 476,
     "url": "https://www.matprat.no/oppskrifter/familien/kremet-fiskesuppe/"
   },
   {
@@ -166122,7 +166324,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 5,
-    "rating_count": 3,
+    "rating_count": 4,
     "url": "https://www.matprat.no/oppskrifter/familien/kremet-kyllingpasta/"
   },
   {
@@ -166940,6 +167142,79 @@
     "url": "https://www.matprat.no/oppskrifter/familien/kylling-i-pita/"
   },
   {
+    "name": "Kylling lårfilet med kremet estragonsaus",
+    "parts": [
+      {
+        "category": "/kjøtt/kylling/høns",
+        "form": "",
+        "grams": 200,
+        "name": "kylling lårfilet",
+        "unit": "g"
+      },
+      {
+        "category": "/margarin/olje/majones",
+        "form": "",
+        "grams": 10,
+        "name": "olivenolje",
+        "unit": "ss"
+      },
+      {
+        "category": "/melk/melkeprodukter",
+        "form": "",
+        "grams": 5,
+        "name": "smør",
+        "unit": "ss"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 50,
+        "name": "løk",
+        "unit": "stk"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 0,
+        "name": "hvitløk",
+        "unit": "båt"
+      },
+      {
+        "category": "/melk/melkeprodukter",
+        "form": "",
+        "grams": 100,
+        "name": "kremfløte",
+        "unit": "dl"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 5,
+        "name": "frisk estragon",
+        "unit": "g"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "frossen",
+        "grams": 100,
+        "name": "frosne erter",
+        "unit": "g"
+      },
+      {
+        "category": "/grønnsaker",
+        "form": "",
+        "grams": 30,
+        "name": "frisk spinat",
+        "unit": "g"
+      }
+    ],
+    "portions": 2,
+    "prep_time": "20–40 min",
+    "rating": 5,
+    "rating_count": 1,
+    "url": "https://www.matprat.no/oppskrifter/familien/kylling-larfilet-med-kremet-estragonsaus/"
+  },
+  {
     "name": "Kylling med søtpotet og grønnkål",
     "parts": [
       {
@@ -167305,7 +167580,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.8,
-    "rating_count": 797,
+    "rating_count": 800,
     "url": "https://www.matprat.no/oppskrifter/familien/kyllingfilet-i-form/"
   },
   {
@@ -170812,7 +171087,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 1461,
+    "rating_count": 1464,
     "url": "https://www.matprat.no/oppskrifter/familien/lasagne/"
   },
   {
@@ -171940,7 +172215,7 @@
     "portions": 4,
     "prep_time": "40–60 min",
     "rating": 4.8,
-    "rating_count": 12,
+    "rating_count": 13,
     "url": "https://www.matprat.no/oppskrifter/familien/meksikansk-gryte/"
   },
   {
@@ -174507,7 +174782,7 @@
     "portions": 1,
     "prep_time": "40–60 min",
     "rating": 4.9,
-    "rating_count": 108,
+    "rating_count": 109,
     "url": "https://www.matprat.no/oppskrifter/familien/pannekaker-uten-melk/"
   },
   {
@@ -174552,7 +174827,7 @@
     "portions": 4,
     "prep_time": "40–60 min",
     "rating": 4.7,
-    "rating_count": 4684,
+    "rating_count": 4689,
     "url": "https://www.matprat.no/oppskrifter/familien/pannekaker/"
   },
   {
@@ -177625,7 +177900,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.7,
-    "rating_count": 106,
+    "rating_count": 107,
     "url": "https://www.matprat.no/oppskrifter/familien/risgrot/"
   },
   {
@@ -180155,7 +180430,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.7,
-    "rating_count": 107,
+    "rating_count": 108,
     "url": "https://www.matprat.no/oppskrifter/familien/spinatsuppe-med-egg/"
   },
   {
@@ -180561,8 +180836,8 @@
     ],
     "portions": 4,
     "prep_time": "20–40 min",
-    "rating": 4.8,
-    "rating_count": 21,
+    "rating": 4.7,
+    "rating_count": 22,
     "url": "https://www.matprat.no/oppskrifter/familien/stekt-laks-med-kokosris/"
   },
   {
@@ -182984,7 +183259,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.5,
-    "rating_count": 79,
+    "rating_count": 80,
     "url": "https://www.matprat.no/oppskrifter/familien/tomatsuppe-bakt-i-ovn/"
   },
   {
@@ -187182,8 +187457,8 @@
     ],
     "portions": 4,
     "prep_time": "Over 60 min",
-    "rating": 4.2,
-    "rating_count": 10,
+    "rating": 4.3,
+    "rating_count": 11,
     "url": "https://www.matprat.no/oppskrifter/gjester/biff-med-jordskokkpure/"
   },
   {
@@ -188385,7 +188660,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.9,
-    "rating_count": 1362,
+    "rating_count": 1368,
     "url": "https://www.matprat.no/oppskrifter/gjester/boeuf-bourguignon/"
   },
   {
@@ -192936,7 +193211,7 @@
     "portions": 2,
     "prep_time": "40–60 min",
     "rating": 4.9,
-    "rating_count": 7,
+    "rating_count": 8,
     "url": "https://www.matprat.no/oppskrifter/gjester/entrecote-med-soppstuing/"
   },
   {
@@ -204899,7 +205174,7 @@
     "portions": 6,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 31,
+    "rating_count": 32,
     "url": "https://www.matprat.no/oppskrifter/gjester/irish-stew/"
   },
   {
@@ -212600,7 +212875,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 20,
+    "rating_count": 21,
     "url": "https://www.matprat.no/oppskrifter/gjester/lammecarre/"
   },
   {
@@ -214864,7 +215139,7 @@
     "portions": 10,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 295,
+    "rating_count": 297,
     "url": "https://www.matprat.no/oppskrifter/gjester/langtidsstekt-lammelar/"
   },
   {
@@ -216882,7 +217157,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 69,
+    "rating_count": 70,
     "url": "https://www.matprat.no/oppskrifter/gjester/marokkansk-lammegryte-tagine-bbarkouq/"
   },
   {
@@ -230106,7 +230381,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.9,
-    "rating_count": 22,
+    "rating_count": 23,
     "url": "https://www.matprat.no/oppskrifter/gjester/roastbiff-av-elg/"
   },
   {
@@ -230381,7 +230656,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.9,
-    "rating_count": 88,
+    "rating_count": 89,
     "url": "https://www.matprat.no/oppskrifter/gjester/rodvinsgryte-av-elg/"
   },
   {
@@ -232751,7 +233026,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 349,
+    "rating_count": 350,
     "url": "https://www.matprat.no/oppskrifter/gjester/shepherds-pie/"
   },
   {
@@ -234255,7 +234530,7 @@
     "portions": 4,
     "prep_time": "40–60 min",
     "rating": 5,
-    "rating_count": 1,
+    "rating_count": 2,
     "url": "https://www.matprat.no/oppskrifter/gjester/sopprisotto/"
   },
   {
@@ -234453,7 +234728,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.5,
-    "rating_count": 45,
+    "rating_count": 46,
     "url": "https://www.matprat.no/oppskrifter/gjester/sotpotetsuppe/"
   },
   {
@@ -236267,65 +236542,6 @@
     "rating": 4.5,
     "rating_count": 2,
     "url": "https://www.matprat.no/oppskrifter/gjester/stilksellerisuppe-med-reinsdyr-flatbiff/"
-  },
-  {
-    "name": "Sufflé med ost og spinat",
-    "parts": [
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 10,
-        "name": "smør",
-        "unit": "ss"
-      },
-      {
-        "category": "/korn/mel/bakervarer",
-        "form": "",
-        "grams": 15,
-        "name": "hvetemel",
-        "unit": "ss"
-      },
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 75,
-        "name": "melk",
-        "unit": "dl"
-      },
-      {
-        "category": "/egg",
-        "form": "",
-        "grams": 125,
-        "name": "egg",
-        "unit": "stk"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "",
-        "grams": 25,
-        "name": "sjalottløk",
-        "unit": "stk"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "",
-        "grams": 50,
-        "name": "frisk spinat",
-        "unit": "g"
-      },
-      {
-        "category": "/ost",
-        "form": "",
-        "grams": 40,
-        "name": "cheddar ost",
-        "unit": "g"
-      }
-    ],
-    "portions": 4,
-    "prep_time": "40–60 min",
-    "rating": 5,
-    "rating_count": 5,
-    "url": "https://www.matprat.no/oppskrifter/gjester/suffle-med-ost-og-spinat/"
   },
   {
     "name": "Sukiyaki - Japans nasjonalrett",
@@ -238316,275 +238532,6 @@
     "rating": 4.9,
     "rating_count": 19,
     "url": "https://www.matprat.no/oppskrifter/gjester/thailandsk-oksehalesuppe/"
-  },
-  {
-    "name": "Thanksgiving-kalkun med løk- og selleristuffing",
-    "parts": [
-      {
-        "category": "/kjøtt/kalkun",
-        "form": "",
-        "grams": 10,
-        "name": "kalkun, ca. 5 kg",
-        "unit": "stk"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "",
-        "grams": 25,
-        "name": "løk",
-        "unit": "stk"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "",
-        "grams": null,
-        "name": "stilkselleri (stangselleri)",
-        "unit": "stilk"
-      },
-      {
-        "category": "/sopp",
-        "form": "",
-        "grams": 40,
-        "name": "frisk sjampinjong",
-        "unit": "g"
-      },
-      {
-        "category": "/korn/mel/bakervarer",
-        "form": "",
-        "grams": 10,
-        "name": "loff",
-        "unit": "stk"
-      },
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 30,
-        "name": "smør",
-        "unit": "g"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "",
-        "grams": 5,
-        "name": "bladpersille",
-        "unit": "bunt"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "tørket",
-        "grams": 10,
-        "name": "frisk basilikum",
-        "unit": "ss"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "tørket",
-        "grams": 10,
-        "name": "frisk salvie",
-        "unit": "ss"
-      },
-      {
-        "category": "/krydder",
-        "form": "",
-        "grams": 5,
-        "name": "paprikapulver",
-        "unit": "ss"
-      },
-      {
-        "category": "/krydder",
-        "form": "",
-        "grams": 0,
-        "name": "revet muskatnøtt",
-        "unit": "ts"
-      },
-      {
-        "category": "/krydder",
-        "form": "",
-        "grams": 0,
-        "name": "salt",
-        "unit": "ts"
-      },
-      {
-        "category": "/krydder",
-        "form": "",
-        "grams": 0,
-        "name": "pepper",
-        "unit": "ts"
-      },
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 5,
-        "name": "smør",
-        "unit": "ss"
-      },
-      {
-        "category": "/krydder",
-        "form": "",
-        "grams": 0,
-        "name": "salt",
-        "unit": "ts"
-      },
-      {
-        "category": "/krydder",
-        "form": "",
-        "grams": 0,
-        "name": "pepper",
-        "unit": "ts"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "",
-        "grams": 40,
-        "name": "søtpotet",
-        "unit": "stk"
-      },
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 25,
-        "name": "smør",
-        "unit": "g"
-      },
-      {
-        "category": "/tørrvarer",
-        "form": "",
-        "grams": 15,
-        "name": "brunt sukker",
-        "unit": "dl"
-      },
-      {
-        "category": "/drikke",
-        "form": "",
-        "grams": 5,
-        "name": "vann",
-        "unit": "dl"
-      },
-      {
-        "category": "/poteter",
-        "form": "",
-        "grams": 190,
-        "name": "potet",
-        "unit": "stk"
-      },
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 10,
-        "name": "smør",
-        "unit": "g"
-      },
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 25,
-        "name": "matfløte",
-        "unit": "dl"
-      },
-      {
-        "category": "/krydder",
-        "form": "",
-        "grams": 0,
-        "name": "salt",
-        "unit": "ts"
-      },
-      {
-        "category": "/krydder",
-        "form": "",
-        "grams": 0,
-        "name": "pepper",
-        "unit": "ts"
-      },
-      {
-        "category": "/drikke",
-        "form": "",
-        "grams": 10,
-        "name": "vann",
-        "unit": "dl"
-      },
-      {
-        "category": "/frukt",
-        "form": "",
-        "grams": 60,
-        "name": "tranebær",
-        "unit": "dl"
-      },
-      {
-        "category": "/tørrvarer",
-        "form": "",
-        "grams": 25,
-        "name": "sukker",
-        "unit": "g"
-      },
-      {
-        "category": "/frukt",
-        "form": "",
-        "grams": 10,
-        "name": "appelsin",
-        "unit": "stk"
-      },
-      {
-        "category": "/diverse",
-        "form": "",
-        "grams": 190,
-        "name": "kalkunkraft (laget på innmatposen i kalkunen)",
-        "unit": "l"
-      },
-      {
-        "category": "/korn/mel/bakervarer",
-        "form": "",
-        "grams": 20,
-        "name": "hvetemel",
-        "unit": "dl"
-      },
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 25,
-        "name": "kremfløte",
-        "unit": "dl"
-      },
-      {
-        "category": "/diverse",
-        "form": "",
-        "grams": 0,
-        "name": "soyasaus",
-        "unit": "ts"
-      },
-      {
-        "category": "/krydder",
-        "form": "",
-        "grams": null,
-        "name": "pepper",
-        "unit": "pose"
-      },
-      {
-        "category": "/tørrvarer",
-        "form": "",
-        "grams": null,
-        "name": "sukkerkulør",
-        "unit": "dråpe"
-      },
-      {
-        "category": "/diverse",
-        "form": "",
-        "grams": 5,
-        "name": "portvinsgelé",
-        "unit": "ss"
-      },
-      {
-        "category": "/diverse",
-        "form": "",
-        "grams": 0,
-        "name": "dijonsennep",
-        "unit": "ts"
-      }
-    ],
-    "portions": 8,
-    "prep_time": "Over 60 min",
-    "rating": 4.3,
-    "rating_count": 6,
-    "url": "https://www.matprat.no/oppskrifter/gjester/thanksgiving-kalkun-med-lok--og-selleristuffing/"
   },
   {
     "name": "Tjelknøl",
@@ -251574,7 +251521,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.7,
-    "rating_count": 311,
+    "rating_count": 312,
     "url": "https://www.matprat.no/oppskrifter/kos/fransk-loksuppe/"
   },
   {
@@ -261209,8 +261156,8 @@
     ],
     "portions": 4,
     "prep_time": "20–40 min",
-    "rating": 5,
-    "rating_count": 6,
+    "rating": 4.4,
+    "rating_count": 7,
     "url": "https://www.matprat.no/oppskrifter/kos/kebab-med-lam/"
   },
   {
@@ -263834,7 +263781,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.9,
-    "rating_count": 349,
+    "rating_count": 351,
     "url": "https://www.matprat.no/oppskrifter/kos/kylling-i-mangosaus/"
   },
   {
@@ -265672,7 +265619,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.6,
-    "rating_count": 187,
+    "rating_count": 188,
     "url": "https://www.matprat.no/oppskrifter/kos/kyllinggryte-med-kokosmelk/"
   },
   {
@@ -270577,7 +270524,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.7,
-    "rating_count": 906,
+    "rating_count": 909,
     "url": "https://www.matprat.no/oppskrifter/kos/langpannepizza/"
   },
   {
@@ -271134,7 +271081,7 @@
     "portions": 6,
     "prep_time": "20–40 min",
     "rating": 4.5,
-    "rating_count": 464,
+    "rating_count": 465,
     "url": "https://www.matprat.no/oppskrifter/kos/mac-and-cheese/"
   },
   {
@@ -272420,7 +272367,7 @@
     "portions": 3,
     "prep_time": "20–40 min",
     "rating": 4.7,
-    "rating_count": 543,
+    "rating_count": 547,
     "url": "https://www.matprat.no/oppskrifter/kos/marry-me-chicken/"
   },
   {
@@ -275149,7 +275096,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 5,
-    "rating_count": 2,
+    "rating_count": 3,
     "url": "https://www.matprat.no/oppskrifter/kos/ovnsbakt-klippfisk-med-sitron--og-kapersrelish/"
   },
   {
@@ -276134,7 +276081,7 @@
     "portions": 4,
     "prep_time": "Under 20 min",
     "rating": 4.5,
-    "rating_count": 1010,
+    "rating_count": 1012,
     "url": "https://www.matprat.no/oppskrifter/kos/pasta-carbonara/"
   },
   {
@@ -278492,8 +278439,8 @@
     ],
     "portions": 2,
     "prep_time": "20–40 min",
-    "rating": 4.8,
-    "rating_count": 8,
+    "rating": 4.7,
+    "rating_count": 10,
     "url": "https://www.matprat.no/oppskrifter/kos/pinsa-med-spekeskinke-og-mozzarella/"
   },
   {
@@ -280554,7 +280501,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.9,
-    "rating_count": 59,
+    "rating_count": 60,
     "url": "https://www.matprat.no/oppskrifter/kos/polsehorn/"
   },
   {
@@ -284910,8 +284857,8 @@
     ],
     "portions": 4,
     "prep_time": "Over 60 min",
-    "rating": 4.5,
-    "rating_count": 24,
+    "rating": 4.6,
+    "rating_count": 25,
     "url": "https://www.matprat.no/oppskrifter/kos/rodbeteburger-med-gronnkal/"
   },
   {
@@ -290142,8 +290089,8 @@
     ],
     "portions": 4,
     "prep_time": "20–40 min",
-    "rating": 5,
-    "rating_count": 21,
+    "rating": 4.8,
+    "rating_count": 22,
     "url": "https://www.matprat.no/oppskrifter/kos/svinefilet-med-brokkolisalat/"
   },
   {
@@ -294693,7 +294640,7 @@
     "portions": 4,
     "prep_time": "Under 20 min",
     "rating": 4.7,
-    "rating_count": 31,
+    "rating_count": 32,
     "url": "https://www.matprat.no/oppskrifter/kos/wraps-med-reinsdyrskav-og-tyttebarromme/"
   },
   {
@@ -296053,7 +296000,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.7,
-    "rating_count": 951,
+    "rating_count": 953,
     "url": "https://www.matprat.no/oppskrifter/rask/chili-con-carne/"
   },
   {
@@ -298407,7 +298354,7 @@
     "portions": 4,
     "prep_time": "Under 20 min",
     "rating": 4.8,
-    "rating_count": 13,
+    "rating_count": 14,
     "url": "https://www.matprat.no/oppskrifter/rask/greske-lammeskiver/"
   },
   {
@@ -299008,7 +298955,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.6,
-    "rating_count": 390,
+    "rating_count": 391,
     "url": "https://www.matprat.no/oppskrifter/rask/grove-pannekaker/"
   },
   {
@@ -300806,7 +300753,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.7,
-    "rating_count": 41,
+    "rating_count": 43,
     "url": "https://www.matprat.no/oppskrifter/rask/kremet-finnbiff-med-potetmos/"
   },
   {
@@ -300938,7 +300885,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.6,
-    "rating_count": 65,
+    "rating_count": 66,
     "url": "https://www.matprat.no/oppskrifter/rask/kylling-alfredo/"
   },
   {
@@ -302423,7 +302370,7 @@
     "portions": 2,
     "prep_time": "20–40 min",
     "rating": 4.9,
-    "rating_count": 47,
+    "rating_count": 48,
     "url": "https://www.matprat.no/oppskrifter/rask/kyllingfrikasse-med-filet/"
   },
   {
@@ -305902,7 +305849,7 @@
     "portions": 1,
     "prep_time": "Under 20 min",
     "rating": 4.6,
-    "rating_count": 28,
+    "rating_count": 29,
     "url": "https://www.matprat.no/oppskrifter/rask/omelett-med-ost-og-lok/"
   },
   {
@@ -305989,7 +305936,7 @@
     "portions": 1,
     "prep_time": "Under 20 min",
     "rating": 5,
-    "rating_count": 2,
+    "rating_count": 3,
     "url": "https://www.matprat.no/oppskrifter/rask/omelett-med-ost-og-tomatsalsa/"
   },
   {
@@ -311649,7 +311596,7 @@
     "portions": 1,
     "prep_time": "Under 20 min",
     "rating": 4.7,
-    "rating_count": 19,
+    "rating_count": 20,
     "url": "https://www.matprat.no/oppskrifter/rask/taco-wrap/"
   },
   {
@@ -324776,7 +324723,7 @@
     "portions": 4,
     "prep_time": "Under 20 min",
     "rating": 4.5,
-    "rating_count": 71,
+    "rating_count": 73,
     "url": "https://www.matprat.no/oppskrifter/sunn/kylling-chop-suey/"
   },
   {
@@ -329947,7 +329894,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.8,
-    "rating_count": 56,
+    "rating_count": 57,
     "url": "https://www.matprat.no/oppskrifter/sunn/purre--og-brokkolisuppe-med-egg/"
   },
   {
@@ -336091,7 +336038,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 96,
+    "rating_count": 97,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/bankekjott/"
   },
   {
@@ -336359,7 +336306,7 @@
     "portions": 4,
     "prep_time": "40–60 min",
     "rating": 4.4,
-    "rating_count": 234,
+    "rating_count": 235,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/bidos/"
   },
   {
@@ -337295,7 +337242,7 @@
     "portions": 6,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 41,
+    "rating_count": 42,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/elgstek-i-leirgryte/"
   },
   {
@@ -337424,67 +337371,8 @@
     "portions": 6,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 212,
+    "rating_count": 213,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/elgstek/"
-  },
-  {
-    "name": "Enkel levergryte",
-    "parts": [
-      {
-        "category": "/kjøtt/innmat",
-        "form": "",
-        "grams": 125,
-        "name": "lever av kalv",
-        "unit": "g"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "",
-        "grams": 50,
-        "name": "løk",
-        "unit": "stk"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "",
-        "grams": 0,
-        "name": "hvitløk",
-        "unit": "båt"
-      },
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 10,
-        "name": "smør",
-        "unit": "ss"
-      },
-      {
-        "category": "/melk/melkeprodukter",
-        "form": "",
-        "grams": 50,
-        "name": "kremfløte",
-        "unit": "dl"
-      },
-      {
-        "category": "/frukt",
-        "form": "",
-        "grams": 10,
-        "name": "sitronsaft",
-        "unit": "ss"
-      },
-      {
-        "category": "/grønnsaker",
-        "form": "",
-        "grams": 10,
-        "name": "bladpersille",
-        "unit": "ss"
-      }
-    ],
-    "portions": 4,
-    "prep_time": "20–40 min",
-    "rating": 4.7,
-    "rating_count": 36,
-    "url": "https://www.matprat.no/oppskrifter/tradisjon/enkel-levergryte/"
   },
   {
     "name": "Erter, kjøtt og flesk",
@@ -337650,7 +337538,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.7,
-    "rating_count": 314,
+    "rating_count": 315,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/ertesuppe-med-svineknoke/"
   },
   {
@@ -337778,7 +337666,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.7,
-    "rating_count": 818,
+    "rating_count": 819,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/farikal/"
   },
   {
@@ -337973,7 +337861,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 113,
+    "rating_count": 114,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/ferskt-kjott-og-suppe/"
   },
   {
@@ -338147,7 +338035,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.7,
-    "rating_count": 622,
+    "rating_count": 624,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/finnbiff/"
   },
   {
@@ -338314,7 +338202,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.8,
-    "rating_count": 176,
+    "rating_count": 177,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/flesk-og-duppe/"
   },
   {
@@ -340423,7 +340311,7 @@
     "portions": 6,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 217,
+    "rating_count": 218,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/kjottsuppe/"
   },
   {
@@ -340869,7 +340757,7 @@
     "portions": 8,
     "prep_time": "Over 60 min",
     "rating": 4.7,
-    "rating_count": 233,
+    "rating_count": 234,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/klassisk-skinkestek-med-surkal/"
   },
   {
@@ -341200,7 +341088,7 @@
     "portions": 4,
     "prep_time": "40–60 min",
     "rating": 4.8,
-    "rating_count": 39,
+    "rating_count": 40,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/kokt-laks-med-agurksalat-og-sandefjordsmor/"
   },
   {
@@ -341663,7 +341551,7 @@
     "portions": 4,
     "prep_time": "40–60 min",
     "rating": 4.9,
-    "rating_count": 129,
+    "rating_count": 130,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/kremet-elggryte/"
   },
   {
@@ -343717,8 +343605,8 @@
     ],
     "portions": 4,
     "prep_time": "20–40 min",
-    "rating": 4.8,
-    "rating_count": 48,
+    "rating": 4.7,
+    "rating_count": 49,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/lettsaltet-torsk-med-bacon/"
   },
   {
@@ -344191,7 +344079,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.8,
-    "rating_count": 336,
+    "rating_count": 337,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/lutefisk1/"
   },
   {
@@ -346411,7 +346299,7 @@
     "portions": 6,
     "prep_time": "Over 60 min",
     "rating": 4.8,
-    "rating_count": 1530,
+    "rating_count": 1532,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/ribbe/"
   },
   {
@@ -346821,7 +346709,7 @@
     "portions": 6,
     "prep_time": "Over 60 min",
     "rating": 4.6,
-    "rating_count": 264,
+    "rating_count": 265,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/rokt-svinekam/"
   },
   {
@@ -346859,7 +346747,7 @@
     "portions": 4,
     "prep_time": "20–40 min",
     "rating": 4.8,
-    "rating_count": 279,
+    "rating_count": 281,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/rommegrot/"
   },
   {
@@ -347409,7 +347297,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.9,
-    "rating_count": 360,
+    "rating_count": 361,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/skogsgryte/"
   },
   {
@@ -347820,7 +347708,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.9,
-    "rating_count": 375,
+    "rating_count": 376,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/sosekjott/"
   },
   {
@@ -348798,7 +348686,7 @@
     "portions": 4,
     "prep_time": "Over 60 min",
     "rating": 4.7,
-    "rating_count": 57,
+    "rating_count": 59,
     "url": "https://www.matprat.no/oppskrifter/tradisjon/svineknoker-med-surkal/"
   },
   {

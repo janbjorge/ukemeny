@@ -26,6 +26,7 @@ addEventListener("htmx:beforeSwap", () => {
   openAll = document.getElementById("alle-filtre")?.checked ?? false;
 });
 addEventListener("htmx:afterSwap", () => {
+  keepSeed();
   if (openPick) document.getElementById(openPick)?.setAttribute("open", "");
   const all = document.getElementById("alle-filtre");
   if (all) all.checked = openAll;
@@ -36,19 +37,30 @@ addEventListener("htmx:afterSwap", () => {
 // cookie: nothing but the search itself reaches the server) and forgotten with «Hele landet» (jb 2026-10-23: "Can we have
 // the browser save our prefnces, like location"; "local storage works for me")
 const kept = (use) => { try { return use(localStorage); } catch { return null; } };
+// «Sted» is #sted on the front page and #place on the menu; both keep the same place
+const placeSelect = () => document.getElementById("sted") ?? document.getElementById("place");
 addEventListener("change", (e) => {
-  if (e.target.id !== "sted") return;
+  if (e.target !== placeSelect()) return;
   e.target.blur();
   kept((s) => e.target.value ? s.setItem("sted", e.target.value) : s.removeItem("sted"));
 });
-// A page opened without a place in its address searches with the one kept, once htmx has the page: the list is swapped in
-// and the address gets the place, as when it is picked
+// The menu's seed is kept too, so the same menu comes back until «Ny meny» (jb 2026-11-02: "we give them seed or something
+// in local storage, so we know what items they got")
+const keepSeed = () => { const seed = document.getElementById("seed")?.value; if (seed) kept((s) => s.setItem("seed", seed)); };
+// A page opened without a place or a seed in its address searches with the ones kept, once htmx has the page: the list is
+// swapped in and the address gets them, as when they are picked
 addEventListener("htmx:load", () => {
-  const sted = document.getElementById("sted"), place = kept((s) => s.getItem("sted"));
-  if (!sted || !place || new URLSearchParams(location.search).has("sted")) return;
-  sted.value = place;
-  if (sted.value === place) sted.dispatchEvent(new Event("change", { bubbles: true }));
-  else kept((s) => s.removeItem("sted"));  // a place no longer on the list
+  const sted = placeSelect(), seed = document.getElementById("seed"), given = new URLSearchParams(location.search);
+  const place = kept((s) => s.getItem("sted")), seedKept = kept((s) => s.getItem("seed"));
+  let again = false;
+  if (seed && seedKept && !given.has("seed") && seed.value !== seedKept) { seed.value = seedKept; again = true; }
+  if (sted && place && !given.has(sted.name)) {
+    sted.value = place;
+    if (sted.value === place) again = true;
+    else kept((s) => s.removeItem("sted"));  // a place no longer on the list
+  }
+  keepSeed();
+  if (again && sted) sted.dispatchEvent(new Event("change", { bubbles: true }));
 }, { once: true });
 addEventListener("click", (e) => { const done = e.target.closest?.(".pick .done"); if (done) done.closest("details").open = false; });
 addEventListener("keydown", (e) => {
@@ -64,6 +76,7 @@ addEventListener("keydown", (e) => {
 <nav class="top" aria-label="Sider">
   <div class="in">
     <a class="brand" href="/"><img src="{{ static_url('icon.svg') }}" alt="" width="26" height="26">matris</a>
+    <a href="/menu"{% if request.url.path == "/menu" %} aria-current="page"{% endif %}>Lag meny</a>
     <a href="/om"{% if request.url.path == "/om" %} aria-current="page"{% endif %}>Slik virker det</a>
   </div>
 </nav>

@@ -14,12 +14,16 @@ from datetime import date
 
 from core import ranking
 from core.diet import judge
+from core.menu import Menu, Weight, plan
 from core.models import Dinner, Dish, Household, Offer, Snapshot, Tally, Verdict
 from core.ports import Datasets
 from core.search import ANYTHING, Clause, Counts, Index, Kind, Search, View, fold, household, via
 
 type Rules = tuple[Household, str | None]
 """What a ranking depends on: the household, and the place whose offers count (None: every store)."""
+
+type Kept = tuple[Household, str | None, bool]
+"""Rules, and whether the ranking keeps to core.ranking.FLOOR_KR (the menu's does not)."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,6 +51,16 @@ class Found:
     """With nothing found: which clause to drop, and how many dinners that gives."""
 
 
+@dataclass(frozen=True, slots=True)
+class Planned:
+    found: Found
+    """The search, its rules and counts; no dinners (the menu has them)."""
+    menu: Menu | None
+    """None without a place, or with nothing on sale there."""
+    via: Mapping[str, tuple[str, ...]]
+    """As Found.via, for the menu's dinners."""
+
+
 class Queries:
     KEPT = 8
     """Rankings kept. With godt.no a ranking takes 1.3 MiB and a place's offers 1.1 MiB, and the 256 MB machine has room
@@ -62,8 +76,8 @@ class Queries:
         self.index = Index(self.prepared, self.snapshot.traits)
         self._places = {fold(place): place for place in self.snapshot.places}
         self._nearby: dict[str | None, tuple[ranking.Prepared, ...]] = {None: self.prepared}
-        self._ranked: dict[Rules, list[Dinner]] = {}
-        self._view: dict[Rules, View] = {}
+        self._ranked: dict[Kept, list[Dinner]] = {}
+        self._view: dict[Kept, View] = {}
         self._tally: dict[Rules, Tally] = {}
 
     def nearby(self, place: str | None) -> tuple[ranking.Prepared, ...]:
@@ -72,11 +86,12 @@ class Queries:
             nearby = self._nearby[place] = ranking.nearby(self.prepared, self.snapshot, place)
         return nearby
 
-    def ranked(self, h: Household | None = None, place: str | None = None) -> list[Dinner]:
+    def ranked(self, h: Household | None = None, place: str | None = None, floor: bool = True) -> list[Dinner]:
         """Every dinner that fits and saves at least core.ranking.FLOOR_KR near `place`, best first (core.ranking.dinners;
         jb 2026-10-22: "We should ignore dinners with 0 Discounted ingredients", "no point in showing 100 menues with
-        tuna on sale for 8kr")."""
-        key = (h or self.base, place)
+        tuna on sale for 8kr"). Without `floor`, every dinner with something on sale: the menu goes by price, and a
+        cheap dinner may save little (jb 2026-11-02: "only loooking at discounts is a trap")."""
+        key = (h or self.base, place, floor)
         if (ranked := self._ranked.get(key)) is None:
             if len(self._ranked) >= self.KEPT:
                 self._ranked.clear()
@@ -84,11 +99,11 @@ class Queries:
                 self._tally.clear()
                 self._nearby = {None: self.prepared}
             found = ranking.dinners(self.snapshot, key[0], self.nearby(place))
-            ranked = self._ranked[key] = [d for d in found if d.saving >= ranking.FLOOR_KR]
+            ranked = self._ranked[key] = [d for d in found if d.saving >= (ranking.FLOOR_KR if floor else 0.01)]
         return ranked  # Not self._ranked[key]: another request's thread may have dropped it already
 
-    def view(self, h: Household | None = None, place: str | None = None) -> View:
-        key = (h or self.base, place)
+    def view(self, h: Household | None = None, place: str | None = None, floor: bool = True) -> View:
+        key = (h or self.base, place, floor)
         if (view := self._view.get(key)) is None:
             view = self._view[key] = self.index.view(self.ranked(*key))
         return view
@@ -138,6 +153,16 @@ class Queries:
             via={d.dish.url: names for d in shown if (names := via(d, search))},
             relax=() if found else tuple(self.index.relax(search, view)),
         )
+
+    def menu(self, text: str = "", place: str | None = None, weight: Weight = Weight.BALANCED, seed: int | None = None) -> Planned:
+        """A week's menu from the dinners the search finds near `place` (core.menu.plan). Only with a place: a chain's
+        catalogs differ from region to region, so «shop at KIWI» needs to know where."""
+        found = self.search(text, place, limit=0)
+        if found.place is None:
+            return Planned(found, None, {})
+        menu = plan(self.index.find(found.search, self.view(found.household, found.place, floor=False)), weight, seed)
+        shown = menu.dinners if menu else ()
+        return Planned(found, menu, {d.dish.url: names for d in shown if (names := via(d, found.search))})
 
     def offers(self, place: str | None = None) -> list[Offer]:
         """This week's offers at the stores near `place`, or at every store."""

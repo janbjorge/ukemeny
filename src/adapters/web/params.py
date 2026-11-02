@@ -10,6 +10,7 @@ from urllib.parse import urlencode
 from pydantic import BaseModel, BeforeValidator, ConfigDict
 
 from core.matching import PROTEINS, VEGETARIAN
+from core.menu import Weight
 from core.search import Tag, protein_word
 
 KNOWN_PROTEINS = (*dict.fromkeys(PROTEINS.values()), "kjøtt", VEGETARIAN)
@@ -56,6 +57,40 @@ class DinnerQuery(BaseModel):
         """The whole search: `protein` and `tilbud` (older links, the API) are words in it too."""
         words = (self.q, protein_word(self.protein) if self.protein else "", Tag.ON_SALE.value if self.tilbud else "")
         return " ".join(w for w in words if w)
+
+
+def _weight(value: object) -> Weight:
+    return Weight(str(value)) if value in set(Weight) else Weight.BALANCED
+
+
+def _seed(value: object) -> int | None:
+    digits = "".join(c for c in str(value) if c.isdigit())[:9]
+    return int(digits) if digits else None
+
+
+class MenuQuery(BaseModel):
+    """The menu's query string (/menu). English names, unlike the front page's older `sted` (jb 2026-11-02: "lets keep
+    english in the code")."""
+
+    model_config = ConfigDict(frozen=True)
+
+    q: Annotated[str, BeforeValidator(_text)] = ""
+    place: Annotated[str, BeforeValidator(_text)] = ""
+    """As DinnerQuery.sted."""
+    weight: Annotated[Weight, BeforeValidator(_weight)] = Weight.BALANCED
+    seed: Annotated[int | None, BeforeValidator(_seed)] = None
+    """Varies the menu (core.menu.plan); none: the page draws one."""
+
+    @classmethod
+    def of(cls, **given: str | None) -> MenuQuery:
+        """From query parameters, leaving out empty ones."""
+        return cls.model_validate({k: v for k, v in given.items() if v})
+
+
+def menu_link(text: str, place: str | None, weight: Weight, seed: int | None) -> str:
+    """The menu's query string: "q=rask&place=bergen&weight=cheapest&seed=48213", the default weight left out."""
+    given = {"q": text, "place": place and place.lower(), "weight": None if weight is Weight.BALANCED else weight.value, "seed": seed}
+    return urlencode({k: v for k, v in given.items() if v})
 
 
 def link(text: str, antall: int | None = None, place: str | None = None) -> str:

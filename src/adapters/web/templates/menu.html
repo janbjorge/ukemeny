@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "_search.html" import search_box %}
+{% block title %}Lag en meny · matris{% endblock %}
+{% block main %}
+<section id="week" class="finder">
+  <div class="hero">
+  <h1>Lag en meny</h1>
+  <form class="search" id="menu-form" action="/menu#week" method="get" role="search"
+    hx-get="/menu/list" hx-target="#menu-list" hx-swap="outerHTML" hx-indicator="#menu-list"
+    onsubmit="document.getElementById('q').blur()">
+    {{ search_box(found.search.text, get="/menu/list", form="menu-form", target="#menu-list") }}
+    <button type="submit">Lag meny</button>
+  </form>
+  </div>
+  {% include "_menu.html" %}
+</section>
+{% endblock %}

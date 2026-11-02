@@ -151,7 +151,8 @@ def test_unknown_choices_still_show_a_page(client: TestClient) -> None:
 def test_about_llms_robots_sitemap_health(client: TestClient) -> None:
     about = client.get("/om").text
     nav = about[about.index('<nav class="top"') : about.index("</nav>")]
-    assert nav.count("<a ") == 2 and 'href="/om" aria-current="page"' in nav  # one page for the search (jb 2026-10-13)
+    # one page for the search (jb 2026-10-13), one for the menu (jb 2026-11-02)
+    assert nav.count("<a ") == 3 and 'href="/om" aria-current="page"' in nav
     assert "Slik virker det" in about
     assert "mattilbud" not in about  # no pricing sources on the page (jb 2026-10-22)
     assert "sparer deg minst 20 kroner" in about  # the floor (jb 2026-10-22)
@@ -250,3 +251,59 @@ def test_offers_are_from_every_store_until_a_place_is_picked() -> None:
     assert moved.headers["HX-Replace-Url"] == "/?sted=bergen#forslag" and 'id="q"' not in moved.text  # the box stays
     assert client.get("/middager?sted=bergen", follow_redirects=False).headers["location"] == "/?sted=bergen#forslag"
     assert "Bergen, Tromsø" in client.get("/om").text
+
+
+def test_the_menu_asks_for_a_place_then_shops_at_few_chains() -> None:
+    s = snapshot(
+        recipe("Kyllinggryte", CHICKEN),
+        recipe("Laks i ovn", SALMON),
+        offers=[
+            offer("KYLLINGBRYST", 99, pre_price=135, id="sale", catalog="kiwi-vest"),
+            offer("LAKSEFILET", 99, pre_price=120, id="laks", store="REMA 1000", catalog="rema-vest"),
+        ],
+        matches={"kyllingfilet": ["sale"], "laksefilet": ["laks"]},
+        places={"Bergen": ["kiwi-vest", "rema-vest"]},
+    )
+    client = TestClient(main.create_app(Queries(FakeDatasets(s))))
+    blank = client.get("/menu").text
+    assert "<h1>Lag en meny</h1>" in blank and "Velg et sted" in blank and '<article class="card"' not in blank
+    assert '<a href="/menu" aria-current="page">Lag meny</a>' in blank
+    assert '<select id="place" name="place" form="menu-form" hx-get="/menu/list" hx-include="#menu-form">' in blank
+    one = client.get("/menu?place=bergen&weight=one-store&seed=5").text
+    assert '<p class="count" role="status">1 middag · 1 butikk</p>' in one
+    assert 'class="receipt"' not in one  # the cards say what to buy where (jb 2026-11-02: "its repated informtion")
+    assert "I alt 99\u00a0kr for varene på tilbud." in one
+    assert "Kyllinggryte" in one and "Laks i ovn" not in one
+    assert 'href="/menu?place=bergen&amp;weight=cheapest&amp;seed=5#week"' in one  # «Prioriter» keeps the place and seed
+    assert 'class="again" href="/menu?place=bergen&amp;weight=one-store&amp;seed=' in one
+    assert 'href="/menu?q=glutenfri&amp;place=bergen&amp;weight=one-store&amp;seed=5#week"' in one  # a chip too
+    cheapest = client.get("/menu?place=bergen&weight=cheapest&seed=5").text
+    assert "2 middager · 2 butikker" in cheapest and 'class="again" href="/menu?place=bergen&amp;weight=cheapest&amp;seed=' in cheapest
+    fragment = client.get("/menu/list?place=bergen&weight=nonsense&seed=5", headers=HX)
+    assert fragment.headers["HX-Replace-Url"] == "/menu?place=bergen&seed=5#week"  # an unknown weight is «Balansert»
+    assert '<input type="hidden" id="seed" name="seed" value="5" form="menu-form">' in fragment.text
+    moved = client.get("/menu/list?place=bergen", follow_redirects=False).headers["location"]
+    assert moved.startswith("/menu?place=bergen&seed=") and moved.endswith("#week")  # without HTMX: the page, a seed drawn
+
+
+def test_a_menu_card_leads_with_its_price_and_adds_up() -> None:
+    cheap = recipe("Karbonader", ingredient("karbonade", 400, "g", "/kjøtt/kjøttdeig"), SIDE)
+    s = snapshot(
+        cheap,
+        offers=[offer("KARBONADER", 20, pre_price=30, id="karb", catalog="meny-vest", store="MENY"), SIDE_OFFER],
+        matches={"karbonade": ["karb"], **SIDE_MATCH},
+        places={"Bergen": ["meny-vest", "KIWI"]},
+    )
+    html = TestClient(main.create_app(Queries(FakeDatasets(s)))).get("/menu?place=bergen&weight=cheapest").text
+    # 10 kr off: under the list's 20 kr floor, and still on the menu (jb 2026-11-02: "only loooking at discounts is a trap")
+    assert "I alt 65\u00a0kr: 20\u00a0kr på tilbud og ca. 45\u00a0kr til vanlig pris." in html
+    assert '<span class="cost">65\u00a0kr</span> <span class="sum small">\u221210\u00a0kr</span>' in html  # 20 + 45
+    assert '<span class="what">potet</span><span class="where">vanlig pris · <span class="price">ca. 45\u00a0kr</span>' in html
+    assert "Handle på" not in html  # the line over the cards went (jb 2026-11-02: "lets kill this header")
+
+
+def test_a_seed_from_the_address_is_only_a_number(client: TestClient) -> None:
+    for given, kept in (("-5", "5"), ("12abc", "12"), ("1" * 30, "1" * 9), ("%3Cscript%3E", None)):
+        moved = client.get(f"/menu/list?seed={given}", follow_redirects=False).headers["location"]
+        seed = moved.split("seed=")[1].split("#")[0]
+        assert seed.isdigit() and len(seed) <= 9 and (kept is None or seed == kept)

@@ -1,0 +1,36 @@
+{# A week's menu for the search (core.menu): the same filters as the front page, how to weigh price against chains, then
+   the dinners, each card with only the offers at the chains picked. An HTMX fragment of menu.html (/menu/list); then it
+   also sends the search box out of band. The weight and the seed go with every search (form="menu-form"); base.html
+   keeps the seed in the browser, so the same menu comes back until «Ny meny». #}
+{% from "_dinner.html" import card with context %}
+{% from "_search.html" import search_box %}
+{% from "_ui.html" import go, to, filters with context %}
+{% set menu_place = {"id": "place", "name": "place", "form": "menu-form", "url": "/menu/list", "none": "Velg sted"} %}
+{% set s = found.search %}
+<div id="menu-list" hx-target="#menu-list" hx-swap="outerHTML" hx-indicator="#menu-list">
+  <input type="hidden" name="weight" value="{{ weight }}" form="menu-form">
+  <input type="hidden" id="seed" name="seed" value="{{ seed }}" form="menu-form">
+  {{ filters(chips, cleared, places, found.place, menu_place) }}
+  <p class="weights"><span>Prioriter</span>{% for label, on, r in weights %}<a {{ to(r) }}{% if on %} aria-current="true"{% endif %}>{{ label }}</a>{% endfor %}</p>
+  {% for typed, used in s.corrected %}<p class="note">Fant ikke «{{ typed }}», så viser treff for «{{ used }}».</p>{% endfor %}
+  {% if not found.place %}
+  <div class="empty"><p><b>Velg et sted</b>, så lager vi en meny fra butikkene der.</p></div>
+  {% elif menu %}
+  {# The count, «Ny meny» and the total; the cards say what to buy where (jb 2026-11-02: a week strip "doesnot work", and
+     receipts per chain over the cards were "repated informtion"). #}
+  <div class="week-head">
+    <p class="count" role="status">{{ menu.courses|length }} {{ "middag" if menu.courses|length == 1 else "middager" }} · {{ menu.stores|length }} {{ "butikk" if menu.stores|length == 1 else "butikker" }}</p>
+    <a class="again" {{ to(again) }}><span aria-hidden="true">↻</span> Ny meny</a>
+  </div>
+  <p class="menu-total">I alt {{ menu.price|kr }}{% if menu.usual %}: {{ (menu.price - menu.usual)|kr }} på tilbud og ca. {{ menu.usual|kr }} til vanlig pris{% else %} for varene på tilbud{% endif %}.</p>
+  <div class="cards">
+    {% for c in menu.courses %}{{ card(c.dinner, s, via.get(c.dinner.dish.url, ()), c) }}{% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <p><b>Ingen middager passer alt dette.</b></p>
+    {% if relax %}<p>Prøv å fjerne {% for c, n, rest in relax[:3] %}<a {{ go(rest) }}>«{{ c.label }}»</a> ({{ n|tall }} middager){{ ", " if not loop.last }}{% endfor %}.</p>{% endif %}
+  </div>
+  {% endif %}
+  {% if box %}{{ search_box(s.text, oob=true, get="/menu/list", form="menu-form", target="#menu-list") }}{% endif %}
+</div>

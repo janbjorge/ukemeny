@@ -11,7 +11,10 @@
 {% macro offer(o, x, name="") -%}
 <li title="{{ tip(o) }}">{% if name %}<span class="what">{{ name }}</span><span class="off">{{ o.saving|spart }}</span>{{ where(o, x) }}{% else %}{{ where(o, x) }}<span class="off">{{ o.saving|spart }}</span>{% endif %}</li>
 {%- endmacro %}
-{% macro card(d, search=none, via=()) %}
+{# On the menu (`course`, core.menu.Course) the card leads with what the dinner costs at the menu's chains, the kroner off
+   beside it, and lists the ingredients bought at their usual price, so its rows add up to its price (jb 2026-11-02: "We
+   need to mkae sure that look at the pirce, not the discount"). #}
+{% macro card(d, search=none, via=(), course=none) %}
 <article class="card" data-protein="{{ d.protein }}">
   <p class="meta"><span class="protein">{{ d.protein }}</span> · {{ d.dish.prep_time }}
     {%- if d.dish.rating and d.dish.rating_count >= 5 %} · <span class="star">★</span>&nbsp;{{ "%.1f"|format(d.dish.rating)|replace(".", ",") }}{% endif %}</p>
@@ -19,7 +22,8 @@
   {% if via %}<p class="via">Med {% for name in via %}<mark>{{ name }}</mark>{{ ", " if not loop.last }}{% endfor %}</p>{% endif %}
   {% set deals = d.deals %}{% if deals %}
   <div class="save">
-    <p class="total"><span class="sum">{{ d.saving|spart }}</span></p>
+    {% if course %}<p class="total"><span class="cost">{{ course.price|kr }}</span>{% if course.saving %} <span class="sum small">{{ course.saving|spart }}</span>{% endif %}</p>
+    {% else %}<p class="total"><span class="sum">{{ d.saving|spart }}</span></p>{% endif %}
     <ul>{% for x in deals|sort(attribute="part.name") %}{% set offers = x.sales %}
       {%- if offers|length == 1 %}
       {{ offer(offers[0], x, x.part.name) }}
@@ -28,7 +32,10 @@
       {%- for o in offers[1:] %}
         {{ offer(o, x) }}
       {%- endfor %}</ul></details></li>{% endif %}
-    {%- endfor %}</ul>
+    {%- endfor %}
+    {%- if course %}{% for name, kr in course.usual %}
+      <li title="Ikke på tilbud i butikkene på menyen: prisen er den vanlige før-prisen i tilbudene ellers"><span class="what">{{ name }}</span><span class="where">vanlig pris · <span class="price">ca. {{ kr|kr }}</span></span></li>
+    {%- endfor %}{% endif %}</ul>
   </div>
   {% endif %}
 </article>

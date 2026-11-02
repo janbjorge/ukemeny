@@ -4,7 +4,21 @@ import ast
 from pathlib import Path
 
 CORE = Path(__file__).parent.parent / "src" / "core"
-ALLOWED = {"core", "collections", "dataclasses", "datetime", "difflib", "enum", "re", "typing"}
+ALLOWED = {
+    "core",
+    "collections",
+    "dataclasses",
+    "datetime",
+    "difflib",
+    "enum",
+    "heapq",
+    "itertools",
+    "random",
+    "re",
+    "statistics",
+    "typing",
+}
+"""random is seeded (core.menu): the same input gives the same answer."""
 
 
 def test_core_imports_nothing_from_outside() -> None:

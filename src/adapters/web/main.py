@@ -2,12 +2,14 @@
 
 import hashlib
 import os
+import random
+import secrets
 from collections import OrderedDict
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Protocol
 
 import logfire
 from fastapi import FastAPI, Query, Request
@@ -20,9 +22,10 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from adapters.datasets import JsonDatasets
 from adapters.web import api, fmt, telemetry
-from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, link, offset
-from app.queries import Found, Queries
+from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, MenuQuery, link, menu_link, offset
+from app.queries import Found, Planned, Queries
 from core.matching import VEGETARIAN
+from core.menu import Weight
 from core.ranking import FLOOR_KR
 from core.search import (
     Diet,
@@ -43,7 +46,7 @@ CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "")
 # On every page, for agents: the llms.txt guide and the API schema (service-desc, RFC 8631)
 LINK = '</llms.txt>; rel="alternate"; type="text/markdown", </api/openapi.json>; rel="service-desc"; type="application/json"'
 # The pages a crawler should index; the query-string variants and fragments stay out (see robots_txt)
-PAGES = ("", "om")
+PAGES = ("", "menu", "om")
 
 # The chips in the filter bar's panels: the diet rules and allergies a visitor picks (none to start with), then what a
 # dinner is like. «Kosthold» is how you choose to eat, «Allergier» the 14 allergens food must be labelled with (EU
@@ -80,7 +83,7 @@ STOMACH_CHIPS = (Diet.LACTOSE, Diet.ONION, Diet.GARLIC, Diet.FODMAP, Diet.LEGUME
 KIND_CHIPS = (Tag.QUICK, Tag.UNDER_40, Tag.LIKED, Tag.MILD)
 # The elements whose own answer must not replace the search box: the box and its form send what was typed, and «Sted»
 # leaves the text as it is
-KEEP_BOX = {"q", "sok", "sted"}
+KEEP_BOX = {"q", "sok", "sted", "menu-form", "place"}
 # Ideas per page and per "Vis flere": a phone screen holds one or two cards
 PAGE = 12
 # Rendered fragments kept, newest last: the snapshot does not change while the process runs, so a search someone
@@ -90,6 +93,55 @@ FRAGMENTS = 512
 PAGE_CACHE = "public, max-age=300"
 
 type Q = Annotated[str | None, Query()]
+
+# The menu's weights, as the page names them (core.menu.Weight)
+WEIGHTS = {Weight.CHEAPEST: "Lavest pris", Weight.BALANCED: "Balansert", Weight.ONE_STORE: "Én butikk"}
+# Seeds the menu draws from when none is given (core.menu.plan)
+SEEDS = 1_000_000
+
+
+@dataclass(frozen=True, slots=True)
+class Route:
+    """Where a search link goes: the full page, and the fragment HTMX loads instead."""
+
+    page: str
+    fragment: str
+
+
+class Routes(Protocol):
+    def __call__(self, text: str, antall: int | None = None) -> Route: ...
+
+
+def search_route(place: str | None) -> Routes:
+    """The front page's links: /?… and /middager?…, keeping `place`."""
+
+    def route(text: str, antall: int | None = None) -> Route:
+        qs = link(text, antall, place)
+        return Route(f"/{'?' + qs if qs else ''}#forslag", f"/middager{'?' + qs if qs else ''}")
+
+    return route
+
+
+def menu_route(place: str | None, weight: Weight, seed: int) -> Routes:
+    """The menu's links: /menu?… and /menu/list?…, keeping the place, the weight and the seed."""
+
+    def route(text: str, antall: int | None = None) -> Route:
+        qs = menu_link(text, place, weight, seed)
+        return Route(f"/menu{'?' + qs if qs else ''}#week", f"/menu/list{'?' + qs if qs else ''}")
+
+    return route
+
+
+def new_seed() -> int:
+    """A seed for a visitor without one: from the OS, never Python's shared generator, which the process's other requests
+    use too (jb 2026-11-02: "this should not st the random.seed as we have to rememer that multi users")."""
+    return secrets.randbelow(SEEDS - 1) + 1
+
+
+def next_seed(seed: int) -> int:
+    """The seed «Ny meny» moves to: another menu, the same for everyone who presses it, so the fragment is kept. A
+    generator of its own, as core.menu's draws: no request seeds or reads the shared one."""
+    return random.Random(seed).randrange(1, SEEDS)
 
 
 @dataclass(frozen=True, slots=True)
@@ -262,6 +314,7 @@ def create_app(queries: Queries) -> FastAPI:
             # A fragment also sends, when a chip or a link changed the search rather than typing, the search box with its
             # new text (out of band)
             "box": fragment and trigger not in KEEP_BOX,
+            "route": search_route(found.place),
         }
 
     @app.get("/", response_class=HTMLResponse)
@@ -325,6 +378,64 @@ def create_app(queries: Queries) -> FastAPI:
             lambda: {"found": found, "start": start, "shown": len(found.dinners)},
         )
 
+    def plan(choice: MenuQuery, seed: int) -> Planned:
+        place = queries.place(choice.place)
+        with logfire.span("menu {text}", text=choice.q, place=place or "", weight=choice.weight.value, seed=seed) as span:
+            planned = queries.menu(choice.q, place, choice.weight, seed)
+            if planned.menu:
+                span.set_attributes({"menu.stores": list(planned.menu.stores), "menu.dinners": len(planned.menu.dinners)})
+        return planned
+
+    def menu_context(
+        planned: Planned, choice: MenuQuery, seed: int, fragment: bool = False, trigger: str | None = None
+    ) -> dict[str, object]:
+        found = planned.found
+        return {
+            "found": found,
+            "menu": planned.menu,
+            "via": planned.via,
+            "chips": chips(found),
+            "cleared": cleared(found.search),
+            "relax": [(c, n, found.search.drop(c).text) for c, n in found.relax],
+            "places": sorted(queries.snapshot.places),
+            "weight": choice.weight.value,
+            "seed": seed,
+            # «Prioriter»: each weight, the same search
+            "weights": [(label, w is choice.weight, menu_route(found.place, w, seed)(found.search.text)) for w, label in WEIGHTS.items()],
+            # «Ny meny»: another seed, for every weight (core.menu.plan)
+            "again": menu_route(found.place, choice.weight, next_seed(seed))(found.search.text),
+            "box": fragment and trigger not in KEEP_BOX,
+            "route": menu_route(found.place, choice.weight, seed),
+        }
+
+    @app.get("/menu", response_class=HTMLResponse)
+    def menu_page(request: Request, q: Q = None, place: Q = None, weight: Q = None, seed: Q = None) -> HTMLResponse:
+        """A week's menu (jb 2026-11-02: "it should have the same fitlers as we have on search, but it should attempt to
+        minimzze the stores needed to visit, as well as the price"; "i think i want this on a new page")."""
+        choice = MenuQuery.of(q=q, place=place, weight=weight, seed=seed)
+        drawn = choice.seed or new_seed()
+        return templates.TemplateResponse(request, "menu.html", menu_context(plan(choice, drawn), choice, drawn))
+
+    @app.get("/menu/list", response_class=HTMLResponse)
+    def menu_fragment(request: Request, q: Q = None, place: Q = None, weight: Q = None, seed: Q = None) -> Response:
+        """The menu for a search. Without HTMX it is the menu page with the same search."""
+        choice = MenuQuery.of(q=q, place=place, weight=weight, seed=seed)
+        drawn = choice.seed or new_seed()
+        if "hx-request" not in request.headers:
+            query = menu_link(choice.q, queries.place(choice.place), choice.weight, drawn)
+            return RedirectResponse(f"/menu?{query}#week", status_code=303)
+        trigger = request.headers.get("hx-trigger")
+        # Keyed by the search as understood, so a menu already made is not planned again
+        text, place = queries.parse(choice.q).text, queries.place(choice.place)
+        response = fragment(
+            request,
+            "_menu.html",
+            (text, place, choice.weight, drawn, trigger not in KEEP_BOX),
+            lambda: menu_context(plan(choice, drawn), choice, drawn, fragment=True, trigger=trigger),
+        )
+        response.headers["HX-Replace-Url"] = f"/menu?{menu_link(text, place, choice.weight, drawn)}#week"
+        return response
+
     @app.get("/om", response_class=HTMLResponse)
     def about(request: Request) -> HTMLResponse:
         return templates.TemplateResponse(request, "om.html", {"places": sorted(queries.snapshot.places)})
@@ -360,6 +471,8 @@ def create_app(queries: Queries) -> FastAPI:
             # Not `/*?`: some parsers (Python's) let that wildcard outrank `Allow: /api/`, closing the API's searches too
             "Disallow: /?\n"
             "Disallow: /middager\n"
+            "Disallow: /menu?\n"
+            "Disallow: /menu/list\n"
             f"# For AI agents: read {request.base_url}llms.txt, then use the JSON API\n"
             f"Sitemap: {request.base_url}sitemap.xml\n"
         )

@@ -13,9 +13,10 @@ TIME_BONUS: Mapping[str, float] = {"Under": 1.0, "20": 0.5, "40": 0.0, "Over": -
 
 FLOOR_KR = 20.0
 """A dinner is shown from this many kroner off, every discounted ingredient summed (Dinner.saving; app.queries
-`Queries.ranked`). jb 2026-10-22: "no point in showing 100 menues with tuna on sale for 8kr". With the offers of
-2026-10-22, 2 262 of 3 392 dinners had any kroner off, 1 467 had 20 or more, 1 180 had 30 or more and 582 had 50 or
-more; the median among those on sale was 31 kr. To tune on the cards (METHOD.md §3)."""
+`Queries.ranked`), and a menu's dinner from as much off the packs bought at its chains (core.menu `_priced`). jb
+2026-10-22: "no point in showing 100 menues with tuna on sale for 8kr". With the offers of 2026-10-22, 2 262 of 3 392
+dinners had any kroner off, 1 467 had 20 or more, 1 180 had 30 or more and 582 had 50 or more; the median among those
+on sale was 31 kr. To tune on the cards (METHOD.md §3, §8)."""
 
 
 def score(dish: Dish) -> float:

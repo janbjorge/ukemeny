@@ -290,14 +290,13 @@ def test_a_menu_card_leads_with_its_price_and_adds_up() -> None:
     cheap = recipe("Karbonader", ingredient("karbonade", 400, "g", "/kjøtt/kjøttdeig"), SIDE)
     s = snapshot(
         cheap,
-        offers=[offer("KARBONADER", 20, pre_price=30, id="karb", catalog="meny-vest", store="MENY"), SIDE_OFFER],
+        offers=[offer("KARBONADER", 20, pre_price=45, id="karb", catalog="meny-vest", store="MENY"), SIDE_OFFER],
         matches={"karbonade": ["karb"], **SIDE_MATCH},
         places={"Bergen": ["meny-vest", "KIWI"]},
     )
     html = TestClient(main.create_app(Queries(FakeDatasets(s)))).get("/menu?place=bergen&weight=cheapest").text
-    # 10 kr off: under the list's 20 kr floor, and still on the menu (jb 2026-11-02: "only loooking at discounts is a trap")
     assert "I alt 65\u00a0kr: 20\u00a0kr på tilbud og ca. 45\u00a0kr til vanlig pris." in html
-    assert '<span class="cost">65\u00a0kr</span> <span class="sum small">\u221210\u00a0kr</span>' in html  # 20 + 45
+    assert '<span class="cost">65\u00a0kr</span> <span class="sum small">\u221225\u00a0kr</span>' in html  # 20 + 45
     assert '<span class="what">potet</span><span class="where">vanlig pris · <span class="price">ca. 45\u00a0kr</span>' in html
     assert "Handle på" not in html  # the line over the cards went (jb 2026-11-02: "lets kill this header")
 

@@ -4,7 +4,8 @@ menu out (METHOD.md §8).
 The catalogs only price what is on sale, so a menu's price is that of the ingredients some store near the place has on
 sale: per ingredient, the cheapest pack at the chains picked, or, when none of them has it on sale, its usual price, the
 median before-price of every offer for it near the place. Each dinner's main ingredient (Dinner.on_sale) must be on sale
-at the chains picked, so the dearest part of it is known. Every set of up to MAX_STORES chains is tried; per set, the
+at the chains picked, so the dearest part of it is known, and the packs bought there must save core.ranking.FLOOR_KR.
+Every set of up to MAX_STORES chains is tried; per set, the
 cheapest dinners, a few per main protein, make the menu, and each chain past the first costs the weight's STORE_COST.
 """
 
@@ -18,6 +19,7 @@ from itertools import combinations
 from statistics import median
 
 from core.models import MAIN_WEIGHT, Buy, Dinner, Offer
+from core.ranking import FLOOR_KR
 
 SIZE = 7
 """Dinners in a menu: a week (jb 2026-11-02: "i think a full week? I there any point in giving options? They can ignore
@@ -143,7 +145,8 @@ class _Priced:
 
 def _priced(ingredients: Sequence[_Ingredient], stores: frozenset[str]) -> _Priced | None:
     """Per ingredient, the pack on sale at `stores`, or its usual price; an offer two ingredients share is bought once.
-    None when the main ingredient is not on sale there."""
+    None when the main ingredient is not on sale there, or the packs save less than FLOOR_KR (jb 2026-11-02: "right now
+    we get meny options that are 5 nok saving on a recepie, no-one really cares")."""
     picks: dict[str, Offer] = {}
     usual: list[tuple[str, float]] = []
     main = False
@@ -153,10 +156,11 @@ def _priced(ingredients: Sequence[_Ingredient], stores: frozenset[str]) -> _Pric
             continue
         main = main or i.main
         picks.setdefault(o.id, o)
-    if not main:
+    saving = sum(o.saving or 0.0 for o in picks.values())
+    if not main or saving < FLOOR_KR:
         return None
     price = sum(o.price for o in picks.values()) + sum(kr for _, kr in usual)
-    return _Priced(price, sum(o.saving or 0.0 for o in picks.values()), tuple(picks.values()), tuple(usual))
+    return _Priced(price, saving, tuple(picks.values()), tuple(usual))
 
 
 def _draw(seed: int, dinner: Dinner) -> float:

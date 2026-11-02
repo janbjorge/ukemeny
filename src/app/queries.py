@@ -23,7 +23,7 @@ type Rules = tuple[Household, str | None]
 """What a ranking depends on: the household, and the place whose offers count (None: every store)."""
 
 type Kept = tuple[Household, str | None, bool]
-"""Rules, and whether the ranking keeps to core.ranking.FLOOR_KR (the menu's does not)."""
+"""Rules, and whether the ranking keeps to core.ranking.FLOOR_KR (the menu's applies it at its chains, core.menu)."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -89,8 +89,8 @@ class Queries:
     def ranked(self, h: Household | None = None, place: str | None = None, floor: bool = True) -> list[Dinner]:
         """Every dinner that fits and saves at least core.ranking.FLOOR_KR near `place`, best first (core.ranking.dinners;
         jb 2026-10-22: "We should ignore dinners with 0 Discounted ingredients", "no point in showing 100 menues with
-        tuna on sale for 8kr"). Without `floor`, every dinner with something on sale: the menu goes by price, and a
-        cheap dinner may save little (jb 2026-11-02: "only loooking at discounts is a trap")."""
+        tuna on sale for 8kr"). Without `floor`, every dinner with something on sale: the menu counts the floor at
+        the chains it picks, where a dinner may save less than over every chain (core.menu `_priced`)."""
         key = (h or self.base, place, floor)
         if (ranked := self._ranked.get(key)) is None:
             if len(self._ranked) >= self.KEPT:

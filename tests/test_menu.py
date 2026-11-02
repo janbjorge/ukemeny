@@ -20,13 +20,13 @@ def test_the_cheapest_pack_wins_over_the_biggest_discount() -> None:
         recipe("Kyllinggryte", CHICKEN),
         offers=[
             offer("KYLLINGFILET", 40, pre_price=70, id="kiwi", store="KIWI"),
-            offer("KYLLINGFILET", 30, pre_price=45, id="rema", store="REMA 1000"),
+            offer("KYLLINGFILET", 30, pre_price=55, id="rema", store="REMA 1000"),
         ],
         matches={"kyllingfilet": ["kiwi", "rema"]},
     )
     menu = plan(found, Weight.CHEAPEST)
     assert menu is not None and menu.stores == ("REMA 1000",)
-    assert menu.price == 30 and menu.saving == 15  # REMA's 30 kr pack, 15 kr off, over KIWI's 40 kr, 30 kr off
+    assert menu.price == 30 and menu.saving == 25  # REMA's 30 kr pack, 25 kr off, over KIWI's 40 kr, 30 kr off
     assert [o.store for b in menu.dinners[0].buys for o in b.sales] == ["REMA 1000"]  # the card: only where to shop
 
 
@@ -92,6 +92,21 @@ def test_an_ingredient_not_on_sale_at_the_chains_costs_its_usual_price() -> None
     one = plan(found, Weight.ONE_STORE)
     assert one is not None and one.stores == ("KIWI",) and one.price == 145  # 100 kr on sale, potatoes at 45 kr
     assert one.courses[0].usual == (("potet", 45),) and one.saving == 50
+
+
+def test_a_dinner_saving_under_the_floor_at_the_chains_is_left_out() -> None:
+    """The floor counts the packs bought at the menu's chains (jb 2026-11-02: "right now we get meny options that are 5
+    nok saving on a recepie, no-one really cares")."""
+    found = ranked(
+        recipe("Kyllinggryte", CHICKEN),
+        offers=[
+            offer("KYLLINGFILET", 100, pre_price=105, id="kiwi"),
+            offer("KYLLINGFILET", 150, pre_price=200, id="rema", store="REMA 1000"),
+        ],
+        matches={"kyllingfilet": ["kiwi", "rema"]},
+    )
+    menu = plan(found, Weight.ONE_STORE)  # KIWI's pack is cheaper, but saves 5 kr
+    assert menu is not None and menu.stores == ("REMA 1000",) and menu.price == 150 and menu.saving == 50
 
 
 def test_a_few_of_each_main_protein() -> None:

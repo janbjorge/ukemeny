@@ -47,6 +47,21 @@ CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "")
 LINK = '</llms.txt>; rel="alternate"; type="text/markdown", </api/openapi.json>; rel="service-desc"; type="application/json"'
 # The pages a crawler should index; the query-string variants and fragments stay out (see robots_txt)
 PAGES = ("", "menu", "om")
+# Agents that fetch for a person in a chat: welcome everywhere, searches and the API included (jb 2026-11-02: "We need
+# to make sure that ppl. can still access our apis via llms"). All but MistralAI-User seen on /api in the log
+AGENTS = (
+    "ChatGPT-User",
+    "Claude-User",
+    "Perplexity-User",
+    "MistralAI-User",
+    "DuckAssistBot",
+    "Meta-ExternalFetcher",
+)
+# What every other crawler is asked to keep off (robots.txt). The API's links (`add`, `remove`, `places`) reach every
+# combination of rules and places: Amazonbot walked them at one request per 4 s, a new URL each time (jb 2026-11-02:
+# "LLMs welcome, crawlers; fuck off"). Asked, not refused: a 403 by user agent would also turn away an agent fetching
+# for a person that is not in AGENTS
+KEPT_OFF = ("/api/", "/?", "/middager", "/menu?", "/menu/list")
 
 # The chips in the filter bar's panels: the diet rules and allergies a visitor picks (none to start with), then what a
 # dinner is like. «Kosthold» is how you choose to eat, «Allergier» the 14 allergens food must be labelled with (EU
@@ -459,22 +474,14 @@ def create_app(queries: Queries) -> FastAPI:
     @app.get("/robots.txt", response_class=PlainTextResponse)
     def robots_txt(request: Request) -> str:
         # Agents that fetch for a person in a chat may open everything, searches included (ChatGPT read llms.txt and
-        # never reached the API; `Disallow: /*?` may have stopped it, jb 2026-10-13). Crawlers keep off query strings.
+        # never reached the API; `Disallow: /*?` may have stopped it, jb 2026-10-13). Crawlers keep off the API and
+        # query strings (KEPT_OFF).
         return (
-            "User-agent: ChatGPT-User\n"
-            "User-agent: Claude-User\n"
-            "User-agent: Perplexity-User\n"
-            "Allow: /\n"
-            "\n"
-            "User-agent: *\n"
-            "Allow: /api/\n"
-            # Not `/*?`: some parsers (Python's) let that wildcard outrank `Allow: /api/`, closing the API's searches too
-            "Disallow: /?\n"
-            "Disallow: /middager\n"
-            "Disallow: /menu?\n"
-            "Disallow: /menu/list\n"
-            f"# For AI agents: read {request.base_url}llms.txt, then use the JSON API\n"
-            f"Sitemap: {request.base_url}sitemap.xml\n"
+            "".join(f"User-agent: {a}\n" for a in AGENTS)
+            + "Allow: /\n\nUser-agent: *\n"
+            + "".join(f"Disallow: {p}\n" for p in KEPT_OFF)
+            + f"# For AI agents: read {request.base_url}llms.txt, then use the JSON API\n"
+            + f"Sitemap: {request.base_url}sitemap.xml\n"
         )
 
     @app.get("/sitemap.xml")

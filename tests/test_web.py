@@ -1,6 +1,7 @@
 """The site: pages, the HTMX fragment and its no-JS fallback, headers."""
 
 from dataclasses import replace
+from urllib.robotparser import RobotFileParser
 
 import pytest
 from fastapi.testclient import TestClient
@@ -163,11 +164,26 @@ def test_about_llms_robots_sitemap_health(client: TestClient) -> None:
     assert "api/plan" not in llms and "kjøttdeig" in llms  # no week (jb 2026-10-22)
     assert "- [melkefri](http://testserver/api/middager?q=melkefri)" in llms  # a link per rule: agents need not write URLs
     robots = client.get("/robots.txt").text
-    assert "Allow: /api/" in robots and "Sitemap: http://testserver/sitemap.xml" in robots
-    assert robots.startswith("User-agent: ChatGPT-User\nUser-agent: Claude-User\nUser-agent: Perplexity-User\nAllow: /\n")
+    assert "Sitemap: http://testserver/sitemap.xml" in robots
     assert "<loc>http://testserver/om</loc>" in client.get("/sitemap.xml").text
     assert client.get("/helse").text == "ok"
     assert client.get("/favicon.ico").headers["content-type"] == "image/svg+xml"
+
+
+def test_robots_lets_agents_in_and_keeps_crawlers_off_searches(client: TestClient) -> None:
+    # Product tokens from user agents seen on /api (jb 2026-11-02: "LLMs welcome, crawlers; fuck off"; "We need to make
+    # sure that ppl. can still access our apis via llms")
+    robots = RobotFileParser()
+    robots.parse(client.get("/robots.txt").text.splitlines())
+    searches = ("/api/middager?q=melkefri", "/api/oppskrift?url=x", "/?q=fisk", "/middager?q=fisk", "/menu?seed=1")
+    for agent in ("ChatGPT-User", "Claude-User", "Perplexity-User", "DuckAssistBot", "Meta-ExternalFetcher"):
+        assert all(robots.can_fetch(agent, f"http://testserver{p}") for p in ("/llms.txt", *searches)), agent
+    for crawler in ("Amazonbot", "GPTBot", "ClaudeBot", "Googlebot", "bingbot"):
+        assert not any(robots.can_fetch(crawler, f"http://testserver{p}") for p in searches), crawler
+        assert all(robots.can_fetch(crawler, f"http://testserver{p}") for p in ("/", "/om", "/menu", "/llms.txt")), crawler
+    # Robots.txt asks; nothing is refused by user agent
+    amazonbot = "Mozilla/5.0 (compatible; Amazonbot/0.1; +https://developer.amazon.com/support/amazonbot)"
+    assert client.get("/api/middager?q=melkefri", headers={"User-Agent": amazonbot}).status_code == 200
 
 
 def test_headers(client: TestClient) -> None:

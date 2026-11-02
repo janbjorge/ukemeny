@@ -2,6 +2,10 @@
 
 Finished jb requests, newest first. Each quotes request + says what built.
 
+## 2026-11-02
+
+- [x] **LLM agents in, crawlers out** ("How can we set this up as LLMs welcome, crawlers; fuck off"): Amazonbot read llms.txt 2026-10-26, then walked `/api/middager` links (every rule + place combination), one new URL per 4 s, ~21 600/day from 2026-10-29. robots.txt now asks `User-agent: *` off `/api/` plus searches (`KEPT_OFF`); agents fetching for person (`AGENTS`, now + MistralAI-User, DuckAssistBot, Meta-ExternalFetcher) still open everything. 403 by user agent tried, dropped ("We need to make sure that ppl. can still access our apis via llms"): would stop agent not in list (FACTS.md §1).
+
 ## 2026-10-23
 
 - [x] **«Sted» remembered in the browser** ("Can we have the browser save our prefnces, like location etc...? or would we need to cookie gdpr banner todo that?"; "local storage works for me"): picked place kept in localStorage by page's own script. Page opened without place in address searches with it → select, list, address get place. «Hele landet» forgets it; /om says it kept. No cookie, no consent banner: ekomloven § 3-15 exempts storage visitor explicitly asked for (FACTS.md §1). Checked headless WebKit: Bergen picked (1 226 dinners nationally, 876 in Bergen); front page reopened with Bergen in select, list, address; link with typed words kept them + got place; link to Oslo did not overwrite Bergen; «Hele landet» forgot it; kept place no longer on list dropped; no cookie set ever.

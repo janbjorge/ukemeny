@@ -75,7 +75,8 @@ addEventListener("keydown", (e) => {
 <body>
 <nav class="top" aria-label="Sider">
   <div class="in">
-    <a class="brand" href="/"><img src="{{ static_url('icon.svg') }}" alt="" width="26" height="26">matris</a>
+    <a class="brand" href="/"><img src="{{ static_url('icon.svg') }}" alt="" width="26" height="26"><span class="name">matris</span></a>
+    <a href="/"{% if request.url.path == "/" %} aria-current="page"{% endif %}>Finn middag</a>
     <a href="/menu"{% if request.url.path == "/menu" %} aria-current="page"{% endif %}>Lag meny</a>
     <a href="/om"{% if request.url.path == "/om" %} aria-current="page"{% endif %}>Slik virker det</a>
   </div>

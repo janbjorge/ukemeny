@@ -151,8 +151,10 @@ def test_unknown_choices_still_show_a_page(client: TestClient) -> None:
 def test_about_llms_robots_sitemap_health(client: TestClient) -> None:
     about = client.get("/om").text
     nav = about[about.index('<nav class="top"') : about.index("</nav>")]
-    # one page for the search (jb 2026-10-13), one for the menu (jb 2026-11-02)
-    assert nav.count("<a ") == 3 and 'href="/om" aria-current="page"' in nav
+    # the brand, the search's page (jb 2026-11-02: "We lack a 'home' nav in the header"), the menu (jb 2026-11-02), /om
+    assert nav.count("<a ") == 4 and 'href="/om" aria-current="page"' in nav and '<a href="/">Finn middag</a>' in nav
+    home = client.get("/").text
+    assert '<a href="/" aria-current="page">Finn middag</a>' in home[home.index('<nav class="top"') :]
     assert "Slik virker det" in about
     assert "mattilbud" not in about  # no pricing sources on the page (jb 2026-10-22)
     assert "sparer deg minst 20 kroner" in about  # the floor (jb 2026-10-22)

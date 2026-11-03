@@ -1,28 +1,24 @@
 # TODO
 
-All jb requests + status. Newest first. Tick only when done + verified; finished → docs/done.md.
+Open work only. Done → delete; code is record (jb 2026-11-03: "No need to track done, done is in the code").
 
-## Open
+## Now
 
-- [ ] **A menu: few stores, a low price** (jb 2026-11-02: "i want a meny build, it should have the same fitlers as we have on search, but it should attempt to minimzze the stores needed to visit, as well as the price"; "Price is the overall price, not the total discount"; "i think a full week?"; "some kind of semi randomness here"; "lets keep english in the code"): `/menu` (FACTS.md §1, METHOD.md §8). Built, checked locally; «Lavest pris» redone as lowest price after jb's "One is th cheepest?". Dinner saving under FLOOR_KR at menu's chains dropped (jb 2026-11-02: "right now we get meny options that are 5 nok saving on a recepie, no-one really cares"; METHOD.md §8). Left: tune «Balansert»'s 80 kr, check floor's menus in browser, push.
-- [ ] **Mince by kind, every offer on the card, the cheapest offer in the sum** (jb 2026-10-24: "We have a bug in how we correlate pricing and shop; Ex, we got ; kjøttdeig av svin -> Coop Mega"; "I would assume that the recepies would statet what kind of kjootdeig it would want"; "In cases where we cant match 'perfetct' lets list all of them, but we need to take care to pick the lowest for the total discount. We might need to re-think our hero cards as well for this."): offer question = exact/near/no w/ category, offers.json keeps near separate, sum takes cheapest offer per ingredient, card lists all offers (METHOD.md §2, §6). Card: all offers w/ store, price, kroner off in columns, several under name (jb 2026-10-24: "this is the layout i want, super"). Left: jb's `--offers` run, then check kjøttdeig cards.
-- [ ] **A link from each discount line to the shop's own ad** (jb 2026-10-23: "I dont want to link to Tjek, i would like a link the shops ad with the offer"): nothing built. Offer records hold no shop link → check what Tjek offer carries (webshop link per offer?) + each of 13 chains' offers pages; outside reads, need jb's OK.
-- [ ] **The model: two kinds of crawler, a kept dictionary, Jev only joins** (jb 2026-10-22: "we have two type of crawlers: 1. recipes ... 2. discounts ... What jev does, it to connect these, as the data is not always 1 to 1"; "Make sure to make a plan, ideally a kick as checklist that we can prune as we do them"; "killing a shitton of what feel slike crappy code"): checklist = docs/plan-model.md. Done: docs fixed, vocabulary (row shape, tests/test_traits.py, seeded traits.json), build on it (row drafted once per new name, no hint dinner, no doubt check), form per part + matcher asking per product, 20 kr floor + week's draw deleted, jb's rebuild (2026-10-23, 62134ab, pushed), cards checked: 37 rows + two snack words fixed by hand (METHOD.md §2), floor kept 20 kr (Stavanger: 371 dinners save 20–30 kr, main protein on sale in 259). Left: «Svinespyd med østerssaus og kokosmelk» still no pork part (needs godt.no page read), push fixes.
-- [ ] **Only the offers, weekly** ("For the most part i think matprat and godt.no wont really change that mutch. So i want sometihng that fetches the updated tilbud and does the matching"): `--offers` (FACTS.md §4). Code in. Left: run, then check cards.
-- [ ] **godt.no without its sitemap** ("it seems godt.no has changed there agent polecy, so we need to find relay on the urls we have in dishes.json"): `--known` (FACTS.md §4). Code in. Left: check godt.no robots.txt still lets matris read recipe pages, then run.
-- [ ] **Offers matched for the dinner, not the name** ("I think we have a bug in our classifier"; "im pretty sure that the cheep tuna, is canned, not really something you want to use with sussu?"; "Tracking a new 'canned' attribute seems to narrow to me"; "lets start the re-deisn. We should also make sure that we do not waaste effort on dishes that do not have any discounts"): meat, fish, shellfish asked per dinner w/ recipe line → tin, smoked salmon, grilled ribbe count only where dinner can use; only discounted offers asked (METHOD.md §2). Built 2026-10-23, checked: tinned tuna on offer → «Fiskekaker med tunfisk», not «Tunfisk poke» or nigiri. Left: Jev's wrong yeses on unknown product names (Smøremyk for smøreost, Ristorante for carnaroli-ris, ALI HELE BØNNER for grønne bønner; METHOD.md §2): probe question vs those pairs, w/ jb's OK.
-- [ ] Offers per place, picked in «Sted» (jb 2026-10-13: "At the moment the pipeline assumes one location (stavanger), we need to extend this not assume location, and push that up to the search input in the 'finn en middag' part"). Code + first build w/ places committed (FACTS.md §1, §4); place moved from search to select 2026-10-14 (docs/done.md); pushed by jb 2026-10-23 (62134ab). Left: check live site.
-- [ ] Logfire, every insight the app can see (jb 2026-10-13: "I wanto add logfire, go full tilt on all options. Make sure to understand the runtime in terms of being on fly.io and make sure we get every insight metric we can into logfire"). Code in (FACTS.md §7), checked in Docker image. Left: `matris` project in Logfire w/ write token, `fly secrets set LOGFIRE_TOKEN=… -a matris`, push, check data arrives.
-- [ ] Tune Lavkarbo's 20 g per portion (METHOD.md §1): leaves 378 of 1 943 dinners (727 of 3 399 w/ godt.no, 2026-10-14).
-- [ ] Rebuild `datasets/` weekly so offers stay current: by hand (`uv run python -m pipeline.datasets`, commit, push), or scheduled GitHub Action w/ `TYPESAFE_API_KEY` secret (Jev still offline, not in site).
-- [ ] Open question: min rating or max prep time in profile.yaml, since discount can push three-star, hour-long dish to top (METHOD.md §5).
+Numbers must hold (jb 2026-11-02: "The resulsts does not feel real or correct").
 
-## Ideas not yet requested
+- [ ] Card's kroner off from one chain: `Dinner.saving` sums cheapest offer per ingredient across chains. Pick rule, METHOD.md §3.
+- [ ] Floor on main ingredient: sides alone pass FLOOR_KR (kålrot + potet = 20 kr). Pick rule, count dinners, METHOD.md §3, §8.
+- [ ] Wrong Jev matches (Smøremyk → smøreost, Ristorante → carnaroli-ris, ALI HELE BØNNER → grønne bønner): probe or override list, jb's OK.
+- [ ] Shopping list from `/menu`, per chain, shareable by seed, printable. ASCII mockup first.
+- [ ] «Bytt» one dinner on menu, keeps rest. ASCII mockup first.
 
-- Fix known wrong Jev answers (FACTS.md §6) w/ small override list.
-- Keep one Fly machine running (`min_machines_running = 1`) so first visit after quiet spell skips start wait; costs machine running 24/7.
-- Weekly shopping list from `check --json` ingredient lists.
+## Later
 
-## Done
-
-Moved to docs/done.md.
+- [ ] Menu: tune «Balansert»'s 80 kr.
+- [ ] `--offers` run, then check kjøttdeig cards; rebuild `datasets/` weekly (by hand or GitHub Action).
+- [ ] `--known`: check godt.no robots.txt, then run.
+- [ ] «Svinespyd med østerssaus og kokosmelk» has no pork part.
+- [ ] Logfire: project + `fly secrets set LOGFIRE_TOKEN=… -a matris`, check data arrives.
+- [ ] Link discount line to shop's own ad, not Tjek. Outside reads need jb's OK.
+- [ ] Tune Lavkarbo's 20 g per portion (METHOD.md §1).
+- [ ] Min rating or max prep time? (METHOD.md §5)

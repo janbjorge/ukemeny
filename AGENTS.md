@@ -1,7 +1,7 @@
 # Rules for agents
 
 - Read FACTS.md first, keep true. Code and file disagree → code wins; fix file.
-- Check TODO.md before + after work. Move done items to docs/done.md with date + quoted request.
+- Check TODO.md before + after work. Delete done items; code is record.
 - Log every simplification/judgement call on diet, matching, ranking in METHOD.md.
 - Each fact in one file; others link. No copying sections between files.
 

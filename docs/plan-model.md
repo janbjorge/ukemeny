@@ -5,7 +5,7 @@ jb, 2026-10-22: "we have two type of crawlers: 1. recipes (matprat.no, godt.no, 
 independent of what they do." "i want to keep the site as is, ie. code is the source of truth for the frontend part."
 "ideally, this should be 90% plus pipeline."
 
-Checklist. Tick item when done + verified; delete when pruned. Finished items → docs/done.md.
+Checklist. Delete item when done + verified.
 
 ## What does not change
 

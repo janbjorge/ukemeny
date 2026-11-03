@@ -25,7 +25,7 @@ from adapters.web import api, fmt, telemetry
 from adapters.web.params import KNOWN_PROTEINS, DinnerQuery, MenuQuery, link, menu_link, offset
 from app.queries import Found, Planned, Queries
 from core.matching import VEGETARIAN
-from core.menu import Weight
+from core.menu import Weight, dish_key, shopping
 from core.ranking import FLOOR_KR
 from core.search import (
     Diet,
@@ -61,7 +61,7 @@ AGENTS = (
 # combination of rules and places: Amazonbot walked them at one request per 4 s, a new URL each time (jb 2026-11-02:
 # "LLMs welcome, crawlers; fuck off"). Asked, not refused: a 403 by user agent would also turn away an agent fetching
 # for a person that is not in AGENTS
-KEPT_OFF = ("/api/", "/?", "/middager", "/menu?", "/menu/list")
+KEPT_OFF = ("/api/", "/?", "/middager", "/menu?", "/menu/list", "/menu/handleliste")
 
 # The chips in the filter bar's panels: the diet rules and allergies a visitor picks (none to start with), then what a
 # dinner is like. «Kosthold» is how you choose to eat, «Allergier» the 14 allergens food must be labelled with (EU
@@ -395,8 +395,10 @@ def create_app(queries: Queries) -> FastAPI:
 
     def plan(choice: MenuQuery, seed: int) -> Planned:
         place = queries.place(choice.place)
-        with logfire.span("menu {text}", text=choice.q, place=place or "", weight=choice.weight.value, seed=seed) as span:
-            planned = queries.menu(choice.q, place, choice.weight, seed)
+        with logfire.span(
+            "menu {text}", text=choice.q, place=place or "", weight=choice.weight.value, seed=seed, swaps=len(choice.swap)
+        ) as span:
+            planned = queries.menu(choice.q, place, choice.weight, seed, choice.swap)
             if planned.menu:
                 span.set_attributes({"menu.stores": list(planned.menu.stores), "menu.dinners": len(planned.menu.dinners)})
         return planned
@@ -405,9 +407,18 @@ def create_app(queries: Queries) -> FastAPI:
         planned: Planned, choice: MenuQuery, seed: int, fragment: bool = False, trigger: str | None = None
     ) -> dict[str, object]:
         found = planned.found
+
+        def swap(url: str, n: int) -> Route:
+            """«Bytt» on the menu's `n`th dinner: the swaps so far and this one. Without JavaScript the page opens at
+            the card, whose place the new dinner takes."""
+            qs = menu_link(found.search.text, found.place, choice.weight, seed, (*choice.swap, dish_key(url)))
+            return Route(f"/menu?{qs}#middag-{n}", f"/menu/list?{qs}")
+
         return {
             "found": found,
             "menu": planned.menu,
+            "swap": swap,
+            "shopping": f"/menu/handleliste?{menu_link(found.search.text, found.place, choice.weight, seed, choice.swap)}",
             "via": planned.via,
             "chips": chips(found),
             "cleared": cleared(found.search),
@@ -424,20 +435,40 @@ def create_app(queries: Queries) -> FastAPI:
         }
 
     @app.get("/menu", response_class=HTMLResponse)
-    def menu_page(request: Request, q: Q = None, place: Q = None, weight: Q = None, seed: Q = None) -> HTMLResponse:
+    def menu_page(request: Request, q: Q = None, place: Q = None, weight: Q = None, seed: Q = None, swap: Q = None) -> HTMLResponse:
         """A week's menu (jb 2026-11-02: "it should have the same fitlers as we have on search, but it should attempt to
         minimzze the stores needed to visit, as well as the price"; "i think i want this on a new page")."""
-        choice = MenuQuery.of(q=q, place=place, weight=weight, seed=seed)
+        choice = MenuQuery.of(q=q, place=place, weight=weight, seed=seed, swap=swap)
         drawn = choice.seed or new_seed()
         return templates.TemplateResponse(request, "menu.html", menu_context(plan(choice, drawn), choice, drawn))
 
+    @app.get("/menu/handleliste", response_class=HTMLResponse)
+    def shopping_page(request: Request, q: Q = None, place: Q = None, weight: Q = None, seed: Q = None, swap: Q = None) -> HTMLResponse:
+        """The menu's shopping list, per chain, to tick off in the shop or print (TODO 2026-11-03: "per chain, shareable
+        by seed, printable"; jb: "it need tobe smartphone fridnly"). The same address as the menu, so it is the same menu."""
+        choice = MenuQuery.of(q=q, place=place, weight=weight, seed=seed, swap=swap)
+        drawn = choice.seed or new_seed()
+        planned = plan(choice, drawn)
+        found = planned.found
+        back = menu_link(found.search.text, found.place, choice.weight, drawn, choice.swap)
+        return templates.TemplateResponse(
+            request,
+            "handleliste.html",
+            {
+                "menu": planned.menu,
+                "aisles": shopping(planned.menu) if planned.menu else (),
+                "place": found.place,
+                "back": f"/menu?{back}#week",
+            },
+        )
+
     @app.get("/menu/list", response_class=HTMLResponse)
-    def menu_fragment(request: Request, q: Q = None, place: Q = None, weight: Q = None, seed: Q = None) -> Response:
+    def menu_fragment(request: Request, q: Q = None, place: Q = None, weight: Q = None, seed: Q = None, swap: Q = None) -> Response:
         """The menu for a search. Without HTMX it is the menu page with the same search."""
-        choice = MenuQuery.of(q=q, place=place, weight=weight, seed=seed)
+        choice = MenuQuery.of(q=q, place=place, weight=weight, seed=seed, swap=swap)
         drawn = choice.seed or new_seed()
         if "hx-request" not in request.headers:
-            query = menu_link(choice.q, queries.place(choice.place), choice.weight, drawn)
+            query = menu_link(choice.q, queries.place(choice.place), choice.weight, drawn, choice.swap)
             return RedirectResponse(f"/menu?{query}#week", status_code=303)
         trigger = request.headers.get("hx-trigger")
         # Keyed by the search as understood, so a menu already made is not planned again
@@ -445,10 +476,10 @@ def create_app(queries: Queries) -> FastAPI:
         response = fragment(
             request,
             "_menu.html",
-            (text, place, choice.weight, drawn, trigger not in KEEP_BOX),
+            (text, place, choice.weight, drawn, choice.swap, trigger not in KEEP_BOX),
             lambda: menu_context(plan(choice, drawn), choice, drawn, fragment=True, trigger=trigger),
         )
-        response.headers["HX-Replace-Url"] = f"/menu?{menu_link(text, place, choice.weight, drawn)}#week"
+        response.headers["HX-Replace-Url"] = f"/menu?{menu_link(text, place, choice.weight, drawn, choice.swap)}#week"
         return response
 
     @app.get("/om", response_class=HTMLResponse)

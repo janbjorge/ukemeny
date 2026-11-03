@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Handleliste · matris{% endblock %}
+{# The menu's shopping list (core.menu.shopping): per chain, each pack once with how many and for which dinners, then what
+   none of the chains has on sale, at its usual price. Made for a phone in the shop (jb 2026-11-03: "it need tobe
+   smartphone fridnly"): each row is a checkbox as wide as the screen, ticked off in this browser (base.html), in two
+   lines, the name, then the price and the dinners. Printed, only the list is left. #}
+{% block main %}
+<section class="shopping">
+  <p class="actions"><a class="back" href="{{ back }}">← Menyen</a>{% if menu %}<button type="button" class="print">Skriv ut</button>{% endif %}</p>
+  <h1>Handleliste</h1>
+  {% if not place %}
+  <div class="empty"><p><b>Velg et sted</b> på <a href="/menu">menyen</a>, så lager vi en handleliste fra butikkene der.</p></div>
+  {% elif not menu %}
+  <div class="empty"><p><b>Ingen middager passer alt dette.</b> Prøv et annet søk på <a href="{{ back }}">menyen</a>.</p></div>
+  {% else %}
+  <p class="sum">{{ menu.courses|length }} {{ "middag" if menu.courses|length == 1 else "middager" }} · {{ menu.price|kr }}</p>
+  <div class="aisles">
+  {% for a in aisles %}
+  <section class="aisle">
+    <h2>{{ a.store or "Vanlig pris" }} <span class="kr">{% if not a.store %}ca. {% endif %}{{ a.price|kr }}</span></h2>
+    {% if not a.store %}<p class="note">Ikke på tilbud i butikkene på menyen: prisen er den vanlige før-prisen i tilbudene ellers.</p>{% endif %}
+    <ul>{% for line in a.lines %}
+      <li><label><input type="checkbox" value="{{ a.store }}:{{ line.name }}"><span class="what">{{ line.name }}</span><span class="price">{% if not a.store %}ca. {% endif %}{% if line.count > 1 %}{{ line.count }} × {{ (line.price / line.count)|kr }} = {% endif %}{{ line.price|kr }}</span><span class="for">{{ line.dinners|join(", ") }}</span></label></li>
+    {%- endfor %}</ul>
+  </section>
+  {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

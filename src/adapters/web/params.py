@@ -4,6 +4,7 @@ Validation never fails: an unknown protein is ignored, numbers are capped, a lon
 old or hand-edited link still shows a page.
 """
 
+import re
 from typing import Annotated
 from urllib.parse import urlencode
 
@@ -63,6 +64,16 @@ def _weight(value: object) -> Weight:
     return Weight(str(value)) if value in set(Weight) else Weight.BALANCED
 
 
+MAX_SWAPS = 30
+"""«Bytt» pressed this often on one menu; more is a hand-made link."""
+_KEY = re.compile(r"[0-9a-f]{8}")
+
+
+def _swaps(value: object) -> tuple[str, ...]:
+    """Dish keys (core.menu.dish_key) joined by "-"; anything else is dropped."""
+    return tuple(k for k in str(value).split("-") if _KEY.fullmatch(k))[:MAX_SWAPS]
+
+
 def _seed(value: object) -> int | None:
     digits = "".join(c for c in str(value) if c.isdigit())[:9]
     return int(digits) if digits else None
@@ -80,6 +91,8 @@ class MenuQuery(BaseModel):
     weight: Annotated[Weight, BeforeValidator(_weight)] = Weight.BALANCED
     seed: Annotated[int | None, BeforeValidator(_seed)] = None
     """Varies the menu (core.menu.plan); none: the page draws one."""
+    swap: Annotated[tuple[str, ...], BeforeValidator(_swaps)] = ()
+    """The dinners «Bytt» was pressed on, in turn (core.menu.plan `swapped`)."""
 
     @classmethod
     def of(cls, **given: str | None) -> MenuQuery:
@@ -87,9 +100,16 @@ class MenuQuery(BaseModel):
         return cls.model_validate({k: v for k, v in given.items() if v})
 
 
-def menu_link(text: str, place: str | None, weight: Weight, seed: int | None) -> str:
-    """The menu's query string: "q=rask&place=bergen&weight=cheapest&seed=48213", the default weight left out."""
-    given = {"q": text, "place": place and place.lower(), "weight": None if weight is Weight.BALANCED else weight.value, "seed": seed}
+def menu_link(text: str, place: str | None, weight: Weight, seed: int | None, swap: tuple[str, ...] = ()) -> str:
+    """The menu's query string: "q=rask&place=bergen&weight=cheapest&seed=48213&swap=1f0c9a2e", the default weight left
+    out."""
+    given = {
+        "q": text,
+        "place": place and place.lower(),
+        "weight": None if weight is Weight.BALANCED else weight.value,
+        "seed": seed,
+        "swap": "-".join(swap),
+    }
     return urlencode({k: v for k, v in given.items() if v})
 
 

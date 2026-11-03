@@ -1,7 +1,8 @@
 {# A week's menu for the search (core.menu): the same filters as the front page, how to weigh price against chains, then
    the dinners, each card with only the offers at the chains picked. An HTMX fragment of menu.html (/menu/list); then it
    also sends the search box out of band. The weight and the seed go with every search (form="menu-form"); base.html
-   keeps the seed in the browser, so the same menu comes back until «Ny meny». #}
+   keeps the seed in the browser, so the same menu comes back until «Ny meny». «Bytt» on a card swaps that dinner and keeps
+   the rest; «Handleliste» is the same menu as a list per chain (/menu/handleliste). #}
 {% from "_dinner.html" import card with context %}
 {% from "_search.html" import search_box %}
 {% from "_ui.html" import go, to, filters with context %}
@@ -20,11 +21,11 @@
      receipts per chain over the cards were "repated informtion"). #}
   <div class="week-head">
     <p class="count" role="status">{{ menu.courses|length }} {{ "middag" if menu.courses|length == 1 else "middager" }} · {{ menu.stores|length }} {{ "butikk" if menu.stores|length == 1 else "butikker" }}</p>
-    <a class="again" {{ to(again) }}><span aria-hidden="true">↻</span> Ny meny</a>
+    <p class="actions"><a class="again" {{ to(again) }}><span aria-hidden="true">↻</span> Ny meny</a><a class="list" href="{{ shopping }}">Handleliste</a></p>
   </div>
   <p class="menu-total">I alt {{ menu.price|kr }}{% if menu.usual %}: {{ (menu.price - menu.usual)|kr }} på tilbud og ca. {{ menu.usual|kr }} til vanlig pris{% else %} for varene på tilbud{% endif %}.</p>
   <div class="cards">
-    {% for c in menu.courses %}{{ card(c.dinner, s, via.get(c.dinner.dish.url, ()), c) }}{% endfor %}
+    {% for c in menu.courses %}{{ card(c.dinner, s, via.get(c.dinner.dish.url, ()), c, swap(c.dinner.dish.url, loop.index), "middag-" ~ loop.index) }}{% endfor %}
   </div>
   {% else %}
   <div class="empty">

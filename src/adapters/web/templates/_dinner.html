@@ -4,6 +4,7 @@
    the rest are folded under it behind «+N», each a line of store, price and kroner off, ≈ last (jb 2026-10-24: "I think
    we need to add the drop-down after all, it gets noisy"). ≈ marks an offer to use instead; its heading and end date are
    in the tooltip. With a search, the searched words are marked. The rest is on matprat.no or godt.no (the link). #}
+{% from "_ui.html" import to %}
 {% macro tip(o) %}{{ o.heading }}: {{ o.price|kr }}, før {{ o.pre_price|kr }}, til {{ o.valid_until|dato }}{% endmacro %}
 {% macro where(o, x) -%}
 <span class="where"><span class="store">{% if o in x.near %}≈ {% endif %}{{ o.store }}</span> · <span class="price">{{ o.price|kr }}</span></span>
@@ -13,9 +14,10 @@
 {%- endmacro %}
 {# On the menu (`course`, core.menu.Course) the card leads with what the dinner costs at the menu's chains, the kroner off
    beside it, and lists the ingredients bought at their usual price, so its rows add up to its price (jb 2026-11-02: "We
-   need to mkae sure that look at the pirce, not the discount"). #}
-{% macro card(d, search=none, via=(), course=none) %}
-<article class="card" data-protein="{{ d.protein }}">
+   need to mkae sure that look at the pirce, not the discount"). Under it, «Bytt middag» (`swap`, a route), a row as wide as
+   the card, big enough for a thumb (jb 2026-11-03: "it need tobe smartphone fridnly"). #}
+{% macro card(d, search=none, via=(), course=none, swap=none, id="") %}
+<article class="card"{% if id %} id="{{ id }}"{% endif %} data-protein="{{ d.protein }}">
   <p class="meta"><span class="protein">{{ d.protein }}</span> · {{ d.dish.prep_time }}
     {%- if d.dish.rating and d.dish.rating_count >= 5 %} · <span class="star">★</span>&nbsp;{{ "%.1f"|format(d.dish.rating)|replace(".", ",") }}{% endif %}</p>
   <h3><a href="{{ d.dish.url }}" rel="noopener">{% if search and search.words %}{% for piece, hit in marked(d.dish.name, search) %}{% if hit %}<mark>{{ piece }}</mark>{% else %}{{ piece }}{% endif %}{% endfor %}{% else %}{{ d.dish.name }}{% endif %}</a></h3>
@@ -38,5 +40,6 @@
     {%- endfor %}{% endif %}</ul>
   </div>
   {% endif %}
+  {% if swap %}<p class="change"><a class="swap" {{ to(swap) }}><span aria-hidden="true">⇄</span> Bytt middag</a></p>{% endif %}
 </article>
 {% endmacro %}

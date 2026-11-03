@@ -7,6 +7,7 @@ median before-price of every offer for it near the place. Each dinner's main ing
 at the chains picked, so the dearest part of it is known, and the packs bought there must save core.ranking.FLOOR_KR.
 Every set of up to MAX_STORES chains is tried; per set, the
 cheapest dinners, a few per main protein, make the menu, and each chain past the first costs the weight's STORE_COST.
+«Bytt» swaps a dinner for the next cheapest at the menu's chains and keeps the rest; `shopping` is the menu's list.
 """
 
 import heapq
@@ -18,6 +19,7 @@ from enum import StrEnum
 from itertools import combinations
 from statistics import median
 
+from core.matching import heading_key
 from core.models import MAIN_WEIGHT, Buy, Dinner, Offer
 from core.ranking import FLOOR_KR
 
@@ -68,6 +70,8 @@ class Course:
     """The catalogs' kroner off the packs bought (Dinner.saving)."""
     usual: tuple[tuple[str, float], ...]
     """Ingredients on sale near the place but not at the menu's chains, with the usual price paid for them."""
+    packs: tuple[Offer, ...]
+    """The packs on sale bought, each once."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -188,9 +192,18 @@ class _Pick:
     """The price, and the weight's cost for each chain past the first."""
 
 
-def plan(dinners: Sequence[Dinner], weight: Weight = Weight.BALANCED, seed: int | None = None) -> Menu | None:
+def dish_key(url: str) -> str:
+    """A dish in the menu's address (`swapped`): 8 hex digits from its URL, which is too long for a link with a few. A
+    generator seeded with the URL, as `_draw`: a str seed goes through SHA-512, so the key is the same on every run."""
+    return f"{random.Random(url).getrandbits(32):08x}"
+
+
+def plan(dinners: Sequence[Dinner], weight: Weight = Weight.BALANCED, seed: int | None = None, swapped: Sequence[str] = ()) -> Menu | None:
     """The cheapest menu of up to SIZE `dinners` for `weight`, a full menu before a shorter one; `seed` gives another
-    within TOLERANCE of it (jb 2026-11-02: "lavest pris lacks the new meny"). None when no dinner's main ingredient is on sale."""
+    within TOLERANCE of it (jb 2026-11-02: "lavest pris lacks the new meny"). None when no dinner's main ingredient is on sale.
+    Then each dinner `swapped` (dish_key) that is on the menu, in turn, is swapped for the cheapest dinner at the menu's
+    chains not on it and not swapped before, within PER_PROTEIN; with none left it stays (TODO 2026-11-03: «Bytt» one dinner,
+    keep the rest)."""
     rows = []
     for d in dinners:
         ingredients = tuple(_ingredient(d, b) for b in d.buys if b.sales)
@@ -267,8 +280,88 @@ def plan(dinners: Sequence[Dinner], weight: Weight = Weight.BALANCED, seed: int 
             ):
                 pick = other
                 break
-    stores = frozenset(pick.stores)
-    return Menu(tuple(Course(_at(d, stores), p.price, p.saving, p.usual) for d, p in pick.taken), pick.stores)
+    taken = _swap(rows, list(pick.taken), frozenset(pick.stores), swapped)
+    used = tuple(sorted({o.store for _, p in taken for o in p.picks}))
+    stores = frozenset(used)
+    return Menu(tuple(Course(_at(d, stores), p.price, p.saving, p.usual, p.picks) for d, p in taken), used)
+
+
+def _swap(
+    rows: Sequence[_Row], taken: list[tuple[Dinner, _Priced]], stores: frozenset[str], swapped: Sequence[str]
+) -> list[tuple[Dinner, _Priced]]:
+    """`taken` with each dinner `swapped` replaced in its place, in turn, as the cook pressed «Bytt» (plan)."""
+    out: set[str] = set()
+    for key in swapped:
+        out.add(key)
+        at = next((n for n, (d, _) in enumerate(taken) if dish_key(d.dish.url) == key), None)
+        if at is None:
+            continue
+        on = {d.dish.url for d, _ in taken}
+        per = Counter(d.protein for n, (d, _) in enumerate(taken) if n != at)
+        best: tuple[Dinner, _Priced] | None = None
+        for row in rows:
+            d = row.dinner
+            if d.dish.url in on or dish_key(d.dish.url) in out or per[d.protein] >= PER_PROTEIN or not stores & row.main:
+                continue
+            if (p := _priced(row.ingredients, stores & row.reach)) and (best is None or p.price < best[1].price):
+                best = d, p
+        if best:
+            taken[at] = best
+    return taken
+
+
+@dataclass(frozen=True, slots=True)
+class Line:
+    """A row of the shopping list."""
+
+    name: str
+    """The pack's heading, or the ingredient's name when it is bought at its usual price."""
+    count: int
+    """Packs: one per dinner that buys it, as Course.price counts it."""
+    price: float
+    """For all `count`."""
+    dinners: tuple[str, ...]
+    offer: Offer | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Aisle:
+    store: str
+    """A chain of the menu's; "" for what none of them has on sale, at its usual price."""
+    lines: tuple[Line, ...]
+
+    @property
+    def price(self) -> float:
+        return sum(line.price for line in self.lines)
+
+
+def shopping(menu: Menu) -> tuple[Aisle, ...]:
+    """What to buy for the menu, per chain in Menu.stores, then what is bought at its usual price, each by name: the
+    aisles add up to Menu.price. One pack in many catalogs (Obs has one per store) is one line, as on the card (Buy.sales)."""
+    packs: dict[tuple[str, str, float], tuple[Offer, list[str]]] = {}
+    usual: dict[str, tuple[list[float], list[str]]] = {}
+    for c in menu.courses:
+        for o in c.packs:
+            packs.setdefault((o.store, heading_key(o.heading), o.price), (o, []))[1].append(c.dinner.dish.name)
+        for name, kr in c.usual:
+            prices, names = usual.setdefault(name, ([], []))
+            prices.append(kr)
+            names.append(c.dinner.dish.name)
+    aisles = [
+        Aisle(
+            store,
+            tuple(
+                sorted(
+                    (Line(o.heading, len(n), o.price * len(n), tuple(n), o) for o, n in packs.values() if o.store == store),
+                    key=lambda line: line.name,
+                )
+            ),
+        )
+        for store in menu.stores
+    ]
+    if usual:
+        aisles.append(Aisle("", tuple(Line(name, len(n), sum(kr), tuple(n)) for name, (kr, n) in sorted(usual.items()))))
+    return tuple(aisles)
 
 
 def _at(dinner: Dinner, stores: frozenset[str]) -> Dinner:

@@ -8,7 +8,7 @@ and rankings, views and tallies per set of rules and place, are worked out when 
 time (Queries.KEPT): the snapshot only changes on deploy.
 """
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
 
@@ -155,13 +155,20 @@ class Queries:
             relax=() if found else tuple(self.index.relax(search, view)),
         )
 
-    def menu(self, text: str = "", place: str | None = None, weight: Weight = Weight.BALANCED, seed: int | None = None) -> Planned:
-        """A week's menu from the dinners the search finds near `place` (core.menu.plan). Only with a place: a chain's
-        catalogs differ from region to region, so «shop at KIWI» needs to know where."""
+    def menu(
+        self,
+        text: str = "",
+        place: str | None = None,
+        weight: Weight = Weight.BALANCED,
+        seed: int | None = None,
+        swapped: Sequence[str] = (),
+    ) -> Planned:
+        """A week's menu from the dinners the search finds near `place`, with the dinners `swapped` swapped (core.menu.plan).
+        Only with a place: a chain's catalogs differ from region to region, so «shop at KIWI» needs to know where."""
         found = self.search(text, place, limit=0)
         if found.place is None:
             return Planned(found, None, {})
-        menu = plan(self.index.find(found.search, self.view(found.household, found.place, floor=False)), weight, seed)
+        menu = plan(self.index.find(found.search, self.view(found.household, found.place, floor=False)), weight, seed, swapped)
         shown = menu.dinners if menu else ()
         return Planned(found, menu, {d.dish.url: names for d in shown if (names := via(d, found.search))})
 

@@ -71,7 +71,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
    names and the sums line up across the row (jb 2026-10-22: cards in different sizes "fuckes with my brain") */
 .card {
   background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 14px; padding: 16px 20px 18px;
-  display: grid; grid-row: span 4; grid-template-rows: subgrid; row-gap: 0; align-content: start; min-width: 0;
+  display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; align-content: start; min-width: 0;
 }
 .card .meta { grid-row: 1; }
 .card .via { grid-row: 3; margin-top: 6px; }
@@ -123,6 +123,14 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
 .card .save .n::after { content: " ▾"; }
 .card .save details[open] .n::after { content: " ▴"; }
 .card .via { color: var(--text-secondary); }
+/* The menu's swap button (_dinner.html): last, as wide as the card and as high as a thumb (jb 2026-11-03: "it need tobe smartphone
+   fridnly"); the cards' fifth row, so the buttons line up across a row */
+.card .change { grid-row: 5; align-self: end; margin-top: 14px; }
+.card .swap {
+  display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; border: 1px solid var(--hairline);
+  border-radius: 10px; color: var(--accent); font-weight: 650; text-decoration: none; -webkit-tap-highlight-color: transparent;
+}
+.card .swap:active { background: var(--accent-soft); }
 
 /* Finn en middag: the title and search box on the paper, then the filter bar */
 .hero h1 { font-size: var(--t-title); margin: 8px 0 8px; }
@@ -207,6 +215,45 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px var(--gutter) calc(64px 
   font-weight: 650; text-decoration: none; align-self: center;
 }
 .week-head .again:active { background: var(--accent-strong); }
+.week-head .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.week-head .list {
+  display: inline-flex; align-items: center; padding: 7px 17px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent);
+  font-weight: 650; text-decoration: none;
+}
+.week-head .list:active { background: var(--accent-soft); }
+
+/* The shopping list (handleliste.html): one column of rows, each a checkbox as wide as the screen with the name over the
+   price and the dinners; on a wide screen the chains side by side. Printed, only the list */
+.shopping .actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; }
+.shopping .back { color: var(--accent); text-decoration: none; padding: 10px 0; font-weight: 650; }
+.shopping .print {
+  font: inherit; font-weight: 650; padding: 8px 18px; border-radius: 999px; border: 1px solid var(--accent); background: none;
+  color: var(--accent); cursor: pointer;
+}
+.shopping h1 { margin: 8px 0 0; }
+.shopping .sum { margin: 4px 0 0; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.shopping .aisles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr)); gap: 0 24px; align-items: start; }
+.shopping h2 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 24px 0 8px; font-size: var(--t-heading); }
+.shopping h2 .kr { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.shopping ul { list-style: none; margin: 0; padding: 0; background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 12px; }
+.shopping li + li { border-top: 1px solid var(--hairline); }
+.shopping label {
+  display: grid; grid-template-columns: auto 1fr; column-gap: 12px; min-height: 44px; padding: 12px 16px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.shopping input { grid-row: 1 / span 3; width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); }
+.shopping .what { font-weight: 650; overflow-wrap: anywhere; }
+.shopping .what::first-letter { text-transform: uppercase; }
+.shopping .price, .shopping .for { grid-column: 2; font-size: var(--t-small); }
+.shopping .price { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.shopping .for { color: var(--text-muted); }
+.shopping label:has(input:checked) .what { text-decoration: line-through; color: var(--text-muted); }
+@media print {
+  nav.top, footer, .banner, .shopping .actions, .shopping .note { display: none; }
+  main { padding: 0; }
+  .shopping ul { border: 0; }
+  .shopping li { break-inside: avoid; }
+}
 .menu-total { margin: 12px 0 0; color: var(--text-secondary); }
 
 .note { background: var(--mark); border-radius: 10px; padding: 8px 12px; font-size: var(--t-small); margin: 8px 0; }

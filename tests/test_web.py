@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 from adapters.web import main
 from app.queries import Queries
+from core.menu import dish_key
 from core.models import Household, Onion
 from tests.fakes import SIDE, SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot, traits
 
@@ -180,7 +181,14 @@ def test_robots_lets_agents_in_and_keeps_crawlers_off_searches(client: TestClien
     # sure that ppl. can still access our apis via llms")
     robots = RobotFileParser()
     robots.parse(client.get("/robots.txt").text.splitlines())
-    searches = ("/api/middager?q=melkefri", "/api/oppskrift?url=x", "/?q=fisk", "/middager?q=fisk", "/menu?seed=1")
+    searches = (
+        "/api/middager?q=melkefri",
+        "/api/oppskrift?url=x",
+        "/?q=fisk",
+        "/middager?q=fisk",
+        "/menu?seed=1",
+        "/menu/handleliste?seed=1",
+    )
     for agent in ("ChatGPT-User", "Claude-User", "Perplexity-User", "DuckAssistBot", "Meta-ExternalFetcher"):
         assert all(robots.can_fetch(agent, f"http://testserver{p}") for p in ("/llms.txt", *searches)), agent
     for crawler in ("Amazonbot", "GPTBot", "ClaudeBot", "Googlebot", "bingbot"):
@@ -333,3 +341,65 @@ def test_a_seed_from_the_address_is_only_a_number(client: TestClient) -> None:
         moved = client.get(f"/menu/list?seed={given}", follow_redirects=False).headers["location"]
         seed = moved.split("seed=")[1].split("#")[0]
         assert seed.isdigit() and len(seed) <= 9 and (kept is None or seed == kept)
+
+
+def chicken_at_kiwi_in_bergen() -> TestClient:
+    """Chicken dinners at 30, 40 and 50 kr at KIWI in Bergen: a menu takes the first two (core.menu.PER_PROTEIN)."""
+    parts = (("kyllingfilet", 30), ("kyllinglår", 40), ("kyllingvinger", 50))
+    s = snapshot(
+        *(recipe(f"Kylling {kr}", ingredient(part, 600, "g", "/kjøtt/kylling/høns")) for part, kr in parts),
+        offers=[offer(part.upper(), kr, pre_price=kr + 30, id=part, catalog="kiwi-vest") for part, kr in parts],
+        matches={part: [part] for part, _ in parts},
+        places={"Bergen": ["kiwi-vest"]},
+    )
+    return TestClient(main.create_app(Queries(FakeDatasets(s))))
+
+
+def test_bytt_swaps_one_dinner_for_the_next_cheapest_and_keeps_the_rest() -> None:
+    client = chicken_at_kiwi_in_bergen()
+    k30, k50 = (dish_key(recipe(name).url) for name in ("Kylling 30", "Kylling 50"))
+    page = client.get("/menu?place=bergen&weight=one-store&seed=5").text
+    assert "Kylling 30" in page and "Kylling 40" in page and "Kylling 50" not in page
+    assert f'class="swap" href="/menu?place=bergen&amp;weight=one-store&amp;seed=5&amp;swap={k30}#middag-' in page
+    swapped = client.get(f"/menu?place=bergen&weight=one-store&seed=5&swap={k30}").text
+    assert "Kylling 30" not in swapped and "Kylling 40" in swapped and "Kylling 50" in swapped
+    assert f"swap={k30}-{k50}#middag-" in swapped  # «Bytt» again: the swaps so far, in turn
+    again = swapped.split('class="again" href="')[1].split('"')[0]
+    assert "swap" not in again and "seed=" in again  # «Ny meny» starts over
+    fragment = client.get(f"/menu/list?place=bergen&weight=one-store&seed=5&swap={k30}", headers=HX)
+    assert fragment.headers["HX-Replace-Url"] == f"/menu?place=bergen&weight=one-store&seed=5&swap={k30}#week"
+    assert "Kylling 50" in fragment.text
+    moved = client.get(f"/menu/list?place=bergen&seed=5&swap={k30}", follow_redirects=False).headers["location"]
+    assert moved == f"/menu?place=bergen&seed=5&swap={k30}#week"
+    junk = client.get("/menu?place=bergen&weight=one-store&seed=5&swap=%3Cscript%3E-zz").text
+    assert "Kylling 30" in junk and "script%3E" not in junk and "&lt;script" not in junk
+
+
+def test_the_shopping_list_is_per_chain_tickable_and_printable() -> None:
+    s = snapshot(
+        recipe("Kyllinggryte", CHICKEN),
+        recipe("Kyllingsuppe", CHICKEN),
+        offers=[offer("KYLLINGFILET", 30, pre_price=60, id="kiwi", catalog="kiwi-vest")],
+        matches={"kyllingfilet": ["kiwi"]},
+        places={"Bergen": ["kiwi-vest"]},
+    )
+    client = TestClient(main.create_app(Queries(FakeDatasets(s))))
+    page = client.get("/menu?place=bergen&weight=one-store&seed=5").text
+    assert 'href="/menu/handleliste?place=bergen&amp;weight=one-store&amp;seed=5"' in page
+    found = client.get("/menu/handleliste?place=bergen&weight=one-store&seed=5").text
+    assert "<h1>Handleliste</h1>" in found and "2 middager · 60\u00a0kr" in found
+    assert '<h2>KIWI <span class="kr">60\u00a0kr</span></h2>' in found
+    assert '<span class="what">KYLLINGFILET</span><span class="price">2 \u00d7 30\u00a0kr = 60\u00a0kr</span>' in found  # a pack per dinner
+    assert '<span class="for">Kyllinggryte, Kyllingsuppe</span>' in found
+    assert found.count('type="checkbox"') == 1 and 'class="print"' in found
+    assert 'href="/menu?place=bergen&amp;weight=one-store&amp;seed=5#week"' in found  # back to the same menu
+    assert "Velg et sted" in client.get("/menu/handleliste").text
+
+
+def test_the_shopping_list_follows_the_swaps() -> None:
+    client = chicken_at_kiwi_in_bergen()
+    k30 = dish_key(recipe("Kylling 30").url)
+    page = client.get(f"/menu?place=bergen&weight=one-store&seed=5&swap={k30}").text
+    assert f'href="/menu/handleliste?place=bergen&amp;weight=one-store&amp;seed=5&amp;swap={k30}"' in page
+    found = client.get(f"/menu/handleliste?place=bergen&weight=one-store&seed=5&swap={k30}").text
+    assert "KYLLINGVINGER" in found and "KYLLINGFILET" not in found

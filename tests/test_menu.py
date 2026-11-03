@@ -2,7 +2,7 @@
 
 import random
 
-from core.menu import PER_PROTEIN, TOLERANCE, Weight, plan
+from core.menu import PER_PROTEIN, TOLERANCE, Aisle, Line, Weight, dish_key, plan, shopping
 from core.models import Dinner, Household, Offer, Recipe
 from core.ranking import dinners
 from tests.fakes import SIDE, ingredient, offer, recipe, snapshot
@@ -168,3 +168,64 @@ def test_a_seed_leaves_the_shared_generator_alone() -> None:
     before = random.getstate()
     plan(sale_at_two_chains(200), Weight.BALANCED, seed=7)
     assert random.getstate() == before
+
+
+def at_kiwi() -> list[Dinner]:
+    """At KIWI: chicken dinners at 30, 40 and 50 kr, salmon ones at 25, 35 and 45 kr."""
+    dinners = [
+        ("Kylling", "kyllingfilet", "/kjøtt/kylling/høns", 30),
+        ("Kylling", "kyllinglår", "/kjøtt/kylling/høns", 40),
+        ("Kylling", "kyllingvinger", "/kjøtt/kylling/høns", 50),
+        ("Laks", "laksefilet", "/fisk og sjømat", 25),
+        ("Laks", "laksesteik", "/fisk og sjømat", 35),
+        ("Laks", "laksekotelett", "/fisk og sjømat", 45),
+    ]
+    return ranked(
+        *(recipe(f"{name} {kr}", ingredient(part, 600, "g", category)) for name, part, category, kr in dinners),
+        offers=[offer(part.upper(), kr, pre_price=kr + 30, id=part) for _, part, _, kr in dinners],
+        matches={part: [part] for _, part, _, _ in dinners},
+    )
+
+
+def test_a_swap_takes_the_next_cheapest_dinner_and_keeps_the_rest() -> None:
+    found = at_kiwi()
+    url = {d.dish.name: d.dish.url for d in found}
+    menu = plan(found, Weight.ONE_STORE)
+    assert menu is not None and [d.dish.name for d in menu.dinners] == ["Laks 25", "Kylling 30", "Laks 35", "Kylling 40"]
+    swapped = plan(found, Weight.ONE_STORE, swapped=[dish_key(url["Kylling 30"])])
+    # In its place: Laks 45 is cheaper, but would be a third salmon dinner (PER_PROTEIN)
+    assert swapped is not None and [d.dish.name for d in swapped.dinners] == ["Laks 25", "Kylling 50", "Laks 35", "Kylling 40"]
+    assert swapped.price == menu.price + 20 and swapped.stores == menu.stores
+    # Kylling 50 swapped too: no dinner is left to take, so it stays; a key of no dinner on the menu changes nothing
+    again = plan(found, Weight.ONE_STORE, swapped=[dish_key(url["Kylling 30"]), dish_key(url["Kylling 50"]), "00000000"])
+    assert again == swapped
+
+
+def test_a_dish_key_is_short_and_from_the_address_alone() -> None:
+    a, b = (dish_key(f"https://www.matprat.no/oppskrifter/familien/{name}/") for name in ("laks", "kylling"))
+    assert a != b and a == dish_key("https://www.matprat.no/oppskrifter/familien/laks/")
+    assert len(a) == 8 and all(c in "0123456789abcdef" for c in a)
+
+
+def test_the_shopping_list_has_each_chains_packs_and_adds_up_to_the_menu() -> None:
+    found = ranked(
+        recipe("Kyllinggryte", CHICKEN, SIDE),
+        recipe("Kyllingsuppe", CHICKEN, SIDE),
+        recipe("Laks i ovn", SALMON),
+        offers=[
+            offer("KYLLINGFILET", 100, pre_price=150, id="kiwi"),
+            offer("LAKSEFILET", 50, pre_price=100, id="laks", store="REMA 1000"),
+            offer("POTETER", 20, pre_price=45, id="potet", store="MENY"),  # MENY has no main ingredient: not on the menu
+        ],
+        matches={"kyllingfilet": ["kiwi"], "laksefilet": ["laks"], "potet": ["potet"]},
+    )
+    menu = plan(found, Weight.CHEAPEST)
+    assert menu is not None and menu.stores == ("KIWI", "REMA 1000")
+    kiwi, rema, usual = shopping(menu)
+    chicken = next(o for d in menu.dinners for b in d.buys for o in b.offers if o.id == "kiwi")
+    salmon = next(o for d in menu.dinners for b in d.buys for o in b.offers if o.id == "laks")
+    # A pack each dinner buys, so two for the two chicken dinners (Course.price counts each)
+    assert kiwi == Aisle("KIWI", (Line("KYLLINGFILET", 2, 200, ("Kyllinggryte", "Kyllingsuppe"), chicken),))
+    assert rema == Aisle("REMA 1000", (Line("LAKSEFILET", 1, 50, ("Laks i ovn",), salmon),))
+    assert usual == Aisle("", (Line("potet", 2, 90, ("Kyllinggryte", "Kyllingsuppe")),))
+    assert kiwi.price + rema.price + usual.price == menu.price == 340

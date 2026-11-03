@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from adapters.web import main
 from app.queries import Queries
 from core.models import Household
-from tests.fakes import SIDE, SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot
+from tests.fakes import SIDE_MATCH, SIDE_OFFER, FakeDatasets, ingredient, offer, recipe, snapshot
 
 CHICKEN = ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")
 SALMON = ingredient("laksefilet", 600, "g", "/fisk og sjømat")
@@ -11,16 +11,16 @@ KYLLING = recipe("Kyllinggryte", CHICKEN)
 
 s = snapshot(
     KYLLING,
-    recipe("Laks i ovn", SALMON, SIDE),
-    offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale"), SIDE_OFFER],
-    matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
+    recipe("Laks i ovn", SALMON),
+    offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale"), offer("LAKSEFILET", 100, pre_price=125, id="laks"), SIDE_OFFER],
+    matches={"kyllingfilet": ["sale"], "laksefilet": ["laks"], **SIDE_MATCH},
 )
 client = TestClient(main.create_app(Queries(FakeDatasets(s), Household())))
 
 
 def test_dinners() -> None:
     body = client.get("/api/middager").json()
-    assert (body["considered"], body["fitting"], body["on_sale"], body["offers"]) == (2, 2, 1, 2)
+    assert (body["considered"], body["fitting"], body["on_sale"], body["offers"]) == (2, 2, 2, 3)
     first = body["dinners"][0]
     assert first["rank"] == 1 and first["protein"] == "kylling"  # the most kroner off first
     assert "plan" not in body and "plan" not in body["links"]
@@ -47,7 +47,7 @@ def test_dinners_filters() -> None:
     names = [d["name"] for d in client.get("/api/middager?protein=fisk").json()["dinners"]]
     assert names == ["Laks i ovn"]
     names = [d["name"] for d in client.get("/api/middager?tilbud=1").json()["dinners"]]
-    assert names == ["Kyllinggryte"]
+    assert names == ["Kyllinggryte", "Laks i ovn"]  # Every dinner shown has its main ingredient on sale
     assert len(client.get("/api/middager?antall=1").json()["dinners"]) == 1
 
 
@@ -60,8 +60,8 @@ def test_dinners_search() -> None:
     assert body["dinners"][0]["matched"] == ["laksefilet"]
     body = client.get("/api/middager", params={"q": "kylling", "tilbud": "1"}).json()
     assert body["search"]["query"] == "kylling på tilbud" and body["search"]["total"] == 1
-    body = client.get("/api/middager", params={"q": "fisk på tilbud"}).json()
-    assert body["dinners"] == [] and [c["text"] for c in body["search"]["without"]] == ["fisk", "på tilbud"]
+    body = client.get("/api/middager", params={"q": "laks kylling"}).json()
+    assert body["dinners"] == [] and [c["text"] for c in body["search"]["without"]] == ["laks", "kylling"]
 
 
 def test_rules_come_from_q() -> None:

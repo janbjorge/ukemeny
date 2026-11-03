@@ -6,8 +6,6 @@ Open work only. Done → delete; code is record (jb 2026-11-03: "No need to trac
 
 Numbers must hold (jb 2026-11-02: "The resulsts does not feel real or correct").
 
-- [ ] Card's kroner off from one chain: `Dinner.saving` sums cheapest offer per ingredient across chains. Pick rule, METHOD.md §3.
-- [ ] Floor on main ingredient: sides alone pass FLOOR_KR (kålrot + potet = 20 kr). Pick rule, count dinners, METHOD.md §3, §8.
 - [ ] Wrong Jev matches (Smøremyk → smøreost, Ristorante → carnaroli-ris, ALI HELE BØNNER → grønne bønner): probe or override list, jb's OK.
 - [ ] Shopping list from `/menu`, per chain, shareable by seed, printable. ASCII mockup first.
 - [ ] «Bytt» one dinner on menu, keeps rest. ASCII mockup first.

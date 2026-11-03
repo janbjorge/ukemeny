@@ -19,11 +19,11 @@ Ask where the person shops. Each link below is the list with the offers from the
 Read-only, no key, CORS open. `{{ base }}api` redirects to the schema. Keys are English; advice is bokmål; prices are kroner.
 
 - [OpenAPI schema]({{ base }}api/openapi.json): every endpoint and field
-- [Search the dinners that fit]({{ base }}api/middager?q=rask+kylling+uten+sopp): best first; only dinners with at least 20 kr off are listed. `q` is a search in plain bokmål: diet rules and allergies ({{ diets }}; they decide which dinners fit, nothing is swapped, and a rule that leaves something out also leaves out ingredients that may hold it), categories (`under 20 min`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins ({{ proteins }}; also `kjøtt`, `sjømat`), `uten X` to leave X out, `X eller Y` for either, and any word in the dish name or an ingredient. Typos are fixed and reported in `search.corrected`; `search.understood` says how `q` was read, and `search.query` is the same search written out. `sted` is the place whose stores' offers count, and `antall` is 1-100.
+- [Search the dinners that fit]({{ base }}api/middager?q=rask+kylling+uten+sopp): best first; only dinners with the main ingredient on sale and at least 20 kr off are listed. `q` is a search in plain bokmål: diet rules and allergies ({{ diets }}; they decide which dinners fit, nothing is swapped, and a rule that leaves something out also leaves out ingredients that may hold it), categories (`under 20 min`, `på tilbud`, `godt likt`, `barnevennlig`), main proteins ({{ proteins }}; also `kjøtt`, `sjømat`), `uten X` to leave X out, `X eller Y` for either, and any word in the dish name or an ingredient. Typos are fixed and reported in `search.corrected`; `search.understood` says how `q` was read, and `search.query` is the same search written out. `sted` is the place whose stores' offers count, and `antall` is 1-100.
 - [One recipe]({{ base }}api/oppskrift?url=https://www.matprat.no/oppskrifter/familien/lasagne/): whether it fits, and why not. The ingredients and method are on matprat.no or godt.no; link there
 
 ## Method
 
-- Dinners with the most kroner off every ingredient on sale, the cheapest offer of each, come first, then rating and prep time.
+- Dinners with the most kroner off come first, counted at one chain: the chain of the cheapest pack of the most important ingredient on sale. Then rating and prep time.
 - A dinner is on sale when its main protein (the heaviest meat or fish; without one, a main vegetable) has a before-price in this week's catalog, at the stores near the place searched for or, without one, at any store.
 - [How it works, in Norwegian]({{ base }}om)

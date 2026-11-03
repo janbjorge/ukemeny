@@ -29,8 +29,13 @@ def client() -> TestClient:
         recipe("Laks i ovn", SALMON, SIDE),
         recipe("Torsk med bacon", COD, SIDE),
         known={"løk": traits(onion=Onion.ONION)},
-        offers=[offer("KYLLINGBRYST", 99, pre_price=135, id="sale"), SIDE_OFFER],
-        matches={"kyllingfilet": ["sale"], **SIDE_MATCH},
+        offers=[
+            offer("KYLLINGBRYST", 99, pre_price=135, id="sale"),
+            offer("LAKSEFILET", 100, pre_price=125, id="laks"),
+            offer("TORSKEFILET", 100, pre_price=125, id="torsk"),
+            SIDE_OFFER,
+        ],
+        matches={"kyllingfilet": ["sale"], "laksefilet": ["laks"], "torskefilet": ["torsk"], **SIDE_MATCH},
     )
     queries = Queries(FakeDatasets(s))  # as on the site: no rules until searched for
     return TestClient(main.create_app(queries))
@@ -110,9 +115,9 @@ def test_search_page_says_what_it_understood(client: TestClient) -> None:
 
 
 def test_nothing_found_offers_what_to_drop(client: TestClient) -> None:
-    html = client.get("/?q=fisk+p%C3%A5+tilbud").text
+    html = client.get("/?q=laks+kylling").text
     assert "Ingen middager passer alt dette." in html
-    assert 'href="/?q=p%C3%A5+tilbud#forslag"' in html  # drop «fisk»
+    assert 'href="/?q=kylling#forslag"' in html  # drop «laks»
 
 
 def test_chips_toggle_and_count(client: TestClient) -> None:
@@ -205,7 +210,11 @@ def test_canonical_host_redirects_everything_but_health(client: TestClient, monk
 
 def test_more_appends_the_next_page(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(main, "PAGE", 1)
-    s = snapshot(*(recipe(f"Laks {n}", SALMON, SIDE) for n in range(4)), offers=[SIDE_OFFER], matches=SIDE_MATCH)
+    s = snapshot(
+        *(recipe(f"Laks {n}", SALMON) for n in range(4)),
+        offers=[offer("LAKSEFILET", 100, pre_price=125, id="laks")],
+        matches={"laksefilet": ["laks"]},
+    )
     small = TestClient(main.create_app(Queries(FakeDatasets(s), Household())))
     html = small.get("/?q=laks").text
     assert html.count('<article class="card"') == 1

@@ -418,9 +418,21 @@ class Dinner:
 
     @property
     def saving(self) -> float:
-        """Kroner off every discounted ingredient, as the catalogs have it (per pack, not per portion: jb 2026-10-22,
-        "its a rabbit hole")."""
-        return sum((b.sale.saving or 0.0) for b in self.deals if b.sale)
+        """Kroner off every discounted ingredient at the chain of `deal`'s sale, as the catalogs have it (per pack, not
+        per portion: jb 2026-10-22, "its a rabbit hole"). Per ingredient the pack Buy.sale would pick among that chain's
+        offers; an offer two ingredients share counts once. Not summed across chains: no shop sells REMA's kjøttdeig
+        and KIWI's potatoes (jb 2026-11-03: one chain, the main deal's, so the cheapest pack still decides)."""
+        if (deal := self.deal) is None or deal.sale is None:
+            return 0.0
+        store = deal.sale.store
+        picks: dict[str, float] = {}
+        for b in self.buys:
+            for offers in (b.offers, b.near):
+                if found := [o for o in offers if o.saving and o.store == store]:
+                    o = min(found, key=lambda o: (o.price, -(o.saving or 0.0)))
+                    picks.setdefault(o.id, o.saving or 0.0)
+                    break
+        return sum(picks.values())
 
     @property
     def on_sale(self) -> bool:

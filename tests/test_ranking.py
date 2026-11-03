@@ -96,6 +96,21 @@ def test_the_saving_counts_the_cheapest_offer_exact_before_near() -> None:
     assert dinner.buys[0].sale is not None and dinner.buys[0].sale.id == "mix" and dinner.on_sale
 
 
+def test_the_saving_counts_the_chain_that_saves_the_most() -> None:
+    mince = ingredient("kjøttdeig av svin", 400, "g", "/kjøtt/svinekjøtt")
+    potato = ingredient("potet", 800, "g", "/grønnsaker")
+    s = snapshot(
+        recipe("Kjøttkaker", mince, potato),
+        offers=[
+            offer("SVINEKJØTTDEIG", 50, pre_price=80, id="rema", store="REMA 1000"),
+            offer("POTET", 20, pre_price=35, id="kiwi", store="KIWI"),
+        ],
+        matches={mince.name: ["rema"], potato.name: ["kiwi"]},
+    )
+    (dinner,) = dinners(s, HOUSEHOLD)
+    assert dinner.saving == 30  # REMA's 30 kr off the mince; KIWI's 15 kr off the potatoes is another shop
+
+
 def test_the_main_protein_is_the_meat_in_the_recipe_not_matprats_label() -> None:
     s = snapshot(recipe("Kylling med spekeskinke", CHICKEN, HAM, main="Svin"), recipe("Svinestek", PORK))
     assert [d.protein for d in dinners(s, HOUSEHOLD)] == ["kylling", "svin"]

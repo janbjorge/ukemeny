@@ -87,9 +87,10 @@ class Queries:
         return nearby
 
     def ranked(self, h: Household | None = None, place: str | None = None, floor: bool = True) -> list[Dinner]:
-        """Every dinner that fits and saves at least core.ranking.FLOOR_KR near `place`, best first (core.ranking.dinners;
-        jb 2026-10-22: "We should ignore dinners with 0 Discounted ingredients", "no point in showing 100 menues with
-        tuna on sale for 8kr"). Without `floor`, every dinner with something on sale: the menu counts the floor at
+        """Every dinner that fits, has its main ingredient on sale (Dinner.on_sale; sides alone do not make a lamb dinner
+        a deal) and saves at least core.ranking.FLOOR_KR near `place`, best first (core.ranking.dinners; jb 2026-10-22:
+        "We should ignore dinners with 0 Discounted ingredients", "no point in showing 100 menues with tuna on sale for
+        8kr"). Without `floor`, every dinner with something on sale: the menu counts the floor at
         the chains it picks, where a dinner may save less than over every chain (core.menu `_priced`)."""
         key = (h or self.base, place, floor)
         if (ranked := self._ranked.get(key)) is None:
@@ -99,7 +100,7 @@ class Queries:
                 self._tally.clear()
                 self._nearby = {None: self.prepared}
             found = ranking.dinners(self.snapshot, key[0], self.nearby(place))
-            ranked = self._ranked[key] = [d for d in found if d.saving >= (ranking.FLOOR_KR if floor else 0.01)]
+            ranked = self._ranked[key] = [d for d in found if (d.on_sale and d.saving >= ranking.FLOOR_KR if floor else d.saving >= 0.01)]
         return ranked  # Not self._ranked[key]: another request's thread may have dropped it already
 
     def view(self, h: Household | None = None, place: str | None = None, floor: bool = True) -> View:

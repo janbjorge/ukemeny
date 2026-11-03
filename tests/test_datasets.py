@@ -6,6 +6,15 @@ from core.models import Gluten, Ingredient
 from tests.fakes import ingredient, offer, recipe, snapshot, traits
 
 
+def test_shelves_and_scores_are_written_and_only_the_shelves_read(tmp_path: Path) -> None:
+    o = replace(offer("KYLLINGBRYST", 99, pre_price=135, id="a"), shelf="/kjøtt/kylling/høns")
+    s = replace(snapshot(offers=[o], matches={"kyllingfilet": ["a"]}), scores={"kyllingfilet": {"KYLLINGBRYST": (0.9, 0.05)}})
+    write(s, tmp_path)
+    assert '"scores"' in (tmp_path / "offers.json").read_text()
+    read = JsonDatasets(tmp_path).snapshot()
+    assert read.offers[0].shelf == "/kjøtt/kylling/høns" and read.scores == {}  # The site has no use for the scores
+
+
 def test_snapshot_round_trip(tmp_path: Path) -> None:
     bacon = ingredient("bacon", 100, "g", "/kjøtt/svinekjøtt")
     bacon = Ingredient(bacon.name, "100 g røkt bacon", bacon.amount, bacon.unit, bacon.category)

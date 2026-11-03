@@ -3,7 +3,7 @@
 from collections.abc import Collection, Iterable, Mapping, Sequence
 from typing import Protocol
 
-from core.models import Fit, Ingredient, Levels, Offer, Offers, Recipe, RecipeRef, Snapshot
+from core.models import Answer, Ingredient, Levels, Offer, Offers, Recipe, RecipeRef, Snapshot
 
 
 class Datasets(Protocol):
@@ -64,9 +64,14 @@ class CategoryClassifier(Protocol):
 class OfferMatcher(Protocol):
     """Which of these offers is this product?"""
 
-    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> Mapping[str, Fit]:
+    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> Mapping[str, Answer]:
         """Per id of an offer a cook can buy as the product (a name in the vocabulary, or what it stands for:
         Traits.product, filed under `category`), in `form` (Part.form: "røkt", "hermetisk"; "" for what the name
-        means) for the dinner `dish`, when given: whether it is the kind the name says or one to use instead. Offers
-        that are neither are left out."""
+        means) for the dinner `dish`, when given: whether it is the kind the name says or one to use instead, and how
+        likely each is. Offers that are neither are left out."""
+        ...
+
+    async def shelves(self, offers: Sequence[Offer], categories: Mapping[str, Sequence[str]]) -> Mapping[str, str]:
+        """Per heading (core.matching.heading_key), what the offer is: one of `categories` (each with names filed
+        there), or core.matching.READY_MEAL. Asked once per heading, without any ingredient (core.matching.on_shelf)."""
         ...

@@ -6,9 +6,10 @@ from datetime import UTC, date, datetime
 
 from core.dishes import dish
 from core.errors import SourceUnavailableError
-from core.matching import per_dinner
+from core.matching import heading_key, per_dinner
 from core.models import (
     LABELS,
+    Answer,
     Carbs,
     Fit,
     Fodmap,
@@ -174,8 +175,16 @@ class FakeMatcher:
     """(product, offers, form, dinner) per request."""
     categories: dict[str, str] = field(default_factory=dict)
     """Per product, the category it was asked with."""
+    shelf: Mapping[str, str] = field(default_factory=dict)
+    """Per word in an offer's heading, the shelf it is on: {"ristorante": "/ferdigmat"}; other offers on none."""
+    shelved: list[int] = field(default_factory=list)
+    """Offers per shelf request."""
 
-    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> dict[str, Fit]:
+    async def shelves(self, offers: Sequence[Offer], categories: Mapping[str, Sequence[str]]) -> dict[str, str]:
+        self.shelved.append(len(offers))
+        return {heading_key(o.heading): s for o in offers for word, s in self.shelf.items() if word in o.heading.lower()}
+
+    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> dict[str, Answer]:
         self.asked.append((product, len(offers), form, dish))
         self.categories[product] = category
         word, bad, close = self.matches.get(product), self.wrong.get(dish), self.near.get(product)
@@ -184,9 +193,9 @@ class FakeMatcher:
             if bad and bad in o.description:
                 continue
             if close and close in o.heading.lower():
-                fits[o.id] = Fit.NEAR
+                fits[o.id] = Answer(Fit.NEAR, 0.0, 1.0)
             elif word and word in o.heading.lower():
-                fits[o.id] = Fit.EXACT
+                fits[o.id] = Answer(Fit.EXACT, 1.0, 0.0)
         return fits
 
 

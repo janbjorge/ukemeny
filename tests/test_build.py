@@ -76,7 +76,7 @@ async def test_each_category_is_shown_with_the_names_the_dinners_use_most() -> N
         "olivenolje": traits(category="/margarin/olje/majones"),
         "smør": traits(category="/melk/melkeprodukter"),
     }
-    shown = build.examples(oil, vocabulary)
+    shown = build.examples((i.name for r in oil for i in r.ingredients), vocabulary)
     assert shown["/margarin/olje/majones"] == ("olivenolje", "rapsolje") and shown["/melk/melkeprodukter"] == ("smør",)
     assert tuple(shown) == CATEGORIES and shown["/egg"] == ()
 
@@ -137,6 +137,45 @@ async def test_offers_to_use_instead_are_kept_apart_from_the_exact_ones() -> Non
     assert found.served == {pork.url: {"kjøttdeig av svin": ("pork",)}}
     assert found.near_served == {pork.url: {"kjøttdeig av svin": ("mix",)}}
     assert found.matches == found.near == {}
+
+
+async def test_an_offer_on_another_shelf_is_not_the_ingredient() -> None:
+    """Jev said yes to Smøremyk (a butter) for smøreost, Ristorante (a pizza) for carnaroli-ris and ALI HELE BØNNER
+    (coffee) for grønne bønner (METHOD.md §2, 2026-10-23). Asked once what shelf each offer is on, none is on the
+    ingredient's, so none is asked about. Tinned tomatoes are on a shelf that spans departments: kept."""
+    cheese = ingredient("smøreost", 200, "g", "/ost")
+    rice = ingredient("carnaroli-ris", 300, "g", "/pasta/ris")
+    beans = ingredient("grønne bønner", 400, "g", "/grønnsaker")
+    tomatoes = ingredient("tomater", 400, "g", "/grønnsaker")
+    offers = [
+        offer("Smøremyk", 30, pre_price=45, id="smør"),
+        offer("Smøreost", 30, pre_price=45, id="ost"),
+        offer("Ristorante", 40, pre_price=60, id="pizza"),
+        offer("ALI HELE BØNNER", 60, pre_price=90, id="kaffe"),
+        offer("HAKKEDE TOMATER", 10, pre_price=20, id="tomat"),
+    ]
+    matcher = FakeMatcher(
+        {"smøreost": "smøre", "carnaroli-ris": "ristorante", "grønne bønner": "bønner", "tomater": "tomater"},  # Jev's yes
+        shelf={
+            "smøremyk": "/margarin/olje/majones",
+            "smøreost": "/ost",
+            "ristorante": "/ferdigmat",
+            "ali ": "/drikke",
+            "tomater": "/hermetikk",
+        },
+    )
+    found = await build.match([dish(recipe("Middag", cheese, rice, beans, tomatoes))], offers, matcher, {})
+    assert found.matches == {"smøreost": ("ost",), "tomater": ("tomat",)}
+    assert sorted(matcher.asked) == [("smøreost", 1, "", ""), ("tomater", 1, "", "")]
+    assert matcher.shelved == [5]  # Once per build, every offer on sale
+
+
+async def test_the_scores_of_the_offers_matched_are_kept() -> None:
+    tomato = ingredient("tomat", 400, "g", "/grønnsaker")
+    salad = recipe("Tunfisksalat", ingredient("tunfisk", 1, "boks", "/fisk og sjømat"), tomato)
+    offers = [offer("Tunfisk", 15, pre_price=23.9, id="tin"), offer("TOMATER", 20, pre_price=30, id="tomat")]
+    found = await build.match([dish(salad)], offers, FakeMatcher({"tunfisk": "tunfisk", "tomat": "tomat"}), {})
+    assert found.scores == {"tomat": {"TOMATER": (1.0, 0.0)}, f"tunfisk @ {salad.url}": {"Tunfisk": (1.0, 0.0)}}
 
 
 async def test_a_dinner_without_a_discount_costs_nothing() -> None:

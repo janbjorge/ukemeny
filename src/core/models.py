@@ -252,6 +252,9 @@ class Offer:
     per_kg: float | None
     """NOK per kg when the catalog says or the pack size gives it."""
     valid_until: date
+    shelf: str = ""
+    """What the offer is, as the classifier files it: one of core.matching.CATEGORIES, or core.matching.READY_MEAL;
+    "" when not asked (offers.json from before 2026-11-03)."""
 
     @property
     def discount(self) -> float | None:
@@ -277,6 +280,15 @@ class Fit(StrEnum):
     """The kind the recipe names: «COOP KJØTTDEIG» for kjøttdeig."""
     NEAR = "near"
     """Another or a mixed kind a cook could use instead: «Kjøttdeig av storfe&svin» for kjøttdeig av svin."""
+
+
+@dataclass(frozen=True, slots=True)
+class Answer:
+    """How well an offer is an ingredient, and how likely the classifier found it exact and near (Snapshot.scores)."""
+
+    fit: Fit
+    exact: float
+    near: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -491,3 +503,7 @@ class Snapshot:
     """As `matches`, the offers a cook could use instead (Fit.NEAR)."""
     near_served: Mapping[str, Mapping[str, tuple[str, ...]]] = field(default_factory=dict)
     """As `served`, the offers a cook could use instead (Fit.NEAR)."""
+    scores: Mapping[str, Mapping[str, tuple[float, float]]] = field(default_factory=dict, compare=False)
+    """Per question (the product, or "product @ Dish.url" for meat, fish and shellfish), per heading of an offer it
+    matched, how likely the classifier found it exact and near (Answer). Written to offers.json to check the matches
+    by, never read: the site has no use for them."""

@@ -197,14 +197,36 @@ async def test_matcher_asks_once_per_heading_and_reads_exact_near_or_no() -> Non
             "2": {"exact": 0.1, "near": 0.2, "no": 0.7},
         }
     )
-    fits = await JevOfferMatcher(Jev(client)).fit("kyllingfilet", [kiwi, rema, thigh, sausage], category="/kjøtt/kylling/høns")
-    assert fits == {kiwi.id: Fit.EXACT, rema.id: Fit.EXACT, thigh.id: Fit.NEAR}
+    answers = await JevOfferMatcher(Jev(client)).fit("kyllingfilet", [kiwi, rema, thigh, sausage], category="/kjøtt/kylling/høns")
+    assert {i: a.fit for i, a in answers.items()} == {kiwi.id: Fit.EXACT, rema.id: Fit.EXACT, thigh.id: Fit.NEAR}
     state, questions = client.calls[0]
     assert state == {"ingredient": "kyllingfilet", "category": "/kjøtt/kylling/høns"}
     assert set(questions) == {"0", "1", "2"}
     question = questions["2"]
     assert isinstance(question, Choice) and set(question.criteria) == {"exact", "near", "no"}
     assert "KYLLINGPØLSER" in str(question.instructions)
+
+
+async def test_matcher_keeps_the_probabilities() -> None:
+    thigh = offer("KYLLINGLÅR", 59)
+    client = FakeOfferClient({"0": {"exact": 0.3, "near": 0.4, "no": 0.3}})
+    (answer,) = (await JevOfferMatcher(Jev(client)).fit("kyllingfilet", [thigh])).values()
+    assert (answer.fit, answer.exact, answer.near) == (Fit.NEAR, 0.3, 0.4)
+
+
+async def test_shelves_are_asked_once_per_heading_and_the_likeliest_kept() -> None:
+    kiwi = offer("Smøremyk", store="KIWI")
+    rema = offer("SMØREMYK ", store="REMA 1000")
+    pizza = offer("Ristorante", description="Pizza Mozzarella, 355 g")
+    client = FakeOfferClient({"0": {"/margarin/olje/majones": 0.7, "/ost": 0.3}, "1": {"/ferdigmat": 0.9, "/pasta/ris": 0.1}})
+    shown = {"/ost": ("smøreost",), "/margarin/olje/majones": ("smør",), "/pasta/ris": ("carnaroli-ris",)}
+    shelves = await JevOfferMatcher(Jev(client)).shelves([kiwi, rema, pizza], shown)
+    assert shelves == {"smøremyk": "/margarin/olje/majones", "ristorante": "/ferdigmat"}
+    ((_, questions),) = client.calls
+    question = questions["1"]
+    assert isinstance(question, Choice) and set(question.criteria) == {*shown, "/ferdigmat"}
+    assert question.criteria["/ost"] == ["smøreost"]
+    assert "Pizza Mozzarella" in str(question.instructions)
 
 
 async def test_matcher_asks_with_the_form_and_the_dinner() -> None:

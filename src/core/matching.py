@@ -209,6 +209,23 @@ own name has the word too (hamburgerbrød). Jev said yes to MAARUD POTETGULL for
 on 2026-10-23, and to COOP KOPPNUDLER for «nudler»."""
 
 
+READY_MEAL = "/ferdigmat"
+"""The shelf of an offer that is no ingredient: pizza, ready meals, snacks, sweets."""
+
+OPEN_SHELVES = ("/diverse", "/glutenfritt", "/hermetikk", "/melkefritt")
+"""Shelves that hold goods of every department: glutenfri pasta, laktosefri melk, tinned tomatoes."""
+
+
+def on_shelf(category: str, shelf: str) -> bool:
+    """Whether an offer on `shelf` can be an ingredient filed under `category`: the same department (the first part of
+    the path), or a shelf that spans them. Jev said yes to Smøremyk (a butter) for smøreost, Ristorante (a pizza) for
+    carnaroli-ris and ALI HELE BØNNER (coffee) for grønne bønner (METHOD.md §2): asked without the ingredient, it
+    files them under /margarin/olje/majones, READY_MEAL and /drikke. An offer not asked about ("") is kept."""
+    if not shelf or not category or shelf.startswith(OPEN_SHELVES) or category.startswith(OPEN_SHELVES):
+        return True
+    return shelf.split("/")[1] == category.split("/")[1]
+
+
 def heading_key(heading: str) -> str:
     """Offers with the same heading are the same product, whatever the chain."""
     return " ".join(heading.lower().split())

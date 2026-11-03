@@ -19,7 +19,8 @@ import httpx2
 from typesafe_sdk import Choice, JSONContent, Noul, Score, SystemOneResponse, TypeSafeError
 
 from core.errors import ClassifierUnavailableError
-from core.models import Fit, Ingredient, Item, Offer
+from core.matching import READY_MEAL, heading_key
+from core.models import Answer, Fit, Ingredient, Item, Offer
 
 type Question = Noul | Choice | Score
 
@@ -453,6 +454,18 @@ def _offer_question(offer: Offer, dinner: bool) -> Choice:
     )
 
 
+READY_MEAL_CRITERION = "A ready meal, frozen pizza, snack, sweet or anything else no recipe lists as an ingredient"
+
+
+def _shelf_question(offer: Offer, categories: Mapping[str, Sequence[str]]) -> Choice:
+    return Choice(
+        instructions=f"Which department of a Norwegian grocery store sells the offer «{offer.heading}: "
+        f"{offer.description[:90]}»? Each department lists ingredients a recipe site files there. Go by what the product "
+        "is, not by a word in its name: «Smøremyk» is a butter, «Ristorante» a pizza.",
+        criteria={**{category: list(names) for category, names in categories.items()}, READY_MEAL: READY_MEAL_CRITERION},
+    )
+
+
 @dataclass
 class JevOfferMatcher:
     """Implements core.ports.OfferMatcher with one question per offer, all in one request: exact, near or no, read
@@ -469,7 +482,7 @@ class JevOfferMatcher:
 
     jev: Jev
 
-    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> Mapping[str, Fit]:
+    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> Mapping[str, Answer]:
         groups: dict[str, list[Offer]] = {}
         for offer in offers:
             groups.setdefault(offer.heading.strip().upper(), []).append(offer)
@@ -477,13 +490,31 @@ class JevOfferMatcher:
         state: dict[str, JSONContent] = {"ingredient": product, "category": category}
         if dish:
             state |= {"form": form or AS_NAMED, "dish": dish}
-        fits: dict[str, Fit] = {}
+        fits: dict[str, Answer] = {}
         for start in range(0, len(options), QUESTIONS_PER_CALL):
             chunk = options[start : start + QUESTIONS_PER_CALL]
             response = await self.jev.ask(
                 "offer matcher", state, {str(i): _offer_question(group[0], bool(dish)) for i, group in enumerate(chunk)}
             )
             for i, group in enumerate(chunk):
-                if found := _label(response.choices[str(i)].probabilities, Fit.EXACT, Fit.NEAR):
-                    fits.update((offer.id, Fit(found)) for offer in group)
+                p = response.choices[str(i)].probabilities
+                if found := _label(p, Fit.EXACT, Fit.NEAR):
+                    answer = Answer(Fit(found), p.get(Fit.EXACT, 0.0), p.get(Fit.NEAR, 0.0))
+                    fits.update((offer.id, answer) for offer in group)
         return fits
+
+    async def shelves(self, offers: Sequence[Offer], categories: Mapping[str, Sequence[str]]) -> Mapping[str, str]:
+        """The likeliest shelf per heading, each of `categories` described by the names filed there, as
+        JevCategoryClassifier asks: one question per heading and no ingredient, since the ingredient's name made Jev
+        say yes to Smøremyk for smøreost (core.matching.on_shelf)."""
+        first: dict[str, Offer] = {}
+        for offer in offers:
+            first.setdefault(heading_key(offer.heading), offer)
+        keys = list(first)
+        found: dict[str, str] = {}
+        for start in range(0, len(keys), QUESTIONS_PER_CALL):
+            chunk = keys[start : start + QUESTIONS_PER_CALL]
+            response = await self.jev.ask("offer shelf", {}, {str(i): _shelf_question(first[k], categories) for i, k in enumerate(chunk)})
+            for i, key in enumerate(chunk):
+                found[key] = _likeliest(response.choices[str(i)].probabilities, (*categories, READY_MEAL))
+        return found

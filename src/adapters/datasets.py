@@ -50,6 +50,8 @@ class OfferJSON(TypedDict):
     pre_price: float | None
     per_kg: float | None
     valid_until: str
+    shelf: NotRequired[str]
+    """Missing in offers.json from before 2026-11-03."""
 
 
 _JSON = orjson.OPT_INDENT_2 | orjson.OPT_APPEND_NEWLINE | orjson.OPT_SORT_KEYS
@@ -96,6 +98,7 @@ def write(snapshot: Snapshot, root: Path = DATASETS) -> dict[str, int]:
             "served": {url: {name: list(ids) for name, ids in found.items()} for url, found in snapshot.served.items()},
             "near": {name: list(ids) for name, ids in snapshot.near.items()},
             "near_served": {url: {name: list(ids) for name, ids in found.items()} for url, found in snapshot.near_served.items()},
+            "scores": {key: {heading: list(p) for heading, p in found.items()} for key, found in snapshot.scores.items()},
         },
     }
     sizes = {}
@@ -131,4 +134,5 @@ def _offer(o: OfferJSON) -> Offer:
         pre_price=o["pre_price"],
         per_kg=o["per_kg"],
         valid_until=date.fromisoformat(o["valid_until"]),
+        shelf=intern(o.get("shelf", "")),
     )

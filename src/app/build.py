@@ -12,12 +12,12 @@ import asyncio
 import logging
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 
 from core.dishes import dish
 from core.errors import SourceUnavailableError
-from core.matching import CATEGORIES, candidates, not_an_ingredient, per_dinner, weight, words
+from core.matching import CATEGORIES, candidates, heading_key, not_an_ingredient, on_shelf, per_dinner, weight, words
 from core.models import Dish, Fit, Ingredient, Offer, Recipe, RecipeRef, RefreshReport, Snapshot, Traits
 from core.ports import CategoryClassifier, IngredientClassifier, OfferMatcher, OfferSource, RecipeSource
 
@@ -67,10 +67,10 @@ async def recipes(
     return dinners, RefreshReport(listed=len(listed), fetched=done - failed, failed=failed, dinners=len(dinners))
 
 
-def examples(dinners: Iterable[Recipe], vocabulary: Mapping[str, Traits]) -> dict[str, tuple[str, ...]]:
-    """Per category of ours, the names the vocabulary files there that the dinners use most, EXAMPLES at most: what the
-    category classifier is shown."""
-    used = Counter(i.name for r in dinners for i in r.ingredients)
+def examples(names: Iterable[str], vocabulary: Mapping[str, Traits]) -> dict[str, tuple[str, ...]]:
+    """Per category of ours, the names the vocabulary files there that the dinners use most (`names`: every name in
+    every dinner), EXAMPLES at most: what the category classifier and OfferMatcher.shelves are shown."""
+    used = Counter(names)
     filed: dict[str, list[str]] = {category: [] for category in CATEGORIES}
     for name, t in vocabulary.items():
         if t.category in filed:
@@ -100,7 +100,7 @@ async def draft(
         near.setdefault(words(name), t.category)
     known = {name: wanted[name].category or near.get(words(name), "") for name in new}
     ask = [name for name in new if not known[name]]
-    shown = examples(dinners, vocabulary)
+    shown = examples((i.name for r in dinners for i in r.ingredients), vocabulary)
     log.info("vocabulary: %d names without a row, %d of them with no line or near-name to file them", len(new), len(ask))
     done = 0
     if progress:
@@ -162,12 +162,15 @@ type ByDinner = dict[str, dict[str, tuple[str, ...]]]
 @dataclass(frozen=True, slots=True)
 class Matched:
     """The offer ids per ingredient name and per dinner, as Snapshot has them: `matches` and `served` the exact
-    offers, `near` and `near_served` those a cook could use instead (Fit)."""
+    offers, `near` and `near_served` those a cook could use instead (Fit), and the scores of each (Snapshot.scores)."""
 
     matches: ByName
     served: ByDinner
     near: ByName
     near_served: ByDinner
+    scores: dict[str, dict[str, tuple[float, float]]] = field(default_factory=dict)
+    shelves: dict[str, str] = field(default_factory=dict)
+    """Per heading (core.matching.heading_key) of an offer that could be an ingredient, what it is (Offer.shelf)."""
 
 
 async def match(
@@ -185,7 +188,8 @@ async def match(
     carries the form the recipe line asks for (Part.form) and the dinner (METHOD.md §2). Only discounted offers are
     asked about, since nothing else reaches a card (jb 2026-10-22: "make sure that we do not waaste effort on dishes that
     do not have any discounts"), so a dinner without one costs nothing. Snacks and pålegg are left out without asking
-    (core.matching.not_an_ingredient)."""
+    (core.matching.not_an_ingredient), and an offer on another shelf than the ingredient's after asking once per heading
+    what it is (OfferMatcher.shelves, core.matching.on_shelf): Smøremyk is no smøreost (METHOD.md §2)."""
     on_sale = [o for o in offers if o.saving]
     found: dict[str, tuple[Offer, ...]] = {}
 
@@ -212,6 +216,15 @@ async def match(
             else:
                 by_product.setdefault(product, Question(product, maybe, category=part.category))
                 names.setdefault(product, set()).add(part.name)
+    maybe_offers = {o.id: o for q in (*by_product.values(), *by_dinner.values()) for o in q.offers}
+    shown = examples((p.name for d in dishes for p in d.parts), vocabulary)
+    shelves = dict(await matcher.shelves(list(maybe_offers.values()), shown)) if maybe_offers else {}
+
+    def shelved(q: Question) -> Question:
+        return replace(q, offers=tuple(o for o in q.offers if on_shelf(q.category, shelves.get(heading_key(o.heading), ""))))
+
+    by_product = {key: q for key, asked in by_product.items() if (q := shelved(asked)).offers}
+    by_dinner = {key: q for key, asked in by_dinner.items() if (q := shelved(asked)).offers}
     due = len(by_product) + len(by_dinner)
     log.info(
         "offers: %d of %d discounted, %d products and %d dinner products to ask about",
@@ -224,10 +237,15 @@ async def match(
     if progress:
         progress(done, due)
 
-    async def ask(q: Question) -> dict[Fit, tuple[str, ...]]:
+    scores: dict[str, dict[str, tuple[float, float]]] = {}
+
+    async def ask(q: Question, key: str) -> dict[Fit, tuple[str, ...]]:
         nonlocal done
-        fits = await matcher.fit(q.product, q.offers, q.form, q.dish, q.category)
+        answers = await matcher.fit(q.product, q.offers, q.form, q.dish, q.category)
+        fits = {i: a.fit for i, a in answers.items()}
         ids = {fit: tuple(o.id for o in q.offers if fits.get(o.id) is fit) for fit in Fit}
+        if found := {o.heading: (a.exact, a.near) for o in q.offers if (a := answers.get(o.id))}:
+            scores[key] = dict(sorted(found.items()))
         log.debug(
             "%s%s%s: %d exact and %d near of %d offers %s",
             q.product,
@@ -244,8 +262,8 @@ async def match(
         return ids
 
     async with asyncio.TaskGroup() as tg:
-        products = {product: tg.create_task(ask(q)) for product, q in by_product.items()}
-        served = {key: tg.create_task(ask(q)) for key, q in by_dinner.items()}
+        products = {product: tg.create_task(ask(q, product)) for product, q in by_product.items()}
+        served = {(url, product): tg.create_task(ask(q, f"{product} @ {url}")) for (url, product), q in by_dinner.items()}
 
     def by_name(fit: Fit) -> ByName:
         return dict(sorted((name, ids) for product, task in products.items() if (ids := task.result()[fit]) for name in names[product]))
@@ -257,7 +275,7 @@ async def match(
                 kept.setdefault(url, {}).update(dict.fromkeys(sorted(dinner_names[url, product]), ids))
         return kept
 
-    return Matched(by_name(Fit.EXACT), per_dish(Fit.EXACT), by_name(Fit.NEAR), per_dish(Fit.NEAR))
+    return Matched(by_name(Fit.EXACT), per_dish(Fit.EXACT), by_name(Fit.NEAR), per_dish(Fit.NEAR), dict(sorted(scores.items())), shelves)
 
 
 async def snapshot(
@@ -305,10 +323,16 @@ async def reprice(base: Snapshot, offers: OfferSource, matcher: OfferMatcher, pr
     return replace(
         base,
         built=datetime.now(UTC),
-        offers=tuple(sorted(current.offers, key=lambda o: (o.store, o.heading, o.id))),
+        offers=tuple(
+            sorted(
+                (replace(o, shelf=matched.shelves.get(heading_key(o.heading), "")) for o in current.offers),
+                key=lambda o: (o.store, o.heading, o.id),
+            )
+        ),
         matches=matched.matches,
         places={place: tuple(sorted(catalogs)) for place, catalogs in sorted(current.places.items())},
         served=matched.served,
         near=matched.near,
         near_served=matched.near_served,
+        scores=matched.scores,
     )

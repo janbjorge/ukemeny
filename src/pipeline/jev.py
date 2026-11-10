@@ -435,9 +435,9 @@ AS_NAMED = "fresh or raw, as a recipe means by the name alone"
 """The form sent when the recipe line names none (Part.form "")."""
 
 
-def _offer_question(offer: Offer, dinner: bool) -> Choice:
-    where = ", in the form `form`, for the dinner `dish`" if dinner else ""
-    wanted = "the form the dinner wants (`form`)" if dinner else "a form a recipe means by the name"
+def _offer_question(offer: Offer, form: bool, dinner: bool) -> Choice:
+    where = (", in the form `form`" if form else "") + (", for the dinner `dish`" if dinner else "")
+    wanted = "the form the dinner wants (`form`)" if dinner else "the form `form`" if form else "a form a recipe means by the name"
     return Choice(
         instructions=f"Can a cook buy the grocery offer «{offer.heading}: {offer.description[:90]}» as the recipe ingredient "
         f"`ingredient` (filed under `category`){where}?",
@@ -474,27 +474,31 @@ class JevOfferMatcher:
     A single Choice over the offers split its probability between several right answers
     (KYLLINGFILET and KYLLINGBRYST) and dropped some. Questions that pointed at `offers[i]`
     in a list mixed offers up (KINDEREGG for "egg"). Each question carries its own offer.
-    Offers with the same heading (one product at several chains) are asked about once. With a dinner, the form counts:
-    the recipe line's word (røkt, hermetisk), or AS_NAMED when it says none, so King Oskar's tinned tuna is tunfisk in
-    a tunfisksalat («1 boks tunfisk»), not in nigiri. The category says what the name holds: «kjøttdeig av svin» is
-    under /kjøtt/svinekjøtt, and a yes/no question without it took «COOP KJØTTDEIG», beef, for it (2026-10-24).
+    Offers with the same heading (one product at several chains) are asked about once. With a form or a dinner, the form
+    counts: the recipe line's word (røkt, hermetisk), or AS_NAMED when it says none, so King Oskar's tinned tuna is
+    tunfisk in a tunfisksalat («1 boks tunfisk»), not in nigiri. The category says what the name holds: «kjøttdeig av
+    svin» is under /kjøtt/svinekjøtt, and a yes/no question without it took «COOP KJØTTDEIG», beef, for it (2026-10-24).
     """
 
     jev: Jev
 
-    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> Mapping[str, Answer]:
+    async def fit(
+        self, product: str, offers: Sequence[Offer], form: str | None = None, dish: str = "", category: str = ""
+    ) -> Mapping[str, Answer]:
         groups: dict[str, list[Offer]] = {}
         for offer in offers:
             groups.setdefault(offer.heading.strip().upper(), []).append(offer)
         options = list(groups.values())
         state: dict[str, JSONContent] = {"ingredient": product, "category": category}
+        if form is not None or dish:
+            state["form"] = form or AS_NAMED
         if dish:
-            state |= {"form": form or AS_NAMED, "dish": dish}
+            state["dish"] = dish
         fits: dict[str, Answer] = {}
         for start in range(0, len(options), QUESTIONS_PER_CALL):
             chunk = options[start : start + QUESTIONS_PER_CALL]
             response = await self.jev.ask(
-                "offer matcher", state, {str(i): _offer_question(group[0], bool(dish)) for i, group in enumerate(chunk)}
+                "offer matcher", state, {str(i): _offer_question(group[0], "form" in state, bool(dish)) for i, group in enumerate(chunk)}
             )
             for i, group in enumerate(chunk):
                 p = response.choices[str(i)].probabilities

@@ -106,13 +106,38 @@ async def test_meat_and_fish_are_asked_about_per_dinner_and_the_rest_by_name() -
         offer("TUNFISKPÅLEGG", 20, pre_price=30, id="pålegg"),  # Never an ingredient
         offer("TOMATER", 20, pre_price=30, id="tomat"),
     ]
-    matcher = FakeMatcher({"tunfisk": "tunfisk", "tomat": "tomat"}, wrong={"Nigiri": "boks"})
+    matcher = FakeMatcher({"tunfisk": "tunfisk", "tomat": "tomat"}, wrong={"Nigiri": "boks", "": "boks"})
     found = await build.match([dish(r) for r in (raw, salad, soup)], offers, matcher, {})
     assert found.matches == {"tomat": ("tomat",)}
     assert found.served == {salad.url: {"tunfisk": ("tin",)}}  # The tin is no tuna for nigiri
+    assert found.near_served == {}  # Nor one to use instead: fresh tuna is asked for
     assert matcher.categories == {"tomat": "/grønnsaker", "tunfisk": "/fisk og sjømat"}
-    # Meat and fish with the form the line asks for («1 boks tunfisk») and the dinner; the rest by name
-    assert sorted(matcher.asked) == [("tomat", 1, "", ""), ("tunfisk", 1, "", "Nigiri"), ("tunfisk", 1, "hermetisk", "Tunfisksalat")]
+    # Meat and fish with the form the line asks for («1 boks tunfisk»), per dinner and once per form; the rest by name
+    assert sorted(matcher.asked, key=str) == [
+        ("tomat", 1, None, ""),
+        ("tunfisk", 1, "", ""),
+        ("tunfisk", 1, "", "Nigiri"),
+        ("tunfisk", 1, "hermetisk", ""),
+        ("tunfisk", 1, "hermetisk", "Tunfisksalat"),
+    ]
+
+
+async def test_near_is_asked_once_per_product_and_form_and_exact_per_dinner() -> None:
+    """Jev's near per dinner flipped from one dinner to the next (METHOD.md §2): the dinner's question decides what is
+    exact, the one per product and form what to use instead, in every dinner with them."""
+    stew, wok = (recipe(name, ingredient("kyllingfilet", 600, "g", "/kjøtt/kylling/høns")) for name in ("Gryte", "Wok"))
+    offers = [
+        offer("KYLLINGFILET", 89, pre_price=120, id="filet", description="1 kg"),
+        offer("KYLLINGLÅR", 49, pre_price=69, id="lår", description="hel, 1 kg"),
+        offer("KYLLINGLÅR MARINERT", 59, pre_price=79, id="marinert", description="marinert, 600 g"),
+    ]
+    # Per dinner, near to the marinated thighs, and for the wok no to both fillet and thighs; asked as named, no to the
+    # marinated ones
+    matcher = FakeMatcher({"kyllingfilet": "kyllingfilet"}, near={"kyllingfilet": "lår"}, wrong={"": "marinert", "Wok": "1 kg"})
+    found = await build.match([dish(stew), dish(wok)], offers, matcher, {})
+    assert found.served == {stew.url: {"kyllingfilet": ("filet",)}}
+    assert found.near_served == {stew.url: {"kyllingfilet": ("lår",)}, wok.url: {"kyllingfilet": ("filet", "lår")}}
+    assert sorted(dish for *_, dish in matcher.asked) == ["", "Gryte", "Wok"]
 
 
 async def test_two_names_of_one_product_are_asked_once_and_both_written() -> None:
@@ -122,7 +147,7 @@ async def test_two_names_of_one_product_are_asked_once_and_both_written() -> Non
     matcher = FakeMatcher({"tomat": "tomat"})
     found = await build.match([dish(recipe("Salat", tomatoes, cherry))], [offer("TOMATER", 20, pre_price=30, id="t")], matcher, vocabulary)
     assert found.matches == {"cherrytomater": ("t",), "tomater": ("t",)}
-    assert matcher.asked == [("tomat", 1, "", "")]
+    assert matcher.asked == [("tomat", 1, None, "")]
 
 
 async def test_offers_to_use_instead_are_kept_apart_from_the_exact_ones() -> None:
@@ -166,7 +191,7 @@ async def test_an_offer_on_another_shelf_is_not_the_ingredient() -> None:
     )
     found = await build.match([dish(recipe("Middag", cheese, rice, beans, tomatoes))], offers, matcher, {})
     assert found.matches == {"smøreost": ("ost",), "tomater": ("tomat",)}
-    assert sorted(matcher.asked) == [("smøreost", 1, "", ""), ("tomater", 1, "", "")]
+    assert sorted(matcher.asked) == [("smøreost", 1, None, ""), ("tomater", 1, None, "")]
     assert matcher.shelved == [5]  # Once per build, every offer on sale
 
 
@@ -175,7 +200,11 @@ async def test_the_scores_of_the_offers_matched_are_kept() -> None:
     salad = recipe("Tunfisksalat", ingredient("tunfisk", 1, "boks", "/fisk og sjømat"), tomato)
     offers = [offer("Tunfisk", 15, pre_price=23.9, id="tin"), offer("TOMATER", 20, pre_price=30, id="tomat")]
     found = await build.match([dish(salad)], offers, FakeMatcher({"tunfisk": "tunfisk", "tomat": "tomat"}), {})
-    assert found.scores == {"tomat": {"TOMATER": (1.0, 0.0)}, f"tunfisk @ {salad.url}": {"Tunfisk": (1.0, 0.0)}}
+    assert found.scores == {
+        "tomat": {"TOMATER": (1.0, 0.0)},
+        "tunfisk (hermetisk)": {"Tunfisk": (1.0, 0.0)},
+        f"tunfisk @ {salad.url}": {"Tunfisk": (1.0, 0.0)},
+    }
 
 
 async def test_a_dinner_without_a_discount_costs_nothing() -> None:
@@ -217,8 +246,8 @@ async def test_reprice_keeps_the_dinners_and_takes_this_weeks_offers() -> None:
     assert s.dishes == base.dishes and s.traits == base.traits
     assert [o.id for o in s.offers] == ["new"] and s.places == {"Bergen": ("KIWI",)}
     assert s.served == {DINNER.url: {"kyllingfilet": ("new",)}} and s.matches == {}
-    assert matcher.asked == [("kyllingfilet", 1, "", "Kyllinggryte")]
-    assert [step for step, _, _ in seen] == ["catalogs", "catalogs", "offers", "offers"]
+    assert sorted(matcher.asked) == [("kyllingfilet", 1, "", ""), ("kyllingfilet", 1, "", "Kyllinggryte")]
+    assert [step for step, _, _ in seen] == ["catalogs", "catalogs", "offers", "offers", "offers"]  # Per form, per dinner
 
 
 async def test_snapshot_reports_each_step() -> None:
@@ -241,6 +270,7 @@ async def test_snapshot_reports_each_step() -> None:
         ("ingredients", 2, 2),
         ("catalogs", 0, 1),
         ("catalogs", 1, 1),
-        ("offers", 0, 1),
-        ("offers", 1, 1),
+        ("offers", 0, 2),
+        ("offers", 1, 2),
+        ("offers", 2, 2),
     ]

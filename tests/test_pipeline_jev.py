@@ -238,6 +238,13 @@ async def test_matcher_asks_with_the_form_and_the_dinner() -> None:
     assert "`form`" in str(questions["0"].instructions) and "canned" in str(questions["0"].criteria)
     await JevOfferMatcher(Jev(client)).fit("tunfisk", [tin], "hermetisk", "Tunfisksalat", "/fisk og sjømat")
     assert client.calls[1][0] == {"ingredient": "tunfisk", "category": "/fisk og sjømat", "form": "hermetisk", "dish": "Tunfisksalat"}
+    # Once per form, without a dinner: fresh still said, not left to what the name means
+    await JevOfferMatcher(Jev(client)).fit("tunfisk", [tin], "", category="/fisk og sjømat")
+    state, questions = client.calls[2]
+    assert state == {"ingredient": "tunfisk", "category": "/fisk og sjømat", "form": AS_NAMED}
+    assert "`form`" in str(questions["0"].instructions) and "`dish`" not in str(questions["0"].instructions)
+    await JevOfferMatcher(Jev(client)).fit("tunfisk", [tin], category="/fisk og sjømat")
+    assert client.calls[3][0] == {"ingredient": "tunfisk", "category": "/fisk og sjømat"}  # By name
 
 
 async def test_matcher_splits_long_lists() -> None:

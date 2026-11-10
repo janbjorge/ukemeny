@@ -163,15 +163,16 @@ class FakeOffers:
 
 @dataclass
 class FakeMatcher:
-    """An offer is the product when its heading contains `matches[product]`, unless the dinner wants another form:
-    `wrong` names a word in an offer's description that rules it out for a dinner, as a tin for nigiri."""
+    """An offer is the product when its heading contains `matches[product]`, unless the dinner or form wants another
+    one: `wrong` names a word in an offer's description that rules it out for a dinner, as a tin for nigiri."""
 
     matches: Mapping[str, str] = field(default_factory=dict)
     wrong: Mapping[str, str] = field(default_factory=dict)
-    """Per dinner, a word in an offer's description that rules it out there: {"Nigiri": "boks"}."""
+    """Per dinner, or per form when asked without one ("" for fresh), a word in an offer's description that rules it
+    out there: {"Nigiri": "boks", "": "boks"}."""
     near: Mapping[str, str] = field(default_factory=dict)
     """Per product, a word in the heading of an offer to use instead: {"kjøttdeig av svin": "storfe&svin"}."""
-    asked: list[tuple[str, int, str, str]] = field(default_factory=list)
+    asked: list[tuple[str, int, str | None, str]] = field(default_factory=list)
     """(product, offers, form, dinner) per request."""
     categories: dict[str, str] = field(default_factory=dict)
     """Per product, the category it was asked with."""
@@ -184,10 +185,13 @@ class FakeMatcher:
         self.shelved.append(len(offers))
         return {heading_key(o.heading): s for o in offers for word, s in self.shelf.items() if word in o.heading.lower()}
 
-    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> dict[str, Answer]:
+    async def fit(
+        self, product: str, offers: Sequence[Offer], form: str | None = None, dish: str = "", category: str = ""
+    ) -> dict[str, Answer]:
         self.asked.append((product, len(offers), form, dish))
         self.categories[product] = category
-        word, bad, close = self.matches.get(product), self.wrong.get(dish), self.near.get(product)
+        bad = self.wrong.get(dish) if dish else None if form is None else self.wrong.get(form)
+        word, close = self.matches.get(product), self.near.get(product)
         fits = {}
         for o in offers:
             if bad and bad in o.description:

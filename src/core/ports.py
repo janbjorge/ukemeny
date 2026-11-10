@@ -64,11 +64,13 @@ class CategoryClassifier(Protocol):
 class OfferMatcher(Protocol):
     """Which of these offers is this product?"""
 
-    async def fit(self, product: str, offers: Sequence[Offer], form: str = "", dish: str = "", category: str = "") -> Mapping[str, Answer]:
+    async def fit(
+        self, product: str, offers: Sequence[Offer], form: str | None = None, dish: str = "", category: str = ""
+    ) -> Mapping[str, Answer]:
         """Per id of an offer a cook can buy as the product (a name in the vocabulary, or what it stands for:
-        Traits.product, filed under `category`), in `form` (Part.form: "røkt", "hermetisk"; "" for what the name
-        means) for the dinner `dish`, when given: whether it is the kind the name says or one to use instead, and how
-        likely each is. Offers that are neither are left out."""
+        Traits.product, filed under `category`), in `form` (Part.form: "røkt", "hermetisk"; "" for fresh or raw, as the
+        name alone means) and for the dinner `dish`, when given: whether it is the kind the name says or one to use
+        instead, and how likely each is. Offers that are neither are left out. Without a form, by the name alone."""
         ...
 
     async def shelves(self, offers: Sequence[Offer], categories: Mapping[str, Sequence[str]]) -> Mapping[str, str]:

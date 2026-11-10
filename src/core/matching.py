@@ -240,7 +240,8 @@ def not_an_ingredient(ingredient: str, heading: str) -> bool:
 
 PER_DINNER = ("/kjøtt", "/fisk og sjømat", "/skalldyr")
 """Departments whose offers are matched per dinner, with the recipe's line: the dinner says whether tunfisk is raw or
-tinned, laks fresh or smoked, ribbe raw or grilled. Other ingredients are matched by name (METHOD.md §2)."""
+tinned, laks fresh or smoked, ribbe raw or grilled. Only exact is read per dinner; near is asked once per product and
+form (app.build.match). Other ingredients are matched by name (METHOD.md §2)."""
 
 
 def per_dinner(part: Part) -> bool:

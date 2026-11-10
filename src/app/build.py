@@ -146,11 +146,11 @@ def filed(dinners: Iterable[Recipe], vocabulary: Mapping[str, Traits]) -> list[R
 @dataclass(frozen=True, slots=True)
 class Question:
     """One request to the offer matcher: a product, its category and the offers that could be it, and for meat, fish and
-    shellfish (core.matching.per_dinner) the form the recipe asks for and the dinner."""
+    shellfish (core.matching.per_dinner) the form the recipe asks for, and the dinner when asked per dinner."""
 
     product: str
     offers: tuple[Offer, ...]
-    form: str = ""
+    form: str | None = None
     dish: str = ""
     category: str = ""
 
@@ -185,8 +185,10 @@ async def match(
     Snapshot.near_served; jb 2026-10-24: "In cases where we cant match 'perfetct' lets list all of them"). A question is
     about the product a name stands for in the vocabulary (Traits.product; the name itself until set), filed under the
     name's category, so two names of one product are asked once and both written; for meat, fish and shellfish it
-    carries the form the recipe line asks for (Part.form) and the dinner (METHOD.md §2). Only discounted offers are
-    asked about, since nothing else reaches a card (jb 2026-10-22: "make sure that we do not waaste effort on dishes that
+    carries the form the recipe line asks for (Part.form) and the dinner (METHOD.md §2). The dinner's question decides
+    only what is exact; what to use instead is asked once per product and form, without a dinner, and holds in every
+    dinner with them, since Jev's near per dinner flipped from one dinner to the next (`answer`). Only discounted offers
+    are asked about, since nothing else reaches a card (jb 2026-10-22: "make sure that we do not waaste effort on dishes that
     do not have any discounts"), so a dinner without one costs nothing. Snacks and pålegg are left out without asking
     (core.matching.not_an_ingredient), and an offer on another shelf than the ingredient's after asking once per heading
     what it is (OfferMatcher.shelves, core.matching.on_shelf): Smøremyk is no smøreost (METHOD.md §2)."""
@@ -202,6 +204,7 @@ async def match(
         return (t.product if (t := vocabulary.get(name)) else "") or name
 
     by_product: dict[str, Question] = {}
+    by_form: dict[tuple[str, str | None], Question] = {}
     by_dinner: dict[tuple[str, str], Question] = {}
     names: dict[str, set[str]] = {}
     dinner_names: dict[tuple[str, str], set[str]] = {}
@@ -211,6 +214,7 @@ async def match(
             if not weight(part) or not (maybe := could_be(product)):
                 continue
             if per_dinner(part):
+                by_form.setdefault((product, part.form), Question(product, maybe, part.form, category=part.category))
                 by_dinner.setdefault((d.url, product), Question(product, maybe, part.form, d.name, part.category))
                 dinner_names.setdefault((d.url, product), set()).add(part.name)
             else:
@@ -224,13 +228,15 @@ async def match(
         return replace(q, offers=tuple(o for o in q.offers if on_shelf(q.category, shelves.get(heading_key(o.heading), ""))))
 
     by_product = {key: q for key, asked in by_product.items() if (q := shelved(asked)).offers}
+    by_form = {key: q for key, asked in by_form.items() if (q := shelved(asked)).offers}
     by_dinner = {key: q for key, asked in by_dinner.items() if (q := shelved(asked)).offers}
-    due = len(by_product) + len(by_dinner)
+    due = len(by_product) + len(by_form) + len(by_dinner)
     log.info(
-        "offers: %d of %d discounted, %d products and %d dinner products to ask about",
+        "offers: %d of %d discounted, %d products, %d products in a form and %d dinner products to ask about",
         len(on_sale),
         len(offers),
         len(by_product),
+        len(by_form),
         len(by_dinner),
     )
     done = 0
@@ -263,15 +269,25 @@ async def match(
 
     async with asyncio.TaskGroup() as tg:
         products = {product: tg.create_task(ask(q, product)) for product, q in by_product.items()}
+        forms = {key: tg.create_task(ask(q, f"{key[0]} ({key[1] or 'as named'})")) for key, q in by_form.items()}
         served = {(url, product): tg.create_task(ask(q, f"{product} @ {url}")) for (url, product), q in by_dinner.items()}
 
     def by_name(fit: Fit) -> ByName:
         return dict(sorted((name, ids) for product, task in products.items() if (ids := task.result()[fit]) for name in names[product]))
 
+    def answer(url: str, product: str) -> dict[Fit, tuple[str, ...]]:
+        """Exact what the dinner's question calls exact; near what the question for the product in that form calls exact
+        or near, unless the dinner's calls it exact. The dinner's near is not read: in week 44 Jev called one offer
+        exact in some dinners and near in others for 37 of 199 pairs (METHOD.md §2)."""
+        q = by_dinner[url, product]
+        exact = served[url, product].result()[Fit.EXACT]
+        either = {i for ids in task.result().values() for i in ids} if (task := forms.get((product, q.form))) else set()
+        return {Fit.EXACT: exact, Fit.NEAR: tuple(o.id for o in q.offers if o.id in either and o.id not in exact)}
+
     def per_dish(fit: Fit) -> ByDinner:
         kept: ByDinner = {}
-        for (url, product), task in sorted(served.items()):
-            if ids := task.result()[fit]:
+        for url, product in sorted(served):
+            if ids := answer(url, product)[fit]:
                 kept.setdefault(url, {}).update(dict.fromkeys(sorted(dinner_names[url, product]), ids))
         return kept
 

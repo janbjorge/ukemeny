@@ -7,6 +7,7 @@ Open work only. Done → delete; code is record (jb 2026-11-03: "No need to trac
 Numbers must hold (jb 2026-11-02: "The resulsts does not feel real or correct").
 
 - [ ] Shelf check (core.matching `on_shelf`) unrun against Jev: `--offers` run, count matches it drops vs last week's offers.json, read `scores` of bad ones left, METHOD.md §2.
+- [ ] Near per product and form (app.build `answer`) unrun against Jev: same `--offers` run, count near per dinner vs last week's, check frozen cod still near in its 4 dinners, spekeskinke not near for kokt skinke, METHOD.md §2.
 
 ## Later
 

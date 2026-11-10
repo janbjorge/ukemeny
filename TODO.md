@@ -6,8 +6,8 @@ Open work only. Done → delete; code is record (jb 2026-11-03: "No need to trac
 
 Numbers must hold (jb 2026-11-02: "The resulsts does not feel real or correct").
 
-- [ ] Shelf check (core.matching `on_shelf`) unrun against Jev: `--offers` run, count matches it drops vs last week's offers.json, read `scores` of bad ones left, METHOD.md §2.
-- [ ] Near per product and form (app.build `answer`) unrun against Jev: same `--offers` run, count near per dinner vs last week's, check frozen cod still near in its 4 dinners, spekeskinke not near for kokt skinke, METHOD.md §2.
+- [ ] Near too loose since one answer per product and form spreads (METHOD.md §2, 2026-11-10): wings for kyllingfilet in 195 dinners, roastbiff for ytrefilet, grytekjøtt for hønsekjøtt, laksefilet for lakserogn. Raise near threshold (exact + near ≥ 0.5) or drop «form exact, dinner not = near»? jb's call.
+- [ ] Wrong shelves (METHOD.md §2, 2026-11-10): NORA SELSKAPSERTER as /kjøtt/and/gås, svisker as /nøtter and /melk, RØKTE BAKKNOKER as /sopp drop good matches; pinnekjøtt as /kjøtt/svinekjøtt keeps bad one.
 
 ## Later
 

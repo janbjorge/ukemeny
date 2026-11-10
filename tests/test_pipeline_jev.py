@@ -214,16 +214,38 @@ async def test_matcher_keeps_the_probabilities() -> None:
     assert (answer.fit, answer.exact, answer.near) == (Fit.NEAR, 0.3, 0.4)
 
 
+@dataclass
+class FakeShelfClient:
+    """Answers a shelf question by the heading its offer has."""
+
+    answers: Mapping[str, Mapping[str, float]]
+    calls: list[tuple[JSONContent, Mapping[str, Question]]] = field(default_factory=list)
+
+    async def system_one(self, state: JSONContent, questions: Mapping[str, Question]) -> SystemOneResponse:
+        self.calls.append((state, questions))
+        return SystemOneResponse(
+            model="jev-1.14.0",
+            answers={
+                name: choice(next(p for heading, p in self.answers.items() if f"«{heading}:" in str(q.instructions)))
+                for name, q in questions.items()
+            },
+            usage=Usage(input_tokens=3_700, output_tokens=0),
+        )
+
+
 async def test_shelves_are_asked_once_per_heading_and_the_likeliest_kept() -> None:
+    """One question per request, as JevCategoryClassifier's: 100 per request ran over Jev's limit (2026-11-10)."""
     kiwi = offer("Smøremyk", store="KIWI")
     rema = offer("SMØREMYK ", store="REMA 1000")
     pizza = offer("Ristorante", description="Pizza Mozzarella, 355 g")
-    client = FakeOfferClient({"0": {"/margarin/olje/majones": 0.7, "/ost": 0.3}, "1": {"/ferdigmat": 0.9, "/pasta/ris": 0.1}})
+    client = FakeShelfClient(
+        {"Smøremyk": {"/margarin/olje/majones": 0.7, "/ost": 0.3}, "Ristorante": {"/ferdigmat": 0.9, "/pasta/ris": 0.1}}
+    )
     shown = {"/ost": ("smøreost",), "/margarin/olje/majones": ("smør",), "/pasta/ris": ("carnaroli-ris",)}
     shelves = await JevOfferMatcher(Jev(client)).shelves([kiwi, rema, pizza], shown)
     assert shelves == {"smøremyk": "/margarin/olje/majones", "ristorante": "/ferdigmat"}
-    ((_, questions),) = client.calls
-    question = questions["1"]
+    assert [len(questions) for _, questions in client.calls] == [1, 1]
+    (question,) = client.calls[1][1].values()
     assert isinstance(question, Choice) and set(question.criteria) == {*shown, "/ferdigmat"}
     assert question.criteria["/ost"] == ["smøreost"]
     assert "Pizza Mozzarella" in str(question.instructions)

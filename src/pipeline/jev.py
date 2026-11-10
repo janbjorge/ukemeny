@@ -510,15 +510,16 @@ class JevOfferMatcher:
     async def shelves(self, offers: Sequence[Offer], categories: Mapping[str, Sequence[str]]) -> Mapping[str, str]:
         """The likeliest shelf per heading, each of `categories` described by the names filed there, as
         JevCategoryClassifier asks: one question per heading and no ingredient, since the ingredient's name made Jev
-        say yes to Smøremyk for smøreost (core.matching.on_shelf)."""
+        say yes to Smøremyk for smøreost (core.matching.on_shelf). One per request, as that one's: 100 per request ran
+        over Jev's limit (400 max_tokens_exceeded, 2026-11-10)."""
         first: dict[str, Offer] = {}
         for offer in offers:
             first.setdefault(heading_key(offer.heading), offer)
-        keys = list(first)
-        found: dict[str, str] = {}
-        for start in range(0, len(keys), QUESTIONS_PER_CALL):
-            chunk = keys[start : start + QUESTIONS_PER_CALL]
-            response = await self.jev.ask("offer shelf", {}, {str(i): _shelf_question(first[k], categories) for i, k in enumerate(chunk)})
-            for i, key in enumerate(chunk):
-                found[key] = _likeliest(response.choices[str(i)].probabilities, (*categories, READY_MEAL))
-        return found
+
+        async def shelf(offer: Offer) -> str:
+            response = await self.jev.ask("offer shelf", {}, {"shelf": _shelf_question(offer, categories)})
+            return _likeliest(response.choices["shelf"].probabilities, (*categories, READY_MEAL))
+
+        async with asyncio.TaskGroup() as tg:
+            found = {key: tg.create_task(shelf(offer)) for key, offer in first.items()}
+        return {key: task.result() for key, task in found.items()}

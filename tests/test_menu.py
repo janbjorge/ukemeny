@@ -1,6 +1,7 @@
 """A week's menu: few chains, a low price (core.menu)."""
 
 import random
+from dataclasses import replace
 
 from core.menu import PER_PROTEIN, TOLERANCE, Aisle, Line, Weight, dish_key, plan, shopping
 from core.models import Dinner, Household, Offer, Recipe
@@ -124,6 +125,21 @@ def test_a_seed_gives_the_same_menu() -> None:
     found = sale_at_two_chains(200)
     for weight in Weight:
         assert plan(found, weight, seed=7) == plan(found, weight, seed=7)
+
+
+def test_the_main_ingredient_counts_only_as_itself() -> None:
+    """Thighs to use instead of fillet do not put a chicken dinner on the menu at KIWI (Dinner.on_sale, jb 2026-11-25)."""
+    s = snapshot(
+        recipe("Kyllinggryte", CHICKEN),
+        offers=[
+            offer("KYLLINGLÅR", 50, pre_price=100, id="lår", store="KIWI"),
+            offer("KYLLINGFILET", 90, pre_price=120, id="filet", store="REMA 1000"),
+        ],
+        matches={"kyllingfilet": ["filet"]},
+    )
+    found = dinners(replace(s, near_served={s.dishes[0].url: {"kyllingfilet": ("lår",)}}), Household())
+    menu = plan(found, Weight.CHEAPEST)
+    assert menu is not None and menu.stores == ("REMA 1000",)
 
 
 def test_nothing_on_sale_is_no_menu() -> None:

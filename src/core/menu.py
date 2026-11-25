@@ -4,9 +4,9 @@ menu out (METHOD.md §8).
 The catalogs only price what is on sale, so a menu's price is that of the ingredients some store near the place has on
 sale: per ingredient, the cheapest pack at the chains picked, or, when none of them has it on sale, its usual price, the
 median before-price of every offer for it near the place. Each dinner's main ingredient (Dinner.on_sale) must be on sale
-at the chains picked, so the dearest part of it is known, and the packs bought there must save core.ranking.FLOOR_KR.
-Every set of up to MAX_STORES chains is tried; per set, the
-cheapest dinners, a few per main protein, make the menu, and each chain past the first costs the weight's STORE_COST.
+as itself (an exact offer, not one to use instead) at the chains picked, so the dearest part of it is known, and the
+packs bought there must save core.ranking.FLOOR_KR. Every set of up to MAX_STORES chains is tried; per set, the cheapest
+dinners, a few per main protein, make the menu, and each chain past the first costs the weight's STORE_COST.
 «Bytt» swaps a dinner for the next cheapest at the menu's chains and keeps the rest; `shopping` is the menu's list.
 """
 
@@ -158,7 +158,7 @@ def _priced(ingredients: Sequence[_Ingredient], stores: frozenset[str]) -> _Pric
         if (o := i.pick(stores)) is None:
             usual.append((i.name, i.usual))
             continue
-        main = main or i.main
+        main = main or (i.main and not stores.isdisjoint(i.exact))
         picks.setdefault(o.id, o)
     saving = sum(o.saving or 0.0 for o in picks.values())
     if not main or saving < FLOOR_KR:
@@ -177,7 +177,7 @@ class _Row:
     dinner: Dinner
     ingredients: tuple[_Ingredient, ...]
     main: frozenset[str]
-    """The chains with its main ingredient on sale."""
+    """The chains with its main ingredient on sale as itself (exact)."""
     reach: frozenset[str]
     """The chains with any of its ingredients on sale."""
     floor: float
@@ -207,7 +207,7 @@ def plan(dinners: Sequence[Dinner], weight: Weight = Weight.BALANCED, seed: int 
     rows = []
     for d in dinners:
         ingredients = tuple(_ingredient(d, b) for b in d.buys if b.sales)
-        main = frozenset(s for i in ingredients if i.main for s in (*i.exact, *i.near))
+        main = frozenset(s for i in ingredients if i.main for s in i.exact)
         reach = frozenset(s for i in ingredients for s in (*i.exact, *i.near))
         floor = 0.0
         shared: set[str] = set()

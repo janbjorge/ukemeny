@@ -276,13 +276,14 @@ async def match(
         return dict(sorted((name, ids) for product, task in products.items() if (ids := task.result()[fit]) for name in names[product]))
 
     def answer(url: str, product: str) -> dict[Fit, tuple[str, ...]]:
-        """Exact what the dinner's question calls exact; near what the question for the product in that form calls exact
-        or near, unless the dinner's calls it exact. The dinner's near is not read: in week 44 Jev called one offer
-        exact in some dinners and near in others for 37 of 199 pairs (METHOD.md §2)."""
+        """Exact what the dinner's question calls exact; near what the question for the product in that form calls near,
+        unless the dinner's calls it exact. The dinner's near is not read: in week 44 Jev called one offer exact in some
+        dinners and near in others for 37 of 199 pairs. Exact for the form but not for the dinner is neither: it made
+        LAKSEFILET near for lakserogn (METHOD.md §2)."""
         q = by_dinner[url, product]
         exact = served[url, product].result()[Fit.EXACT]
-        either = {i for ids in task.result().values() for i in ids} if (task := forms.get((product, q.form))) else set()
-        return {Fit.EXACT: exact, Fit.NEAR: tuple(o.id for o in q.offers if o.id in either and o.id not in exact)}
+        near = set(task.result()[Fit.NEAR]) if (task := forms.get((product, q.form))) else set()
+        return {Fit.EXACT: exact, Fit.NEAR: tuple(o.id for o in q.offers if o.id in near and o.id not in exact)}
 
     def per_dish(fit: Fit) -> ByDinner:
         kept: ByDinner = {}

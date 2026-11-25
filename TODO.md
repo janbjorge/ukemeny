@@ -6,7 +6,7 @@ Open work only. Done → delete; code is record (jb 2026-11-03: "No need to trac
 
 Numbers must hold (jb 2026-11-02: "The resulsts does not feel real or correct").
 
-- [ ] Near too loose since one answer per product and form spreads (METHOD.md §2, 2026-11-10): wings for kyllingfilet in 195 dinners, roastbiff for ytrefilet, grytekjøtt for hønsekjøtt, laksefilet for lakserogn. Raise near threshold (exact + near ≥ 0.5) or drop «form exact, dinner not = near»? jb's call.
+- [ ] Near still loose on card (METHOD.md §2): main deal exact since 2026-11-25, but near sides count in kroner off. Week 48: COOP FLØTEGRATINERTE POTETER near for poteter (151 dinners), shelf /poteter, not ready meal. Check after next `--offers` run (form-exact rule first applies there).
 - [ ] Wrong shelves (METHOD.md §2, 2026-11-10): NORA SELSKAPSERTER as /kjøtt/and/gås, svisker as /nøtter and /melk, RØKTE BAKKNOKER as /sopp drop good matches; pinnekjøtt as /kjøtt/svinekjøtt keeps bad one.
 
 ## Later

@@ -444,11 +444,11 @@ class Dinner:
 
     @property
     def on_sale(self) -> bool:
-        """The main protein is discounted this week; without meat or fish, a main vegetable.
-        Discounted bacon on the side does not make lutefisk a dinner on sale."""
-        if self.main:
-            return any(b.sale for b in self.buys if b.part.name == self.main)
-        return any(b.sale for b in self.buys if b.weight >= MAIN_WEIGHT)
+        """The main protein is discounted this week; without meat or fish, a main vegetable. Discounted bacon on the side
+        does not make lutefisk a dinner on sale, and neither does an offer to use instead (Buy.near): a dinner is on the
+        list for the ingredient it names (jb 2026-11-25; 356 of 917 cards headlined a near offer, METHOD.md §3)."""
+        mains = (b for b in self.buys if (b.part.name == self.main if self.main else b.weight >= MAIN_WEIGHT))
+        return any(o.saving for b in mains for o in b.offers)
 
 
 @dataclass(frozen=True, slots=True)

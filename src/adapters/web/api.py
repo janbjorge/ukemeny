@@ -28,7 +28,7 @@ Not an official source; recipes belong to matprat.no and godt.no, and offers to 
 
 Keys are English; advice is bokmål. Prices are kroner. `protein` is the main protein group,
 worked out from the heaviest meat or fish in the recipe. A dinner is `on_sale` when that protein
-(or, without meat or fish, a main vegetable) has a before-price this week.
+(or, without meat or fish, a main vegetable) has a before-price this week as itself, not as a substitute.
 """
 
 

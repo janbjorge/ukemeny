@@ -93,7 +93,8 @@ def test_the_saving_counts_the_cheapest_offer_exact_before_near() -> None:
     assert [o.id for o in dinner.buys[0].sales] == ["kiwi", "rema", "mix"]  # Cheapest first, near last; KIWI's two catalogs once
     near_only = replace(exact, served={})
     (dinner,) = dinners(near_only, HOUSEHOLD)
-    assert dinner.buys[0].sale is not None and dinner.buys[0].sale.id == "mix" and dinner.on_sale
+    assert dinner.buys[0].sale is not None and dinner.buys[0].sale.id == "mix" and round(dinner.saving, 1) == 24.9
+    assert not dinner.on_sale  # An offer to use instead is shown, but does not put the dinner on the list (jb 2026-11-25)
 
 
 def test_the_saving_counts_the_chain_that_saves_the_most() -> None:

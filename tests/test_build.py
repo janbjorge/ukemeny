@@ -132,11 +132,11 @@ async def test_near_is_asked_once_per_product_and_form_and_exact_per_dinner() ->
         offer("KYLLINGLÅR MARINERT", 59, pre_price=79, id="marinert", description="marinert, 600 g"),
     ]
     # Per dinner, near to the marinated thighs, and for the wok no to both fillet and thighs; asked as named, no to the
-    # marinated ones
+    # marinated ones. Exact as named but not for the wok is not near for the wok either (LAKSEFILET for lakserogn)
     matcher = FakeMatcher({"kyllingfilet": "kyllingfilet"}, near={"kyllingfilet": "lår"}, wrong={"": "marinert", "Wok": "1 kg"})
     found = await build.match([dish(stew), dish(wok)], offers, matcher, {})
     assert found.served == {stew.url: {"kyllingfilet": ("filet",)}}
-    assert found.near_served == {stew.url: {"kyllingfilet": ("lår",)}, wok.url: {"kyllingfilet": ("filet", "lår")}}
+    assert found.near_served == {stew.url: {"kyllingfilet": ("lår",)}, wok.url: {"kyllingfilet": ("lår",)}}
     assert sorted(dish for *_, dish in matcher.asked) == ["", "Gryte", "Wok"]
 
 

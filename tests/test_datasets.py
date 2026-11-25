@@ -41,6 +41,8 @@ def test_the_committed_snapshot_reads() -> None:
     s = JsonDatasets().snapshot()
     assert len(s.dishes) > 1000
     assert all(p.name in s.traits for d in s.dishes for p in d.parts)
+    # A week with almost no offers is a broken fetch, not a quiet week: fail the deploy, keep last week's site
+    assert len(s.offers) > 1000
     ids = {o.id for o in s.offers}
     assert all(set(found) <= ids for found in s.matches.values())
     # Every offer holds somewhere. Not every catalog near a place has offers: Tjek listed one for Coop Mega's «Høstmat»

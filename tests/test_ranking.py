@@ -70,7 +70,7 @@ def test_meat_and_fish_offers_count_per_dinner() -> None:
         served={salad.url: {"tunfisk": ("tin",)}},
         matches={"tunfisk": ("tin",)},  # By name, meat and fish are never looked up
     )
-    found = {d.dish.name: [b.best.id for b in d.buys] for d in dinners(s, HOUSEHOLD)}
+    found = {d.dish.name: [o.id for b in d.buys for o in b.offers] for d in dinners(s, HOUSEHOLD)}
     assert found == {"Nigiri": [], "Tunfisksalat": ["tin"]}
 
 

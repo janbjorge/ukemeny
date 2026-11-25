@@ -2,13 +2,11 @@
 
 The read commands (`candidates`, `check`) read datasets/ like the site. With `--json` they print
 one JSON document on stdout (src/adapters/schema.py) and nothing else; errors are
-`{"error": {"kind", "message"}}` with exit code 1. `build` makes datasets/ with Jev (src/pipeline/datasets.py).
+`{"error": {"kind", "message"}}` with exit code 1. datasets/ is built by `uv run python -m pipeline.datasets`.
 """
 
-import asyncio
 import shutil
 import sys
-from contextlib import closing
 from typing import Annotated, NoReturn
 
 import click
@@ -23,8 +21,8 @@ from core.models import Dinner, Dish, Verdict
 from core.search import Tag, fold, protein_word
 
 app = typer.Typer(
-    help="Middager fra matprat.no og godt.no som passer profile.yaml, med ukens tilbud. `matris build` lager datasets/, "
-    "`matris candidates` gir middagene som sparer mest.",
+    help="Middager fra matprat.no og godt.no som passer profile.yaml, med ukens tilbud. "
+    "`uv run python -m pipeline.datasets` lager datasets/, `matris candidates` gir middagene som sparer mest.",
     no_args_is_help=True,
     add_completion=False,
 )
@@ -50,7 +48,7 @@ def queries(as_json: bool) -> Queries:
     except profile.ProfileError as e:
         fail("setup", str(e), as_json)
     if not (DATASETS / "dishes.json").exists():
-        fail("setup", f"{DATASETS} mangler. Kjør `matris build` først.", as_json)
+        fail("setup", f"{DATASETS} mangler. Kjør `uv run python -m pipeline.datasets` først.", as_json)
     datasets = JsonDatasets()
     places = {fold(place): place for place in datasets.snapshot().places}
     if p.place and fold(p.place) not in places:
@@ -132,36 +130,6 @@ def check(url: Annotated[str, typer.Argument(help="En oppskrift på matprat.no e
     typer.echo(f"   passer ikke: {verdict.blocked}" if verdict.blocked else "   passer som den er")
     typer.echo("\n".join(_verdict_lines(verdict)))
     typer.echo(f"   laktose: rundt {verdict.lactose_g:.1f} g per porsjon")
-
-
-@app.command()
-def build(
-    verbose: Annotated[int, typer.Option("--verbose", "-v", count=True, help="Mer detaljer: -v, -vv eller -vvv.")] = 0,
-    known: Annotated[bool, typer.Option("--known", help="godt.no: les middagene i datasets/, ikke oppskriftslisten.")] = False,
-    offers: Annotated[bool, typer.Option("--offers", help="Bare ukens tilbud og matchene, for middagene i datasets/.")] = False,
-) -> None:
-    """Lag datasets/ fra bunnen: matprat.no, godt.no, mattilbud.no og Jev. Trenger TYPESAFE_API_KEY."""
-    from pipeline import datasets as pipeline
-
-    pipeline.configure(verbose)
-    steps = {
-        "recipes": "sider fra matprat.no og godt.no",
-        "categories": "kategorier hos Jev for nye navn",
-        "ingredients": "fakta hos Jev for nye navn",
-        "catalogs": "kundeaviser fra mattilbud.no",
-        "offers": "tilbudsmatcher hos Jev",
-    }
-    try:
-        with closing(pipeline.Bars(steps, live=sys.stderr.isatty())) as bars:
-            result = asyncio.run(pipeline.offers(bars, bars.fetching) if offers else pipeline.run(bars, bars.fetching, known))
-    except pipeline.SetupError as e:
-        fail("setup", str(e), False)
-    s = result.snapshot
-    typer.echo(f"{len(s.dishes):,} middager, {len(s.traits):,} ingredienser, {len(s.offers):,} tilbud på {len(s.places)} steder.")
-    if result.recipes:
-        drafted = ", ".join(result.drafted) or "ingen"
-        typer.echo(f"{len(result.drafted):,} nye navn i ordlisten (se git diff datasets/traits.json): {drafted}")
-    typer.echo(result.jev, err=True)
 
 
 @app.command("profile")

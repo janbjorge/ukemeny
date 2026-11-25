@@ -10,7 +10,7 @@ from dataclasses import asdict
 from datetime import date, datetime
 from pathlib import Path
 from sys import intern
-from typing import NotRequired, TypedDict
+from typing import TypedDict
 
 import orjson
 
@@ -25,8 +25,7 @@ class PartJSON(TypedDict):
     category: str
     grams: float | None
     unit: str
-    form: NotRequired[str]
-    """Missing in dishes.json from before 2026-10-22."""
+    form: str
 
 
 class DishJSON(TypedDict):
@@ -42,16 +41,14 @@ class DishJSON(TypedDict):
 class OfferJSON(TypedDict):
     id: str
     store: str
-    catalog: NotRequired[str]
-    """Missing in offers.json from before places (2026-10-13), as is `places`: then no place is known."""
+    catalog: str
     heading: str
     description: str
     price: float
     pre_price: float | None
     per_kg: float | None
     valid_until: str
-    shelf: NotRequired[str]
-    """Missing in offers.json from before 2026-11-03."""
+    shelf: str
 
 
 _JSON = orjson.OPT_INDENT_2 | orjson.OPT_APPEND_NEWLINE | orjson.OPT_SORT_KEYS
@@ -72,12 +69,10 @@ class JsonDatasets:
             traits=traits,
             offers=tuple(_offer(o) for o in offers["offers"]),
             matches={intern(name): tuple(ids) for name, ids in offers["matches"].items()},
-            places={place: tuple(ids) for place, ids in offers.get("places", {}).items()},
-            served={url: {intern(name): tuple(ids) for name, ids in found.items()} for url, found in offers.get("served", {}).items()},
-            near={intern(name): tuple(ids) for name, ids in offers.get("near", {}).items()},
-            near_served={
-                url: {intern(name): tuple(ids) for name, ids in found.items()} for url, found in offers.get("near_served", {}).items()
-            },
+            places={place: tuple(ids) for place, ids in offers["places"].items()},
+            served={url: {intern(name): tuple(ids) for name, ids in found.items()} for url, found in offers["served"].items()},
+            near={intern(name): tuple(ids) for name, ids in offers["near"].items()},
+            near_served={url: {intern(name): tuple(ids) for name, ids in found.items()} for url, found in offers["near_served"].items()},
         )
 
     def snapshot(self) -> Snapshot:
@@ -117,9 +112,7 @@ def _dish(d: DishJSON) -> Dish:
         prep_time=intern(d["prep_time"]),
         rating=d["rating"],
         rating_count=d["rating_count"],
-        parts=tuple(
-            Part(intern(p["name"]), intern(p["category"]), p["grams"], intern(p["unit"]), intern(p.get("form", ""))) for p in d["parts"]
-        ),
+        parts=tuple(Part(intern(p["name"]), intern(p["category"]), p["grams"], intern(p["unit"]), intern(p["form"])) for p in d["parts"]),
     )
 
 
@@ -127,12 +120,12 @@ def _offer(o: OfferJSON) -> Offer:
     return Offer(
         id=o["id"],
         store=o["store"],
-        catalog=o.get("catalog", ""),
+        catalog=o["catalog"],
         heading=o["heading"],
         description=o["description"],
         price=o["price"],
         pre_price=o["pre_price"],
         per_kg=o["per_kg"],
         valid_until=date.fromisoformat(o["valid_until"]),
-        shelf=intern(o.get("shelf", "")),
+        shelf=intern(o["shelf"]),
     )

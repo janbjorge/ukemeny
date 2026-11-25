@@ -79,6 +79,9 @@ class Queries:
         self._ranked: dict[Kept, list[Dinner]] = {}
         self._view: dict[Kept, View] = {}
         self._tally: dict[Rules, Tally] = {}
+        # Every page asks; the snapshot only changes on deploy
+        ends = sorted(o.valid_until for o in self.snapshot.offers)
+        self._until = ends[len(ends) // 2] if ends else None
 
     def nearby(self, place: str | None) -> tuple[ranking.Prepared, ...]:
         """Every dinner with the offers at the stores near `place` (core.ranking.nearby)."""
@@ -201,8 +204,7 @@ class Queries:
 
     def offers_until(self) -> date | None:
         """When most of this week's offers end (the median; a few catalogs run for months)."""
-        ends = sorted(o.valid_until for o in self.snapshot.offers)
-        return ends[len(ends) // 2] if ends else None
+        return self._until
 
     def stale(self, today: date) -> bool:
         """Most offers have run out: the snapshot needs a rebuild."""

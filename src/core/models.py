@@ -370,10 +370,6 @@ class Buy:
     """The offers a cook could use instead (Fit.NEAR), cheapest per kg first."""
 
     @property
-    def best(self) -> Offer:
-        return (self.offers or self.near)[0]
-
-    @property
     def sale(self) -> Offer | None:
         """The offer the dinner's saving counts: the cheapest among the exact offers on sale, or, with none, among the
         near ones; the first row on the card (jb 2026-10-24: "I would assume ppl. care about the end price, not how

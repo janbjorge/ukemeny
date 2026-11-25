@@ -1,0 +1,51 @@
+# Every Monday morning: this week's offers and their matches (Jev), committed to main, then deployed.
+# Needs the TYPESAFE_API_KEY repository secret.
+name: Offers
+
+on:
+  schedule:
+    # 06:00 UTC: 07:00 in Norway in winter, 08:00 in summer
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: offers
+  cancel-in-progress: false
+
+jobs:
+  offers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.14"
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run python -m pipeline.datasets --offers -v
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+      - name: Commit and push
+        id: push
+        run: |
+          git add datasets/
+          if git diff --cached --quiet; then
+            echo "No change in datasets/"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Data: offers of week $(date -u +%V)"
+          git push origin main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+      # A push made with GITHUB_TOKEN starts no workflow, so start Deploy by hand
+      - if: steps.push.outputs.pushed == 'true'
+        run: gh workflow run deploy.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -74,6 +74,26 @@ def test_meat_and_fish_offers_count_per_dinner() -> None:
     assert found == {"Nigiri": [], "Tunfisksalat": ["tin"]}
 
 
+def test_the_card_leads_with_the_main_ingredient_on_a_tie() -> None:
+    """Mince and fillet weigh the same for the dinner; the fillet is the main ingredient (heaviest), so its deal leads and
+    its chain is where the kroner off are counted, not the mince's to use instead (2026-11-25)."""
+    mince = ingredient("kjøttdeig", 400, "g", "/kjøtt/kjøttdeig")
+    dish = recipe("Kylling og kjøttdeig", mince, CHICKEN)
+    offers = [
+        offer("KYLLINGFILET", 90, pre_price=120, id="filet", store="REMA 1000"),
+        offer("COOP KYLLINGKJØTTDEIG", 40, pre_price=80, id="mix", store="KIWI"),
+    ]
+    s = replace(
+        snapshot(dish, offers=offers),
+        served={dish.url: {"kyllingfilet": ("filet",)}},
+        near_served={dish.url: {"kjøttdeig": ("mix",)}},
+    )
+    (dinner,) = dinners(s, HOUSEHOLD)
+    assert dinner.main == "kyllingfilet" and dinner.buys[0].part.name == "kjøttdeig"  # first by weight, a tie
+    assert dinner.deal is not None and dinner.deal.part.name == "kyllingfilet" and dinner.on_sale
+    assert dinner.saving == 30  # REMA's fillet; KIWI's 40 kr off the mince is another shop
+
+
 def test_the_saving_counts_the_cheapest_offer_exact_before_near() -> None:
     mince = ingredient("kjøttdeig av svin", 400, "g", "/kjøtt/svinekjøtt")
     pork = recipe("Svinekjøttboller", mince)

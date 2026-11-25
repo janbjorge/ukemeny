@@ -410,8 +410,15 @@ class Dinner:
 
     @property
     def deal(self) -> Buy | None:
-        """The discount the card shows: the most important ingredient with one (its `sale`)."""
-        return next((b for b in self.buys if b.sale), None)
+        """The discount the card shows: the main ingredient's when it is on sale as itself (`on_sale`), else the most
+        important ingredient with one (its `sale`). On a tie in weight a side offer to use instead led 5 cards whose main
+        was on sale (COOP KYLLINGKJØTTDEIG on a scampi burger, 2026-11-25), and set the chain `saving` counts at."""
+        return self._main_on_sale() or next((b for b in self.buys if b.sale), None)
+
+    def _main_on_sale(self) -> Buy | None:
+        """The most important main ingredient (see `on_sale`) with an exact offer on sale."""
+        mains = (b for b in self.buys if (b.part.name == self.main if self.main else b.weight >= MAIN_WEIGHT))
+        return next((b for b in mains if any(o.saving for o in b.offers)), None)
 
     @property
     def deals(self) -> tuple[Buy, ...]:
@@ -447,8 +454,7 @@ class Dinner:
         """The main protein is discounted this week; without meat or fish, a main vegetable. Discounted bacon on the side
         does not make lutefisk a dinner on sale, and neither does an offer to use instead (Buy.near): a dinner is on the
         list for the ingredient it names (jb 2026-11-25; 356 of 917 cards headlined a near offer, METHOD.md §3)."""
-        mains = (b for b in self.buys if (b.part.name == self.main if self.main else b.weight >= MAIN_WEIGHT))
-        return any(o.saving for b in mains for o in b.offers)
+        return self._main_on_sale() is not None
 
 
 @dataclass(frozen=True, slots=True)

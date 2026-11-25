@@ -56,6 +56,18 @@ def test_the_bars_are_ascii_on_a_utf8_terminal() -> None:
     assert raw.getvalue().isascii()
 
 
+def test_without_a_terminal_each_step_is_one_line() -> None:
+    out = io.StringIO()
+    bars = Bars(STEPS, out, live=False)
+    bars("offers", 0, 2116)
+    bars.fetching("https://squid-api.tjek.com/v2/offers")
+    for done in range(1, 2117):
+        bars("offers", done, 2116)
+    bars("catalogs", 0, 1)
+    bars("catalogs", 1, 1)
+    assert out.getvalue() == "Jev offer matches: 2,116 in 0 s\nmattilbud.no catalogs: 1 in 0 s\n"
+
+
 def test_known_lists_the_godt_dinners_in_datasets(tmp_path: Path) -> None:
     matprat = recipe("Kyllinggryte")
     godt = replace(recipe("Tomatsuppe"), url="https://www.godt.no/oppskrifter/suppe/9662/tomatsuppe")

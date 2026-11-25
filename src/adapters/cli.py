@@ -152,7 +152,7 @@ def build(
         "offers": "tilbudsmatcher hos Jev",
     }
     try:
-        with closing(pipeline.Bars(steps)) as bars:
+        with closing(pipeline.Bars(steps, live=sys.stderr.isatty())) as bars:
             result = asyncio.run(pipeline.offers(bars, bars.fetching) if offers else pipeline.run(bars, bars.fetching, known))
     except pipeline.SetupError as e:
         fail("setup", str(e), False)

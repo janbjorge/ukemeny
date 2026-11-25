@@ -18,6 +18,7 @@ import asyncio
 import logging
 import os
 import sys
+import time
 from collections import Counter
 from collections.abc import Callable, Mapping
 from contextlib import closing
@@ -75,15 +76,24 @@ STEPS = {
 class Bars:
     """A tqdm bar per step of the build (app.build.Progress), and under it the URL being fetched (jb 2026-10-13: "add
     tqdm and use that to track progress of the diffrent phases, also use to to how the current url getting fetched").
-    ASCII bars (jb 2026-10-19: "Make sure we are ascii first in all our tools")."""
+    ASCII bars (jb 2026-10-19: "Make sure we are ascii first in all our tools"). Not `live` (no terminal, as in CI): no bars
+    or URL, one line per finished step, since a log keeps every redraw."""
 
-    def __init__(self, steps: Mapping[str, str], file: TextIO | None = None) -> None:
+    def __init__(self, steps: Mapping[str, str], file: TextIO | None = None, live: bool = True) -> None:
         self.steps = steps
         self.file = file
+        self.live = live
+        self._started = 0.0
         self._bar: tqdm[Never] | None = None
         self._url: tqdm[Never] | None = None
 
     def __call__(self, step: str, done: int, due: int) -> None:
+        if not self.live:
+            if done == 0:
+                self._started = time.monotonic()
+            if done == due:
+                print(f"{self.steps[step]}: {due:,} in {time.monotonic() - self._started:.0f} s", file=self.file or sys.stderr, flush=True)
+            return
         if done == 0:
             self.close()
             self._bar = tqdm(desc=self.steps[step], total=due, file=self.file, dynamic_ncols=True, ascii=True)
@@ -216,7 +226,7 @@ def main() -> None:
     args = parser.parse_args()
     configure(args.verbose)
     try:
-        with closing(Bars(STEPS)) as bars:
+        with closing(Bars(STEPS, live=sys.stderr.isatty())) as bars:
             result = asyncio.run(offers(bars, bars.fetching) if args.offers else run(bars, bars.fetching, args.known))
     except SetupError as e:
         sys.exit(f"error: {e}")

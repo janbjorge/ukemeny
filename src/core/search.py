@@ -611,7 +611,7 @@ class Index:
     def hits(self, word: str) -> tuple[frozenset[int], frozenset[int]]:
         """(dishes with the word in the name, dishes with it in the name or an ingredient), with synonyms."""
         term = word.lower()
-        if term not in self._hits:
+        if (hit := self._hits.get(term)) is None:
             if len(self._hits) > self.CACHE:
                 self._hits.clear()
             found = finds(term)
@@ -619,8 +619,8 @@ class Index:
             in_parts = (
                 frozenset() if fold(term) in NAME_ONLY_KEYS else frozenset().union(*(ids for w, ids in self._in_parts.items() if found(w)))
             )
-            self._hits[term] = (named, named | in_parts)
-        return self._hits[term]
+            hit = self._hits[term] = (named, named | in_parts)
+        return hit  # Not self._hits[term]: another request's thread may have cleared it already
 
     def fix(self, word: str) -> str:
         """The word if any dish has it, else the closest known word (a category, a protein, a word in a dish or

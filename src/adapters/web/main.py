@@ -6,6 +6,7 @@ import random
 import secrets
 from collections import OrderedDict
 from collections.abc import Awaitable, Callable
+from contextlib import suppress
 from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
@@ -304,16 +305,22 @@ def create_app(queries: Queries) -> FastAPI:
 
     rendered: OrderedDict[tuple[object, ...], bytes] = OrderedDict()
 
-    def fragment(request: Request, template: str, key: tuple[object, ...], context: Callable[[], dict[str, object]]) -> Response:
-        """An HTMX fragment, rendered once per key and kept (FRAGMENTS)."""
+    def fragment(
+        request: Request, template: str, key: tuple[object, ...], context: Callable[[], dict[str, object]], keep: bool = True
+    ) -> Response:
+        """An HTMX fragment, rendered once per key and kept (FRAGMENTS) unless `keep` is false."""
         key = (template, *key)
-        telemetry.fragment(template, kept=key in rendered)
-        if key in rendered:
-            rendered.move_to_end(key)
-            return HTMLResponse(rendered[key])
-        body = rendered[key] = bytes(templates.TemplateResponse(request, template, context()).body)
-        if len(rendered) > FRAGMENTS:
-            rendered.popitem(last=False)
+        body = rendered.get(key)  # Read once: another request's thread may drop the key at any time
+        telemetry.fragment(template, kept=body is not None)
+        if body is not None:
+            with suppress(KeyError):
+                rendered.move_to_end(key)
+            return HTMLResponse(body)
+        body = bytes(templates.TemplateResponse(request, template, context()).body)
+        if keep:
+            rendered[key] = body
+            if len(rendered) > FRAGMENTS:
+                rendered.popitem(last=False)
         return HTMLResponse(body)
 
     def dinner_context(found: Found, fragment: bool = False, trigger: str | None = None) -> dict[str, object]:
@@ -364,8 +371,9 @@ def create_app(queries: Queries) -> FastAPI:
         response = fragment(
             request,
             "_dinners.html",
-            (found.search.text, found.place, len(found.dinners), trigger not in KEEP_BOX),
+            (found.search.text, found.search.corrected, found.place, len(found.dinners), trigger not in KEEP_BOX),
             lambda: dinner_context(found, fragment=True, trigger=trigger),
+            keep=not antall,  # A hand-made «antall» can be ~170 KB; 512 of them would not fit in the machine's memory
         )
         query = link(found.search.text, place=found.place)
         response.headers["HX-Replace-Url"] = f"/?{query}#forslag" if query else "/#forslag"
@@ -472,11 +480,12 @@ def create_app(queries: Queries) -> FastAPI:
             return RedirectResponse(f"/menu?{query}#week", status_code=303)
         trigger = request.headers.get("hx-trigger")
         # Keyed by the search as understood, so a menu already made is not planned again
-        text, place = queries.parse(choice.q).text, queries.place(choice.place)
+        search, place = queries.parse(choice.q), queries.place(choice.place)
+        text = search.text
         response = fragment(
             request,
             "_menu.html",
-            (text, place, choice.weight, drawn, choice.swap, trigger not in KEEP_BOX),
+            (text, search.corrected, place, choice.weight, drawn, choice.swap, trigger not in KEEP_BOX),
             lambda: menu_context(plan(choice, drawn), choice, drawn, fragment=True, trigger=trigger),
         )
         response.headers["HX-Replace-Url"] = f"/menu?{menu_link(text, place, choice.weight, drawn, choice.swap)}#week"

@@ -115,6 +115,14 @@ def test_search_page_says_what_it_understood(client: TestClient) -> None:
     assert '<p class="count" role="status">1 middag</p>' in html
 
 
+def test_kept_fragment_keeps_its_own_typo_note(client: TestClient) -> None:
+    typed = {**HX, "HX-Trigger": "q"}  # Same search as understood («laks ovn»), so the same fragment unless the swap counts
+    note = "Fant ikke «ovnn»"
+    assert note not in client.get("/middager?q=laks+ovn", headers=typed).text
+    assert note in client.get("/middager?q=laks+ovnn", headers=typed).text
+    assert note not in client.get("/middager?q=laks+ovn", headers=typed).text
+
+
 def test_nothing_found_offers_what_to_drop(client: TestClient) -> None:
     html = client.get("/?q=laks+kylling").text
     assert "Ingen middager passer alt dette." in html

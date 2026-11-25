@@ -98,7 +98,6 @@ NOTES: Mapping[Problem, str] = {
     Problem.ONION: "inneholder løk",
     Problem.GARLIC: "plager mange med sensitiv mage; hvitløksolje er et trygt bytte",
 }
-CHECK_GLUTEN = "sjekk etiketten for hvete"
 CHECK_ONION = "sjekk etiketten for løk"
 SPICY_NOTE = "hold det mildt, og server det sterke ved siden av"
 CHOKING_NOTE = "kutt smått eller dropp for de minste (fare for å sette i halsen)"
@@ -169,7 +168,7 @@ def judge(dish: Dish, traits: Mapping[str, Traits], household: Household) -> Ver
         if t.gluten is Gluten.YES:
             why = _apply(household.gluten, Problem.GLUTEN, name, warnings)
         elif t.gluten is Gluten.MAYBE and household.gluten is Rule.AVOID:
-            warnings.append(Note(Problem.GLUTEN, name, CHECK_GLUTEN))
+            why = f"kan inneholde gluten ({name})"
 
         if t.onion is Onion.ONION and onion_ok and onion_ok in name:
             pass  # An onion that is fine.

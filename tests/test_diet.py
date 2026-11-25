@@ -43,11 +43,13 @@ def test_gluten_or_onion_leaves_the_dinner_out_with_nothing_swapped() -> None:
     assert judge(r, known, Household(gluten=Rule.OK)).blocked == "inneholder løk (rødløk)"
 
 
-def test_maybe_is_a_warning_to_check_the_label() -> None:
+def test_maybe_gluten_leaves_the_dinner_out_maybe_onion_is_a_warning() -> None:
     r = recipe("Gryte", ingredient("buljongterning", 1, "stk."))
-    verdict = judge(r, {"buljongterning": traits(gluten=Gluten.MAYBE, onion=Onion.MAYBE)}, HOUSEHOLD)
-    assert verdict.blocked is None
-    assert {w.problem for w in verdict.warnings} == {Problem.GLUTEN, Problem.ONION}
+    known = {"buljongterning": traits(gluten=Gluten.MAYBE, onion=Onion.MAYBE)}
+    verdict = judge(r, known, HOUSEHOLD)
+    assert verdict.blocked == "kan inneholde gluten (buljongterning)"  # as every other rule drops "maybe" (jb 2026-11-25)
+    assert {w.problem for w in verdict.warnings} == {Problem.ONION}
+    assert judge(r, known, Household(gluten=Rule.NOTE)).blocked is None  # only `avoid` drops it
 
 
 def test_garlic_is_not_onion() -> None:
